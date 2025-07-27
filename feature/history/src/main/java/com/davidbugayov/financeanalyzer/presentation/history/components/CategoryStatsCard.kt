@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.feature.history.R
@@ -59,7 +58,7 @@ fun CategoryStatsCard(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.current_period),
+                        text = "Текущий период",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -70,7 +69,7 @@ fun CategoryStatsCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = stringResource(R.string.previous_period),
+                        text = "Предыдущий период",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -86,16 +85,10 @@ fun CategoryStatsCard(
                 val changeText =
                     when {
                         percentChangeInt > 0 ->
-                            stringResource(
-                                R.string.change_increase,
-                                percentChangeInt,
-                            )
+                            "Увеличение на $percentChangeInt%"
                         percentChangeInt < 0 ->
-                            stringResource(
-                                R.string.change_decrease,
-                                kotlin.math.abs(percentChangeInt),
-                            )
-                        else -> stringResource(R.string.change_no_change)
+                            "Уменьшение на ${kotlin.math.abs(percentChangeInt)}%"
+                        else -> "Без изменений"
                     }
                 val percentChangeColor =
                     when {

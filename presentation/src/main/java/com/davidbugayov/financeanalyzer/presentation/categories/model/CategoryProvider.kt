@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.categories.model
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
-import com.davidbugayov.financeanalyzer.presentation.R
+
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
@@ -20,26 +20,26 @@ object CategoryProvider {
 
     val defaultCategories =
         listOf(
-            CategoryMeta(R.string.category_food, "ShoppingCart", "food", true),
-            CategoryMeta(R.string.category_transport, "DirectionsCar", "transport", true),
-            CategoryMeta(R.string.category_entertainment, "Movie", "entertainment", true),
-            CategoryMeta(R.string.category_restaurant, "Restaurant", "restaurant", true),
-            CategoryMeta(R.string.category_health, "LocalHospital", "health", true),
-            CategoryMeta(R.string.category_clothing, "Checkroom", "clothing", true),
-            CategoryMeta(R.string.category_housing, "Home", "housing", true),
-            CategoryMeta(R.string.category_communication, "Phone", "communication", true),
-            CategoryMeta(R.string.category_pet, "Pets", "pet", true),
-            CategoryMeta(R.string.category_services, "Work", "services", true),
-            CategoryMeta(R.string.category_charity, "Payments", "charity", true),
-            CategoryMeta(R.string.category_credit, "CreditCard", "credit", true),
-            CategoryMeta(R.string.category_transfer, "SwapHoriz", "transfer", true),
-            CategoryMeta(R.string.category_other, "MoreHoriz", "other_expense", true),
-            CategoryMeta(R.string.category_salary, "Payments", "salary", false),
-            CategoryMeta(R.string.category_freelance, "Work", "freelance", false),
-            CategoryMeta(R.string.category_gift, "Payments", "gifts", false),
-            CategoryMeta(R.string.category_interest, "TrendingUp", "interest", false),
-            CategoryMeta(R.string.category_rent, "Work", "rental", false),
-            CategoryMeta(R.string.category_other, "MoreHoriz", "other_income", false),
+            CategoryMeta(0, "ShoppingCart", "food", true),
+            CategoryMeta(0, "DirectionsCar", "transport", true),
+            CategoryMeta(0, "Movie", "entertainment", true),
+            CategoryMeta(0, "Restaurant", "restaurant", true),
+            CategoryMeta(0, "LocalHospital", "health", true),
+            CategoryMeta(0, "Checkroom", "clothing", true),
+            CategoryMeta(0, "Home", "housing", true),
+            CategoryMeta(0, "Phone", "communication", true),
+            CategoryMeta(0, "Pets", "pet", true),
+            CategoryMeta(0, "Work", "services", true),
+            CategoryMeta(0, "Payments", "charity", true),
+            CategoryMeta(0, "CreditCard", "credit", true),
+            CategoryMeta(0, "SwapHoriz", "transfer", true),
+            CategoryMeta(0, "MoreHoriz", "other_expense", true),
+            CategoryMeta(0, "Payments", "salary", false),
+            CategoryMeta(0, "Work", "freelance", false),
+            CategoryMeta(0, "Payments", "gifts", false),
+            CategoryMeta(0, "TrendingUp", "interest", false),
+            CategoryMeta(0, "Work", "rental", false),
+            CategoryMeta(0, "MoreHoriz", "other_income", false),
         )
 
     private fun getCategoryColorByKey(
@@ -55,7 +55,7 @@ object CategoryProvider {
 
     fun getDefaultExpenseCategories(context: Context): List<UiCategory> =
         defaultCategories.filter { it.isExpense }.mapIndexed { idx, meta ->
-            val name = context.getString(meta.nameRes)
+            val name = getCategoryNameByKey(meta.categoryKey)
             val cat = Category.expense(name)
             UiCategory(
                 id = idx + 1L,
@@ -71,7 +71,7 @@ object CategoryProvider {
 
     fun getDefaultIncomeCategories(context: Context): List<UiCategory> =
         defaultCategories.filter { !it.isExpense }.mapIndexed { idx, meta ->
-            val name = context.getString(meta.nameRes)
+            val name = getCategoryNameByKey(meta.categoryKey)
             val cat = Category.income(name)
             UiCategory(
                 id = idx + 1L,
@@ -84,6 +84,32 @@ object CategoryProvider {
                 icon = CategoryIconProvider.getIconByName(meta.iconName),
             )
         }
+
+    private fun getCategoryNameByKey(key: String): String {
+        return when (key) {
+            "food" -> "Продукты"
+            "transport" -> "Транспорт"
+            "entertainment" -> "Развлечения"
+            "restaurant" -> "Рестораны"
+            "health" -> "Здоровье"
+            "clothing" -> "Одежда"
+            "housing" -> "Жилье"
+            "communication" -> "Связь"
+            "pet" -> "Питомцы"
+            "services" -> "Услуги"
+            "charity" -> "Благотворительность"
+            "credit" -> "Кредиты"
+            "transfer" -> "Переводы"
+            "other_expense" -> "Другое"
+            "salary" -> "Зарплата"
+            "freelance" -> "Фриланс"
+            "gifts" -> "Подарки"
+            "interest" -> "Проценты"
+            "rental" -> "Аренда"
+            "other_income" -> "Другое"
+            else -> "Другое"
+        }
+    }
 
     /**
      * Генерирует цвет для новой категории, выбирая его из соответствующей палитры.

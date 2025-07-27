@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 
@@ -43,7 +42,7 @@ fun GroupingChips(
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,
             onClick = { onGroupingSelected(GroupingType.DAY) },
-            label = { Text(stringResource(R.string.group_by_day)) },
+            label = { Text("По дням") },
             colors =
                 FilterChipDefaults.filterChipColors(
                     selectedContainerColor = selectedContainerColor,
@@ -56,7 +55,7 @@ fun GroupingChips(
         FilterChip(
             selected = currentGrouping == GroupingType.WEEK,
             onClick = { onGroupingSelected(GroupingType.WEEK) },
-            label = { Text(stringResource(R.string.group_by_week)) },
+            label = { Text("По неделям") },
             colors =
                 FilterChipDefaults.filterChipColors(
                     selectedContainerColor = selectedContainerColor,
@@ -69,7 +68,7 @@ fun GroupingChips(
         FilterChip(
             selected = currentGrouping == GroupingType.MONTH,
             onClick = { onGroupingSelected(GroupingType.MONTH) },
-            label = { Text(stringResource(R.string.group_by_month)) },
+            label = { Text("По месяцам") },
             colors =
                 FilterChipDefaults.filterChipColors(
                     selectedContainerColor = selectedContainerColor,

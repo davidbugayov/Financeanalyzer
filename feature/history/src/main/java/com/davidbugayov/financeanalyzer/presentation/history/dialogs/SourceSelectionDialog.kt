@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
@@ -52,7 +51,7 @@ fun SourceSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_sources)) },
+                    title = { Text("Выбрать источники") },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -75,11 +74,11 @@ fun SourceSelectionDialog(
                     Text(
                         text =
                             if (localSelectedSources.isEmpty()) {
-                                stringResource(R.string.all_sources)
+                                "Все источники"
                             } else if (localSelectedSources.size == sourceNames.size) {
-                                stringResource(R.string.clear_selection)
+                                "Очистить выбор"
                             } else {
-                                stringResource(R.string.select_all_sources)
+                                "Выбрать все"
                             },
                         color =
                             if (localSelectedSources.isEmpty() ||
@@ -142,12 +141,12 @@ fun SourceSelectionDialog(
                 onSourcesSelected(localSelectedSources)
                 onDismiss()
             }) {
-                Text(stringResource(R.string.apply))
+                Text("Применить")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
+                Text("Закрыть")
             }
         },
     )

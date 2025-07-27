@@ -23,11 +23,8 @@ class NotificationScheduler(
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
      */
     private fun createNotificationChannel() { // Убираем context из параметра
-        val name = applicationContext.getString(R.string.transaction_reminder_channel_name)
-        val description =
-            applicationContext.getString(
-                R.string.transaction_reminder_channel_description,
-            )
+        val name = "Напоминания о транзакциях"
+        val description = "Канал для уведомлений о необходимости внести транзакции"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
         val channel =

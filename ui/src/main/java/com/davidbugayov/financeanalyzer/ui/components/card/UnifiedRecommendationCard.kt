@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Унифицированная карточка рекомендаций для всех экранов приложения
@@ -39,9 +41,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun UnifiedRecommendationCard(
     recommendations: List<UnifiedRecommendation>,
-    title: String = "Рекомендации",
+    title: String = stringResource(R.string.recommendations_title),
     titleIcon: ImageVector = Icons.Filled.Lightbulb,
-    emptyStateText: String = "Все отлично! Рекомендаций нет",
+    emptyStateText: String = stringResource(R.string.empty_state_text),
     modifier: Modifier = Modifier,
     cardStyle: RecommendationCardStyle = RecommendationCardStyle.DETAILED,
     onRecommendationClick: ((UnifiedRecommendation) -> Unit)? = null,
@@ -285,7 +287,7 @@ private fun CompactRecommendationsList(
             verticalAlignment = Alignment.Top,
         ) {
             Text(
-                text = "• ",
+                text = stringResource(R.string.bullet_point),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
             )

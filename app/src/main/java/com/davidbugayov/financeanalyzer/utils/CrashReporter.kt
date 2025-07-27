@@ -38,7 +38,7 @@ object CrashReporter : CrashLogger {
                 logCrash(throwable, application)
             } catch (e: Exception) {
                 // Если отправка отчета о сбое не удалась, логируем ошибку, но не перезапускаем
-                Timber.e(e, "Ошибка при отправке отчета о сбое")
+                Timber.e(e, "Crash report error")
             } finally {
                 // Всегда делегируем по умолчанию
                 defaultHandler?.uncaughtException(thread, throwable)

@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * 📊 Премиум карточка статистики с профессиональным дизайном
@@ -143,7 +145,7 @@ private fun PremiumStatisticsHeader(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Детальная аналитика",
+                text = stringResource(R.string.detailed_analytics),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.alpha(0.8f)
@@ -365,7 +367,7 @@ fun PremiumInsightsCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Умные наблюдения",
+                            text = stringResource(R.string.smart_observations),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.alpha(0.8f)

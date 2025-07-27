@@ -9,7 +9,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,9 +47,9 @@ fun HomeTransactionsHeader(
             Text(
                 text =
                     if (showGroupSummary) {
-                        stringResource(R.string.hide_summary)
+                        "Скрыть сводку"
                     } else {
-                        stringResource(R.string.show_summary)
+                        "Показать сводку"
                     },
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
@@ -62,9 +61,9 @@ fun HomeTransactionsHeader(
 @Composable
 private fun headerTitleForFilter(filter: TransactionFilter): String {
     return when (filter) {
-        TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
-        TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
-        TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
-        TransactionFilter.ALL -> stringResource(R.string.all_transactions)
+        TransactionFilter.TODAY -> "Транзакции за сегодня"
+        TransactionFilter.WEEK -> "Транзакции за неделю"
+        TransactionFilter.MONTH -> "Транзакции за месяц"
+        TransactionFilter.ALL -> "Все транзакции"
     }
 }

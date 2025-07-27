@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
@@ -52,7 +51,7 @@ fun PeriodSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_period)) },
+                    title = { Text("Выбрать период") },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -65,7 +64,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.ALL,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.all_time),
+                    title = "Все время",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -73,7 +72,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.DAY,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.day),
+                    title = "День",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -81,7 +80,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.WEEK,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.week),
+                    title = "Неделя",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -89,7 +88,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.MONTH,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.month),
+                    title = "Месяц",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -97,7 +96,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.QUARTER,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.period_quarter),
+                    title = "Квартал",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -105,7 +104,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.YEAR,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.year),
+                    title = "Год",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -113,7 +112,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.CUSTOM,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.custom_period),
+                    title = "Произвольный период",
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -123,7 +122,7 @@ fun PeriodSelectionDialog(
 
                     // Поле начальной даты
                     DateField(
-                        label = stringResource(R.string.start_date),
+                        label = "Начальная дата",
                         date = startDate,
                         dateFormat = dateFormat,
                         onClick = onStartDateClick,
@@ -133,7 +132,7 @@ fun PeriodSelectionDialog(
 
                     // Поле конечной даты
                     DateField(
-                        label = stringResource(R.string.end_date),
+                        label = "Конечная дата",
                         date = endDate,
                         dateFormat = dateFormat,
                         onClick = onEndDateClick,
@@ -144,18 +143,18 @@ fun PeriodSelectionDialog(
         confirmButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onConfirm) {
-                    Text(stringResource(R.string.apply))
+                    Text("Применить")
                 }
             } else {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.close))
+                    Text("Закрыть")
                 }
             }
         },
         dismissButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.cancel))
+                    Text("Отмена")
                 }
             }
         },

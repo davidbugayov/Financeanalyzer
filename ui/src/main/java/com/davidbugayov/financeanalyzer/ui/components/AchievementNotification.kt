@@ -46,9 +46,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Компонент для отображения уведомления о разблокированной ачивке
@@ -72,7 +74,7 @@ fun AchievementNotification(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow,
             ),
-        label = "trophy_rotation",
+        label = stringResource(R.string.trophy_rotation),
     )
 
     LaunchedEffect(isVisible) {
@@ -137,7 +139,7 @@ fun AchievementNotification(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "🎉 Достижение разблокировано!",
+                            text = stringResource(R.string.achievement_unlocked),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -149,7 +151,7 @@ fun AchievementNotification(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                contentDescription = "Закрыть",
+                                contentDescription = stringResource(R.string.close_button),
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -235,7 +237,7 @@ fun AchievementNotification(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "★ $rewardCoins",
+                                        text = stringResource(R.string.reward_coins, rewardCoins),
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Bold,
                                         color = Color(0xFFFFD700),
@@ -258,8 +260,8 @@ fun AchievementNotification(
 private fun AchievementNotificationPreview() {
     MaterialTheme {
         AchievementNotification(
-            title = "Первые шаги",
-            description = "Добавьте свою первую транзакцию",
+            title = stringResource(R.string.achievement_first_steps_title),
+            description = stringResource(R.string.achievement_first_steps_description),
             rewardCoins = 10,
             isVisible = true,
             onDismiss = {},

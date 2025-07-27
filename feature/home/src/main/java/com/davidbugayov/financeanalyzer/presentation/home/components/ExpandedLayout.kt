@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -200,7 +199,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
     ) {
         androidx.compose.material3.Icon(
             imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-            contentDescription = stringResource(R.string.empty_state_icon_desc),
+                            contentDescription = "Иконка пустого состояния",
             tint = MaterialTheme.colorScheme.primary,
             modifier =
                 Modifier
@@ -208,7 +207,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                     .size(36.dp),
         )
         Text(
-            text = stringResource(R.string.empty_state_title),
+                            text = "Нет транзакций",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
@@ -216,7 +215,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             modifier = Modifier.padding(bottom = 4.dp),
         )
         Text(
-            text = stringResource(R.string.empty_state_subtitle),
+                            text = "Добавьте первую транзакцию, чтобы начать отслеживать свои финансы",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 3,
@@ -242,7 +241,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                     .heightIn(min = 44.dp),
         ) {
             Text(
-                text = stringResource(R.string.empty_state_add_first_transaction),
+                text = "Добавить транзакцию",
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp,
                 maxLines = 1,

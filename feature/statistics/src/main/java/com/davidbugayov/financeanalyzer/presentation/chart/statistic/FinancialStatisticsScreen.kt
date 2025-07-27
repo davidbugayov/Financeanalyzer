@@ -54,7 +54,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -133,7 +132,7 @@ fun FinancialStatisticsScreen(
 
     // Список динамических советов
     val tips = listOf(
-        Pair(stringResource(R.string.statistics_tip_title), stringResource(R.string.statistics_tip_text)),
+        Pair("Совет по статистике", "Изучайте свои финансовые привычки через графики и аналитику — это поможет принимать более осознанные решения!"),
         Pair("Сравнивайте периоды", "Смотрите, как меняются ваши расходы и доходы от месяца к месяцу — ищите тренды!"),
         Pair("Категории под контролем", "Анализируйте, на что уходит больше всего денег, и оптимизируйте свои траты."),
         Pair("Планируйте бюджет", "Используйте аналитику для постановки финансовых целей и отслеживания прогресса."),
@@ -201,7 +200,7 @@ fun FinancialStatisticsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.charts_title),
+                title = "Графики",
                 showBackButton = true,
                 onBackClick = {
                     onNavigateBack()
@@ -237,10 +236,10 @@ fun FinancialStatisticsScreen(
                     .background(backgroundGradient),
         ) {
             if (state.isLoading) {
-                CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                CenteredLoadingIndicator(message = "Загрузка данных...")
             } else if (state.error != null) {
                 ErrorContent(
-                    error = state.error ?: stringResource(R.string.unknown_error),
+                    error = state.error ?: "Неизвестная ошибка",
                     onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) },
                 )
             } else {
@@ -303,12 +302,12 @@ fun FinancialStatisticsScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = stringResource(R.string.add_first_transaction),
+                                        text = "Добавьте первую транзакцию",
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.primary,
                                     )
                                     Text(
-                                        text = stringResource(R.string.analytics_magic_hint),
+                                        text = "И увидите магию аналитики!",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.alpha(0.8f),
@@ -344,7 +343,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(0)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_categories)) },
+                            text = { Text("Категории") },
                         )
                         Tab(
                             selected = pagerState.currentPage == 1,
@@ -353,7 +352,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(1)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_dynamics)) },
+                            text = { Text("Динамика") },
                         )
                         Tab(
                             selected = pagerState.currentPage == 2,
@@ -362,7 +361,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(2)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_analysis)) },
+                            text = { Text("Анализ") },
                         )
                     }
 
@@ -423,9 +422,7 @@ fun FinancialStatisticsScreen(
                                         ) {
                                             Text(
                                                 text =
-                                                    stringResource(
-                                                        R.string.enhanced_chart_no_data,
-                                                    ),
+                                                    "Нет данных",
                                                 style = MaterialTheme.typography.bodyLarge,
                                             )
                                         }
@@ -492,7 +489,7 @@ fun FinancialStatisticsScreen(
                                         expenseData = state.expenseLineChartData,
                                         showIncome = lineChartDisplayMode.showIncome,
                                         showExpense = lineChartDisplayMode.showExpense,
-                                        title = stringResource(id = R.string.chart_title_dynamics),
+                                        title = "Динамика",
                                         period = periodText,
                                     )
                                 }
@@ -552,9 +549,7 @@ fun FinancialStatisticsScreen(
                                             Column {
                                                 Text(
                                                     text =
-                                                        stringResource(
-                                                            R.string.detailed_financial_statistics,
-                                                        ),
+                                                        "Детальная финансовая статистика",
                                                     style = MaterialTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
                                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -562,9 +557,7 @@ fun FinancialStatisticsScreen(
 
                                                 Text(
                                                     text =
-                                                        stringResource(
-                                                            R.string.explore_your_financial_metrics,
-                                                        ),
+                                                        "Изучите свои финансовые показатели",
                                                     style = MaterialTheme.typography.bodyMedium,
                                                     color =
                                                         MaterialTheme.colorScheme.onPrimaryContainer.copy(

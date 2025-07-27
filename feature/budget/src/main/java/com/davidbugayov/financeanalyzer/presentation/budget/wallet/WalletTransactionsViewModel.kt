@@ -1,7 +1,9 @@
 package com.davidbugayov.financeanalyzer.presentation.budget.wallet
 
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.feature.budget.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
@@ -94,7 +96,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading wallet")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при загрузке кошелька",
+                        error = e.message ?: "Ошибка загрузки кошелька",
                         isLoading = false,
                     )
                 }
@@ -150,7 +152,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading transactions")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при загрузке транзакций",
+                        error = e.message ?: "Ошибка загрузки транзакций",
                         isLoading = false,
                     )
                 }
@@ -208,7 +210,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error linking categories")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при связывании категорий",
+                        error = e.message ?: "Ошибка привязки категорий",
                     )
                 }
             }

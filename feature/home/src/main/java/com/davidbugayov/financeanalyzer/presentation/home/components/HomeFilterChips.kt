@@ -11,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,10 +31,10 @@ fun PermissionUtilsHomeFilterChips(
 ) {
     val filters =
         listOf(
-            FilterChipData(TransactionFilter.TODAY, R.string.filter_today),
-            FilterChipData(TransactionFilter.WEEK, R.string.filter_week),
-            FilterChipData(TransactionFilter.MONTH, R.string.filter_month),
-            FilterChipData(TransactionFilter.ALL, R.string.all),
+            FilterChipData(TransactionFilter.TODAY, "Сегодня"),
+            FilterChipData(TransactionFilter.WEEK, "Неделя"),
+            FilterChipData(TransactionFilter.MONTH, "Месяц"),
+            FilterChipData(TransactionFilter.ALL, "Все"),
         )
 
     Row(
@@ -58,7 +57,7 @@ fun PermissionUtilsHomeFilterChips(
     }
 }
 
-private data class FilterChipData(val filter: TransactionFilter, val labelRes: Int)
+private data class FilterChipData(val filter: TransactionFilter, val label: String)
 
 @Composable
 private fun FilterChipItem(
@@ -77,7 +76,7 @@ private fun FilterChipItem(
         onClick = onClick,
         label = {
             Text(
-                stringResource(filterData.labelRes),
+                filterData.label,
                 fontSize = 14.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             )

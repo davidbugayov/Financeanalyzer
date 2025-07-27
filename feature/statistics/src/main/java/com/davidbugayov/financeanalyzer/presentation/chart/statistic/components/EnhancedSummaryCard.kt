@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -258,7 +257,7 @@ fun EnhancedSummaryCard(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = stringResource(R.string.enhanced_summary_select_period),
+                        contentDescription = "Выбрать период",
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         modifier = Modifier.padding(end = 6.dp),
                     )
@@ -341,7 +340,7 @@ fun EnhancedSummaryCard(
                         }
 
                         Text(
-                            text = stringResource(R.string.enhanced_summary_income),
+                            text = "Доходы",
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
@@ -390,7 +389,7 @@ fun EnhancedSummaryCard(
                         }
 
                         Text(
-                            text = stringResource(R.string.enhanced_summary_expense),
+                            text = "Расходы",
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =

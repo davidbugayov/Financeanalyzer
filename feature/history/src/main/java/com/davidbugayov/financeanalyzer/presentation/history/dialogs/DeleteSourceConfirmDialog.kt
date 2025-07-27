@@ -27,9 +27,7 @@ fun DeleteSourceConfirmDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Text(
-                text =
-                    "Вы уверены, что хотите удалить источник \"$source\"?\n\n" +
-                        "Удаление источника не повлияет на существующие транзакции.",
+                text = stringResource(R.string.delete_source_confirmation_message, source),
             )
         },
         confirmButton = {

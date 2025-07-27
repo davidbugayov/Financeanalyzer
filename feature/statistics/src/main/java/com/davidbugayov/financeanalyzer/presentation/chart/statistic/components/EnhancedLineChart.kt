@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -100,7 +99,7 @@ fun EnhancedLineChart(
     expenseData: List<LineChartPoint>,
     showIncome: Boolean = true,
     showExpense: Boolean = true,
-    title: String = stringResource(id = R.string.chart_title_dynamics),
+    title: String = "Динамика",
     subtitle: String = "",
     period: String = "",
     formatYValue: (Float) -> String = { value ->
@@ -128,7 +127,7 @@ fun EnhancedLineChart(
     // Если нет данных для отображения, показываем сообщение
     if (!hasIncomeData && !hasExpenseData) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent(message = stringResource(id = R.string.chart_empty_line_data))
+            EmptyContent(message = "Нет данных для отображения")
         }
         return
     }
@@ -162,7 +161,7 @@ fun EnhancedLineChart(
     // Если список пуст после фильтрации, возвращаемся
     if (allPoints.isEmpty()) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent(message = stringResource(id = R.string.chart_empty_line_data))
+            EmptyContent(message = "Нет данных для отображения")
         }
         return
     }
@@ -614,7 +613,7 @@ fun EnhancedLineChart(
                 if (showIncome) {
                     ChartLegendItem(
                         color = currentIncomeColor,
-                        text = stringResource(id = R.string.chart_title_income), // Use string resource
+                        text = "Доходы", // Use string resource
                     )
                     if (showExpense) {
                         Spacer(modifier = Modifier.width(spacingNormal))
@@ -623,7 +622,7 @@ fun EnhancedLineChart(
                 if (showExpense) {
                     ChartLegendItem(
                         color = currentExpenseColor,
-                        text = stringResource(id = R.string.chart_title_expense), // Use string resource
+                        text = "Расходы", // Use string resource
                     )
                 }
             }

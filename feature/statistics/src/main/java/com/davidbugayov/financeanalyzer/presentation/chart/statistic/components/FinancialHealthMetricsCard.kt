@@ -130,7 +130,7 @@ private fun CardHeader(onInfoClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.financial_health_analysis),
+                text = stringResource(R.string.financial_health_analysis_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -142,14 +142,14 @@ private fun CardHeader(onInfoClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Info,
-                    contentDescription = stringResource(R.string.financial_health_info_description),
+                                            contentDescription = stringResource(R.string.financial_health_info_description),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
         }
 
         Text(
-            text = stringResource(R.string.financial_health_subtitle),
+                            text = stringResource(R.string.financial_health_evaluation_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -201,10 +201,10 @@ private fun ExpensesSection(averageDailyExpense: Money) {
 private fun SavingsRateSection(savingsRate: Double) {
     val qualification =
         when {
-            savingsRate >= 30 -> stringResource(R.string.qualification_excellent)
-            savingsRate >= 15 -> stringResource(R.string.qualification_good)
-            savingsRate >= 5 -> stringResource(R.string.qualification_satisfactory)
-            else -> stringResource(R.string.qualification_needs_attention)
+            savingsRate >= 30 -> stringResource(R.string.savings_rate_excellent_qualification)
+            savingsRate >= 15 -> stringResource(R.string.savings_rate_good_qualification)
+            savingsRate >= 5 -> stringResource(R.string.savings_rate_satisfactory_qualification)
+            else -> stringResource(R.string.savings_rate_needs_attention_qualification)
         }
 
     val qualificationColor =
@@ -224,10 +224,10 @@ private fun SavingsRateSection(savingsRate: Double) {
 
     val recommendationText =
         when {
-            savingsRate >= 30 -> stringResource(R.string.savings_rate_excellent)
-            savingsRate >= 15 -> stringResource(R.string.savings_rate_good)
-            savingsRate >= 5 -> stringResource(R.string.savings_rate_satisfactory)
-            else -> stringResource(R.string.savings_rate_needs_attention)
+            savingsRate >= 30 -> stringResource(R.string.savings_rate_excellent_recommendation)
+            savingsRate >= 15 -> stringResource(R.string.savings_rate_good_recommendation)
+            savingsRate >= 5 -> stringResource(R.string.savings_rate_satisfactory_recommendation)
+            else -> stringResource(R.string.savings_rate_needs_attention_recommendation)
         }
 
     MetricItemEnhanced(
@@ -292,9 +292,9 @@ private fun FinancialCushionSection(
 ) {
     val qualification =
         when {
-            monthsOfSavings >= 6 -> stringResource(R.string.qualification_excellent)
-            monthsOfSavings >= 3 -> stringResource(R.string.qualification_good)
-            else -> stringResource(R.string.qualification_insufficient)
+            monthsOfSavings >= 6 -> stringResource(R.string.financial_cushion_excellent_qualification)
+            monthsOfSavings >= 3 -> stringResource(R.string.financial_cushion_good_qualification)
+            else -> stringResource(R.string.financial_cushion_insufficient_qualification)
         }
 
     val qualificationColor =
@@ -306,9 +306,9 @@ private fun FinancialCushionSection(
 
     val recommendationText =
         when {
-            monthsOfSavings >= 6 -> stringResource(R.string.financial_cushion_excellent)
-            monthsOfSavings >= 3 -> stringResource(R.string.financial_cushion_good)
-            else -> stringResource(R.string.financial_cushion_insufficient)
+            monthsOfSavings >= 6 -> stringResource(R.string.financial_cushion_excellent_recommendation)
+            monthsOfSavings >= 3 -> stringResource(R.string.financial_cushion_good_recommendation)
+            else -> stringResource(R.string.financial_cushion_insufficient_recommendation)
         }
 
     val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
@@ -345,7 +345,7 @@ private fun FinancialCushionSection(
                         Spacer(modifier = Modifier.width(4.dp))
 
                         Text(
-                            text = stringResource(R.string.financial_cushion_months_short),
+                            text = "${monthsOfSavings.toInt()} мес.",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 4.dp),
@@ -426,19 +426,19 @@ private fun TrendIcon(trendDirection: TrendDirection) {
             TrendDirection.UP ->
                 Triple(
                     Icons.Filled.ArrowUpward,
-                    stringResource(R.string.trend_positive),
+                    stringResource(R.string.trend_positive_description),
                     colorResource(R.color.trend_positive),
                 )
             TrendDirection.DOWN ->
                 Triple(
                     Icons.Filled.ArrowDownward,
-                    stringResource(R.string.trend_negative),
+                    stringResource(R.string.trend_negative_description),
                     colorResource(R.color.trend_negative),
                 )
             TrendDirection.NEUTRAL ->
                 Triple(
                     Icons.AutoMirrored.Filled.ArrowForward,
-                    stringResource(R.string.trend_neutral),
+                    stringResource(R.string.trend_neutral_description),
                     colorResource(R.color.trend_neutral),
                 )
         }
@@ -762,22 +762,22 @@ private fun ProgressLabels() {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.savings_rate_percent_0),
+                            text = "0%",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = stringResource(R.string.savings_rate_percent_15),
+                            text = "15%",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = stringResource(R.string.savings_rate_percent_30),
+                            text = "30%",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = stringResource(R.string.savings_rate_percent_50),
+                            text = "50%",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

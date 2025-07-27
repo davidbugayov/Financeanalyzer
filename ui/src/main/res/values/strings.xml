@@ -85,14 +85,14 @@
     <string name="period_year">Год</string>
     <string name="period_custom">Произвольный</string>
     <string name="period_custom_range">%1$s – %2$s</string>
-    <string name="period_day_format">День: %s</string>
-    <string name="period_week_format">Неделя: %s - %s</string>
-    <string name="period_month_format">Месяц: %s - %s</string>
-    <string name="period_quarter_format">Квартал: %s - %s</string>
-    <string name="period_year_format">Год: %s - %s</string>
-    <string name="period_date_range">%s - %s</string>
-    <string name="from_date">С: %s</string>
-    <string name="to_date">По: %s</string>
+    <string name="period_day_format">День: %1$s</string>
+    <string name="period_week_format">Неделя: %1$s - %2$s</string>
+    <string name="period_month_format">Месяц: %1$s - %2$s</string>
+    <string name="period_quarter_format">Квартал: %1$s - %2$s</string>
+    <string name="period_year_format">Год: %1$s - %2$s</string>
+    <string name="period_date_range">%1$s - %2$s</string>
+    <string name="from_date">С: %1$s</string>
+    <string name="to_date">По: %1$s</string>
     <string name="select_start_date">Выберите начальную дату</string>
     <string name="select_end_date">Выберите конечную дату</string>
     <string name="apply">Применить</string>
@@ -767,7 +767,6 @@
     <string name="category_services">Услуги</string>
     <string name="category_charity">Благотворительность</string>
     <string name="category_credit">Кредит</string>
-    <string name="category_transfer">Переводы</string>
     <string name="category_salary">Зарплата</string>
     <string name="category_freelance">Фриланс</string>
     <string name="category_gift">Подарки</string>
@@ -1089,19 +1088,16 @@
 
     <!-- Wallet Type Names -->
     <string name="wallet_type_cash">Наличные</string>
-    <string name="wallet_type_card">Банковская карта</string>
     <string name="wallet_type_savings">Сбережения</string>
     <string name="wallet_type_investment">Инвестиции</string>
     <string name="wallet_type_goal">Накопительная цель</string>
     <string name="wallet_type_other">Другое</string>
-
-    <!-- Wallet Type Descriptions -->
-    <string name="wallet_type_cash_desc">Наличные деньги в кошельке или дома</string>
-    <string name="wallet_type_card_desc">Дебетовые карты, расчётные счета в банке</string>
-    <string name="wallet_type_savings_desc">Сберегательные счета, депозиты, накопления</string>
-    <string name="wallet_type_investment_desc">Брокерские счета, ИИС, инвестиционные портфели</string>
-    <string name="wallet_type_goal_desc">Специальные счета для достижения целей</string>
-    <string name="wallet_type_other_desc">Кредиты, долги, займы и другие финансовые инструменты</string>
+    <string name="wallet_description_cash">Наличные деньги в кошельке или дома</string>
+    <string name="wallet_description_card">Дебетовые карты, расчётные счета в банке</string>
+    <string name="wallet_description_savings">Сберегательные счета, депозиты, накопления</string>
+    <string name="wallet_description_investment">Брокерские счета, ИИС, инвестиционные портфели</string>
+    <string name="wallet_description_goal">Специальные счета для достижения целей</string>
+    <string name="wallet_description_other">Кредиты, долги, займы и другие финансовые инструменты</string>
 
     <!-- Wallet Validation Messages -->
     <string name="wallet_error_name_empty">Введите название кошелька</string>
@@ -1435,5 +1431,195 @@
 
     <string name="add_transactions_to_see_analytics">Добавьте транзакции, чтобы увидеть аналитику</string>
     <string name="refresh">Обновить</string>
+
+    <string name="date_format_short">d MMM</string>
+    <string name="date_format_long">d MMM yyyy</string>
+    <string name="category_transfer">Перевод</string>
+    <string name="header_content">header_content</string>
+    <string name="append_loading">append_loading</string>
+    <string name="fab_spacer">fab_spacer</string>
+    <string name="error_profile_analytics">Ошибка при получении аналитики профиля</string>
+    <string name="subscription_recommendation">Проверьте ваши подписки: возможно, некоторые из них можно отключить или заменить на более выгодные.</string>
+    <string name="large_expense_recommendation">Обнаружены крупные разовые расходы. Планируйте такие траты заранее и ищите альтернативы.</string>
+    <string name="validate_amount_error">Введите сумму транзакции</string>
+
+    <!-- Новые строки для хардкода -->
+    <string name="select_all">Выбрать все</string>
+    <string name="all_categories_option">Все категории</string>
+    <string name="expenses_group">Расходы</string>
+    <string name="income_group">Доходы</string>
+    <string name="delete_source_confirmation_message">Вы уверены, что хотите удалить источник "%1$s"?\n\nУдаление источника не повлияет на существующие транзакции.</string>
+
+
+    <string name="expand_collapse">Развернуть</string>
+    <string name="collapse_expand">Свернуть</string>
+    <string name="protected_category_other">Другое</string>
+    <string name="period_changed_log">Период изменился на: %1$s, загружено транзакций: %2$d</string>
+    <string name="categories_filter">Категории: %1$s</string>
+    <string name="sources_filter">Источники: %1$s</string>
+    <string name="analytics_system_added">Добавлена система аналитики: %1$s</string>
+    <string name="analytics_system_removed">Удалена система аналитики: %1$s</string>
+    <string name="crash_report_error">Ошибка при отправке отчета о сбое</string>
+    <string name="appmetrica_init_error">Ошибка инициализации AppMetrica</string>
+    <string name="koin_init_error">Ошибка инициализации Koin</string>
+    <string name="koin_init_error_detail">Ошибка инициализации Koin: %1$s</string>
+    <string name="modules_init_error">Ошибка инициализации модулей</string>
+    <string name="modules_init_error_detail">Ошибка инициализации модулей: %1$s</string>
+    <string name="achievements_init_error">Ошибка инициализации системы достижений</string>
+    <string name="achievements_init_error_detail">Ошибка инициализации системы достижений: %1$s</string>
+    <string name="device_info_log_error">Ошибка логирования device info</string>
+    <string name="device_info_log_error_detail">Ошибка логирования device info: %1$s</string>
+    <string name="flavor_init_error">Ошибка инициализации flavor</string>
+    <string name="flavor_init_error_detail">Ошибка инициализации flavor: %1$s</string>
+    <string name="modules_initialized_success">Модули успешно инициализированы</string>
+    <string name="achievements_system_init_error">Ошибка инициализации системы достижений</string>
+    <string name="user_activity_check_error">Ошибка при проверке активности пользователя</string>
+    <string name="wallet_not_found">Кошелек не найден</string>
+    <string name="wallet_load_error">Ошибка при загрузке кошелька</string>
+    <string name="transactions_load_error">Ошибка при загрузке транзакций</string>
+    <string name="link_categories_error">Ошибка при связывании категорий</string>
+    <string name="loading">Загрузка...</string>
+    <string name="link_categories">Связать категории</string>
+    <string name="linked_categories">Связанные категории:</string>
+    <string name="transactions_section">Транзакции</string>
+    <string name="no_transactions_found">Нет транзакций</string>
+    <string name="link_categories_title">Связать категории</string>
+    <string name="link_categories_subtitle">Выберите категории расходов, которые будут учитываться в этом кошельке:</string>
+    <string name="link_button">Связать</string>
+    <string name="period_all_time">Все время</string>
+
+
+
+
+
+    <string name="transfer_category">Перевод</string>
+    <string name="transaction_not_found">Транзакция с id=%1$s не найдена</string>
+    <string name="transaction_update_log">Обновление транзакции: %1$s</string>
+    <string name="enter_transaction_amount">Введите сумму транзакции</string>
+    <string name="spend_button">Потратить</string>
+    <string name="add_funds_button">Пополнить</string>
+    <string name="wallet_title">Кошелек</string>
+    <string name="link_categories_content_description">Связать категории</string>
+    <string name="ok_button">ОК</string>
+    <string name="week_format">Неделя %1$d, %2$d</string>
+    <string name="transaction_history_init_log">Инициализация TransactionHistoryViewModel с начальным периодом ALL</string>
+    <string name="widgets_updated_after_delete">Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.</string>
+    <string name="transaction_updated_success">Транзакция успешно обновлена в истории: %1$s</string>
+    <string name="transaction_update_error">Ошибка при обновлении транзакции</string>
+    <string name="start_loading_transactions">Начинаем загрузку транзакций с периодом: %1$s</string>
+    <string name="total_transactions_count">Общее количество транзакций: %1$d</string>
+    <string name="get_transactions_count_error">Ошибка при получении количества транзакций: %1$s</string>
+    <string name="loading_transactions_period">Загрузка транзакций с периодом: %1$s</string>
+    <string name="loading_all_transactions">Загружаем ВСЕ транзакции напрямую из репозитория</string>
+    <string name="loading_transactions_via_usecase">Загружаем транзакции через use case по периоду: %1$s - %2$s</string>
+    <string name="loading_monthly_transactions">Загружаем транзакции за МЕСЯЦ: %1$s-%2$s</string>
+    <string name="loading_weekly_transactions">Загружаем транзакции за НЕДЕЛЮ: %1$s-%2$s</string>
+    <string name="first_page_load_error">Ошибка при загрузке первой страницы транзакций: %1$s</string>
+    <string name="transactions_loaded_count">Загружено %1$d транзакций из %2$d всего</string>
+    <string name="filters_applied">Применены фильтры: %1$d -> %2$d транзакций</string>
+    <string name="transactions_load_error_detail">Ошибка при загрузке транзакций: %1$s</string>
+    <string name="transactions_load_error_generic">Ошибка при загрузке транзакций</string>
+    <string name="next_page_load_error">Ошибка при загрузке следующей страницы: %1$s</string>
+    <string name="additional_transactions_loaded">Загружено %1$d дополнительных транзакций</string>
+    <string name="additional_transactions_error">Ошибка при загрузке дополнительных транзакций: %1$s</string>
+    <string name="category_statistics_calculated">Статистика по категории %1$s рассчитана: %2$s, %3$s, %4$s</string>
+    <string name="category_statistics_error">Ошибка при расчете статистики по категории: %1$s</string>
+    <string name="processing_transactions_start">Начало обработки %1$d транзакций</string>
+    <string name="filtering_transactions">Фильтрация: %1$d -> %2$d транзакций</string>
+    <string name="grouping_transactions_time">Группировка %1$d транзакций заняла %2$d мс</string>
+    <string name="period_type_changed">Обновляем тип периода на: %1$s</string>
+    <string name="reload_transactions_period">Перезагружаем транзакции для периода %1$s</string>
+    <string name="check_transactions_count_start">Начинаем проверку количества транзакций в базе данных</string>
+    <string name="transactions_count_in_db">Количество транзакций в базе данных: %1$d</string>
+    <string name="all_transactions_count">Всего транзакций при прямом запросе: %1$d</string>
+    <string name="monthly_transactions_count">Транзакций за последний месяц: %1$d</string>
+    <string name="check_transactions_count_error">Ошибка при проверке количества транзакций: %1$s</string>
+    <string name="improve_financial_health_title">Улучшите общее финансовое здоровье</string>
+    <string name="improve_financial_health_description">Ваш коэффициент финансового здоровья (%1$d/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.</string>
+    <string name="improve_expense_control_title">Улучшите контроль расходов</string>
+    <string name="improve_expense_control_description">Ваш индекс расходной дисциплины (%1$d/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.</string>
+    <string name="increase_retirement_savings_title">Увеличьте пенсионные накопления</string>
+    <string name="increase_retirement_savings_description">Для достижения пенсионной цели увеличьте ежемесячные накопления на %1$s. Текущий прогресс: %2$d%%</string>
+    <string name="increase_savings_rate_title">Увеличьте норму сбережений</string>
+    <string name="increase_savings_rate_description">Ваша норма сбережений на %1$d%% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10%% от дохода.</string>
+    <string name="diversify_income_sources_title">Диверсифицируйте источники дохода</string>
+    <string name="diversify_income_sources_description">У вас только %1$d источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.</string>
+    <string name="create_emergency_fund_title">Создайте резервный фонд</string>
+    <string name="create_emergency_fund_description">Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на %1$d месяца.</string>
+    <string name="budget_exceeded_title">Превышен бюджет по категории %1$s</string>
+    <string name="budget_exceeded_description">Вы превысили бюджет по категории %1$s. Пересмотрите траты или увеличьте лимит.</string>
+    <string name="budget_limit_warning_title">Близко к лимиту по категории %1$s</string>
+    <string name="budget_limit_warning_description">Вы близки к превышению лимита по категории %1$s. Контролируйте расходы!</string>
+    <string name="subscription_category">Подписка</string>
+    <string name="subscription_category_en">Subscription</string>
+    <string name="services_category">Сервисы</string>
+    <string name="check_subscriptions_title">Проверьте подписки</string>
+    <string name="check_subscriptions_description">У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.</string>
+    <string name="cafe_category">Кафе</string>
+    <string name="restaurant_category">Ресторан</string>
+    <string name="coffee_category">Coffee</string>
+    <string name="restaurant_category_en">Restaurant</string>
+    <string name="save_on_cafe_title">Экономьте на кафе и ресторанах</string>
+    <string name="save_on_cafe_description">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.</string>
+    <string name="wallet_type_card">Банковская карта</string>
+    <string name="wallet_type_cash_description">Наличные деньги в кошельке или дома</string>
+    <string name="wallet_type_card_description">Дебетовые карты, расчётные счета в банке</string>
+    <string name="wallet_type_savings_description">Сберегательные счета, депозиты, накопления</string>
+    <string name="wallet_type_investment_description">Брокерские счета, ИИС, инвестиционные портфели</string>
+    <string name="wallet_type_goal_description">Специальные счета для достижения целей</string>
+    <string name="wallet_type_other_description">Кредиты, долги, займы и другие финансовые инструменты</string>
+    <string name="no_transactions_to_export">Нет транзакций для экспорта</string>
+    <string name="finance_export_filename">Финансы_%1$s.csv</string>
+    <string name="transaction_type_expense">Расход</string>
+    <string name="transaction_type_income">Доход</string>
+    <string name="csv_export_error">Ошибка при экспорте транзакций в CSV</string>
+    <string name="csv_export_unexpected_error">Непредвиденная ошибка при экспорте транзакций</string>
+    <string name="file_created">Файл создан: %1$s</string>
+    <string name="file_ready_for_sharing">Файл готов для отправки: %1$s</string>
+    <string name="transaction_add_log">Добавление транзакции: сумма=%1$s, категория=%2$s</string>
+    <string name="month_january">январь</string>
+    <string name="month_february">февраль</string>
+    <string name="month_march">март</string>
+    <string name="month_april">апрель</string>
+    <string name="month_may">май</string>
+    <string name="month_june">июнь</string>
+    <string name="month_july">июль</string>
+    <string name="month_august">август</string>
+    <string name="month_september">сентябрь</string>
+    <string name="month_october">октябрь</string>
+    <string name="month_november">ноябрь</string>
+    <string name="month_december">декабрь</string>
+    <string name="achievement_first_steps_title">Первые шаги</string>
+    <string name="achievement_first_steps_description">Добавьте первую транзакцию</string>
+    <string name="achievement_transaction_master_description">Добавьте 100 транзакций</string>
+    <string name="achievement_data_analyst_description">Просмотрите статистику 10 раз</string>
+    <string name="achievement_first_budget_description">Создайте свой первый бюджет</string>
+    <string name="achievement_explorer_title">Исследователь</string>
+    <string name="achievement_explorer_description">Посетите все разделы приложения</string>
+    <string name="achievement_category_organizer_description">Используйте 10 разных категорий</string>
+    <string name="achievement_early_bird_description">Добавьте транзакцию до 7 утра</string>
+    <string name="achievement_night_owl_description">Добавьте транзакцию после 23:00</string>
+    <string name="achievement_first_penny_title">Первая копейка</string>
+    <string name="achievement_first_penny_description">Накопите 1000 рублей</string>
+    <string name="smart_tip_top_category">Вы тратите больше всего на категорию: %1$s. Подумайте, можно ли сократить эти расходы.</string>
+    <string name="smart_tip_subscriptions">У вас есть регулярные подписки. Проверьте, все ли из них вам действительно нужны.</string>
+    <string name="smart_tip_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее, чтобы избежать финансового стресса.</string>
+    <string name="smart_tip_small_expenses">У вас много мелких трат. Попробуйте объединять покупки или отказаться от лишнего.</string>
+    <string name="smart_tip_expenses_income">Ваши расходы равны или превышают доходы. Попробуйте откладывать хотя бы 10%% от дохода.</string>
+    <string name="optimization_check_subscriptions">Проверьте ваши подписки: возможно, некоторые из них можно отключить или заменить на более выгодные.</string>
+    <string name="optimization_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее и ищите альтернативы.</string>
+    <string name="optimization_cafe_restaurants">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома чаще — это поможет сэкономить.</string>
+    <string name="optimization_small_expenses">У вас много мелких трат. Ведите учёт и попробуйте отказаться от ненужных покупок.</string>
+    <string name="optimization_no_savings">Вы не делаете регулярных накоплений. Откладывайте хотя бы 10%% от дохода каждый месяц.</string>
+
+    <!-- Дополнительные строки для UI компонентов -->
+    <string name="trophy_rotation">trophy_rotation</string>
+    <string name="close_button">Закрыть</string>
+    <string name="reward_coins">Награда: %1$d монет</string>
+    <string name="recommendations_title">Рекомендации</string>
+    <string name="empty_state_text">Нет рекомендаций</string>
+    <string name="detailed_analytics">Детальная аналитика</string>
+    <string name="smart_observations">Умные наблюдения</string>
+    <string name="bullet_point">•</string>
 
 </resources>

@@ -15,7 +15,7 @@ class CompositeAnalytics : IAnalytics {
      */
     fun addAnalytics(analytics: IAnalytics) {
         this.analytics.add(analytics)
-        Timber.d("Добавлена система аналитики: ${analytics.javaClass.simpleName}")
+        Timber.d("Analytics system added: ${analytics.javaClass.simpleName}")
     }
 
     /**
@@ -23,7 +23,7 @@ class CompositeAnalytics : IAnalytics {
      */
     fun removeAnalytics(analytics: IAnalytics) {
         this.analytics.remove(analytics)
-        Timber.d("Удалена система аналитики: ${analytics.javaClass.simpleName}")
+        Timber.d("Analytics system removed: ${analytics.javaClass.simpleName}")
     }
 
     override fun logEvent(eventName: String) {

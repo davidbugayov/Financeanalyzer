@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.chart.statistic.model
 
 import androidx.annotation.StringRes
 import com.davidbugayov.financeanalyzer.feature.statistics.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Режимы отображения для линейного графика

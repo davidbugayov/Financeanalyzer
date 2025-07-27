@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -76,7 +75,7 @@ fun CategorySelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_category)) },
+                    title = { Text("Выбрать категорию") },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -106,11 +105,11 @@ fun CategorySelectionDialog(
                     Text(
                         text =
                             if (localSelectedCategories.isEmpty()) {
-                                stringResource(R.string.all_categories)
+                                "Все категории"
                             } else if (localSelectedCategories.size == allCategories.size) {
-                                stringResource(R.string.clear_selection)
+                                "Очистить выбор"
                             } else {
-                                stringResource(R.string.select_all_categories)
+                                "Выбрать все"
                             },
                         color =
                             if (localSelectedCategories.isEmpty() ||
@@ -149,7 +148,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Расходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = stringResource(R.string.expenses),
+                    title = "Расходы",
                     isExpanded = isExpensesExpanded,
                     color = expenseColor,
                     onToggle = { isExpensesExpanded = !isExpensesExpanded },
@@ -196,7 +195,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Доходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = stringResource(R.string.income),
+                    title = "Доходы",
                     isExpanded = isIncomeExpanded,
                     color = incomeColor,
                     onToggle = { isIncomeExpanded = !isIncomeExpanded },
@@ -237,12 +236,12 @@ fun CategorySelectionDialog(
                 onCategoriesSelected(localSelectedCategories)
                 onDismiss()
             }) {
-                Text(stringResource(R.string.apply))
+                Text("Применить")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
+                Text("Закрыть")
             }
         },
     )
@@ -291,9 +290,9 @@ private fun CategoryGroupHeader(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription =
                     if (isExpanded) {
-                        stringResource(R.string.collapse)
+                        "Свернуть"
                     } else {
-                        stringResource(R.string.expand)
+                        "Развернуть"
                     },
                 modifier = Modifier.rotate(rotation),
                 tint = color,

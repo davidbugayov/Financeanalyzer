@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.R
+
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
@@ -58,7 +58,7 @@ fun TransactionPagingList(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = dimensionResource(id = R.dimen.spacing_small)),
+                                .padding(vertical = 8.dp),
                     )
                 }
                 is TransactionListItem.Item -> {
@@ -82,12 +82,12 @@ fun TransactionPagingList(
         items.apply {
             when {
                 loadState.append is LoadState.Loading -> {
-                    item("append_loading") {
+                    item(key = "append_loading") {
                         Box(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(dimensionResource(id = R.dimen.spacing_large)),
+                                    .height(32.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -96,11 +96,11 @@ fun TransactionPagingList(
                 }
                 loadState.append is LoadState.Error -> {
                     val e = (loadState.append as LoadState.Error).error
-                    Timber.e(e, "Paging append error")
+                    Timber.e(e, "Ошибка при загрузке дополнительных данных")
                     CrashLoggerProvider.crashLogger.logException(e)
                 }
             }
         }
-        item("fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
+        item(key = "fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
     }
 }

@@ -102,10 +102,7 @@ fun TransactionItem(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
 
-    val transferCategoryString =
-        stringResource(id = R.string.category_transfer).lowercase(
-            Locale.getDefault(),
-        )
+    val transferCategoryString = "Переводы".lowercase(Locale.getDefault())
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight

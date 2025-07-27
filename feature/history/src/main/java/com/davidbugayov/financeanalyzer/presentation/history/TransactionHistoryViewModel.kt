@@ -129,7 +129,7 @@ class TransactionHistoryViewModel(
     init {
         // Первичный запуск Paging
         pagerTrigger.tryEmit(Unit)
-        Timber.d("Инициализация TransactionHistoryViewModel с начальным периодом ALL")
+        Timber.d("Инициализация истории транзакций")
         // Принудительно устанавливаем период на ALL
         val initialPeriod = PeriodType.ALL
         val startDate = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
@@ -226,7 +226,7 @@ class TransactionHistoryViewModel(
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
                     Timber.d(
-                        "Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.",
+                        "Виджеты обновлены после удаления",
                     )
 
                     // Логируем событие в аналитику
@@ -251,10 +251,10 @@ class TransactionHistoryViewModel(
                 is Result.Success -> {
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
-                    Timber.d("Транзакция успешно обновлена в истории: ${transaction.id}")
+                    Timber.d("Транзакция успешно обновлена: ${transaction.id}")
                 }
                 is Result.Error -> {
-                    Timber.e(result.exception, "Ошибка при обновлении транзакции")
+                    Timber.e(result.exception, "Ошибка обновления транзакции")
                     val errorMessage = result.exception.message ?: "Unknown error"
                     _state.update { it.copy(error = errorMessage) }
                 }
@@ -303,7 +303,7 @@ class TransactionHistoryViewModel(
                 // Получаем текущие параметры
                 val currentState = _state.value
 
-                Timber.d("Начинаем загрузку транзакций с периодом: ${currentState.periodType}")
+                Timber.d("Начало загрузки транзакций для периода: ${currentState.periodType}")
 
                 // Создаем вспомогательную корутину для получения общего количества транзакций
                 val totalCountDeferred =
@@ -313,7 +313,7 @@ class TransactionHistoryViewModel(
                             Timber.d("Общее количество транзакций: $count")
                             count
                         } catch (exception: Exception) {
-                            Timber.e(exception, "Ошибка при получении количества транзакций: ${exception.message}")
+                            Timber.e(exception, "Ошибка получения количества транзакций: ${exception.message ?: ""}")
                             0 // По умолчанию считаем, что транзакций нет
                         }
                     }
@@ -322,7 +322,7 @@ class TransactionHistoryViewModel(
                 var transactions =
                     withContext(Dispatchers.IO) {
                         try {
-                            Timber.d("Загрузка транзакций с периодом: ${currentState.periodType}")
+                            Timber.d("Загрузка транзакций для периода: ${currentState.periodType}")
                             when (currentState.periodType) {
                                 PeriodType.ALL -> {
                                     Timber.d("Загружаем ВСЕ транзакции напрямую из репозитория")

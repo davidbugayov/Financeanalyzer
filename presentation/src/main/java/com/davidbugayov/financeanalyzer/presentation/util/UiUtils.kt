@@ -24,12 +24,12 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> "Все время"
-            PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
-            PeriodType.WEEK -> "Неделя: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            PeriodType.MONTH -> "Месяц: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            PeriodType.QUARTER -> "Квартал: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            PeriodType.YEAR -> "Год: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+                    PeriodType.ALL -> "Все время"
+        PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
+        PeriodType.WEEK -> "Неделя: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        PeriodType.MONTH -> "Месяц: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        PeriodType.QUARTER -> "Квартал: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        PeriodType.YEAR -> "Год: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
             PeriodType.CUSTOM -> "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
         }
     }

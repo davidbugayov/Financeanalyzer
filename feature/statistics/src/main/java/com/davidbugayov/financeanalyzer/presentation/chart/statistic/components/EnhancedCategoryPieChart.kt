@@ -45,7 +45,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -96,7 +95,7 @@ fun EnhancedCategoryPieChart(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = stringResource(R.string.enhanced_chart_no_data),
+                text = "Нет данных",
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -184,7 +183,7 @@ fun EnhancedCategoryPieChart(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.chart_type_selector_expense),
+                    text = "Расходы",
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
@@ -194,7 +193,7 @@ fun EnhancedCategoryPieChart(
                 )
 
                 Text(
-                    text = stringResource(R.string.chart_type_selector_income),
+                    text = "Доходы",
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
@@ -260,7 +259,7 @@ fun EnhancedCategoryPieChart(
 
             // Заголовок для списка категорий
             Text(
-                text = stringResource(id = R.string.enhanced_chart_category_list),
+                text = "Список категорий",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
@@ -390,10 +389,7 @@ fun EnhancedCategoryPieChart(
                         // Процент с цветом категории для выделенного элемента
                         Text(
                             text =
-                                stringResource(
-                                    R.string.enhanced_chart_percent_format,
-                                    item.percentage,
-                                ),
+                                "${item.percentage}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(45.dp),
@@ -676,8 +672,8 @@ private fun DrawPieChart(
     isIncome: Boolean,
     backgroundColor: Color,
 ) {
-    val incomeText = stringResource(id = R.string.chart_type_selector_income)
-    val expenseText = stringResource(id = R.string.chart_type_selector_expense)
+    val incomeText = "Доходы"
+    val expenseText = "Расходы"
     val currentIncomeColor = LocalIncomeColor.current
     val currentExpenseColor = LocalExpenseColor.current
     val context = LocalContext.current

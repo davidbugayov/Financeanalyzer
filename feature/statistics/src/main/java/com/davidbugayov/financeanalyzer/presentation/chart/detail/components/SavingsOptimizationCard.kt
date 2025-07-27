@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
@@ -41,7 +40,7 @@ fun SavingsOptimizationCard(
                     .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = stringResource(R.string.savings_optimization_title),
+                text = "Оптимизация сбережений",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -54,14 +53,14 @@ fun SavingsOptimizationCard(
             )
 
             MetricRow(
-                title = stringResource(R.string.savings_rate),
+                title = "Норма сбережений",
                 value = "${metrics.savingsRate.setScale(1)}%",
             )
 
             MetricRow(
-                title = stringResource(R.string.months_of_savings),
-                value = stringResource(R.string.months_count, metrics.monthsOfSavings),
+                title = "Месяцев сбережений",
+                value = "${metrics.monthsOfSavings} мес.",
             )
         }
     }
-} 
+}

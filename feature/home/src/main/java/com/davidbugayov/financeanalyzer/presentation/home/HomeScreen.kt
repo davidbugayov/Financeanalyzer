@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -77,7 +76,7 @@ private fun HomeTopBar(
     profileIconModifier: Modifier = Modifier,
 ) {
     AppTopBar(
-        title = stringResource(R.string.app_title),
+                        title = "Финансовый Анализатор",
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
@@ -94,7 +93,7 @@ private fun HomeTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.generate_test_data),
+                        contentDescription = "Сгенерировать тестовые данные",
                     )
                 }
             }
@@ -113,7 +112,7 @@ private fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = stringResource(R.string.profile),
+                                            contentDescription = "Профиль",
                 )
             }
         },
@@ -284,9 +283,9 @@ fun HomeScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-    val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
-    val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
-    val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
+            val testDataGeneratedMsg = "Тестовые данные сгенерированы"
+        val transactionDeletedMsg = "Транзакция удалена"
+        val emptyTransactionIdErrorMsg = "ID транзакции не может быть пустым"
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
@@ -444,7 +443,7 @@ fun HomeScreen(
                         .padding(paddingValues),
             ) {
                 if (state.isLoading && state.transactions.isEmpty()) {
-                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                    CenteredLoadingIndicator(message = "Загрузка данных...")
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),

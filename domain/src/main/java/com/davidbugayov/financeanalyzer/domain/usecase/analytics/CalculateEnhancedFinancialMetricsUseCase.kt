@@ -84,8 +84,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (healthScore < 50) {
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Улучшите общее финансовое здоровье",
-                    description = "Ваш коэффициент финансового здоровья (${healthScore.toInt()}/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.",
+                            title = "Улучшите общее финансовое здоровье",
+        description = "Ваш коэффициент финансового здоровья (${healthScore.toInt()}/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.",
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.SAVINGS,
                     potentialImpact = 15.0
@@ -97,8 +97,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (expenseDisciplineIndex < 60) {
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Улучшите контроль расходов",
-                    description = "Ваш индекс расходной дисциплины (${expenseDisciplineIndex.toInt()}/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.",
+                            title = "Улучшите контроль расходов",
+        description = "Ваш индекс расходной дисциплины (${expenseDisciplineIndex.toInt()}/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.",
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 12.0
@@ -115,8 +115,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
             if (monthlyDeficit.toDouble() > 0) {
                 recommendations.add(
                     FinancialRecommendation(
-                        title = "Увеличьте пенсионные накопления",
-                        description = "Для достижения пенсионной цели увеличьте ежемесячные накопления на ${Money(monthlyDeficit).formatted}. Текущий прогресс: ${retirementForecast.retirementGoalProgress.toInt()}%",
+                                title = "Увеличьте пенсионные накопления",
+        description = "Для достижения пенсионной цели увеличьте ежемесячные накопления на ${Money(monthlyDeficit).formatted}. Текущий прогресс: ${retirementForecast.retirementGoalProgress.toInt()}%",
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.RETIREMENT,
                         potentialImpact = 8.0
@@ -129,8 +129,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (peerComparison.savingsRateVsPeers < -5) { // На 5% меньше среднего
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Увеличьте норму сбережений",
-                    description = "Ваша норма сбережений на ${(-peerComparison.savingsRateVsPeers).toInt()}% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10% от дохода.",
+                            title = "Увеличьте норму сбережений",
+        description = "Ваша норма сбережений на ${(-peerComparison.savingsRateVsPeers).toInt()}% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10% от дохода.",
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.SAVINGS,
                     potentialImpact = 10.0
@@ -143,8 +143,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (incomeSources < 2) {
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Диверсифицируйте источники дохода",
-                    description = "У вас только $incomeSources источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.",
+                            title = "Диверсифицируйте источники дохода",
+        description = "У вас только $incomeSources источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.",
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.INCOME,
                     potentialImpact = 5.0
@@ -164,8 +164,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (emergencyFundMonths < 3) {
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Создайте резервный фонд",
-                    description = "Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на ${max(0.0, emergencyFundMonths).toInt()} месяца.",
+                            title = "Создайте резервный фонд",
+        description = "Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на ${max(0.0, emergencyFundMonths).toInt()} месяца.",
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EMERGENCY_FUND,
                     potentialImpact = 12.0
@@ -179,8 +179,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
             if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount) {
                 recommendations.add(
                     FinancialRecommendation(
-                        title = "Превышен бюджет по категории ${wallet.name}",
-                        description = "Вы превысили бюджет по категории ${wallet.name}. Пересмотрите траты или увеличьте лимит.",
+                                title = "Превышен бюджет по категории ${wallet.name}",
+        description = "Вы превысили бюджет по категории ${wallet.name}. Пересмотрите траты или увеличьте лимит.",
                         priority = RecommendationPriority.HIGH,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 15.0
@@ -189,8 +189,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
             } else if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount.multiply(java.math.BigDecimal("0.8"))) {
                 recommendations.add(
                     FinancialRecommendation(
-                        title = "Близко к лимиту по категории ${wallet.name}",
-                        description = "Вы близки к превышению лимита по категории ${wallet.name}. Контролируйте расходы!",
+                                title = "Близко к лимиту по категории ${wallet.name}",
+        description = "Вы близки к превышению лимита по категории ${wallet.name}. Контролируйте расходы!",
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 8.0
@@ -207,8 +207,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (unusedSubscriptions.isNotEmpty()) {
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Проверьте подписки",
-                    description = "У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.",
+                            title = "Проверьте подписки",
+        description = "У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.",
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 6.0
@@ -223,8 +223,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (cafeExpenses.size > 5) { // Порог можно скорректировать
             recommendations.add(
                 FinancialRecommendation(
-                    title = "Экономьте на кафе и ресторанах",
-                    description = "Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.",
+                            title = "Экономьте на кафе и ресторанах",
+        description = "Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.",
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 4.0

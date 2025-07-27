@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
@@ -90,7 +89,7 @@ fun FinancialHealthScoreCard(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.financial_health_score_title),
+                    text = "Коэффициент финансового здоровья",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -118,7 +117,7 @@ fun FinancialHealthScoreCard(
                     modifier = Modifier.weight(1f),
                 ) {
                     HealthScoreComponent(
-                        title = stringResource(R.string.savings_rate_component),
+                        title = "Норма сбережений",
                         score = breakdown.savingsRateScore,
                         maxScore = 25.0,
                     )
@@ -126,7 +125,7 @@ fun FinancialHealthScoreCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     HealthScoreComponent(
-                        title = stringResource(R.string.income_stability_component),
+                        title = "Стабильность доходов",
                         score = breakdown.incomeStabilityScore,
                         maxScore = 25.0,
                     )
@@ -134,7 +133,7 @@ fun FinancialHealthScoreCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     HealthScoreComponent(
-                        title = stringResource(R.string.expense_control_component),
+                        title = "Контроль расходов",
                         score = breakdown.expenseControlScore,
                         maxScore = 25.0,
                     )
@@ -142,7 +141,7 @@ fun FinancialHealthScoreCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     HealthScoreComponent(
-                        title = stringResource(R.string.diversification_component),
+                        title = "Диверсификация",
                         score = breakdown.diversificationScore,
                         maxScore = 25.0,
                     )
@@ -289,25 +288,25 @@ private fun HealthScoreInterpretation(score: Double) {
         when {
             score >= 80 ->
                 Triple(
-                    stringResource(R.string.health_score_excellent),
+                    "Отлично",
                     Icons.AutoMirrored.Filled.TrendingUp,
                     Color(0xFF4CAF50),
                 )
             score >= 60 ->
                 Triple(
-                    stringResource(R.string.health_score_good),
+                    "Хорошо",
                     Icons.AutoMirrored.Filled.TrendingUp,
                     Color(0xFF8BC34A),
                 )
             score >= 40 ->
                 Triple(
-                    stringResource(R.string.health_score_average),
+                    "Средне",
                     Icons.AutoMirrored.Filled.TrendingFlat,
                     Color(0xFFFF9800),
                 )
             else ->
                 Triple(
-                    stringResource(R.string.health_score_poor),
+                    "Плохо",
                     Icons.AutoMirrored.Filled.TrendingDown,
                     Color(0xFFF44336),
                 )

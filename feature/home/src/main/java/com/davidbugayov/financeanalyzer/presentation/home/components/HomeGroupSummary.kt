@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -175,7 +174,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.total_income),
+                            text = "Общий доход",
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -195,7 +194,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.total_expense),
+                            text = "Общий расход",
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -215,7 +214,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(R.string.balance),
+                            text = "Баланс",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = textSecondary,
@@ -244,9 +243,7 @@ private fun SummaryCategorySwitcher(
     ) {
         Text(
             text =
-                stringResource(
-                    if (showExpenses) R.string.expense_categories else R.string.income_categories,
-                ),
+                if (showExpenses) "Категории расходов" else "Категории доходов",
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -254,9 +251,7 @@ private fun SummaryCategorySwitcher(
         )
         Text(
             text =
-                stringResource(
-                    if (showExpenses) R.string.show_income else R.string.show_expenses,
-                ),
+                if (showExpenses) "Показать доходы" else "Показать расходы",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
@@ -316,9 +311,7 @@ private fun SummaryEmptyState(
 ) {
     Text(
         text =
-            stringResource(
-                if (showExpenses) R.string.no_expenses_period else R.string.no_income_period,
-            ),
+            if (showExpenses) "Нет расходов за период" else "Нет доходов за период",
         fontSize = 13.sp,
         color = textSecondary,
         modifier = Modifier.padding(vertical = 8.dp),
@@ -332,7 +325,7 @@ private fun SummaryShowMoreButton(
     onClick: () -> Unit,
 ) {
     Text(
-        text = stringResource(R.string.and_more_categories, moreCount),
+        text = "И еще $moreCount категорий",
         fontSize = 12.sp,
         color = textSecondary,
         modifier =
@@ -350,7 +343,7 @@ private fun SummaryHideButton(
     onClick: () -> Unit,
 ) {
     Text(
-        text = stringResource(R.string.hide),
+        text = "Скрыть",
         fontSize = 12.sp,
         color = textSecondary,
         modifier =
@@ -365,10 +358,10 @@ private fun SummaryHideButton(
 @Composable
 private fun periodTitleForFilter(filter: TransactionFilter): String {
     return when (filter) {
-        TransactionFilter.TODAY -> stringResource(R.string.summary_today)
-        TransactionFilter.WEEK -> stringResource(R.string.summary_week)
-        TransactionFilter.MONTH -> stringResource(R.string.summary_month)
-        TransactionFilter.ALL -> stringResource(R.string.summary_all_time)
+        TransactionFilter.TODAY -> "Сегодня"
+        TransactionFilter.WEEK -> "Неделя"
+        TransactionFilter.MONTH -> "Месяц"
+        TransactionFilter.ALL -> "Все время"
     }
 }
 

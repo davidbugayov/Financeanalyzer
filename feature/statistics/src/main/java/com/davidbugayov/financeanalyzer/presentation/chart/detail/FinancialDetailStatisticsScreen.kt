@@ -139,7 +139,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.Info, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Обзор",
+                            text = stringResource(R.string.overview),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -231,7 +231,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.BarChart, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Статистика",
+                            text = stringResource(R.string.statistics),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -256,7 +256,7 @@ fun FinancialDetailStatisticsScreen(
                         )
 
                         PremiumStatisticsCard(
-                            title = "Статистика транзакций",
+                            title = stringResource(R.string.transaction_statistics),
                             icon = Icons.Default.Receipt,
                             statistics = transactionStats,
                             modifier = Modifier.fillMaxWidth()
@@ -285,7 +285,7 @@ fun FinancialDetailStatisticsScreen(
                         )
 
                         PremiumStatisticsCard(
-                            title = "Анализ расходов",
+                            title = stringResource(R.string.expense_analysis),
                             icon = Icons.Default.Analytics,
                             statistics = expenseAnalysis,
                             accentColor = MaterialTheme.colorScheme.tertiary,
@@ -310,7 +310,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.Lightbulb, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Инсайты",
+                            text = stringResource(R.string.insights),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -345,7 +345,7 @@ fun FinancialDetailStatisticsScreen(
                         )
 
                         PremiumInsightsCard(
-                            title = "Анализ расходов",
+                            title = stringResource(R.string.expense_analysis),
                             insights = expenseInsights,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -368,7 +368,7 @@ fun FinancialDetailStatisticsScreen(
                         )
 
                         PremiumInsightsCard(
-                            title = "Паттерны трат",
+                            title = stringResource(R.string.spending_patterns),
                             insights = spendingPatterns,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -391,7 +391,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.ThumbUp, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Советы",
+                            text = stringResource(R.string.tips),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -415,8 +415,8 @@ fun FinancialDetailStatisticsScreen(
 
                         SmartRecommendationCard(
                             recommendations = criticalRecommendations,
-                            title = "🎯 Персональный финансовый анализ",
-                            subtitle = "Критические рекомендации для вашего бюджета",
+                            title = stringResource(R.string.personal_financial_analysis),
+                            subtitle = stringResource(R.string.critical_recommendations_for_your_budget),
                             style = SmartCardStyle.ENHANCED,
                             showPriorityIndicator = true,
                             modifier = Modifier.fillMaxWidth()
@@ -437,8 +437,8 @@ fun FinancialDetailStatisticsScreen(
 
                         SmartRecommendationCard(
                             recommendations = budgetingTips,
-                            title = "💡 Золотые правила бюджета",
-                            subtitle = "Профессиональные принципы финансового планирования",
+                            title = stringResource(R.string.golden_budgeting_rules),
+                            subtitle = stringResource(R.string.professional_budgeting_principles),
                             style = SmartCardStyle.COMPACT,
                             showPriorityIndicator = true,
                             modifier = Modifier.fillMaxWidth()

@@ -73,8 +73,8 @@ class AchievementsRepositoryImpl(
     private val defaultAchievements = listOf(
         Achievement(
             id = "first_transaction",
-            title = "Первые шаги",
-            description = "Добавьте первую транзакцию",
+                    title = "Первые шаги",
+        description = "Добавьте первую транзакцию",
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -83,8 +83,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "transaction_master",
-            title = "Мастер транзакций",
-            description = "Добавьте 100 транзакций",
+                    title = "Мастер транзакций",
+        description = "Добавьте 100 транзакций",
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
@@ -93,8 +93,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "data_analyst",
-            title = "Аналитик данных",
-            description = "Просмотрите статистику 10 раз",
+                    title = "Аналитик данных",
+        description = "Просмотрите статистику 10 раз",
             iconRes = 0,
             category = AchievementCategory.STATISTICS,
             rarity = AchievementRarity.COMMON,
@@ -103,8 +103,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "first_budget",
-            title = "Первый бюджет",
-            description = "Создайте свой первый бюджет",
+                    title = "Первый бюджет",
+        description = "Создайте свой первый бюджет",
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
@@ -113,8 +113,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "app_explorer",
-            title = "Исследователь",
-            description = "Посетите все разделы приложения",
+                    title = "Исследователь",
+        description = "Посетите все разделы приложения",
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
@@ -123,8 +123,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "category_organizer",
-            title = "Организатор категорий",
-            description = "Используйте 10 разных категорий",
+                    title = "Организатор категорий",
+        description = "Используйте 10 разных категорий",
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -133,8 +133,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "early_bird",
-            title = "Ранняя пташка",
-            description = "Добавьте транзакцию до 7 утра",
+                    title = "Ранняя пташка",
+        description = "Добавьте транзакцию до 7 утра",
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -143,8 +143,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "night_owl",
-            title = "Ночная сова",
-            description = "Добавьте транзакцию после 23:00",
+                    title = "Ночная сова",
+        description = "Добавьте транзакцию после 23:00",
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -153,8 +153,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "first_savings",
-            title = "Первая копейка",
-            description = "Накопите 1000 рублей",
+                    title = "Первая копейка",
+        description = "Накопите 1000 рублей",
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.COMMON,

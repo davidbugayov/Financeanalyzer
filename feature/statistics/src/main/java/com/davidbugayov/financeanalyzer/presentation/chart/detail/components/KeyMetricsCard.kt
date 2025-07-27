@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
@@ -63,7 +62,7 @@ fun KeyMetricsCard(
                     .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = stringResource(R.string.key_metrics),
+                text = "Ключевые показатели",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -82,7 +81,7 @@ fun KeyMetricsCard(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.income),
+                        text = "Доход",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -95,7 +94,7 @@ fun KeyMetricsCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = stringResource(R.string.expense),
+                        text = "Расход",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -121,18 +120,16 @@ fun KeyMetricsCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.savings_norm),
+                    text = "Норма сбережений",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text =
                         if (savingsRate >= 20) {
-                            stringResource(R.string.savings_status_done)
+                            "Выполнено"
                         } else {
-                            stringResource(
-                                R.string.savings_status_attention,
-                            )
+                            "Требует внимания"
                         },
                     style = MaterialTheme.typography.bodyMedium,
                     color =
@@ -219,22 +216,22 @@ fun KeyMetricsCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = stringResource(R.string.savings_rate_percent_0),
+                    text = "0%",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_percent_15),
+                    text = "15%",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_percent_30),
+                    text = "30%",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_percent_50),
+                    text = "50%",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

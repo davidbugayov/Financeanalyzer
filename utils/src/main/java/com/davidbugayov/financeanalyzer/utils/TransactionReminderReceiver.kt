@@ -79,9 +79,9 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         // Создаем уведомление
         val builder =
             NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_rubble)
-                .setContentTitle(context.getString(R.string.notification_disabled_title))
-                .setContentText(context.getString(R.string.notification_disabled_description))
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("Уведомления отключены")
+                .setContentText("Включите уведомления в настройках приложения")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
@@ -119,9 +119,9 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         // Создаем уведомление
         val builder =
             NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_rubble) // Убедитесь, что у вас есть такая иконка
-                .setContentTitle(context.getString(R.string.transaction_reminder_title))
-                .setContentText(context.getString(R.string.transaction_reminder_text))
+                .setSmallIcon(android.R.drawable.ic_dialog_info) // Убедитесь, что у вас есть такая иконка
+                .setContentTitle("Напоминание о транзакции")
+                .setContentText("Не забудьте внести сегодняшние транзакции")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
