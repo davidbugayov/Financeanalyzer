@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.data.local.entity
 
 import androidx.room.ColumnInfo
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -24,7 +25,7 @@ data class TransactionEntity(
     val isExpense: Boolean,
     val date: Date,
     val note: String? = null,
-    val source: String = "Наличные",
+    val source: String = StringProvider.defaultSource,
     val sourceColor: Int = 0,
     val isTransfer: Boolean = false,
     val categoryId: String = "",

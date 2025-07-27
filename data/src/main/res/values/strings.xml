@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Значения по умолчанию -->
+    <string name="default_source">Наличные</string>
+    
+    <!-- Логирование -->
+    <string name="log_wallet_migration_completed">Выполнена миграция %1$d кошельков с установкой type по умолчанию</string>
+    <string name="log_error_getting_wallets">Ошибка при получении кошельков для транзакции %1$s</string>
+    <string name="log_transaction_repository_not_set">TransactionRepository не установлен в WalletRepositoryImpl</string>
+    <string name="log_error_getting_transaction">Ошибка при получении транзакции по ID: %1$s</string>
+    <string name="log_error_string_conversion">Ошибка при преобразовании строки в список: %1$s</string>
+    
+    <!-- Ошибки миграции базы данных -->
+    <string name="error_migration_1_2">Ошибка миграции с 1 на 2</string>
+    <string name="error_migration_2_3">Ошибка миграции с 2 на 3</string>
+    <string name="error_migration_3_4">Ошибка миграции с 3 на 4</string>
+    <string name="error_migration_4_5">Ошибка миграции с 4 на 5</string>
+    <string name="error_migration_5_6">Ошибка миграции с 5 на 6</string>
+    <string name="error_migration_6_7">Ошибка миграции с 6 на 7</string>
+    <string name="error_migration_7_8">Ошибка миграции с 7 на 8</string>
+    <string name="error_migration_8_9">Ошибка миграции с 8 на 9</string>
+    <string name="error_migration_9_10">Ошибка миграции с 9 на 10</string>
+    
+    <!-- Успешные миграции -->
+    <string name="log_migration_14_15_completed">Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity</string>
+    <string name="log_migration_15_14_completed">Выполнена миграция с версии 15 на 14 (обратная совместимость)</string>
+    <string name="log_migration_15_16_completed">Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title</string>
+    <string name="log_migration_16_15_completed">Выполнена миграция с версии 16 на 15 (обратная совместимость)</string>
+</resources> 

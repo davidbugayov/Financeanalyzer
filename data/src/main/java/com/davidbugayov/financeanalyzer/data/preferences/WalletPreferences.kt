@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 
 /**
  * Класс для управления кошельками через SharedPreferences.
@@ -75,7 +76,7 @@ class WalletPreferences private constructor(context: Context) {
                 // Сохраняем обновлённые данные, если была выполнена миграция
                 if (migratedWallets != wallets) {
                     saveWallets(migratedWallets)
-                    Timber.i("Выполнена миграция ${wallets.size - migratedWallets.count { it.type != null }} кошельков с установкой type по умолчанию")
+                    Timber.i(StringProvider.logWalletMigrationCompleted(wallets.size - migratedWallets.count { it.type != null }))
                 }
                 
                 migratedWallets

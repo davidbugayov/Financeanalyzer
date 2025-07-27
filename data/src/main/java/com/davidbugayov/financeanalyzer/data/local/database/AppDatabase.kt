@@ -15,6 +15,7 @@ import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 
 /**
  * Класс базы данных Room для приложения.
@@ -50,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'",
                     )
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_1_2", "Ошибка миграции с 1 на 2", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_1_2", StringProvider.errorMigration1_2, e)
                     throw e
                 }
             }
@@ -92,7 +93,7 @@ abstract class AppDatabase : RoomDatabase() {
                     // Переименовываем временную таблицу
                     db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_2_3", "Ошибка миграции с 2 на 3", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_2_3", StringProvider.errorMigration2_3, e)
                     throw e
                 }
             }
@@ -110,7 +111,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'",
                     )
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_3_4", "Ошибка миграции с 3 на 4", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_3_4", StringProvider.errorMigration3_4, e)
                     throw e
                 }
             }
@@ -128,7 +129,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'",
                     )
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_4_5", "Ошибка миграции с 4 на 5", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_4_5", StringProvider.errorMigration4_5, e)
                     throw e
                 }
             }
@@ -172,7 +173,7 @@ abstract class AppDatabase : RoomDatabase() {
                     // Переименовываем временную таблицу
                     db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_5_6", "Ошибка миграции с 5 на 6", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_5_6", StringProvider.errorMigration5_6, e)
                     throw e
                 }
             }
@@ -187,7 +188,7 @@ abstract class AppDatabase : RoomDatabase() {
                 try {
                     // Миграция не требуется
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_6_7", "Ошибка миграции с 6 на 7", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_6_7", StringProvider.errorMigration6_7, e)
                     throw e
                 }
             }
@@ -229,7 +230,7 @@ abstract class AppDatabase : RoomDatabase() {
                     // Переименовываем временную таблицу
                     db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_7_8", "Ошибка миграции с 7 на 8", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_7_8", StringProvider.errorMigration7_8, e)
                     throw e
                 }
             }
@@ -248,7 +249,7 @@ abstract class AppDatabase : RoomDatabase() {
                     // Например, обновить источник "Сбер" на "Наличные" если нужно
                     db.execSQL("UPDATE transactions SET source = 'Наличные' WHERE source = 'Сбер'")
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_8_9", "Ошибка миграции с 8 на 9", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_8_9", StringProvider.errorMigration8_9, e)
                     throw e
                 }
             }
@@ -273,7 +274,7 @@ abstract class AppDatabase : RoomDatabase() {
                         "UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'",
                     )
                 } catch (e: Exception) {
-                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_9_10", "Ошибка миграции с 9 на 10", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_9_10", StringProvider.errorMigration9_10, e)
                     throw e
                 }
             }
@@ -402,7 +403,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
 
                 Timber.i(
-                    "Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity",
+                    StringProvider.logMigration14_15Completed,
                 )
             }
         }
@@ -419,7 +420,7 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_15_14 = object : Migration(15, 14) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Пустая миграция, так как структура в версии 14 уже должна быть совместима
-                Timber.i("Выполнена миграция с версии 15 на 14 (обратная совместимость)")
+                Timber.i(StringProvider.logMigration15_14Completed)
             }
         }
 
@@ -441,7 +442,7 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE transactions ADD COLUMN title TEXT NOT NULL DEFAULT ''")
 
                 Timber.i(
-                    "Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title",
+                    StringProvider.logMigration15_16Completed,
                 )
             }
         }
@@ -453,7 +454,7 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Обратная миграция не удаляет колонки, так как это может привести к потере данных
                 // Просто обновляем версию схемы
-                Timber.i("Выполнена миграция с версии 16 на 15 (обратная совместимость)")
+                Timber.i(StringProvider.logMigration16_15Completed)
             }
         }
 

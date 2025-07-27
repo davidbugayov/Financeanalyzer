@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.data.local.converter
 import androidx.room.TypeConverter
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 
 /**
  * Конвертер для преобразования списка строк в строку и обратно.
@@ -24,7 +25,7 @@ class StringListConverter {
             try {
                 value.split(SEPARATOR).filter { it.isNotBlank() }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при преобразовании строки в список: $value")
+                Timber.e(e, StringProvider.logErrorStringConversion(value))
                 CrashLoggerProvider.crashLogger.logException(e)
                 return emptyList()
             }

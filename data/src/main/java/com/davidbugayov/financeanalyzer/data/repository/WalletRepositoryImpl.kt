@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 
 /**
  * Реализация репозитория для работы с кошельками
@@ -86,7 +87,7 @@ class WalletRepositoryImpl(
             // Для расходных транзакций или если транзакция не найдена, возвращаем пустой список
             return emptyList()
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении кошельков для транзакции $transactionId")
+            Timber.e(e, StringProvider.logErrorGettingWallets(transactionId))
             return emptyList()
         }
     }
@@ -94,7 +95,7 @@ class WalletRepositoryImpl(
     // Вспомогательный метод для получения транзакции из репозитория транзакций
     private suspend fun getTransactionForWallets(transactionId: String): Transaction? {
         if (transactionRepository == null) {
-            Timber.d("TransactionRepository не установлен в WalletRepositoryImpl")
+            Timber.d(StringProvider.logTransactionRepositoryNotSet)
             return null
         }
 
@@ -102,7 +103,7 @@ class WalletRepositoryImpl(
             // В реальной реализации здесь используем репозиторий для получения транзакции
             return transactionRepository.getTransactionById(transactionId)
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении транзакции по ID: $transactionId")
+            Timber.e(e, StringProvider.logErrorGettingTransaction(transactionId))
             return null
         }
     }
