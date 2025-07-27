@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.core.model
 
+import com.davidbugayov.financeanalyzer.core.util.StringProvider
+
 /**
  * Базовый класс для всех исключений в приложении
  */
@@ -14,7 +16,7 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class Connection(cause: Throwable? = null) : Network("Ошибка подключения к сети", cause)
+        class Connection(cause: Throwable? = null) : Network(StringProvider.errorNetworkConnection, cause)
     }
 
     /**
@@ -24,9 +26,9 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class ValidationError(message: String? = null) : Data(message ?: "Ошибка валидации")
+        class ValidationError(message: String? = null) : Data(message ?: StringProvider.errorValidation)
 
-        class NotFound(message: String? = null) : Data(message ?: "Данные не найдены")
+        class NotFound(message: String? = null) : Data(message ?: StringProvider.errorDataNotFound)
     }
 
     /**
@@ -37,7 +39,7 @@ sealed class AppException(
         cause: Throwable? = null,
     ) : AppException(message, cause) {
         class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(
-            message ?: "Ошибка чтения файла",
+            message ?: StringProvider.errorFileRead,
             cause,
         )
     }
@@ -58,7 +60,7 @@ sealed class AppException(
     class Unknown(
         message: String? = null,
         cause: Throwable? = null,
-    ) : AppException(message ?: "Неизвестная ошибка", cause)
+    ) : AppException(message ?: StringProvider.errorUnknown, cause)
 
     /**
      * Общая ошибка приложения
@@ -66,7 +68,7 @@ sealed class AppException(
     class GenericAppException(
         message: String? = null,
         cause: Throwable? = null,
-    ) : AppException(message ?: "Ошибка приложения", cause)
+    ) : AppException(message ?: StringProvider.errorApplication, cause)
 
     companion object {
         /**

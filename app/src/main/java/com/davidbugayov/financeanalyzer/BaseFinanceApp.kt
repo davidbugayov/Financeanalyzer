@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModule
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
+import com.davidbugayov.financeanalyzer.core.util.StringProvider
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -43,6 +44,9 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         PerformanceMetrics.startOperation(PerformanceMetrics.Operations.APP_STARTUP)
 
         super<Application>.onCreate()
+
+        // Инициализация StringProvider для строковых ресурсов
+        StringProvider.init(this)
 
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {
