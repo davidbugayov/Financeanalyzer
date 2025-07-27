@@ -1,4 +1,4 @@
-# 🎯 Lint Baseline для Finance Analyzer
+# 🎯 Lint Baseline для Деньги под Контролем
 
 ## 📚 Что такое Lint Baseline?
 

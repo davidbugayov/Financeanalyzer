@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.util
 
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -24,13 +25,13 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-                    PeriodType.ALL -> "Все время"
-        PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
-        PeriodType.WEEK -> "Неделя: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-        PeriodType.MONTH -> "Месяц: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-        PeriodType.QUARTER -> "Квартал: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-        PeriodType.YEAR -> "Год: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            PeriodType.CUSTOM -> "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            PeriodType.ALL -> StringProvider.periodAllTime
+            PeriodType.DAY -> StringProvider.periodDay(dateFormat.format(startDate))
+            PeriodType.WEEK -> StringProvider.periodWeek(dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.MONTH -> StringProvider.periodMonth(dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.QUARTER -> StringProvider.periodQuarter(dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.YEAR -> StringProvider.periodYear(dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.CUSTOM -> StringProvider.periodCustom(dateFormat.format(startDate), dateFormat.format(endDate))
         }
     }
 
@@ -49,10 +50,10 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> "Все время"
+            PeriodType.ALL -> StringProvider.periodAllTime
             PeriodType.DAY -> dateFormat.format(startDate)
             PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
-                "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+                dateFormat.format(startDate) + " - " + dateFormat.format(endDate)
         }
     }
 

@@ -98,4 +98,50 @@ object StringProvider {
     val recommendationCheckSubscriptionsDesc: String get() = getString(R.string.recommendation_check_subscriptions_desc)
     val recommendationSaveOnCafe: String get() = getString(R.string.recommendation_save_on_cafe)
     val recommendationSaveOnCafeDesc: String get() = getString(R.string.recommendation_save_on_cafe_desc)
+    
+    // Названия категорий
+    val categoryFood: String get() = getString(R.string.category_food)
+    val categoryHealth: String get() = getString(R.string.category_health)
+    val categoryHousing: String get() = getString(R.string.category_housing)
+    val categoryCommunication: String get() = getString(R.string.category_communication)
+    val categoryPet: String get() = getString(R.string.category_pet)
+    val categoryCharity: String get() = getString(R.string.category_charity)
+    val categoryCredit: String get() = getString(R.string.category_credit)
+    val categoryTransfer: String get() = getString(R.string.category_transfer)
+    val categoryOtherExpense: String get() = getString(R.string.category_other_expense)
+    val categorySalary: String get() = getString(R.string.category_salary)
+    val categoryFreelance: String get() = getString(R.string.category_freelance)
+    val categoryGifts: String get() = getString(R.string.category_gifts)
+    val categoryInterest: String get() = getString(R.string.category_interest)
+    val categoryRental: String get() = getString(R.string.category_rental)
+    val categoryOtherIncome: String get() = getString(R.string.category_other_income)
+    
+    // Периоды
+    val periodAllTime: String get() = getString(R.string.period_all_time)
+    fun periodDay(date: String): String = getString(R.string.period_day, date)
+    fun periodWeek(startDate: String, endDate: String): String = getString(R.string.period_week, startDate, endDate)
+    fun periodMonth(startDate: String, endDate: String): String = getString(R.string.period_month, startDate, endDate)
+    fun periodQuarter(startDate: String, endDate: String): String = getString(R.string.period_quarter, startDate, endDate)
+    fun periodYear(startDate: String, endDate: String): String = getString(R.string.period_year, startDate, endDate)
+    fun periodCustom(startDate: String, endDate: String): String = getString(R.string.period_custom, startDate, endDate)
+    
+    // Типы кошельков
+    val walletTypeCash: String get() = getString(R.string.wallet_type_cash)
+    val walletTypeCard: String get() = getString(R.string.wallet_type_card)
+    val walletTypeSavings: String get() = getString(R.string.wallet_type_savings)
+    val walletTypeInvestment: String get() = getString(R.string.wallet_type_investment)
+    val walletTypeGoal: String get() = getString(R.string.wallet_type_goal)
+    val walletTypeOther: String get() = getString(R.string.wallet_type_other)
+    
+    // Описания типов кошельков
+    val walletTypeCashDescription: String get() = getString(R.string.wallet_type_cash_description)
+    val walletTypeCardDescription: String get() = getString(R.string.wallet_type_card_description)
+    val walletTypeSavingsDescription: String get() = getString(R.string.wallet_type_savings_description)
+    val walletTypeInvestmentDescription: String get() = getString(R.string.wallet_type_investment_description)
+    val walletTypeGoalDescription: String get() = getString(R.string.wallet_type_goal_description)
+    val walletTypeOtherDescription: String get() = getString(R.string.wallet_type_other_description)
+    
+    // Транзакции
+    val transactionTransfers: String get() = getString(R.string.transaction_transfers)
+    val transactionTransfer: String get() = getString(R.string.transaction_transfer)
 } 

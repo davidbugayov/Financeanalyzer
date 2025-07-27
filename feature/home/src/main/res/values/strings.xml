@@ -8,7 +8,7 @@
     <string name="transactions_week">Транзакции за неделю</string>
     <string name="transactions_month">Транзакции за месяц</string>
     <string name="transactions_all">Все транзакции</string>
-    <string name="financial_analyzer">Финансовый Анализатор</string>
+    <string name="financial_analyzer">Деньги под Контролем</string>
     
     <!-- Приветствие -->
     <string name="welcome_title">🚀 Добро пожаловать!</string>

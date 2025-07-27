@@ -16,7 +16,7 @@ class GetExpenseOptimizationRecommendationsUseCase {
         if (transactions.isEmpty()) return recommendations
 
         // 1. Повторяющиеся траты (подписки)
-        val subscriptionKeywords = listOf("подписк", "subscription", "сервис", "music", "video", "netflix", "yandex", "apple", "google")
+        val subscriptionKeywords = listOf("подписк", "subscription", StringProvider.categoryServices, "music", "video", "netflix", "yandex", "apple", "google")
         val subscriptions = transactions.filter { tx ->
             tx.isExpense && subscriptionKeywords.any { key ->
                 tx.category.contains(key, true) || tx.title.contains(key, true) || (tx.note?.contains(key, true) == true)
@@ -33,7 +33,7 @@ class GetExpenseOptimizationRecommendationsUseCase {
         }
 
         // 3. Частые расходы на кафе/рестораны
-        val foodKeywords = listOf("кафе", "ресторан", "еда", "food", "coffee", "кофе", "бар")
+        val foodKeywords = listOf(StringProvider.categoryCafe, StringProvider.categoryRestaurant, "еда", "food", "coffee", "кофе", "бар")
         val foodExpenses = transactions.filter { it.isExpense && foodKeywords.any { key -> it.category.contains(key, true) } }
         if (foodExpenses.size > 5) {
             recommendations.add(StringProvider.recommendationCafeSpending)

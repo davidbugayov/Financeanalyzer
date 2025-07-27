@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.categories.model
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
@@ -87,27 +88,27 @@ object CategoryProvider {
 
     private fun getCategoryNameByKey(key: String): String {
         return when (key) {
-            "food" -> "Продукты"
-            "transport" -> "Транспорт"
-            "entertainment" -> "Развлечения"
-            "restaurant" -> "Рестораны"
-            "health" -> "Здоровье"
-            "clothing" -> "Одежда"
-            "housing" -> "Жилье"
-            "communication" -> "Связь"
-            "pet" -> "Питомцы"
-            "services" -> "Услуги"
-            "charity" -> "Благотворительность"
-            "credit" -> "Кредиты"
-            "transfer" -> "Переводы"
-            "other_expense" -> "Другое"
-            "salary" -> "Зарплата"
-            "freelance" -> "Фриланс"
-            "gifts" -> "Подарки"
-            "interest" -> "Проценты"
-            "rental" -> "Аренда"
-            "other_income" -> "Другое"
-            else -> "Другое"
+            "food" -> StringProvider.categoryFood
+            "transport" -> StringProvider.categoryTransport
+            "entertainment" -> StringProvider.categoryEntertainment
+            "restaurant" -> StringProvider.categoryRestaurant
+            "health" -> StringProvider.categoryHealth
+            "clothing" -> StringProvider.categoryClothing
+            "housing" -> StringProvider.categoryHousing
+            "communication" -> StringProvider.categoryCommunication
+            "pet" -> StringProvider.categoryPet
+            "services" -> StringProvider.categoryServices
+            "charity" -> StringProvider.categoryCharity
+            "credit" -> StringProvider.categoryCredit
+            "transfer" -> StringProvider.categoryTransfer
+            "other_expense" -> StringProvider.categoryOtherExpense
+            "salary" -> StringProvider.categorySalary
+            "freelance" -> StringProvider.categoryFreelance
+            "gifts" -> StringProvider.categoryGifts
+            "interest" -> StringProvider.categoryInterest
+            "rental" -> StringProvider.categoryRental
+            "other_income" -> StringProvider.categoryOtherIncome
+            else -> StringProvider.categoryOther
         }
     }
 

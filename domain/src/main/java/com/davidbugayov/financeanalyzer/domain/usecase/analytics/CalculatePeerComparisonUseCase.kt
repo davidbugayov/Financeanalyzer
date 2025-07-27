@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.PeerComparison
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.max
@@ -59,7 +60,7 @@ class CalculatePeerComparisonUseCase {
      */
     private fun createDefaultComparison(): PeerComparison {
         return PeerComparison(
-            incomeRange = "Недостаточно данных",
+            incomeRange = StringProvider.incomeRangeInsufficientData,
             savingsRateVsPeers = 0.0,
             expenseCategoriesVsPeers = emptyMap(),
             healthScorePercentile = 50.0,
@@ -162,96 +163,96 @@ class CalculatePeerComparisonUseCase {
             "< 30k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.05, // 5%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.25,
-                    "Транспорт" to 0.15,
-                    "ЖКХ" to 0.20,
-                    "Одежда" to 0.08,
-                    "Развлечения" to 0.07,
-                    "Прочее" to 0.25
+                    StringProvider.categoryProducts to 0.25,
+                    StringProvider.categoryTransport to 0.15,
+                    StringProvider.categoryUtilities to 0.20,
+                    StringProvider.categoryClothing to 0.08,
+                    StringProvider.categoryEntertainment to 0.07,
+                    StringProvider.categoryOther to 0.25
                 ),
                 sampleSize = 1000
             )
             "30-50k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.08, // 8%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.22,
-                    "Транспорт" to 0.18,
-                    "ЖКХ" to 0.18,
-                    "Одежда" to 0.10,
-                    "Развлечения" to 0.10,
-                    "Прочее" to 0.22
+                    StringProvider.categoryProducts to 0.22,
+                    StringProvider.categoryTransport to 0.18,
+                    StringProvider.categoryUtilities to 0.18,
+                    StringProvider.categoryClothing to 0.10,
+                    StringProvider.categoryEntertainment to 0.10,
+                    StringProvider.categoryOther to 0.22
                 ),
                 sampleSize = 1500
             )
             "50-75k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.12, // 12%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.20,
-                    "Транспорт" to 0.20,
-                    "ЖКХ" to 0.15,
-                    "Одежда" to 0.12,
-                    "Развлечения" to 0.13,
-                    "Прочее" to 0.20
+                    StringProvider.categoryProducts to 0.20,
+                    StringProvider.categoryTransport to 0.20,
+                    StringProvider.categoryUtilities to 0.15,
+                    StringProvider.categoryClothing to 0.12,
+                    StringProvider.categoryEntertainment to 0.13,
+                    StringProvider.categoryOther to 0.20
                 ),
                 sampleSize = 2000
             )
             "75-100k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.15, // 15%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.18,
-                    "Транспорт" to 0.22,
-                    "ЖКХ" to 0.12,
-                    "Одежда" to 0.13,
-                    "Развлечения" to 0.15,
-                    "Прочее" to 0.20
+                    StringProvider.categoryProducts to 0.18,
+                    StringProvider.categoryTransport to 0.22,
+                    StringProvider.categoryUtilities to 0.12,
+                    StringProvider.categoryClothing to 0.13,
+                    StringProvider.categoryEntertainment to 0.15,
+                    StringProvider.categoryOther to 0.20
                 ),
                 sampleSize = 1200
             )
             "100-150k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.18, // 18%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.16,
-                    "Транспорт" to 0.25,
-                    "ЖКХ" to 0.10,
-                    "Одежда" to 0.15,
-                    "Развлечения" to 0.18,
-                    "Прочее" to 0.16
+                    StringProvider.categoryProducts to 0.16,
+                    StringProvider.categoryTransport to 0.25,
+                    StringProvider.categoryUtilities to 0.10,
+                    StringProvider.categoryClothing to 0.15,
+                    StringProvider.categoryEntertainment to 0.18,
+                    StringProvider.categoryOther to 0.16
                 ),
                 sampleSize = 800
             )
             "150-200k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.22, // 22%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.15,
-                    "Транспорт" to 0.28,
-                    "ЖКХ" to 0.08,
-                    "Одежда" to 0.17,
-                    "Развлечения" to 0.20,
-                    "Прочее" to 0.12
+                    StringProvider.categoryProducts to 0.15,
+                    StringProvider.categoryTransport to 0.28,
+                    StringProvider.categoryUtilities to 0.08,
+                    StringProvider.categoryClothing to 0.17,
+                    StringProvider.categoryEntertainment to 0.20,
+                    StringProvider.categoryOther to 0.12
                 ),
                 sampleSize = 500
             )
             "200-300k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.25, // 25%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.12,
-                    "Транспорт" to 0.30,
-                    "ЖКХ" to 0.06,
-                    "Одежда" to 0.20,
-                    "Развлечения" to 0.22,
-                    "Прочее" to 0.10
+                    StringProvider.categoryProducts to 0.12,
+                    StringProvider.categoryTransport to 0.30,
+                    StringProvider.categoryUtilities to 0.06,
+                    StringProvider.categoryClothing to 0.20,
+                    StringProvider.categoryEntertainment to 0.22,
+                    StringProvider.categoryOther to 0.10
                 ),
                 sampleSize = 300
             )
             else -> IncomeBenchmarks( // "300k+"
                 averageSavingsRate = 0.30, // 30%
                 averageExpenseBreakdown = mapOf(
-                    "Продукты" to 0.10,
-                    "Транспорт" to 0.35,
-                    "ЖКХ" to 0.05,
-                    "Одежда" to 0.25,
-                    "Развлечения" to 0.20,
-                    "Прочее" to 0.05
+                    StringProvider.categoryProducts to 0.10,
+                    StringProvider.categoryTransport to 0.35,
+                    StringProvider.categoryUtilities to 0.05,
+                    StringProvider.categoryClothing to 0.25,
+                    StringProvider.categoryEntertainment to 0.20,
+                    StringProvider.categoryOther to 0.05
                 ),
                 sampleSize = 150
             )
@@ -268,7 +269,7 @@ class CalculatePeerComparisonUseCase {
         val comparison = mutableMapOf<String, Double>()
         
         // Сравниваем основные категории
-        val mainCategories = setOf("Продукты", "Транспорт", "ЖКХ", "Одежда", "Развлечения")
+        val mainCategories = setOf(StringProvider.categoryProducts, StringProvider.categoryTransport, StringProvider.categoryUtilities, StringProvider.categoryClothing, StringProvider.categoryEntertainment)
         
         for (category in mainCategories) {
             val userPercent = userBreakdown[category] ?: 0.0

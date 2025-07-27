@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Заголовки -->
-    <string name="onboarding_welcome_title">Деньги под контролем</string>
+    <string name="onboarding_welcome_title">Деньги под Контролем</string>
     <string name="onboarding_welcome_subtitle">Ваш личный помощник для управления финансами</string>
     <string name="onboarding_features_title">Возможности приложения</string>
     <string name="onboarding_benefits_title">Преимущества</string>
@@ -34,7 +34,7 @@
     
     <!-- Устаревшие строки (для совместимости) -->
     <string name="onboarding_page_1_title">Добро пожаловать!</string>
-    <string name="onboarding_page_1_description">Finance Analyzer поможет вам управлять личными финансами</string>
+    <string name="onboarding_page_1_description">Деньги под Контролем поможет вам управлять личными финансами</string>
     <string name="onboarding_page_2_title">Отслеживайте расходы</string>
     <string name="onboarding_page_2_description">Легко добавляйте транзакции и контролируйте свои траты</string>
     <string name="onboarding_page_3_title">Анализируйте данные</string>

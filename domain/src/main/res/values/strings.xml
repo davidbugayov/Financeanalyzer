@@ -2,7 +2,7 @@
 <resources>
     <!-- Валидация -->
     <string name="error_enter_transaction_amount">Введите сумму транзакции</string>
-    
+
     <!-- Достижения -->
     <string name="log_achievement_trigger_initialized">🏆 AchievementTrigger инициализирован</string>
     <string name="log_achievement_transaction_added">🏆 Триггер: Транзакция добавлена</string>
@@ -13,21 +13,21 @@
     <string name="log_achievement_budget_progress">🏆 Триггер: Прогресс бюджета: %1$d%%</string>
     <string name="log_achievement_category_used">🏆 Триггер: Использована категория %1$s</string>
     <string name="log_achievement_milestone_reached">🏆 Триггер: Достигнута веха %1$s</string>
-    
+
     <!-- Советы по расходам -->
     <string name="tip_top_category_spending">Вы тратите больше всего на категорию: \'%1$s\'. Подумайте, можно ли сократить эти расходы.</string>
     <string name="tip_subscriptions_found">У вас есть регулярные подписки. Проверьте, все ли из них вам действительно нужны.</string>
     <string name="tip_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее, чтобы избежать финансового стресса.</string>
     <string name="tip_small_expenses">У вас много мелких трат. Попробуйте объединять покупки или отказаться от лишнего.</string>
     <string name="tip_expenses_equal_income">Ваши расходы равны или превышают доходы. Попробуйте откладывать хотя бы 10% от дохода.</string>
-    
+
     <!-- Рекомендации по оптимизации -->
     <string name="recommendation_check_subscriptions">Проверьте ваши подписки: возможно, некоторые из них можно отключить или заменить на более выгодные.</string>
     <string name="recommendation_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее и ищите альтернативы.</string>
     <string name="recommendation_cafe_spending">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома чаще — это поможет сэкономить.</string>
     <string name="recommendation_small_expenses">У вас много мелких трат. Ведите учёт и попробуйте отказаться от ненужных покупок.</string>
     <string name="recommendation_no_savings">Вы не делаете регулярных накоплений. Откладывайте хотя бы 10% от дохода каждый месяц.</string>
-    
+
     <!-- Экспорт -->
     <string name="error_no_transactions_to_export">Нет транзакций для экспорта</string>
     <string name="export_filename">Финансы_%1$s.csv</string>
@@ -39,10 +39,10 @@
     <string name="log_export_unexpected_error">Непредвиденная ошибка при экспорте транзакций</string>
     <string name="log_file_created">Файл создан: %1$s</string>
     <string name="log_file_ready_for_send">Файл готов для отправки: %1$s</string>
-    
+
     <!-- Сравнение с аналогами -->
     <string name="income_range_insufficient_data">Недостаточно данных</string>
-    
+
     <!-- Категории расходов -->
     <string name="category_products">Продукты</string>
     <string name="category_transport">Транспорт</string>
@@ -54,7 +54,7 @@
     <string name="category_services">Сервисы</string>
     <string name="category_cafe">Кафе</string>
     <string name="category_restaurant">Ресторан</string>
-    
+
     <!-- Рекомендации по финансовому здоровью -->
     <string name="recommendation_improve_financial_health">Улучшите общее финансовое здоровье</string>
     <string name="recommendation_improve_financial_health_desc">Ваш коэффициент финансового здоровья (%1$d/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.</string>
@@ -76,4 +76,50 @@
     <string name="recommendation_check_subscriptions_desc">У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.</string>
     <string name="recommendation_save_on_cafe">Экономьте на кафе и ресторанах</string>
     <string name="recommendation_save_on_cafe_desc">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.</string>
-</resources> 
+
+    <!-- Названия категорий -->
+    <string name="category_food">Продукты</string>
+    <string name="category_health">Здоровье</string>
+    <string name="category_housing">Жилье</string>
+    <string name="category_communication">Связь</string>
+    <string name="category_pet">Питомцы</string>
+    <string name="category_charity">Благотворительность</string>
+    <string name="category_credit">Кредиты</string>
+    <string name="category_transfer">Переводы</string>
+    <string name="category_other_expense">Другое</string>
+    <string name="category_salary">Зарплата</string>
+    <string name="category_freelance">Фриланс</string>
+    <string name="category_gifts">Подарки</string>
+    <string name="category_interest">Проценты</string>
+    <string name="category_rental">Аренда</string>
+    <string name="category_other_income">Другое</string>
+
+    <!-- Периоды -->
+    <string name="period_all_time">Все время</string>
+    <string name="period_day">День: %1$s</string>
+    <string name="period_week">Неделя: %1$s - %2$s</string>
+    <string name="period_month">Месяц: %1$s - %2$s</string>
+    <string name="period_quarter">Квартал: %1$s - %2$s</string>
+    <string name="period_year">Год: %1$s - %2$s</string>
+    <string name="period_custom">%1$s - %2$s</string>
+
+    <!-- Типы кошельков -->
+    <string name="wallet_type_cash">Наличные</string>
+    <string name="wallet_type_card">Банковская карта</string>
+    <string name="wallet_type_savings">Сбережения</string>
+    <string name="wallet_type_investment">Инвестиции</string>
+    <string name="wallet_type_goal">Накопительная цель</string>
+    <string name="wallet_type_other">Другое</string>
+
+    <!-- Описания типов кошельков -->
+    <string name="wallet_type_cash_description">Наличные деньги в кошельке или дома</string>
+    <string name="wallet_type_card_description">Дебетовые карты, расчётные счета в банке</string>
+    <string name="wallet_type_savings_description">Сберегательные счета, депозиты, накопления</string>
+    <string name="wallet_type_investment_description">Брокерские счета, ИИС, инвестиционные портфели</string>
+    <string name="wallet_type_goal_description">Специальные счета для достижения целей</string>
+    <string name="wallet_type_other_description">Кредиты, долги, займы и другие финансовые инструменты</string>
+
+    <!-- Транзакции -->
+    <string name="transaction_transfers">Переводы</string>
+    <string name="transaction_transfer">Перевод</string>
+</resources>

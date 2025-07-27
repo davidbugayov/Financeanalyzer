@@ -664,7 +664,7 @@
 
     <string name="savings_rate_title">Норма сбережений</string>
     <string name="savings_rate_explanation" formatted="false">Показывает процент дохода, который вы откладываете. Рекомендуемый показатель – от 15% до 30%. Чем выше, тем быстрее растут ваши накопления.</string>
-    <string name="savings_rate_percent">%d%%</string>
+    <string name="savings_rate_percent">%1$s%%</string>
     <string name="savings_rate_percent_0">0%</string>
     <string name="savings_rate_percent_15">15%</string>
     <string name="savings_rate_percent_30">30%</string>

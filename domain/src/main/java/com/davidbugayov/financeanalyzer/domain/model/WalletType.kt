@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+
 /**
  * Тип кошелька.
  * Используется для упрощённой фильтрации и отображения иконок.
@@ -27,24 +29,24 @@ enum class WalletType {
      * Получить локализованное название типа кошелька
      */
     fun getDisplayName(): String = when (this) {
-        CASH -> "Наличные"
-        CARD -> "Банковская карта"
-        SAVINGS -> "Сбережения"
-        INVESTMENT -> "Инвестиции"
-        GOAL -> "Накопительная цель"
-        OTHER -> "Другое"
+        CASH -> StringProvider.walletTypeCash
+        CARD -> StringProvider.walletTypeCard
+        SAVINGS -> StringProvider.walletTypeSavings
+        INVESTMENT -> StringProvider.walletTypeInvestment
+        GOAL -> StringProvider.walletTypeGoal
+        OTHER -> StringProvider.walletTypeOther
     }
 
     /**
      * Получить описание назначения типа кошелька
      */
     fun getDescription(): String = when (this) {
-        CASH -> "Наличные деньги в кошельке или дома"
-        CARD -> "Дебетовые карты, расчётные счета в банке"
-        SAVINGS -> "Сберегательные счета, депозиты, накопления"
-        INVESTMENT -> "Брокерские счета, ИИС, инвестиционные портфели"
-        GOAL -> "Специальные счета для достижения целей"
-        OTHER -> "Кредиты, долги, займы и другие финансовые инструменты"
+        CASH -> StringProvider.walletTypeCashDescription
+        CARD -> StringProvider.walletTypeCardDescription
+        SAVINGS -> StringProvider.walletTypeSavingsDescription
+        INVESTMENT -> StringProvider.walletTypeInvestmentDescription
+        GOAL -> StringProvider.walletTypeGoalDescription
+        OTHER -> StringProvider.walletTypeOtherDescription
     }
 
     /**

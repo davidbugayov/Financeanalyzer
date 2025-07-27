@@ -6,6 +6,10 @@ import com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation
 import com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory
 import com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import kotlin.math.max
 import java.math.BigDecimal
 
@@ -82,23 +86,23 @@ class CalculateEnhancedFinancialMetricsUseCase(
         
         // Рекомендации по коэффициенту финансового здоровья
         if (healthScore < 50) {
-            recommendations.add(
-                FinancialRecommendation(
-                            title = "Улучшите общее финансовое здоровье",
-        description = "Ваш коэффициент финансового здоровья (${healthScore.toInt()}/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.",
-                    priority = RecommendationPriority.HIGH,
-                    category = RecommendationCategory.SAVINGS,
-                    potentialImpact = 15.0
+                            recommendations.add(
+                    FinancialRecommendation(
+                        title = StringProvider.recommendationImproveFinancialHealth,
+        description = StringProvider.recommendationImproveFinancialHealthDesc(healthScore.toInt()),
+                        priority = RecommendationPriority.HIGH,
+                        category = RecommendationCategory.SAVINGS,
+                        potentialImpact = 15.0
+                    )
                 )
-            )
         }
         
         // Рекомендации по дисциплине расходов
         if (expenseDisciplineIndex < 60) {
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Улучшите контроль расходов",
-        description = "Ваш индекс расходной дисциплины (${expenseDisciplineIndex.toInt()}/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.",
+                    title = StringProvider.recommendationImproveExpenseControl,
+        description = StringProvider.recommendationImproveExpenseControlDesc(expenseDisciplineIndex.toInt()),
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 12.0
@@ -113,10 +117,10 @@ class CalculateEnhancedFinancialMetricsUseCase(
             )
             
             if (monthlyDeficit.toDouble() > 0) {
-                recommendations.add(
+                                recommendations.add(
                     FinancialRecommendation(
-                                title = "Увеличьте пенсионные накопления",
-        description = "Для достижения пенсионной цели увеличьте ежемесячные накопления на ${Money(monthlyDeficit).formatted}. Текущий прогресс: ${retirementForecast.retirementGoalProgress.toInt()}%",
+                        title = StringProvider.recommendationIncreaseRetirementSavings,
+        description = StringProvider.recommendationIncreaseRetirementSavingsDesc(Money(monthlyDeficit).formatted, retirementForecast.retirementGoalProgress.toInt()),
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.RETIREMENT,
                         potentialImpact = 8.0
@@ -127,10 +131,10 @@ class CalculateEnhancedFinancialMetricsUseCase(
         
         // Рекомендации на основе сравнения с пирами
         if (peerComparison.savingsRateVsPeers < -5) { // На 5% меньше среднего
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Увеличьте норму сбережений",
-        description = "Ваша норма сбережений на ${(-peerComparison.savingsRateVsPeers).toInt()}% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10% от дохода.",
+                    title = StringProvider.recommendationIncreaseSavingsRate,
+        description = StringProvider.recommendationIncreaseSavingsRateDesc((-peerComparison.savingsRateVsPeers).toInt()),
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.SAVINGS,
                     potentialImpact = 10.0
@@ -141,10 +145,10 @@ class CalculateEnhancedFinancialMetricsUseCase(
         // Рекомендации по разнообразию источников дохода
         val incomeSources = transactions.filter { !it.isExpense }.map { it.source }.distinct().size
         if (incomeSources < 2) {
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Диверсифицируйте источники дохода",
-        description = "У вас только $incomeSources источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.",
+                    title = StringProvider.recommendationDiversifyIncome,
+        description = StringProvider.recommendationDiversifyIncomeDesc(incomeSources),
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.INCOME,
                     potentialImpact = 5.0
@@ -162,10 +166,10 @@ class CalculateEnhancedFinancialMetricsUseCase(
         }
         
         if (emergencyFundMonths < 3) {
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Создайте резервный фонд",
-        description = "Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на ${max(0.0, emergencyFundMonths).toInt()} месяца.",
+                    title = StringProvider.recommendationCreateEmergencyFund,
+        description = StringProvider.recommendationCreateEmergencyFundDesc(max(0.0, emergencyFundMonths).toInt()),
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EMERGENCY_FUND,
                     potentialImpact = 12.0
@@ -177,20 +181,20 @@ class CalculateEnhancedFinancialMetricsUseCase(
         val wallets = walletRepository.getAllWallets()
         wallets.forEach { wallet ->
             if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount) {
-                recommendations.add(
+                                recommendations.add(
                     FinancialRecommendation(
-                                title = "Превышен бюджет по категории ${wallet.name}",
-        description = "Вы превысили бюджет по категории ${wallet.name}. Пересмотрите траты или увеличьте лимит.",
+                        title = StringProvider.recommendationBudgetExceeded(wallet.name),
+        description = StringProvider.recommendationBudgetExceededDesc(wallet.name),
                         priority = RecommendationPriority.HIGH,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 15.0
                     )
                 )
             } else if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount.multiply(java.math.BigDecimal("0.8"))) {
-                recommendations.add(
+                                recommendations.add(
                     FinancialRecommendation(
-                                title = "Близко к лимиту по категории ${wallet.name}",
-        description = "Вы близки к превышению лимита по категории ${wallet.name}. Контролируйте расходы!",
+                        title = StringProvider.recommendationBudgetCloseToLimit(wallet.name),
+        description = StringProvider.recommendationBudgetCloseToLimitDesc(wallet.name),
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 8.0
@@ -199,16 +203,16 @@ class CalculateEnhancedFinancialMetricsUseCase(
             }
         }
         // Анализ повторяющихся подписок и крупных трат (пример)
-        val subscriptionCategories = listOf("Подписка", "Subscription", "Сервисы")
+        val subscriptionCategories = listOf(StringProvider.categorySubscription, "Subscription", StringProvider.categoryServices)
         val unusedSubscriptions = transactions.filter { tx ->
             subscriptionCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
             // Здесь можно добавить анализ неиспользуемых подписок
         }
         if (unusedSubscriptions.isNotEmpty()) {
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Проверьте подписки",
-        description = "У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.",
+                    title = StringProvider.recommendationCheckSubscriptionsTitle,
+        description = StringProvider.recommendationCheckSubscriptionsDesc,
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 6.0
@@ -216,15 +220,15 @@ class CalculateEnhancedFinancialMetricsUseCase(
             )
         }
         // Совет по экономии на кафе
-        val cafeCategories = listOf("Кафе", "Ресторан", "Coffee", "Restaurant")
+        val cafeCategories = listOf(StringProvider.categoryCafe, StringProvider.categoryRestaurant, "Coffee", "Restaurant")
         val cafeExpenses = transactions.filter { tx ->
             tx.isExpense && cafeCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
         }
         if (cafeExpenses.size > 5) { // Порог можно скорректировать
-            recommendations.add(
+                        recommendations.add(
                 FinancialRecommendation(
-                            title = "Экономьте на кафе и ресторанах",
-        description = "Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.",
+                    title = StringProvider.recommendationSaveOnCafe,
+        description = StringProvider.recommendationSaveOnCafeDesc,
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 4.0
