@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -67,18 +68,13 @@ class GenericCsvImportUseCase(
         val firstLine = reader.readLine()
         reader.reset()
         if (firstLine == null) {
-            Timber.w("[$bankName] ${context.getString(R.string.csv_file_empty)}")
+            Timber.w("[$bankName] ${TransactionStringProvider.csvFileEmpty}")
             return false
         }
         val columns = firstLine.split(config.delimiter)
         val isValid = columns.isNotEmpty() && columns.size >= config.expectedMinColumnCount
         Timber.d(
-            "[$bankName] ${context.getString(
-                R.string.csv_format_check,
-                firstLine,
-                config.delimiter,
-                isValid,
-            )}",
+            "[$bankName] ${TransactionStringProvider.logCsvFormatCheck(firstLine, config.delimiter, isValid)}",
         )
         return isValid
     }
@@ -89,9 +85,9 @@ class GenericCsvImportUseCase(
     override fun skipHeaders(reader: BufferedReader) {
         if (config.hasHeader) {
             val headerLine = reader.readLine()
-            Timber.d("[$bankName] ${context.getString(R.string.csv_header_skipped, headerLine)}")
+            Timber.d("[$bankName] ${TransactionStringProvider.logCsvHeaderSkipped(headerLine)}")
         } else {
-            Timber.d("[$bankName] ${context.getString(R.string.csv_no_header)}")
+            Timber.d("[$bankName] ${TransactionStringProvider.logCsvNoHeader}")
         }
     }
 
@@ -100,7 +96,7 @@ class GenericCsvImportUseCase(
      * Возвращает null, если строка невалидна или не содержит транзакцию.
      */
     override fun parseLine(line: String): Transaction? {
-        Timber.d("[$bankName] ${context.getString(R.string.csv_parsing_line, line)}")
+        Timber.d("[$bankName] ${TransactionStringProvider.logCsvParsingLine(line)}")
 
         // Определяем разделитель, если строка не соответствует ожидаемому формату
         val actualDelimiter =

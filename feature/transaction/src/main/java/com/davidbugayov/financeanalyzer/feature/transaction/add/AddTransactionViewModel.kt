@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
@@ -70,9 +71,9 @@ class AddTransactionViewModel(
             try {
                 val walletsList = walletRepository.getAllWallets()
                 _wallets.value = walletsList
-                Timber.d("ТРАНЗАКЦИЯ: Загружено %d кошельков", walletsList.size)
+                Timber.d(TransactionStringProvider.logTransactionWalletsLoaded(walletsList.size))
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке кошельков")
+                Timber.e(e, TransactionStringProvider.logErrorLoadingWallets)
                 _wallets.value = emptyList()
             }
         }
@@ -96,7 +97,7 @@ class AddTransactionViewModel(
         amount: String,
         categoryId: String,
     ): Boolean {
-        Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount)
+        Timber.d(TransactionStringProvider.logTransactionValidateInput(amount))
         val validationBuilder = ValidationBuilder()
 
         _state.update {
@@ -109,30 +110,29 @@ class AddTransactionViewModel(
 
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
-            Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма")
-            CrashLoggerProvider.crashLogger.logException(Exception("Пустая сумма"))
+            Timber.d(TransactionStringProvider.logTransactionEmptyAmountError)
+            CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorEmptyAmount))
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
                 if (amountValue <= BigDecimal.ZERO) {
                     validationBuilder.addAmountError()
                     Timber.d(
-                        "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
-                        amountValue,
+                        TransactionStringProvider.logTransactionZeroAmountError(amountValue.toFloat()),
                     )
-                    CrashLoggerProvider.crashLogger.logException(Exception("Сумма меньше или равна нулю: $amountValue"))
+                    CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorZeroAmount(amountValue.toString())))
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
-                Timber.e("ТРАНЗАКЦИЯ: Ошибка валидации при парсинге суммы: %s", e.message)
+                Timber.e(TransactionStringProvider.logTransactionParseAmountError(e.message ?: ""))
                 CrashLoggerProvider.crashLogger.logException(e)
             }
         }
 
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
-            Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая категория")
-            CrashLoggerProvider.crashLogger.logException(Exception("Пустая категория"))
+            Timber.d(TransactionStringProvider.logTransactionEmptyCategoryError)
+            CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorEmptyCategory))
         }
 
         val validationResult = validationBuilder.build()
@@ -145,9 +145,7 @@ class AddTransactionViewModel(
         }
 
         Timber.d(
-            "ТРАНЗАКЦИЯ: validateInput - Результат: isValid=%b, hasAmountError=%b",
-            validationResult.isValid,
-            validationResult.hasAmountError,
+            TransactionStringProvider.logTransactionValidationResult(validationResult.isValid, validationResult.hasAmountError),
         )
         return validationResult.isValid
     }
@@ -403,9 +401,7 @@ class AddTransactionViewModel(
         }
 
         Timber.d(
-            "AddTransactionViewModel: initializeScreen завершена, forceExpense=%b, isExpense=%b",
-            _state.value.forceExpense,
-            _state.value.isExpense,
+            TransactionStringProvider.logTransactionInitializeScreen(_state.value.forceExpense, _state.value.isExpense),
         )
     }
 

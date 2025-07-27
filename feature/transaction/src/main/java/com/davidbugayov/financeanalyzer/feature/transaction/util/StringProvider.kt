@@ -37,8 +37,14 @@ object StringProvider {
     val errorEmptyAmount: String get() = getString(R.string.error_empty_amount)
     fun errorZeroAmount(amount: String): String = getString(R.string.error_zero_amount, amount)
     val errorEmptyCategory: String get() = getString(R.string.error_empty_category)
+    val errorUnknown: String get() = getString(R.string.error_unknown)
     
     // Импорт CSV
+    val csvFileEmpty: String get() = getString(R.string.csv_file_empty)
+    fun logCsvFormatCheck(firstLine: String, delimiter: Char, isValid: Boolean): String = getString(R.string.csv_format_check, firstLine, delimiter, isValid)
+    fun logCsvHeaderSkipped(headerLine: String?): String = getString(R.string.csv_header_skipped, headerLine ?: "")
+    val logCsvNoHeader: String get() = getString(R.string.csv_no_header)
+    fun logCsvParsingLine(line: String): String = getString(R.string.csv_parsing_line, line)
     val csvDateFormat: String get() = getString(R.string.csv_date_format)
     fun logCsvDelimiterUsed(bankName: String, delimiter: String, columns: Int): String = getString(R.string.log_csv_delimiter_used, bankName, delimiter, columns)
     fun logCsvDateNotFound(bankName: String, columnIndex: Int, dateString: String): String = getString(R.string.log_csv_date_not_found, bankName, columnIndex, dateString)
