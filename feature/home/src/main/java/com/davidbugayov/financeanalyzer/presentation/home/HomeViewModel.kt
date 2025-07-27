@@ -21,6 +21,7 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
@@ -470,14 +471,14 @@ class HomeViewModel(
                 } else {
                     _state.update {
                         it.copy(
-                            error = "Ошибка при сохранении некоторых тестовых транзакций",
+                            error = HomeStringProvider.errorSavingTestTransactions,
                         )
                     }
                 }
                 loadTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error generating test data")
-                _state.update { it.copy(error = e.message ?: "Ошибка при генерации тестовых данных") }
+                _state.update { it.copy(error = e.message ?: HomeStringProvider.errorGeneratingTestData) }
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

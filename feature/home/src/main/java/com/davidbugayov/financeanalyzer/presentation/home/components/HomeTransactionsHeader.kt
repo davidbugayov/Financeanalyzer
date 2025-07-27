@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import androidx.compose.ui.res.stringResource
 
 /**
  * Компонент для отображения заголовка списка транзакций.
@@ -47,9 +48,9 @@ fun HomeTransactionsHeader(
             Text(
                 text =
                     if (showGroupSummary) {
-                        "Скрыть сводку"
+                        stringResource(R.string.hide_summary)
                     } else {
-                        "Показать сводку"
+                        stringResource(R.string.show_summary)
                     },
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
@@ -61,9 +62,9 @@ fun HomeTransactionsHeader(
 @Composable
 private fun headerTitleForFilter(filter: TransactionFilter): String {
     return when (filter) {
-        TransactionFilter.TODAY -> "Транзакции за сегодня"
-        TransactionFilter.WEEK -> "Транзакции за неделю"
-        TransactionFilter.MONTH -> "Транзакции за месяц"
-        TransactionFilter.ALL -> "Все транзакции"
+        TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
+        TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
+        TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+        TransactionFilter.ALL -> stringResource(R.string.transactions_all)
     }
 }

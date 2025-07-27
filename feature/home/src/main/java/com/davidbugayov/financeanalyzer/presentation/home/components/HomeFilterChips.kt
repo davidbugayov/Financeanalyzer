@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import androidx.compose.ui.res.stringResource
 import timber.log.Timber
 
 /**
@@ -31,10 +32,10 @@ fun PermissionUtilsHomeFilterChips(
 ) {
     val filters =
         listOf(
-            FilterChipData(TransactionFilter.TODAY, "Сегодня"),
-            FilterChipData(TransactionFilter.WEEK, "Неделя"),
-            FilterChipData(TransactionFilter.MONTH, "Месяц"),
-            FilterChipData(TransactionFilter.ALL, "Все"),
+            FilterChipData(TransactionFilter.TODAY, stringResource(R.string.filter_today)),
+            FilterChipData(TransactionFilter.WEEK, stringResource(R.string.filter_week)),
+            FilterChipData(TransactionFilter.MONTH, stringResource(R.string.filter_month)),
+            FilterChipData(TransactionFilter.ALL, stringResource(R.string.filter_all)),
         )
 
     Row(

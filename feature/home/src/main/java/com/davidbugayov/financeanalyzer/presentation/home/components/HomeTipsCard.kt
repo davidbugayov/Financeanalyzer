@@ -64,8 +64,8 @@ fun HomeTipsCard(
             
             SmartRecommendationCard(
                 recommendations = onboardingRecommendations,
-                title = "🚀 Добро пожаловать!",
-                subtitle = "Изучите возможности приложения",
+                title = stringResource(R.string.welcome_title),
+                subtitle = stringResource(R.string.welcome_subtitle),
                 style = SmartCardStyle.MINIMAL,
                 showPriorityIndicator = false,
                 onDismiss = {

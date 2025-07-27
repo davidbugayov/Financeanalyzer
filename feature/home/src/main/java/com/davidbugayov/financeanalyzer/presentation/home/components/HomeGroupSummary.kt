@@ -30,6 +30,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryDivider
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryExpense
@@ -174,7 +175,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = "Общий доход",
+                            text = stringResource(R.string.total_income),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -194,7 +195,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = "Общий расход",
+                            text = stringResource(R.string.total_expense),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -214,7 +215,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = "Баланс",
+                            text = stringResource(R.string.balance),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = textSecondary,
@@ -243,7 +244,7 @@ private fun SummaryCategorySwitcher(
     ) {
         Text(
             text =
-                if (showExpenses) "Категории расходов" else "Категории доходов",
+                if (showExpenses) stringResource(R.string.expense_categories) else stringResource(R.string.income_categories),
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -251,7 +252,7 @@ private fun SummaryCategorySwitcher(
         )
         Text(
             text =
-                if (showExpenses) "Показать доходы" else "Показать расходы",
+                if (showExpenses) stringResource(R.string.show_incomes) else stringResource(R.string.show_expenses),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
@@ -311,7 +312,7 @@ private fun SummaryEmptyState(
 ) {
     Text(
         text =
-            if (showExpenses) "Нет расходов за период" else "Нет доходов за период",
+            if (showExpenses) stringResource(R.string.no_expenses_period) else stringResource(R.string.no_incomes_period),
         fontSize = 13.sp,
         color = textSecondary,
         modifier = Modifier.padding(vertical = 8.dp),
@@ -325,7 +326,7 @@ private fun SummaryShowMoreButton(
     onClick: () -> Unit,
 ) {
     Text(
-        text = "И еще $moreCount категорий",
+        text = stringResource(R.string.and_more_categories, moreCount),
         fontSize = 12.sp,
         color = textSecondary,
         modifier =

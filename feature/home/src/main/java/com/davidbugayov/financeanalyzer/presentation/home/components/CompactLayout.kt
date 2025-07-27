@@ -31,6 +31,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -79,7 +80,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.compose.material3.Icon(
                 imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-                contentDescription = "Иконка пустого состояния",
+                contentDescription = stringResource(R.string.empty_state_icon),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier =
                     Modifier
@@ -87,7 +88,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                         .size(36.dp),
             )
             Text(
-                text = "Нет транзакций",
+                text = stringResource(R.string.no_transactions),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
@@ -95,7 +96,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 modifier = Modifier.padding(bottom = 4.dp),
             )
             Text(
-                text = "Добавьте первую транзакцию, чтобы начать отслеживать свои финансы",
+                text = stringResource(R.string.add_first_transaction_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,
@@ -118,7 +119,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                         .heightIn(min = 44.dp),
             ) {
                 Text(
-                    text = "Добавить транзакцию",
+                    text = stringResource(R.string.add_transaction),
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     maxLines = 1,
