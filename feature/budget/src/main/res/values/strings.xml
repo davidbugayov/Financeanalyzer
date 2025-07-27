@@ -1,6 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Импорт категорий -->
+    <string name="import_categories_title">Импорт категорий</string>
+    <string name="import_categories_subtitle">Выберите категории расходов для добавления в бюджет:</string>
+    <string name="import_categories_confirm">Импортировать</string>
+    <string name="cancel">Отмена</string>
+    
+    <!-- Ошибки кошельков -->
+    <string name="error_wallet_not_found">Кошелек не найден</string>
+    <string name="error_loading_wallet">Ошибка загрузки кошелька</string>
+    <string name="error_loading_transactions">Ошибка загрузки транзакций</string>
+    <string name="error_binding_categories">Ошибка привязки категорий</string>
+    
+    <!-- Валидация кошельков -->
+    <string name="error_enter_wallet_name">Введите название кошелька</string>
+    <string name="error_enter_target_amount">Введите целевую сумму для накопительной цели</string>
+    <string name="error_target_amount_positive">Целевая сумма должна быть больше нуля</string>
+    <string name="error_enter_valid_amount">Введите корректную сумму</string>
+    <string name="error_creating_wallet">Ошибка при создании кошелька: %1$s</string>
+    
+    <!-- Подкошельки -->
+    <string name="subwallets">Подкошельки</string>
+    <string name="back">Назад</string>
+    <string name="add_subwallet">Добавить подкошелек</string>
+    
     <!-- Бюджет -->
+    <string name="budget">Бюджет</string>
+    <string name="add_income">Добавить доход</string>
+    <string name="period_settings">Настройки периода</string>
+    <string name="my_wallets">Мои кошельки</string>
+    <string name="add_new_wallet">Добавить новый кошелек</string>
+    <string name="wallet_name">Название кошелька</string>
+    <string name="expense_limit">Лимит расходов</string>
+    <string name="add">Добавить</string>
+    
+    <!-- Распределение дохода -->
+    <string name="distribute_income">Распределить доход</string>
+    <string name="distribute_income_description">Доход будет распределен между кошельками пропорционально лимитам категорий</string>
+    <string name="income_amount">Сумма дохода</string>
+    <string name="distribute">Распределить</string>
+    <string name="no_wallets_available">Нет доступных кошельков для распределения</string>
+    <string name="add_without_distribution">Добавить без распределения</string>
+    
+    <!-- Траты -->
+    <string name="spend_from_wallet">Потратить из кошелька</string>
+    <string name="category_label">Категория: %1$s</string>
+    <string name="amount">Сумма</string>
+    <string name="spend">Потратить</string>
+    
+    <!-- Переводы -->
+    <string name="transfer_between_wallets">Перевод между кошельками</string>
+    <string name="from_category">Из категории: %1$s</string>
+    <string name="to_category">В категорию:</string>
+    <string name="selected_wallet">Выбрано: %1$s</string>
+    <string name="transfer_amount">Сумма перевода</string>
+    <string name="transfer">Перевести</string>
+    
+    <!-- Настройки периода -->
+    <string name="period_settings_title">Настройки периода</string>
+    <string name="period_duration_description">Установите продолжительность периода в днях</string>
+    <string name="days_count">Количество дней</string>
+    <string name="save">Сохранить</string>
+    
+    <!-- Ошибки -->
+    <string name="error">Ошибка</string>
+    <string name="ok">ОК</string>
+    <string name="error_distributing_income">Ошибка при распределении дохода</string>
+    
+    <!-- Превышение бюджета -->
     <string name="budget_over_limit_title">Превышение бюджета</string>
     <string name="budget_over_limit_message">Следующие кошельки превысили лимит бюджета: %1$s</string>
     
@@ -16,47 +83,12 @@
     <string name="link_button">Связать</string>
     <string name="error_title">Ошибка</string>
     <string name="ok_button">OK</string>
-    
-    <!-- Настройка кошелька -->
-    <string name="wallet_setup_title">Настройка кошелька</string>
-    <string name="wallet_setup_description">Создайте новый кошелек для управления бюджетом</string>
-    <string name="wallet_name_label">Название кошелька</string>
-    <string name="wallet_name_hint">Введите название кошелька</string>
-    <string name="wallet_name_description">Укажите понятное название для вашего кошелька</string>
-    <string name="wallet_type_label">Тип кошелька</string>
-    <string name="wallet_type_hint">Выберите тип кошелька</string>
-    <string name="wallet_goal_checkbox">Установить цель</string>
-    <string name="wallet_goal_description">Установите цель для накопления средств</string>
-    <string name="wallet_goal_amount_label">Целевая сумма</string>
-    <string name="wallet_goal_amount_hint">Введите целевую сумму</string>
-    <string name="wallet_goal_amount_example">Например: 50000</string>
-    <string name="wallet_created_success">Кошелек успешно создан</string>
-    <string name="wallet_creating">Создание кошелька…</string>
-    <string name="done">Готово</string>
-    <string name="wallet_create_button">Создать кошелек</string>
-    <string name="wallet_setup_tip">Совет: Используйте понятные названия для лучшей организации</string>
-    
-    <!-- Карточка кошелька -->
-    <string name="wallet_spent_amount">Потрачено</string>
-    <string name="wallet_remaining_amount">Осталось</string>
-    <string name="wallet_budget_limit">Лимит бюджета</string>
-    <string name="wallet_overview">Обзор кошелька</string>
-    <string name="wallet_manage_action">Управление кошельком</string>
-    <string name="wallet_budget_exceeded">Бюджет превышен</string>
-    <string name="wallet_budget_progress">Прогресс бюджета</string>
-    <string name="wallet_available_balance">Доступный баланс</string>
-    <string name="wallet_spend_action">Потратить</string>
-    <string name="wallet_add_funds_action">Пополнить</string>
-    
-    <!-- Общие строки -->
-    <string name="retry">Повторить</string>
-    <string name="error_occurred">Произошла ошибка</string>
-    <string name="no_transactions">Нет транзакций для отображения</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Отмена</string>
-    <string name="back">Назад</string>
-    <string name="delete">Удалить</string>
-    <string name="loading_data">Загрузка данных…</string>
-    <string name="error">Ошибка</string>
-    <string name="success">Успешно</string>
+    <string name="error_adding_funds">Ошибка при добавлении средств в кошелек</string>
+    <string name="error_insufficient_funds">Недостаточно средств в кошельке</string>
+    <string name="error_spending_funds">Ошибка при трате средств из кошелька</string>
+    <string name="error_insufficient_source_funds">Недостаточно средств в исходном кошельке</string>
+    <string name="error_transferring_funds">Ошибка при переводе средств между кошельками</string>
+    <string name="error_setting_period_duration">Ошибка при установке продолжительности периода</string>
+    <string name="error_resetting_period">Ошибка при сбросе периода для кошелька</string>
+    <string name="error_resetting_all_periods">Ошибка при сбросе периодов для всех кошельков</string>
 </resources> 

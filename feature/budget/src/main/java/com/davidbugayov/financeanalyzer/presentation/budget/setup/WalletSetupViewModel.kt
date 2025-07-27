@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,12 +80,12 @@ class WalletSetupViewModel(
 
         // Валидация данных
         if (s.name.isBlank()) {
-            _state.value = s.copy(error = "Введите название кошелька")
+            _state.value = s.copy(error = BudgetStringProvider.errorEnterWalletName)
             return
         }
 
         if (s.isGoal && s.goalAmountText.isBlank()) {
-            _state.value = s.copy(error = "Введите целевую сумму для накопительной цели")
+            _state.value = s.copy(error = BudgetStringProvider.errorEnterTargetAmount)
             return
         }
 
@@ -93,12 +94,12 @@ class WalletSetupViewModel(
                 try {
                     val amount = s.goalAmountText.toDouble()
                     if (amount <= 0) {
-                        _state.value = s.copy(error = "Целевая сумма должна быть больше нуля")
+                        _state.value = s.copy(error = BudgetStringProvider.errorTargetAmountPositive)
                         return
                     }
                     Money(amount)
                 } catch (e: Exception) {
-                    _state.value = s.copy(error = "Введите корректную сумму")
+                    _state.value = s.copy(error = BudgetStringProvider.errorEnterValidAmount)
                     return
                 }
             } else {
@@ -141,7 +142,7 @@ class WalletSetupViewModel(
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        error = "Ошибка при создании кошелька: ${e.message}",
+                        error = BudgetStringProvider.errorCreatingWallet(e.message ?: ""),
                     )
             }
         }

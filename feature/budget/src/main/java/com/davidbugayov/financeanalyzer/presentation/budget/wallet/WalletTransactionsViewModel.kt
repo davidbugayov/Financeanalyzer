@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.feature.budget.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -56,7 +57,7 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден",
+                            error = BudgetStringProvider.errorWalletNotFound,
                             isLoading = false,
                         )
                     }
@@ -96,7 +97,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading wallet")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка загрузки кошелька",
+                        error = e.message ?: BudgetStringProvider.errorLoadingWallet,
                         isLoading = false,
                     )
                 }
@@ -115,7 +116,7 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден",
+                            error = BudgetStringProvider.errorWalletNotFound,
                             isLoading = false,
                         )
                     }
@@ -152,7 +153,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading transactions")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка загрузки транзакций",
+                        error = e.message ?: BudgetStringProvider.errorLoadingTransactions,
                         isLoading = false,
                     )
                 }
@@ -178,7 +179,7 @@ class WalletTransactionsViewModel(
                 if (currentWallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден",
+                            error = BudgetStringProvider.errorWalletNotFound,
                         )
                     }
                     return@launch
