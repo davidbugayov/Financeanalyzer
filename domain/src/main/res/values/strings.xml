@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Валидация -->
+    <string name="error_enter_transaction_amount">Введите сумму транзакции</string>
+    
+    <!-- Достижения -->
+    <string name="log_achievement_trigger_initialized">🏆 AchievementTrigger инициализирован</string>
+    <string name="log_achievement_transaction_added">🏆 Триггер: Транзакция добавлена</string>
+    <string name="log_achievement_budget_created">🏆 Триггер: Бюджет создан</string>
+    <string name="log_achievement_statistics_viewed">🏆 Триггер: Статистика просмотрена</string>
+    <string name="log_achievement_section_visited">🏆 Триггер: Посещен раздел %1$s</string>
+    <string name="log_achievement_savings_changed">🏆 Триггер: Накопления изменились: %1$s</string>
+    <string name="log_achievement_budget_progress">🏆 Триггер: Прогресс бюджета: %1$d%%</string>
+    <string name="log_achievement_category_used">🏆 Триггер: Использована категория %1$s</string>
+    <string name="log_achievement_milestone_reached">🏆 Триггер: Достигнута веха %1$s</string>
+    
+    <!-- Советы по расходам -->
+    <string name="tip_top_category_spending">Вы тратите больше всего на категорию: \'%1$s\'. Подумайте, можно ли сократить эти расходы.</string>
+    <string name="tip_subscriptions_found">У вас есть регулярные подписки. Проверьте, все ли из них вам действительно нужны.</string>
+    <string name="tip_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее, чтобы избежать финансового стресса.</string>
+    <string name="tip_small_expenses">У вас много мелких трат. Попробуйте объединять покупки или отказаться от лишнего.</string>
+    <string name="tip_expenses_equal_income">Ваши расходы равны или превышают доходы. Попробуйте откладывать хотя бы 10% от дохода.</string>
+    
+    <!-- Рекомендации по оптимизации -->
+    <string name="recommendation_check_subscriptions">Проверьте ваши подписки: возможно, некоторые из них можно отключить или заменить на более выгодные.</string>
+    <string name="recommendation_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее и ищите альтернативы.</string>
+    <string name="recommendation_cafe_spending">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома чаще — это поможет сэкономить.</string>
+    <string name="recommendation_small_expenses">У вас много мелких трат. Ведите учёт и попробуйте отказаться от ненужных покупок.</string>
+    <string name="recommendation_no_savings">Вы не делаете регулярных накоплений. Откладывайте хотя бы 10% от дохода каждый месяц.</string>
+    
+    <!-- Экспорт -->
+    <string name="error_no_transactions_to_export">Нет транзакций для экспорта</string>
+    <string name="export_filename">Финансы_%1$s.csv</string>
+    <string name="export_csv_header">ID,Дата,Категория,Сумма,Тип,Примечание,Источник</string>
+    <string name="export_transaction_type_expense">Расход</string>
+    <string name="export_transaction_type_income">Доход</string>
+    <string name="log_csv_file_created">CSV файл создан: %1$s, размер: %2$d байт</string>
+    <string name="log_export_error">Ошибка при экспорте транзакций в CSV</string>
+    <string name="log_export_unexpected_error">Непредвиденная ошибка при экспорте транзакций</string>
+    <string name="log_file_created">Файл создан: %1$s</string>
+    <string name="log_file_ready_for_send">Файл готов для отправки: %1$s</string>
+    
+    <!-- Сравнение с аналогами -->
+    <string name="income_range_insufficient_data">Недостаточно данных</string>
+    
+    <!-- Категории расходов -->
+    <string name="category_products">Продукты</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_utilities">ЖКХ</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_other">Прочее</string>
+    <string name="category_subscription">Подписка</string>
+    <string name="category_services">Сервисы</string>
+    <string name="category_cafe">Кафе</string>
+    <string name="category_restaurant">Ресторан</string>
+    
+    <!-- Рекомендации по финансовому здоровью -->
+    <string name="recommendation_improve_financial_health">Улучшите общее финансовое здоровье</string>
+    <string name="recommendation_improve_financial_health_desc">Ваш коэффициент финансового здоровья (%1$d/100) ниже среднего. Сосредоточьтесь на увеличении нормы сбережений и стабилизации доходов.</string>
+    <string name="recommendation_improve_expense_control">Улучшите контроль расходов</string>
+    <string name="recommendation_improve_expense_control_desc">Ваш индекс расходной дисциплины (%1$d/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.</string>
+    <string name="recommendation_increase_retirement_savings">Увеличьте пенсионные накопления</string>
+    <string name="recommendation_increase_retirement_savings_desc">Для достижения пенсионной цели увеличьте ежемесячные накопления на %1$s. Текущий прогресс: %2$d%%</string>
+    <string name="recommendation_increase_savings_rate">Увеличьте норму сбережений</string>
+    <string name="recommendation_increase_savings_rate_desc" formatted="false">Ваша норма сбережений на %1$d%% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10% от дохода.</string>
+    <string name="recommendation_diversify_income">Диверсифицируйте источники дохода</string>
+    <string name="recommendation_diversify_income_desc">У вас только %1$d источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.</string>
+    <string name="recommendation_create_emergency_fund">Создайте резервный фонд</string>
+    <string name="recommendation_create_emergency_fund_desc">Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на %1$d месяца.</string>
+    <string name="recommendation_budget_exceeded">Превышен бюджет по категории %1$s</string>
+    <string name="recommendation_budget_exceeded_desc">Вы превысили бюджет по категории %1$s. Пересмотрите траты или увеличьте лимит.</string>
+    <string name="recommendation_budget_close_to_limit">Близко к лимиту по категории %1$s</string>
+    <string name="recommendation_budget_close_to_limit_desc">Вы близки к превышению лимита по категории %1$s. Контролируйте расходы!</string>
+    <string name="recommendation_check_subscriptions_title">Проверьте подписки</string>
+    <string name="recommendation_check_subscriptions_desc">У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.</string>
+    <string name="recommendation_save_on_cafe">Экономьте на кафе и ресторанах</string>
+    <string name="recommendation_save_on_cafe_desc">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.</string>
+</resources> 

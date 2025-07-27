@@ -18,6 +18,7 @@ import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
 import com.davidbugayov.financeanalyzer.core.util.StringProvider
 import com.davidbugayov.financeanalyzer.data.util.StringProvider as DataStringProvider
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider as DomainStringProvider
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -49,6 +50,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         // Инициализация StringProvider для строковых ресурсов
         StringProvider.init(this)
         DataStringProvider.init(this)
+        DomainStringProvider.init(this)
 
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {

@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.achievements
 
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 
 /**
  * Статический триггер для запуска достижений из разных частей приложения
@@ -17,14 +18,14 @@ object AchievementTrigger {
      */
     fun initialize(achievementEngine: AchievementEngine) {
         engine = achievementEngine
-        Timber.d("🏆 AchievementTrigger инициализирован")
+        Timber.d(StringProvider.logAchievementTriggerInitialized)
     }
     
     /**
      * Вызывается при добавлении новой транзакции
      */
     fun onTransactionAdded() {
-        Timber.d("🏆 Триггер: Транзакция добавлена")
+        Timber.d(StringProvider.logAchievementTransactionAdded)
         engine?.onTransactionAdded()
     }
     
@@ -32,7 +33,7 @@ object AchievementTrigger {
      * Вызывается при создании бюджета
      */
     fun onBudgetCreated() {
-        Timber.d("🏆 Триггер: Бюджет создан")
+        Timber.d(StringProvider.logAchievementBudgetCreated)
         engine?.onBudgetCreated()
     }
     
@@ -40,7 +41,7 @@ object AchievementTrigger {
      * Вызывается при просмотре статистики
      */
     fun onStatisticsViewed() {
-        Timber.d("🏆 Триггер: Статистика просмотрена")
+        Timber.d(StringProvider.logAchievementStatisticsViewed)
         engine?.onStatisticsViewed()
     }
     
@@ -48,7 +49,7 @@ object AchievementTrigger {
      * Вызывается при посещении раздела приложения
      */
     fun onAppSectionVisited(sectionName: String) {
-        Timber.d("🏆 Триггер: Посещен раздел $sectionName")
+        Timber.d(StringProvider.logAchievementSectionVisited(sectionName))
         engine?.onAppSectionVisited(sectionName)
     }
     
@@ -56,7 +57,7 @@ object AchievementTrigger {
      * Вызывается при изменении баланса/накоплений
      */
     fun onSavingsChanged(newAmount: Long) {
-        Timber.d("🏆 Триггер: Накопления изменились: $newAmount")
+        Timber.d(StringProvider.logAchievementSavingsChanged(newAmount.toString()))
         engine?.onSavingsChanged(newAmount)
     }
     
@@ -64,7 +65,7 @@ object AchievementTrigger {
      * Вызывается при прогрессе по бюджету
      */
     fun onBudgetProgress(spentPercentage: Float) {
-        Timber.d("🏆 Триггер: Прогресс бюджета: ${(spentPercentage * 100).toInt()}%")
+        Timber.d(StringProvider.logAchievementBudgetProgress((spentPercentage * 100).toInt()))
         engine?.onBudgetProgress(spentPercentage)
     }
     
@@ -72,7 +73,7 @@ object AchievementTrigger {
      * Вызывается при использовании новой категории
      */
     fun onCategoryUsed(categoryId: String) {
-        Timber.d("🏆 Триггер: Использована категория $categoryId")
+        Timber.d(StringProvider.logAchievementCategoryUsed(categoryId))
         engine?.onCategoryUsed(categoryId)
     }
     
@@ -80,7 +81,7 @@ object AchievementTrigger {
      * Вызывается при достижении определенных вех
      */
     fun onMilestoneReached(milestoneType: String) {
-        Timber.d("🏆 Триггер: Достигнута веха $milestoneType")
+        Timber.d(StringProvider.logAchievementMilestoneReached(milestoneType))
         engine?.onMilestoneReached(milestoneType)
     }
 } 

@@ -12,6 +12,7 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 
 /**
  * UseCase для экспорта транзакций в CSV-файл.
@@ -41,11 +42,11 @@ class ExportTransactionsToCSVUseCase(
             val transactions = transactionRepository.getAllTransactions()
 
             if (transactions.isEmpty()) {
-                return@withContext Result.Error(AppException.Business.InvalidOperation("Нет транзакций для экспорта"))
+                return@withContext Result.Error(AppException.Business.InvalidOperation(StringProvider.errorNoTransactionsToExport))
             }
 
             // Создаем файл во временной директории с понятным именем
-            val fileName = "Финансы_${getCurrentDateTimeFormatted()}.csv"
+            val fileName = StringProvider.exportFilename(getCurrentDateTimeFormatted())
             val file = File.createTempFile("transactions_", ".csv")
             // Переименовываем файл с красивым именем
             val finalFile = File(file.parent, fileName)
@@ -54,7 +55,7 @@ class ExportTransactionsToCSVUseCase(
             // Записываем данные в файл с красивыми заголовками
             FileWriter(finalFile).use { writer ->
                 // Заголовок CSV на русском языке
-                writer.append("ID,Дата,Категория,Сумма,Тип,Примечание,Источник\n")
+                writer.append("${StringProvider.exportCsvHeader}\n")
 
                 // Данные транзакций
                 transactions.forEach { transaction ->
@@ -66,19 +67,19 @@ class ExportTransactionsToCSVUseCase(
                     
                     writer.append("\"${transaction.category}\",")
                     writer.append("\"${transaction.amount.toPlainString()}\",")
-                    writer.append("\"${if (transaction.isExpense) "Расход" else "Доход"}\",")
+                    writer.append("\"${if (transaction.isExpense) StringProvider.exportTransactionTypeExpense else StringProvider.exportTransactionTypeIncome}\",")
                     writer.append("\"${transaction.note ?: ""}\",")
                     writer.append("\"${transaction.source}\"\n")
                 }
             }
 
-            Timber.d("CSV файл создан: ${finalFile.absolutePath}, размер: ${finalFile.length()} байт")
+            Timber.d(StringProvider.logCsvFileCreated(finalFile.absolutePath, finalFile.length()))
             return@withContext Result.Success(finalFile)
         } catch (e: IOException) {
-            Timber.e(e, "Ошибка при экспорте транзакций в CSV")
+            Timber.e(e, StringProvider.logExportError)
             return@withContext Result.Error(AppException.FileSystem.ReadError(cause = e))
         } catch (e: Exception) {
-            Timber.e(e, "Непредвиденная ошибка при экспорте транзакций")
+            Timber.e(e, StringProvider.logExportUnexpectedError)
             return@withContext Result.Error(AppException.Unknown(cause = e))
         }
     }
@@ -88,7 +89,7 @@ class ExportTransactionsToCSVUseCase(
      * Пока возвращает заглушку - логика должна быть реализована в UI слое
      */
     fun openCSVFile(file: File): Result<Unit> {
-        Timber.d("Файл создан: ${file.absolutePath}")
+        Timber.d(StringProvider.logFileCreated(file.absolutePath))
         return Result.Success(Unit)
     }
 
@@ -97,7 +98,7 @@ class ExportTransactionsToCSVUseCase(
      * Пока возвращает заглушку - логика должна быть реализована в UI слое
      */
     fun shareCSVFile(file: File): Result<Unit> {
-        Timber.d("Файл готов для отправки: ${file.absolutePath}")
+        Timber.d(StringProvider.logFileReadyForSend(file.absolutePath))
         return Result.Success(Unit)
     }
 
