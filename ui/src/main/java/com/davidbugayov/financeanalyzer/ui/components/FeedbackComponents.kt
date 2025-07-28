@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.ui.util.StringProvider
 import kotlinx.coroutines.delay
 
 /**
@@ -144,7 +145,7 @@ fun FeedbackMessage(
                                         )?.setPrimaryClip(
                                             clip,
                                         )
-                                        Toast.makeText(context, "Путь скопирован", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, StringProvider.pathCopied, Toast.LENGTH_SHORT).show()
                                         isCopied = true
                                     }
                                     .padding(horizontal = 8.dp, vertical = 4.dp),

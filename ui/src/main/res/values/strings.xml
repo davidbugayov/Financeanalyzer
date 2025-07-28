@@ -1622,4 +1622,87 @@
     <string name="smart_observations">Умные наблюдения</string>
     <string name="bullet_point">•</string>
 
+    <!-- UI компоненты -->
+    <string name="months_short">мес</string>
+    <string name="loading_data_default">Загрузка данных...</string>
+    
+    <!-- Рекомендации -->
+    <string name="critical_level">Критично</string>
+    <string name="high_level">Высокий</string>
+    <string name="medium_level">Средний</string>
+    <string name="normal_level">Обычный</string>
+    <string name="low_level">Низкий</string>
+    
+    <string name="critical_level_alt">Критично</string>
+    <string name="important_level">Важно</string>
+    <string name="worth_considering">Стоит рассмотреть</string>
+    <string name="recommended">Рекомендуем</string>
+    <string name="for_note">На заметку</string>
+    
+    <!-- Категории рекомендаций -->
+    <string name="savings_category">Сбережения</string>
+    <string name="expenses_category">Расходы</string>
+    <string name="budgeting_category">Бюджетирование</string>
+    <string name="investments_category">Инвестиции</string>
+    <string name="emergency_fund_category">Финансовая подушка</string>
+    <string name="habits_category">Привычки</string>
+    <string name="general_category">Общие</string>
+    
+    <!-- Рекомендации по сбережениям -->
+    <string name="critical_low_savings_title">Критически низкий уровень сбережений</string>
+    <string name="critical_low_savings_description">Ваш уровень сбережений менее 5%. Это может привести к финансовым проблемам</string>
+    <string name="critical_low_savings_impact">Увеличение до 10% добавит финансовой стабильности</string>
+    
+    <string name="improve_savings_rate_title">Улучшите норму сбережений</string>
+    <string name="improve_savings_rate_description">Стремитесь к сбережениям 15-20% от дохода для финансовой стабильности</string>
+    <string name="improve_savings_rate_impact">Увеличение на 5% улучшит финансовое здоровье</string>
+    
+    <string name="optimize_category_title">Оптимизируйте категорию "%1$s"</string>
+    <string name="optimize_category_description">Эта категория составляет %1$d%% ваших расходов</string>
+    <string name="optimize_category_impact">Сокращение на 10% даст значительную экономию</string>
+    
+    <string name="create_emergency_fund_title_ui">Создайте финансовую подушку</string>
+    <string name="create_emergency_fund_description_ui">Рекомендуется иметь 3-6 месяцев расходов в резерве</string>
+    <string name="create_emergency_fund_impact">Защита от непредвиденных расходов</string>
+    
+    <string name="consider_investments_title">Рассмотрите инвестиции</string>
+    <string name="consider_investments_description">У вас отличная норма сбережений! Время подумать об инвестициях</string>
+    <string name="consider_investments_impact">Потенциальный рост капитала</string>
+    
+    <string name="many_small_expenses_title">Много мелких трат</string>
+    <string name="many_small_expenses_description">У вас %1$d расходных операций. Попробуйте их объединить</string>
+    <string name="many_small_expenses_impact">Упрощение контроля расходов</string>
+    
+    <!-- Рекомендации для карточек -->
+    <string name="create_emergency_fund_urgent_title">Создайте финансовую подушку СРОЧНО</string>
+    <string name="create_emergency_fund_urgent_description">У вас менее месяца расходов в резерве. Это критически опасно для финансовой стабильности</string>
+    <string name="create_emergency_fund_urgent_impact">Защита от финансового краха при потере дохода</string>
+    
+    <string name="savings_rate_critical_title">Норма сбережений ниже критической</string>
+    <string name="savings_rate_critical_description">Вы откладываете менее 5% дохода. Это ставит под угрозу ваше финансовое будущее</string>
+    <string name="savings_rate_critical_impact">Начните с 10% - это минимум для финансовой безопасности</string>
+    
+    <string name="increase_savings_rate_title_ui">Увеличьте норму сбережений</string>
+    <string name="increase_savings_rate_description_ui">Стремитесь к сбережениям 15-20% от дохода для финансовой стабильности</string>
+    <string name="increase_savings_rate_impact_ui">Увеличение на 5% улучшит финансовое здоровье</string>
+    
+    <string name="think_about_investments_title">Пора подумать об инвестициях</string>
+    <string name="think_about_investments_description">У вас отличная финансовая дисциплина! Время приумножать капитал</string>
+    <string name="think_about_investments_impact">Инвестиции помогут обогнать инфляцию</string>
+    
+    <string name="study_achievements_title">Изучите свои достижения</string>
+    <string name="study_achievements_description">Отслеживайте прогресс и получайте мотивацию</string>
+    
+    <!-- Рекомендации с эмодзи -->
+    <string name="critical_emoji">🚨</string>
+    <string name="important_emoji">⚠️</string>
+    <string name="idea_emoji">💡</string>
+    <string name="check_emoji">✅</string>
+    <string name="thought_emoji">💭</string>
+    
+    <!-- Текст для рекомендаций -->
+    <string name="critical_count_recommendations">%1$d критичных</string>
+    <string name="important_count_recommendations">%1$d важных</string>
+    <string name="recommendations_require_attention"> рекомендаций требуют внимания</string>
+
 </resources>

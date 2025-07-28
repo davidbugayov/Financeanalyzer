@@ -89,8 +89,8 @@ private fun SmartRecommendationCardEnhancedPreview(
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = stringResource(R.string.preview_enhanced_title),
-                    subtitle = stringResource(R.string.preview_enhanced_subtitle),
+                    title = "Улучшенные рекомендации",
+                    subtitle = "Детальный анализ с приоритетами",
                     style = SmartCardStyle.ENHANCED,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
@@ -105,13 +105,13 @@ private fun SmartRecommendationCardEnhancedPreview(
 private fun SmartRecommendationCardCompactPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = stringResource(R.string.increase_savings),
+            title = "Увеличьте сбережения",
             icon = Icons.Default.Savings,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.SAVINGS
         ),
         SmartRecommendation(
-            title = stringResource(R.string.create_emergency_fund),
+            title = "Создайте финансовую подушку",
             icon = Icons.Default.PriorityHigh,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.EMERGENCY_FUND
@@ -124,8 +124,8 @@ private fun SmartRecommendationCardCompactPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = stringResource(R.string.preview_compact_title),
-                    subtitle = stringResource(R.string.preview_compact_subtitle),
+                    title = "Компактные рекомендации",
+                    subtitle = "Краткий обзор важных советов",
                     style = SmartCardStyle.COMPACT,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
@@ -140,15 +140,15 @@ private fun SmartRecommendationCardCompactPreview() {
 private fun SmartRecommendationCardMinimalPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = stringResource(R.string.rec_onboarding_achievements_title),
-            description = stringResource(R.string.rec_onboarding_achievements_desc),
+            title = "Изучите достижения",
+            description = "Отслеживайте прогресс и получайте мотивацию",
             icon = Icons.Default.EmojiEvents,
             priority = SmartRecommendationPriority.NORMAL,
             category = RecommendationCategory.GENERAL
         ),
         SmartRecommendation(
-            title = stringResource(R.string.rec_onboarding_import_title),
-            description = stringResource(R.string.rec_onboarding_import_desc),
+            title = "Импортируйте данные",
+            description = "Загрузите историю транзакций из банка",
             icon = Icons.Default.Upload,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.GENERAL
@@ -161,8 +161,8 @@ private fun SmartRecommendationCardMinimalPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = stringResource(R.string.preview_minimal_title),
-                    subtitle = stringResource(R.string.preview_minimal_subtitle),
+                    title = "Минимальные рекомендации",
+                    subtitle = "Простые советы для начала",
                     style = SmartCardStyle.MINIMAL,
                     showPriorityIndicator = false,
                     modifier = Modifier.fillMaxWidth()
@@ -177,19 +177,19 @@ private fun SmartRecommendationCardMinimalPreview() {
 private fun SmartRecommendationCardDarkPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = stringResource(R.string.rec_critical_emergency_title),
-            description = stringResource(R.string.rec_critical_emergency_desc),
+            title = "Критическая финансовая подушка",
+            description = "Создайте резерв на случай непредвиденных расходов",
             icon = Icons.Default.Warning,
             priority = SmartRecommendationPriority.CRITICAL,
-            impact = stringResource(R.string.rec_critical_emergency_impact),
+            impact = "Защита от финансового краха",
             category = RecommendationCategory.EMERGENCY_FUND
         ),
         SmartRecommendation(
-            title = stringResource(R.string.rec_normal_invest_title),
-            description = stringResource(R.string.rec_normal_invest_desc),
+            title = "Рассмотрите инвестиции",
+            description = "Время приумножать капитал",
             icon = Icons.AutoMirrored.Filled.TrendingUp,
             priority = SmartRecommendationPriority.NORMAL,
-            impact = stringResource(R.string.rec_normal_invest_impact),
+            impact = "Потенциальный рост капитала",
             category = RecommendationCategory.INVESTMENTS
         )
     )
