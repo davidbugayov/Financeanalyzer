@@ -5,8 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider
 
 /**
  * Диалог подтверждения удаления источника.
@@ -23,21 +23,21 @@ fun DeleteSourceConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.delete)) },
+        title = { Text(text = StringProvider.delete) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Text(
-                text = stringResource(R.string.delete_source_confirmation_message, source),
+                text = StringProvider.deleteSourceConfirmationMessage(source),
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = stringResource(R.string.delete))
+                Text(text = StringProvider.delete)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+                Text(text = StringProvider.cancel)
             }
         },
     )

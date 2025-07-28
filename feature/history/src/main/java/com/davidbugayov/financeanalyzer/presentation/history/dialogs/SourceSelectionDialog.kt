@@ -26,10 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
-import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**

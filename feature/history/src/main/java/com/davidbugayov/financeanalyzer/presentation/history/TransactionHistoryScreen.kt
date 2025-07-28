@@ -383,9 +383,11 @@ fun TransactionHistoryScreen(
                             .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val context = LocalContext.current
                     Text(
                         text =
                             UiUtils.formatPeriod(
+                                context,
                                 state.periodType,
                                 state.startDate,
                                 state.endDate,
