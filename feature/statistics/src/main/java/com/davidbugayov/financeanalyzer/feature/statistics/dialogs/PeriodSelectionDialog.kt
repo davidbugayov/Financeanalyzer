@@ -24,6 +24,7 @@ import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора периода для фильтрации транзакций.
@@ -148,14 +149,14 @@ fun PeriodSelectionDialog(
                 }
             } else {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.close))
+                    Text(stringResource(UiR.string.close))
                 }
             }
         },
         dismissButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(UiR.string.cancel))
                 }
             }
         },

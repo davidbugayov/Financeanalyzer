@@ -78,6 +78,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран импорта транзакций.
@@ -405,7 +406,7 @@ fun ImportTransactionsScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Close,
-                                            contentDescription = stringResource(R.string.cancel),
+                                            contentDescription = stringResource(UiR.string.cancel),
                                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                         )
                                     }

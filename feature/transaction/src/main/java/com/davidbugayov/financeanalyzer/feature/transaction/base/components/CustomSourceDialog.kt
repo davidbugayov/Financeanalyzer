@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.dialogs.SourceColorPickerDialog
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
 /**
@@ -130,7 +131,7 @@ fun CustomSourceDialog(
                 Timber.d("Cancel button clicked")
                 onDismiss()
             }) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(UiR.string.cancel))
             }
         },
     )

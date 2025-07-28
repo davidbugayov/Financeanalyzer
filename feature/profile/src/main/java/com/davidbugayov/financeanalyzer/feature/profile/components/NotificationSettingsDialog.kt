@@ -41,6 +41,7 @@ import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import java.util.Locale
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог настройки уведомлений о транзакциях.
@@ -231,7 +232,7 @@ fun NotificationSettingsDialog(
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.close))
+                        Text(stringResource(UiR.string.close))
                     }
                 }
             }

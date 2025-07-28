@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.feature.security.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог для настройки PIN-кода
@@ -173,7 +174,7 @@ fun PinSetupDialog(
                     TextButton(
                         onClick = onDismiss,
                     ) {
-                        Text(stringResource(R.string.cancel))
+                        Text(stringResource(UiR.string.cancel))
                     }
                 }
             }

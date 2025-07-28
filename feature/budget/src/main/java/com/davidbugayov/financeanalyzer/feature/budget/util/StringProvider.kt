@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.budget.util
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.budget.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитный класс для получения строковых ресурсов в модуле budget
@@ -26,7 +27,7 @@ object StringProvider {
     val importCategoriesTitle: String get() = getString(R.string.import_categories_title)
     val importCategoriesSubtitle: String get() = getString(R.string.import_categories_subtitle)
     val importCategoriesConfirm: String get() = getString(R.string.import_categories_confirm)
-    val cancel: String get() = getString(R.string.cancel)
+    val cancel: String get() = getString(UiR.string.cancel)
     
     // Ошибки кошельков
     val errorWalletNotFound: String get() = getString(R.string.error_wallet_not_found)
@@ -43,7 +44,7 @@ object StringProvider {
     
     // Подкошельки
     val subwallets: String get() = getString(R.string.subwallets)
-    val back: String get() = getString(R.string.back)
+    val back: String get() = getString(UiR.string.back)
     val addSubwallet: String get() = getString(R.string.add_subwallet)
     
     // Бюджет
@@ -85,8 +86,8 @@ object StringProvider {
     val save: String get() = getString(R.string.save)
     
     // Ошибки
-    val error: String get() = getString(R.string.error)
-    val ok: String get() = getString(R.string.ok)
+    val error: String get() = getString(UiR.string.error)
+    val ok: String get() = getString(UiR.string.ok)
     val errorDistributingIncome: String get() = getString(R.string.error_distributing_income)
     val errorAddingFunds: String get() = getString(R.string.error_adding_funds)
     val errorInsufficientFunds: String get() = getString(R.string.error_insufficient_funds)

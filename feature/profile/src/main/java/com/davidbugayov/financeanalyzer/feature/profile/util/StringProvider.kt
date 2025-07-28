@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.profile.util
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитный класс для получения строковых ресурсов в модуле profile
@@ -74,8 +75,8 @@ object StringProvider {
     val buildVersion: String get() = getString(R.string.build_version)
     
     // Общие
-    val close: String get() = getString(R.string.close)
-    val cancel: String get() = getString(R.string.cancel)
+    val close: String get() = getString(UiR.string.close)
+    val cancel: String get() = getString(UiR.string.cancel)
     val ok: String get() = getString(R.string.ok)
     val done: String get() = getString(R.string.done)
     val cdDone: String get() = getString(R.string.cd_done)

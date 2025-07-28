@@ -35,6 +35,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора категории
@@ -79,7 +80,7 @@ fun CategoryPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(UiR.string.cancel))
             }
         },
     )
@@ -246,7 +247,7 @@ fun CustomCategoryDialog(
                     ),
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(UiR.string.cancel))
                 }
 
                 TextButton(

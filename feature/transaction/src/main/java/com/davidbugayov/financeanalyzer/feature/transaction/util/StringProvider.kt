@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.transaction.util
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитный класс для получения строковых ресурсов в модуле transaction
@@ -140,8 +141,8 @@ object StringProvider {
     val addCategory: String get() = getString(R.string.add_category)
     val selectIcon: String get() = getString(R.string.select_icon)
     val categoryTransfer: String get() = getString(R.string.category_transfer)
-    val cancel: String get() = getString(R.string.cancel)
-    val close: String get() = getString(R.string.close)
+    val cancel: String get() = getString(UiR.string.cancel)
+    val close: String get() = getString(UiR.string.close)
     val showMoreCategories: String get() = getString(R.string.show_more_categories)
     val hideCategories: String get() = getString(R.string.hide_categories)
     
@@ -160,8 +161,8 @@ object StringProvider {
     
     // Диалоги
     val errorTitle: String get() = getString(R.string.error_title)
-    val unknownErrorMessage: String get() = getString(R.string.unknown_error_message)
-    val dialogOk: String get() = getString(R.string.dialog_ok)
+    val unknownErrorMessage: String get() = getString(UiR.string.unknown_error_message)
+    val dialogOk: String get() = getString(UiR.string.dialog_ok)
     val attentionTitle: String get() = getString(R.string.attention_title)
     val unsavedDataWarning: String get() = getString(R.string.unsaved_data_warning)
     val proceedToImport: String get() = getString(R.string.proceed_to_import)
@@ -170,6 +171,7 @@ object StringProvider {
     val deleteCategoryTitle: String get() = getString(R.string.delete_category_title)
     val dialogDelete: String get() = getString(R.string.dialog_delete)
     val deleteSourceTitle: String get() = getString(R.string.delete_source_title)
+    val delete: String get() = getString(UiR.string.delete)
     
     // Импорт
     val importTransactionsTitle: String get() = getString(R.string.import_transactions_title)

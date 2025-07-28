@@ -20,15 +20,7 @@
     <string name="user_activity_check_error">Ошибка проверки активности пользователя</string>
     
     <!-- Общие строки -->
-    <string name="retry">Повторить</string>
-    <string name="error_occurred">Произошла ошибка</string>
-    <string name="no_transactions">Нет транзакций для отображения</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Отмена</string>
-    <string name="back">Назад</string>
-    <string name="delete">Удалить</string>
-    <string name="loading_data">Загрузка данных…</string>
-    <string name="error">Ошибка</string>
+    <!-- Удалены дублирующиеся строки: ok, cancel, back, delete, loading_data, error, retry, error_occurred, no_transactions -->
     <string name="success">Успешно</string>
     <string name="string">Строка</string>
     <string name="crash_report_error">Ошибка отправки отчета о сбое</string>

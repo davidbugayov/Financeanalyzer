@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.home.util
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитный класс для получения строковых ресурсов в модуле home
@@ -46,7 +47,7 @@ object StringProvider {
     val testDataGenerated: String get() = getString(R.string.test_data_generated)
     val transactionDeleted: String get() = getString(R.string.transaction_deleted)
     val emptyTransactionIdError: String get() = getString(R.string.empty_transaction_id_error)
-    val loadingData: String get() = getString(R.string.loading_data)
+    val loadingData: String get() = getString(UiR.string.loading_data)
     val errorSavingTestTransactions: String get() = getString(R.string.error_saving_test_transactions)
     val errorGeneratingTestData: String get() = getString(R.string.error_generating_test_data)
     
@@ -71,7 +72,7 @@ object StringProvider {
     val hide: String get() = getString(R.string.hide)
     
     // Пустое состояние
-    val noTransactions: String get() = getString(R.string.no_transactions)
+    val noTransactions: String get() = getString(UiR.string.no_transactions)
     val addFirstTransactionDescription: String get() = getString(R.string.add_first_transaction_description)
     val emptyStateIcon: String get() = getString(R.string.empty_state_icon)
     

@@ -4,7 +4,6 @@
     <string name="import_categories_title">Импорт категорий</string>
     <string name="import_categories_subtitle">Выберите категории расходов для добавления в бюджет:</string>
     <string name="import_categories_confirm">Импортировать</string>
-    <string name="cancel">Отмена</string>
     
     <!-- Ошибки кошельков -->
     <string name="error_wallet_not_found">Кошелек не найден</string>

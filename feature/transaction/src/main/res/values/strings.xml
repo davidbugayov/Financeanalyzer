@@ -113,8 +113,6 @@
     <string name="add_category">Добавить категорию</string>
     <string name="select_icon">Выбрать иконку</string>
     <string name="category_transfer">Переводы</string>
-    <string name="cancel">Отмена</string>
-    <string name="close">Закрыть</string>
     <string name="show_more_categories">Показать больше</string>
     <string name="hide_categories">Скрыть</string>
     
@@ -136,8 +134,6 @@
     
     <!-- Диалоги -->
     <string name="error_title">Ошибка</string>
-    <string name="unknown_error_message">Произошла неизвестная ошибка</string>
-    <string name="dialog_ok">ОК</string>
     <string name="attention_title">Внимание</string>
     <string name="unsaved_data_warning">У вас есть несохранённые данные. Если продолжите, изменения будут потеряны.</string>
     <string name="proceed_to_import">Перейти к импорту</string>

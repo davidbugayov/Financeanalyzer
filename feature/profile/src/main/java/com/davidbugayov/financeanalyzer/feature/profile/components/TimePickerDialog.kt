@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора времени для напоминаний
@@ -80,7 +81,7 @@ fun TimePickerDialog(
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel))
+                        Text(stringResource(UiR.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))

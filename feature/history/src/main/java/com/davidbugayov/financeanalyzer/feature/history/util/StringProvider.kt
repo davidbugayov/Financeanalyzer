@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.history.util
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитный класс для получения строковых ресурсов в модуле history
@@ -39,7 +40,7 @@ object StringProvider {
     val selectAll: String get() = getString(R.string.select_all)
     val apply: String get() = getString(R.string.apply)
     val close: String get() = getString(R.string.close)
-    val cancel: String get() = getString(R.string.cancel)
+    val cancel: String get() = getString(UiR.string.cancel)
     
     // Группы категорий
     val expenses: String get() = getString(R.string.expenses)
@@ -49,7 +50,7 @@ object StringProvider {
     val deleteCategoryTitle: String get() = getString(R.string.delete_category_title)
     fun deleteCategoryConfirmIrreversible(category: String): String = getString(R.string.delete_category_confirm_irreversible, category)
     fun deleteCategoryConfirmMove(category: String): String = getString(R.string.delete_category_confirm_move, category)
-    val delete: String get() = getString(R.string.delete)
+    val delete: String get() = getString(UiR.string.delete)
     
     // Удаление источника
     fun deleteSourceConfirmationMessage(source: String): String = getString(R.string.delete_source_confirmation_message, source)
