@@ -32,10 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
 
@@ -70,7 +69,7 @@ fun SettingsSection(
                 .fillMaxWidth(),
     ) {
         Text(
-            text = stringResource(R.string.profile_settings_title),
+            text = StringProvider.profileSettingsTitle,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
         )
@@ -83,12 +82,12 @@ fun SettingsSection(
                         ThemeMode.SYSTEM -> Icons.Default.Brightness6
                     },
                 iconBackground = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.settings_theme_title),
+                title = StringProvider.settingsThemeTitle,
                 subtitle =
                     when (themeMode) {
-                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
-                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
-                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                        ThemeMode.LIGHT -> StringProvider.settingsThemeLight
+                        ThemeMode.DARK -> StringProvider.settingsThemeDark
+                        ThemeMode.SYSTEM -> StringProvider.settingsThemeSystem
                     },
                 onClick = onThemeClick,
             )
@@ -97,8 +96,8 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Language,
                 iconBackground = MaterialTheme.colorScheme.secondary,
-                title = stringResource(R.string.settings_language_title),
-                subtitle = stringResource(R.string.settings_language_current_value),
+                title = StringProvider.settingsLanguageTitle,
+                subtitle = StringProvider.settingsLanguageCurrentValue,
                 onClick = onLanguageClick,
             )
         }
@@ -106,8 +105,8 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Payments,
                 iconBackground = MaterialTheme.colorScheme.tertiary,
-                title = stringResource(R.string.profile_currency_title),
-                subtitle = stringResource(R.string.settings_currency_current_value),
+                title = StringProvider.profileCurrencyTitle,
+                subtitle = StringProvider.settingsCurrencyCurrentValue,
                 onClick = onCurrencyClick,
             )
         }
@@ -115,18 +114,17 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Timer,
                 iconBackground = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.profile_transaction_reminders_title),
+                title = StringProvider.profileTransactionRemindersTitle,
                 subtitle =
                     if (!hasNotificationPermission) {
-                        stringResource(R.string.notification_disabled_description)
+                        StringProvider.notificationDisabledDescription
                     } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
-                        stringResource(
-                            R.string.settings_reminder_time_format,
+                        StringProvider.settingsReminderTimeFormat(
                             transactionReminderTime.hour,
                             transactionReminderTime.minute,
                         )
                     } else {
-                        stringResource(R.string.off)
+                        StringProvider.off
                     },
                 subtitleColor = if (!hasNotificationPermission) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 onClick = onTransactionReminderClick,

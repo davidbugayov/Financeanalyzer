@@ -45,9 +45,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
@@ -98,7 +98,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
             context.packageManager.getPackageInfo(context.packageName, 0)
         }
 
-    val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
+    val appVersion = remember { packageInfo?.versionName ?: StringProvider.unknown }
 
     @SuppressLint("NewApi")
     val buildVersion = remember { 
@@ -297,8 +297,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.budget),
-                    subtitle = stringResource(R.string.profile_budget_subtitle),
+                    title = StringProvider.budget,
+                    subtitle = StringProvider.profileBudgetSubtitle,
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -323,8 +323,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.export_import),
-                    subtitle = stringResource(R.string.profile_export_import_subtitle),
+                    title = StringProvider.exportImport,
+                    subtitle = StringProvider.profileExportImportSubtitle,
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -350,8 +350,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.Star,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.achievements),
-                    subtitle = stringResource(R.string.profile_achievements_subtitle),
+                    title = StringProvider.achievements,
+                    subtitle = StringProvider.profileAchievementsSubtitle,
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(

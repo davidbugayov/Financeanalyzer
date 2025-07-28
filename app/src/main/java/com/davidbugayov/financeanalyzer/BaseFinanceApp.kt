@@ -23,6 +23,8 @@ import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider 
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
 import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as HistoryStringProvider
 import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
+import com.davidbugayov.financeanalyzer.ui.util.StringProvider as UiStringProvider
+import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider as ProfileStringProvider
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -59,6 +61,8 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         HomeStringProvider.init(this)
         HistoryStringProvider.init(this)
         BudgetStringProvider.init(this)
+        UiStringProvider.init(this)
+        ProfileStringProvider.init(this)
 
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {
