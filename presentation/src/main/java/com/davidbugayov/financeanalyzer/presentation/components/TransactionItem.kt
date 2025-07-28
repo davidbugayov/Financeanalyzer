@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -62,7 +63,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.delay
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 
 
 object Formatters {
@@ -104,8 +104,9 @@ fun TransactionItem(
     onTransactionLongClick: (Transaction) -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
+    val context = LocalContext.current
 
-    val transferCategoryString = StringProvider.transactionTransfers.lowercase(Locale.getDefault())
+    val transferCategoryString = context.getString(R.string.transaction_transfers).lowercase(Locale.getDefault())
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
@@ -122,7 +123,7 @@ fun TransactionItem(
         ) {
             when {
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                    transaction.category.equals(StringProvider.transactionTransfer, ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
+                    transaction.category.equals(context.getString(R.string.transaction_transfer), ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
                 transaction.isExpense -> expenseColor
                 else -> incomeColor
             }
@@ -178,7 +179,7 @@ fun TransactionItem(
 
             val isTransfer =
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                    transaction.category.equals(StringProvider.transactionTransfer, ignoreCase = true)
+                    transaction.category.equals(context.getString(R.string.transaction_transfer), ignoreCase = true)
 
             val prefix =
                 when {

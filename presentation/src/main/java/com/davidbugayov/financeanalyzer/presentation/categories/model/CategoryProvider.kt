@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.categories.model
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.presentation.R
 
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
@@ -56,7 +56,7 @@ object CategoryProvider {
 
     fun getDefaultExpenseCategories(context: Context): List<UiCategory> =
         defaultCategories.filter { it.isExpense }.mapIndexed { idx, meta ->
-            val name = getCategoryNameByKey(meta.categoryKey)
+            val name = getCategoryNameByKey(context, meta.categoryKey)
             val cat = Category.expense(name)
             UiCategory(
                 id = idx + 1L,
@@ -72,7 +72,7 @@ object CategoryProvider {
 
     fun getDefaultIncomeCategories(context: Context): List<UiCategory> =
         defaultCategories.filter { !it.isExpense }.mapIndexed { idx, meta ->
-            val name = getCategoryNameByKey(meta.categoryKey)
+            val name = getCategoryNameByKey(context, meta.categoryKey)
             val cat = Category.income(name)
             UiCategory(
                 id = idx + 1L,
@@ -86,29 +86,29 @@ object CategoryProvider {
             )
         }
 
-    private fun getCategoryNameByKey(key: String): String {
+    private fun getCategoryNameByKey(context: Context, key: String): String {
         return when (key) {
-            "food" -> StringProvider.categoryFood
-            "transport" -> StringProvider.categoryTransport
-            "entertainment" -> StringProvider.categoryEntertainment
-            "restaurant" -> StringProvider.categoryRestaurant
-            "health" -> StringProvider.categoryHealth
-            "clothing" -> StringProvider.categoryClothing
-            "housing" -> StringProvider.categoryHousing
-            "communication" -> StringProvider.categoryCommunication
-            "pet" -> StringProvider.categoryPet
-            "services" -> StringProvider.categoryServices
-            "charity" -> StringProvider.categoryCharity
-            "credit" -> StringProvider.categoryCredit
-            "transfer" -> StringProvider.categoryTransfer
-            "other_expense" -> StringProvider.categoryOtherExpense
-            "salary" -> StringProvider.categorySalary
-            "freelance" -> StringProvider.categoryFreelance
-            "gifts" -> StringProvider.categoryGifts
-            "interest" -> StringProvider.categoryInterest
-            "rental" -> StringProvider.categoryRental
-            "other_income" -> StringProvider.categoryOtherIncome
-            else -> StringProvider.categoryOther
+            "food" -> context.getString(R.string.category_food)
+            "transport" -> context.getString(R.string.category_transport)
+            "entertainment" -> context.getString(R.string.category_entertainment)
+            "restaurant" -> context.getString(R.string.category_restaurant)
+            "health" -> context.getString(R.string.category_health)
+            "clothing" -> context.getString(R.string.category_clothing)
+            "housing" -> context.getString(R.string.category_housing)
+            "communication" -> context.getString(R.string.category_communication)
+            "pet" -> context.getString(R.string.category_pet)
+            "services" -> context.getString(R.string.category_services)
+            "charity" -> context.getString(R.string.category_charity)
+            "credit" -> context.getString(R.string.category_credit)
+            "transfer" -> context.getString(R.string.category_transfer)
+            "other_expense" -> context.getString(R.string.category_other_expense)
+            "salary" -> context.getString(R.string.category_salary)
+            "freelance" -> context.getString(R.string.category_freelance)
+            "gifts" -> context.getString(R.string.category_gifts)
+            "interest" -> context.getString(R.string.category_interest)
+            "rental" -> context.getString(R.string.category_rental)
+            "other_income" -> context.getString(R.string.category_other_income)
+            else -> context.getString(R.string.category_other)
         }
     }
 

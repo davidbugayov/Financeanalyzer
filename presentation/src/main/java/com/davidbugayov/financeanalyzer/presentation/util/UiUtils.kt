@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.util
 
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.presentation.R
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -12,12 +12,14 @@ import java.util.Locale
 object UiUtils {
     /**
      * Форматирует период для отображения в пользовательском интерфейсе
+     * @param context Контекст для доступа к ресурсам
      * @param periodType Тип периода
      * @param startDate Начальная дата периода
      * @param endDate Конечная дата периода
      * @return Строка с форматированным периодом
      */
     fun formatPeriod(
+        context: android.content.Context,
         periodType: PeriodType,
         startDate: Date,
         endDate: Date,
@@ -25,24 +27,26 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> StringProvider.periodAllTime
-            PeriodType.DAY -> StringProvider.periodDay(dateFormat.format(startDate))
-            PeriodType.WEEK -> StringProvider.periodWeek(dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.MONTH -> StringProvider.periodMonth(dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.QUARTER -> StringProvider.periodQuarter(dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.YEAR -> StringProvider.periodYear(dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.CUSTOM -> StringProvider.periodCustom(dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.ALL -> context.getString(R.string.period_all_time)
+            PeriodType.DAY -> context.getString(R.string.period_day, dateFormat.format(startDate))
+            PeriodType.WEEK -> context.getString(R.string.period_week, dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.MONTH -> context.getString(R.string.period_month, dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.QUARTER -> context.getString(R.string.period_quarter, dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.YEAR -> context.getString(R.string.period_year, dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.CUSTOM -> context.getString(R.string.period_custom, dateFormat.format(startDate), dateFormat.format(endDate))
         }
     }
 
     /**
      * Форматирует период в краткой форме для компактного отображения
+     * @param context Контекст для доступа к ресурсам
      * @param periodType Тип периода
      * @param startDate Начальная дата периода
      * @param endDate Конечная дата периода
      * @return Строка с кратким форматированным периодом
      */
     fun formatPeriodCompact(
+        context: android.content.Context,
         periodType: PeriodType,
         startDate: Date,
         endDate: Date,
@@ -50,7 +54,7 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> StringProvider.periodAllTime
+            PeriodType.ALL -> context.getString(R.string.period_all_time)
             PeriodType.DAY -> dateFormat.format(startDate)
             PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
                 dateFormat.format(startDate) + " - " + dateFormat.format(endDate)
