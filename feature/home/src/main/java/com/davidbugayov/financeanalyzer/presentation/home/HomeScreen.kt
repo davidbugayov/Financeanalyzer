@@ -31,8 +31,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
@@ -77,7 +77,7 @@ private fun HomeTopBar(
     profileIconModifier: Modifier = Modifier,
 ) {
     AppTopBar(
-                        title = stringResource(R.string.financial_analyzer),
+                        title = StringProvider.financialAnalyzer,
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
@@ -94,7 +94,7 @@ private fun HomeTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.generate_test_data),
+                        contentDescription = StringProvider.generateTestData,
                     )
                 }
             }
@@ -113,7 +113,7 @@ private fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                                            contentDescription = stringResource(R.string.profile),
+                                            contentDescription = StringProvider.profile,
                 )
             }
         },
@@ -284,9 +284,9 @@ fun HomeScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-            val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
-        val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
-        val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
+            val testDataGeneratedMsg = StringProvider.testDataGenerated
+        val transactionDeletedMsg = StringProvider.transactionDeleted
+        val emptyTransactionIdErrorMsg = StringProvider.emptyTransactionIdError
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
@@ -444,7 +444,7 @@ fun HomeScreen(
                         .padding(paddingValues),
             ) {
                 if (state.isLoading && state.transactions.isEmpty()) {
-                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                    CenteredLoadingIndicator(message = StringProvider.loadingData)
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),
@@ -462,10 +462,10 @@ fun HomeScreen(
                 HomeFeedback(
                     title =
                         when (feedbackType) {
-                            FeedbackType.SUCCESS -> stringResource(R.string.feedback_success)
-                            FeedbackType.ERROR -> stringResource(R.string.feedback_error)
-                            FeedbackType.WARNING -> stringResource(R.string.feedback_warning)
-                            FeedbackType.INFO -> stringResource(R.string.feedback_info)
+                            FeedbackType.SUCCESS -> StringProvider.feedbackSuccess
+                            FeedbackType.ERROR -> StringProvider.feedbackError
+                            FeedbackType.WARNING -> StringProvider.feedbackWarning
+                            FeedbackType.INFO -> StringProvider.feedbackInfo
                         },
                     feedbackMessage = feedbackMessage,
                     feedbackType = feedbackType,

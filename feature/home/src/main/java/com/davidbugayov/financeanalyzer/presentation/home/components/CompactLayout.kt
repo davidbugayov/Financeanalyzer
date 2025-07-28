@@ -30,8 +30,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -80,7 +80,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.compose.material3.Icon(
                 imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-                contentDescription = stringResource(R.string.empty_state_icon),
+                contentDescription = StringProvider.emptyStateIcon,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier =
                     Modifier
@@ -88,7 +88,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                         .size(36.dp),
             )
             Text(
-                text = stringResource(R.string.no_transactions),
+                text = StringProvider.noTransactions,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
@@ -96,7 +96,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 modifier = Modifier.padding(bottom = 4.dp),
             )
             Text(
-                text = stringResource(R.string.add_first_transaction_description),
+                text = StringProvider.addFirstTransactionDescription,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,
@@ -119,7 +119,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                         .heightIn(min = 44.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.add_transaction),
+                    text = StringProvider.addTransaction,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     maxLines = 1,
