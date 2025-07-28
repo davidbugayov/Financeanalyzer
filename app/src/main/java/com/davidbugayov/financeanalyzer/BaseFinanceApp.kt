@@ -25,7 +25,6 @@ import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as H
 import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import com.davidbugayov.financeanalyzer.ui.util.StringProvider as UiStringProvider
 import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider as ProfileStringProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
