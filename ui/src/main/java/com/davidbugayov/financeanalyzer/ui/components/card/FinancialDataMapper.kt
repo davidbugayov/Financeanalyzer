@@ -218,15 +218,15 @@ object FinancialDataMapper {
         // Анализ нормы сбережений
         insights.add(
             InsightItem(
-                title = stringResource(R.string.insight_financial_health),
+                title = StringProvider.insightFinancialHealth,
                 description = when {
-                    savingsRate >= 20f -> stringResource(R.string.insight_financial_health_excellent)
-                    savingsRate >= 15f -> stringResource(R.string.insight_financial_health_good)
-                    savingsRate >= 10f -> stringResource(R.string.insight_financial_health_ok)
-                    savingsRate >= 5f -> stringResource(R.string.insight_financial_health_low)
-                    else -> stringResource(R.string.insight_financial_health_critical)
+                    savingsRate >= 20f -> StringProvider.insightFinancialHealthExcellent
+                    savingsRate >= 15f -> StringProvider.insightFinancialHealthGood
+                    savingsRate >= 10f -> StringProvider.insightFinancialHealthOk
+                    savingsRate >= 5f -> StringProvider.insightFinancialHealthLow
+                    else -> StringProvider.insightFinancialHealthCritical
                 },
-                metric = stringResource(R.string.insight_financial_health_metric, savingsRate.toInt()),
+                metric = StringProvider.insightFinancialHealthMetric(savingsRate.toInt()),
                 icon = when {
                     savingsRate >= 15f -> Icons.AutoMirrored.Filled.TrendingUp
                     savingsRate >= 10f -> Icons.Default.Balance
@@ -243,14 +243,14 @@ object FinancialDataMapper {
         // Анализ финансовой подушки
         insights.add(
             InsightItem(
-                title = stringResource(R.string.insight_financial_protection),
+                title = StringProvider.insightFinancialProtection,
                 description = when {
-                    monthsOfSavings >= 6f -> stringResource(R.string.insight_financial_protection_excellent)
-                    monthsOfSavings >= 3f -> stringResource(R.string.insight_financial_protection_good)
-                    monthsOfSavings >= 1f -> stringResource(R.string.insight_financial_protection_minimal)
-                    else -> stringResource(R.string.insight_financial_protection_none)
+                    monthsOfSavings >= 6f -> StringProvider.insightFinancialProtectionExcellent
+                    monthsOfSavings >= 3f -> StringProvider.insightFinancialProtectionGood
+                    monthsOfSavings >= 1f -> StringProvider.insightFinancialProtectionMinimal
+                    else -> StringProvider.insightFinancialProtectionNone
                 },
-                metric = stringResource(R.string.insight_financial_protection_metric, monthsOfSavings.toInt()),
+                metric = StringProvider.insightFinancialProtectionMetric(monthsOfSavings.toInt()),
                 icon = when {
                     monthsOfSavings >= 3f -> Icons.Default.Shield
                     monthsOfSavings >= 1f -> Icons.Default.Security
@@ -268,9 +268,9 @@ object FinancialDataMapper {
         if (totalTransactions > 100) {
             insights.add(
                 InsightItem(
-                    title = stringResource(R.string.insight_expense_frequency),
-                    description = stringResource(R.string.insight_expense_frequency_desc, totalTransactions),
-                    metric = stringResource(R.string.insight_expense_frequency_metric, totalTransactions),
+                    title = StringProvider.insightExpenseFrequency,
+                    description = StringProvider.insightExpenseFrequencyDesc(totalTransactions),
+                    metric = StringProvider.insightExpenseFrequencyMetric(totalTransactions),
                     icon = Icons.Default.ShoppingCart,
                     importance = if (totalTransactions > 200) InsightImportance.MEDIUM else InsightImportance.LOW
                 )
@@ -281,9 +281,9 @@ object FinancialDataMapper {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
                 InsightItem(
-                    title = stringResource(R.string.insight_expense_pattern),
-                    description = stringResource(R.string.insight_expense_pattern_desc, mostFrequentExpenseDay),
-                    metric = stringResource(R.string.insight_expense_pattern_metric, mostFrequentExpenseDay),
+                    title = StringProvider.insightExpensePattern,
+                    description = StringProvider.insightExpensePatternDesc(mostFrequentExpenseDay),
+                    metric = StringProvider.insightExpensePatternMetric(mostFrequentExpenseDay),
                     icon = Icons.Default.Timeline,
                     importance = InsightImportance.LOW
                 )
@@ -307,9 +307,9 @@ object FinancialDataMapper {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
                 InsightItem(
-                    title = stringResource(R.string.insight_active_weekday),
-                    description = stringResource(R.string.insight_active_weekday_desc, mostFrequentExpenseDay),
-                    metric = stringResource(R.string.insight_active_weekday_metric, mostFrequentExpenseDay),
+                    title = StringProvider.insightActiveWeekday,
+                    description = StringProvider.insightActiveWeekdayDesc(mostFrequentExpenseDay),
+                    metric = StringProvider.insightActiveWeekdayMetric(mostFrequentExpenseDay),
                     icon = Icons.Default.CalendarToday,
                     importance = InsightImportance.LOW
                 )
@@ -321,9 +321,9 @@ object FinancialDataMapper {
             averageExpensePerTransaction < 500f -> {
                 insights.add(
                     InsightItem(
-                        title = stringResource(R.string.insight_small_expenses),
-                        description = stringResource(R.string.insight_small_expenses_desc),
-                        metric = stringResource(R.string.insight_small_expenses_metric, averageExpensePerTransaction.toInt()),
+                        title = StringProvider.insightSmallExpenses,
+                        description = StringProvider.insightSmallExpensesDesc,
+                        metric = StringProvider.insightSmallExpensesMetric(averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.LocalGroceryStore,
                         importance = InsightImportance.LOW
                     )
@@ -332,9 +332,9 @@ object FinancialDataMapper {
             averageExpensePerTransaction > 2000f -> {
                 insights.add(
                     InsightItem(
-                        title = stringResource(R.string.insight_large_expenses),
-                        description = stringResource(R.string.insight_large_expenses_desc),
-                        metric = stringResource(R.string.insight_large_expenses_metric, averageExpensePerTransaction.toInt()),
+                        title = StringProvider.insightLargeExpenses,
+                        description = StringProvider.insightLargeExpensesDesc,
+                        metric = StringProvider.insightLargeExpensesMetric(averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.ShoppingBag,
                         importance = InsightImportance.MEDIUM
                     )
@@ -346,9 +346,9 @@ object FinancialDataMapper {
         if (expenseTransactionsCount > 150) {
             insights.add(
                 InsightItem(
-                    title = stringResource(R.string.insight_high_activity),
-                    description = stringResource(R.string.insight_high_activity_desc, expenseTransactionsCount),
-                    metric = stringResource(R.string.insight_high_activity_metric, expenseTransactionsCount),
+                    title = StringProvider.insightHighActivity,
+                    description = StringProvider.insightHighActivityDesc(expenseTransactionsCount),
+                    metric = StringProvider.insightHighActivityMetric(expenseTransactionsCount),
                     icon = Icons.Default.Speed,
                     importance = InsightImportance.MEDIUM
                 )

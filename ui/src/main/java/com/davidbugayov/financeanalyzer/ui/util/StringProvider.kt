@@ -171,4 +171,61 @@ object StringProvider {
     val recNormalInvestTitle: String get() = getString(R.string.rec_normal_invest_title)
     val recNormalInvestDesc: String get() = getString(R.string.rec_normal_invest_desc)
     val recNormalInvestImpact: String get() = getString(R.string.rec_normal_invest_impact)
+    
+    // Дополнительные строки для FinancialDataMapper
+    val insightFinancialHealth: String get() = getString(R.string.insight_financial_health)
+    val insightFinancialHealthExcellent: String get() = getString(R.string.insight_financial_health_excellent)
+    val insightFinancialHealthGood: String get() = getString(R.string.insight_financial_health_good)
+    val insightFinancialHealthOk: String get() = getString(R.string.insight_financial_health_ok)
+    val insightFinancialHealthLow: String get() = getString(R.string.insight_financial_health_low)
+    val insightFinancialHealthCritical: String get() = getString(R.string.insight_financial_health_critical)
+    val insightFinancialHealthMetric: String get() = getString(R.string.insight_financial_health_metric)
+    
+    val insightFinancialProtection: String get() = getString(R.string.insight_financial_protection)
+    val insightFinancialProtectionExcellent: String get() = getString(R.string.insight_financial_protection_excellent)
+    val insightFinancialProtectionGood: String get() = getString(R.string.insight_financial_protection_good)
+    val insightFinancialProtectionMinimal: String get() = getString(R.string.insight_financial_protection_minimal)
+    val insightFinancialProtectionNone: String get() = getString(R.string.insight_financial_protection_none)
+    val insightFinancialProtectionMetric: String get() = getString(R.string.insight_financial_protection_metric)
+    
+    val insightExpenseFrequency: String get() = getString(R.string.insight_expense_frequency)
+    val insightExpenseFrequencyDesc: String get() = getString(R.string.insight_expense_frequency_desc)
+    val insightExpenseFrequencyMetric: String get() = getString(R.string.insight_expense_frequency_metric)
+    
+    val insightExpensePattern: String get() = getString(R.string.insight_expense_pattern)
+    val insightExpensePatternDesc: String get() = getString(R.string.insight_expense_pattern_desc)
+    val insightExpensePatternMetric: String get() = getString(R.string.insight_expense_pattern_metric)
+    
+    val insightActiveWeekday: String get() = getString(R.string.insight_active_weekday)
+    val insightActiveWeekdayDesc: String get() = getString(R.string.insight_active_weekday_desc)
+    val insightActiveWeekdayMetric: String get() = getString(R.string.insight_active_weekday_metric)
+    
+    // Методы с параметрами для insight
+    fun insightFinancialHealthMetric(savingsRate: Int): String = getString(R.string.insight_financial_health_metric, savingsRate)
+    fun insightFinancialProtectionMetric(months: Int): String = getString(R.string.insight_financial_protection_metric, months)
+    fun insightExpenseFrequencyDesc(totalTransactions: Int): String = getString(R.string.insight_expense_frequency_desc, totalTransactions)
+    fun insightExpenseFrequencyMetric(totalTransactions: Int): String = getString(R.string.insight_expense_frequency_metric, totalTransactions)
+    fun insightExpensePatternDesc(day: String): String = getString(R.string.insight_expense_pattern_desc, day)
+    fun insightExpensePatternMetric(day: String): String = getString(R.string.insight_expense_pattern_metric, day)
+    fun insightActiveWeekdayDesc(day: String): String = getString(R.string.insight_active_weekday_desc, day)
+    fun insightActiveWeekdayMetric(day: String): String = getString(R.string.insight_active_weekday_metric, day)
+    
+    // Дополнительные строки для insight
+    val insightSmallExpenses: String get() = getString(R.string.insight_small_expenses)
+    val insightSmallExpensesDesc: String get() = getString(R.string.insight_small_expenses_desc)
+    val insightSmallExpensesMetric: String get() = getString(R.string.insight_small_expenses_metric)
+    
+    val insightLargeExpenses: String get() = getString(R.string.insight_large_expenses)
+    val insightLargeExpensesDesc: String get() = getString(R.string.insight_large_expenses_desc)
+    val insightLargeExpensesMetric: String get() = getString(R.string.insight_large_expenses_metric)
+    
+    val insightHighActivity: String get() = getString(R.string.insight_high_activity)
+    val insightHighActivityDesc: String get() = getString(R.string.insight_high_activity_desc)
+    val insightHighActivityMetric: String get() = getString(R.string.insight_high_activity_metric)
+    
+    // Методы с параметрами для insight
+    fun insightSmallExpensesMetric(amount: Int): String = getString(R.string.insight_small_expenses_metric, amount)
+    fun insightLargeExpensesMetric(amount: Int): String = getString(R.string.insight_large_expenses_metric, amount)
+    fun insightHighActivityDesc(count: Int): String = getString(R.string.insight_high_activity_desc, count)
+    fun insightHighActivityMetric(count: Int): String = getString(R.string.insight_high_activity_metric, count)
 } 
