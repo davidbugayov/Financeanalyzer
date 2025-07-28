@@ -29,10 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.budget.R
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
@@ -76,7 +75,7 @@ fun WalletTransactionsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = state.wallet?.name ?: stringResource(R.string.wallet_not_found),
+                title = state.wallet?.name ?: StringProvider.walletNotFound,
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
@@ -85,7 +84,7 @@ fun WalletTransactionsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.link_categories),
+                            contentDescription = StringProvider.linkCategories,
                         )
                     }
                 },
@@ -104,7 +103,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(stringResource(R.string.loading))
+                    Text(StringProvider.loading)
                 }
             } else if (state.wallet == null) {
                 // Показываем сообщение, если кошелек не найден
@@ -112,7 +111,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(stringResource(R.string.wallet_not_found))
+                    Text(StringProvider.walletNotFound)
                 }
             } else {
                 // Сохраняем кошелек в локальную переменную для умного приведения типов
@@ -136,7 +135,7 @@ fun WalletTransactionsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.linked_categories),
+                            text = StringProvider.linkedCategories,
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium,
                         )
@@ -159,7 +158,7 @@ fun WalletTransactionsScreen(
 
                 // Заголовок списка транзакций
                 Text(
-                    text = stringResource(R.string.transactions_section),
+                    text = StringProvider.transactionsSection,
                     style = MaterialTheme.typography.titleMedium,
                     modifier =
                         Modifier.padding(
@@ -180,7 +179,7 @@ fun WalletTransactionsScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = stringResource(R.string.no_transactions_found),
+                            text = StringProvider.noTransactionsFound,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -213,9 +212,9 @@ fun WalletTransactionsScreen(
                     viewModel.onEvent(WalletTransactionsEvent.LinkCategories(selectedCategories))
                     showImportCategoriesDialog = false
                 },
-                title = stringResource(R.string.link_categories_title),
-                subtitle = stringResource(R.string.link_categories_subtitle),
-                confirmButtonText = stringResource(R.string.link_button),
+                title = StringProvider.linkCategoriesTitle,
+                subtitle = StringProvider.linkCategoriesSubtitle,
+                confirmButtonText = StringProvider.linkButton,
                 preselectedCategories = state.wallet?.linkedCategories ?: emptyList(),
             )
         }
@@ -224,11 +223,11 @@ fun WalletTransactionsScreen(
         state.error?.let { error ->
             AlertDialog(
                 onDismissRequest = { viewModel.onEvent(WalletTransactionsEvent.ClearError) },
-                title = { Text(stringResource(R.string.error_title)) },
+                title = { Text(StringProvider.errorTitle) },
                 text = { Text(error) },
                 confirmButton = {
                     TextButton(onClick = { viewModel.onEvent(WalletTransactionsEvent.ClearError) }) {
-                        Text(stringResource(R.string.ok_button))
+                        Text(StringProvider.okButton)
                     }
                 },
             )
