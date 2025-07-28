@@ -15,6 +15,8 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.Enhan
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,19 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     val effect: SharedFlow<EnhancedFinanceChartEffect> = _effect.asSharedFlow()
 
     private var allTransactions: List<Transaction> = emptyList()
+
+    private fun formatPeriod(periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType, startDate: java.util.Date, endDate: java.util.Date): String {
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        return when (periodType) {
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL -> "Все время"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.WEEK -> "Неделя: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.MONTH -> "Месяц: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.QUARTER -> "Квартал: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.YEAR -> "Год: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM -> "Произвольный: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+        }
+    }
 
     fun handleIntent(intent: EnhancedFinanceChartIntent) {
         when (intent) {
@@ -158,7 +173,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         expenseLineChartData = expenseLineChartData,
                         error = null,
                         periodText =
-                            UiUtils.formatPeriod(
+                            formatPeriod(
                                 it.periodType,
                                 it.startDate,
                                 it.endDate,
@@ -220,7 +235,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         _state.update {
             it.copy(
                 periodText =
-                    UiUtils.formatPeriod(
+                    formatPeriod(
                         it.periodType,
                         it.startDate,
                         it.endDate,
