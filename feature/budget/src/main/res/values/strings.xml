@@ -1,3 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    </resources>
+    <string name="period_settings_title">Настройки периода</string>
+    <string name="ok">ОК</string>
+    <string name="wallet_not_found">Кошелек не найден</string>
+    <string name="error_title">Ошибка</string>
+    <string name="wallet_name_label">Название кошелька</string>
+    <string name="wallet_name_hint">Введите название кошелька</string>
+    <string name="wallet_type_label">Тип кошелька</string>
+    <string name="wallet_spent_amount">Потрачено</string>
+    <string name="wallet_remaining_amount">Осталось</string>
+    <string name="wallet_budget_limit">Лимит бюджета</string>
+</resources>

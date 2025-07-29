@@ -8,19 +8,19 @@ from pathlib import Path
 def add_missing_strings_to_domain():
     """Добавляет недостающие строки в domain модуль"""
     domain_file = Path("domain/src/main/res/values/strings.xml")
-    
+
     if not domain_file.exists():
         print(f"Файл {domain_file} не найден!")
         return
-    
+
     tree = ET.parse(domain_file)
     root = tree.getroot()
-    
+
     existing_strings = set()
     for string_elem in root.findall("string"):
         name = string_elem.get("name")
         existing_strings.add(name)
-    
+
     missing_strings = {
         'achievement_first_steps': 'Первые шаги',
         'achievement_first_steps_desc': 'Создана первая транзакция',
@@ -51,7 +51,7 @@ def add_missing_strings_to_domain():
         'wallet_type_investment': 'Инвестиции',
         'wallet_type_other': 'Другое'
     }
-    
+
     added_count = 0
     for name, value in missing_strings.items():
         if name not in existing_strings:
@@ -60,7 +60,7 @@ def add_missing_strings_to_domain():
             string_elem.text = value
             added_count += 1
             print(f"Добавлена строка {name} в domain")
-    
+
     if added_count > 0:
         tree.write(domain_file, encoding="utf-8", xml_declaration=True)
         print(f"Добавлено {added_count} строк в domain")

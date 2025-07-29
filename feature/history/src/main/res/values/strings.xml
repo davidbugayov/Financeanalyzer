@@ -21,5 +21,4 @@
     <string name="error_loading_transactions">Ошибка при загрузке транзакций</string>
     <string name="week_format">Неделя %1$d, %2$d</string>
     <string name="deleteSourceConfirmationMessage">Вы уверены, что хотите удалить источник?</string>
-    <string name="loading_data">Загрузка данных...</string>
-    </resources>
+    <string name="select_category">Выберите категорию</string><string name="select_period">Выберите период</string><string name="apply">Применить</string><string name="close">Закрыть</string><string name="group_by_days">По дням</string><string name="group_by_weeks">По неделям</string><string name="group_by_months">По месяцам</string><string name="collapse">Свернуть</string><string name="expand">Развернуть</string><string name="transaction_history">История транзакций</string><string name="all_time">За все время</string><string name="day">День</string><string name="week">Неделя</string><string name="month">Месяц</string><string name="quarter">Квартал</string><string name="year">Год</string><string name="start_date">Дата начала</string><string name="end_date">Дата окончания</string><string name="delete">Удалить</string><string name="add_transaction">Добавить транзакцию</string><string name="loading_data">Загрузка данных...</string><string name="expenses">Расходы</string><string name="incomes">Доходы</string></resources>

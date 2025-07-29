@@ -67,12 +67,6 @@ echo 'Удаляем дубликат из feature/transaction/src/main/res/valu
 # Обрабатываем дубликат: Добавить категорию...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'add_category' из feature/transaction/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'add_custom_category' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Добавить источник...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'add_custom_source' из feature/transaction/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Добавить в кошельки...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
@@ -93,6 +87,12 @@ echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # Обрабатываем дубликат: За все время...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'period_all_time' из ui/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'all_time' из feature/statistics/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/home/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'filter_all_time' из feature/home/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'all_time' из feature/history/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Сумма...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
@@ -107,6 +107,10 @@ echo 'Удаляем дубликат из feature/profile/src/main/res/values/s
 # Обрабатываем дубликат: Средний расход...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'stat_avg_expense' из ui/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'average_expenses_title' из feature/statistics/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'financial_health_average_expenses_title' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'average_expense' из feature/profile/src/main/res/values/strings.xml
 
@@ -200,6 +204,8 @@ echo 'Удаляем дубликат из domain/src/main/res/values/strings.xm
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'transaction_transfer' из ui/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'transaction_transfer' из feature/transaction/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'category_transfer' из feature/transaction/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Транспорт...
@@ -271,6 +277,8 @@ echo 'Удаляем дубликат из feature/transaction/src/main/res/valu
 # Обрабатываем дубликат: ОК...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'ok' из ui/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'financial_health_ok_button' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'ok' из feature/profile/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/budget/src/main/res/values/strings.xml'
@@ -320,11 +328,9 @@ echo 'Удаляем дубликат из feature/home/src/main/res/values/stri
 
 # Обрабатываем дубликат: Расход...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'expense' из ui/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'transaction_type_expense' из ui/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'expense' из feature/statistics/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'expense' из ui/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'expense_type' из feature/transaction/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
@@ -337,6 +343,8 @@ echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'expenses_category' из ui/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'stat_expense_transactions' из ui/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'expense' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'chart_title_expense' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
@@ -363,10 +371,6 @@ echo 'Удаляем дубликат из feature/home/src/main/res/values/stri
 # Обрабатываем дубликат: История...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'nav_history' из ui/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Импортировать...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'import_button' из feature/transaction/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Неизвестная ошибка импорта...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
@@ -508,32 +512,6 @@ echo 'Удаляем дубликат из feature/statistics/src/main/res/value
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'savings_rate' из feature/profile/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Выбрать категорию...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_category' из feature/transaction/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_category' из feature/history/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Выбрать цвет...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_color' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Выбрать дату...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_date_button' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Выбрать иконку...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_icon' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Выбрать источник...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_source' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Выбрать кошельки...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_wallets' из feature/transaction/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: Источник...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'source' из feature/transaction/src/main/res/values/strings.xml
@@ -541,10 +519,6 @@ echo 'Удаляем дубликат из feature/transaction/src/main/res/valu
 # Обрабатываем дубликат: Название источника...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'source_name' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Используемые источники...
-echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'sources_used' из feature/profile/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Финансовая подушка...
 echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
@@ -555,6 +529,8 @@ echo 'Удаляем дубликат из feature/statistics/src/main/res/value
 # Обрабатываем дубликат: Всего транзакций...
 echo 'Удаляем дубликат из ui/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'total_transactions' из ui/src/main/res/values/strings.xml
+echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'total_transactions' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'total_transactions' из feature/profile/src/main/res/values/strings.xml
 
@@ -594,12 +570,6 @@ echo 'Удаляем дубликат из domain/src/main/res/values/strings.xm
 echo 'Удаляем дубликат из app/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'achievements_system_init_error' из app/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Выбрать период...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_period' из feature/statistics/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'select_period' из feature/history/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: День...
 echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'day' из feature/statistics/src/main/res/values/strings.xml
@@ -628,47 +598,15 @@ echo 'Удаляем дубликат из feature/statistics/src/main/res/value
 echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'year' из feature/history/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Начальная дата...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'start_date' из feature/statistics/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'start_date' из feature/history/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Конечная дата...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'end_date' из feature/statistics/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'end_date' из feature/history/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: Применить...
 echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'apply' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'apply' из feature/history/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Средние расходы...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'average_expenses_title' из feature/statistics/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'financial_health_average_expenses_title' из feature/statistics/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: Понятно...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'financial_health_ok_button' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'got_it' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Ошибка при загрузке кошельков...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'log_error_loading_wallets' из feature/transaction/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'log_error_loading_wallets_base' из feature/transaction/src/main/res/values/strings.xml
-
-# Обрабатываем дубликат: Озон...
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'transaction_source_ozon' из feature/transaction/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'bank_ozon' из feature/transaction/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Сбербанк...
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
@@ -706,12 +644,6 @@ echo 'Удаляем дубликат из feature/profile/src/main/res/values/s
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'settings_theme_light' из feature/profile/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Тёмная...
-echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'profile_theme_dark' из feature/profile/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'settings_theme_dark' из feature/profile/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: Системная...
 echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'profile_theme_system' из feature/profile/src/main/res/values/strings.xml
@@ -728,35 +660,47 @@ echo 'Удаляем дубликат из core/src/main/res/values/strings.xml'
 echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'error_unknown' из feature/transaction/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Все время...
-echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'all_time' из feature/statistics/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/home/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'filter_all_time' из feature/home/src/main/res/values/strings.xml
-echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'all_time' из feature/history/src/main/res/values/strings.xml
-
 # Обрабатываем дубликат: Квартал...
 echo 'Удаляем дубликат из feature/statistics/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'period_quarter' из feature/statistics/src/main/res/values/strings.xml
 echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'quarter' из feature/history/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Секция транзакций...
-echo 'Удаляем дубликат из feature/budget/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'transactions_section' из feature/budget/src/main/res/values/strings.xml
+# Обрабатываем дубликат: Выберите период...
+echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'select_period' из feature/history/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Привязать категории...
-echo 'Удаляем дубликат из feature/budget/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'link_categories_title' из feature/budget/src/main/res/values/strings.xml
+# Обрабатываем дубликат: Дата начала...
+echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'start_date' из feature/history/src/main/res/values/strings.xml
 
-# Обрабатываем дубликат: Тратить...
-echo 'Удаляем дубликат из feature/budget/src/main/res/values/strings.xml'
-# TODO: Удалить строку 'wallet_spend_action' из feature/budget/src/main/res/values/strings.xml
+# Обрабатываем дубликат: Дата окончания...
+echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'end_date' из feature/history/src/main/res/values/strings.xml
+
+# Обрабатываем дубликат: Импорт...
+echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'import_button' из feature/transaction/src/main/res/values/strings.xml
+
+# Обрабатываем дубликат: Выберите категорию...
+echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'select_category' из feature/history/src/main/res/values/strings.xml
+
+# Обрабатываем дубликат: Ozon...
+echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'bank_ozon' из feature/transaction/src/main/res/values/strings.xml
+
+# Обрабатываем дубликат: Ошибка загрузки кошельков...
+echo 'Удаляем дубликат из feature/transaction/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'log_error_loading_wallets_base' из feature/transaction/src/main/res/values/strings.xml
 
 # Обрабатываем дубликат: Загрузка данных......
 echo 'Удаляем дубликат из feature/history/src/main/res/values/strings.xml'
 # TODO: Удалить строку 'loading_data' из feature/history/src/main/res/values/strings.xml
+
+# Обрабатываем дубликат: Темная...
+echo 'Удаляем дубликат из feature/profile/src/main/res/values/strings.xml'
+# TODO: Удалить строку 'settings_theme_dark' из feature/profile/src/main/res/values/strings.xml
 
 echo "Консолидация завершена!"
 echo "Не забудьте проверить результат и обновить импорты в коде."
