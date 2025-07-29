@@ -197,6 +197,8 @@
     <string name="show_more_categories">Показать больше категорий</string>
     <string name="hide_categories">Скрыть категории</string>
     <string name="import_error_unknown">Неизвестная ошибка при импорте</string>
+    <string name="import_section_title">Импорт</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
     <string name="add_button">Добавить</string>
     <string name="select_category">Выбрать категорию</string>
     <string name="add_category">Добавить категорию</string>
@@ -221,16 +223,16 @@
     <string name="header_amount">Сумма</string>
     <string name="csv_expense_value">Расход</string>
     <string name="back">Назад</string>
-    <string name="import_section_title">Импорт</string>
     <string name="import_transactions_title">Импорт транзакций</string>
     <string name="add_button_text">Добавить</string>
-    <string name="error_unknown">Неизвестная ошибка</string>
     <string name="category_other">Другое</string>
     <string name="category_transfers">Переводы</string>
     <string name="source_cash">Наличные</string>
     <string name="source_card">Карта</string>
     <string name="edit_transaction_title">Редактировать транзакцию</string>
     <string name="save_button_text">Сохранить</string>
+    <string name="category_transfer">Перевод</string>
+    <string name="select_wallets">Выбрать кошельки</string>
     <string name="error_title">Ошибка</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="delete_category_title">Удалить категорию</string>
@@ -239,8 +241,4 @@
     <string name="import_button">Импортировать</string>
     <string name="import_transactions_content_description">Импорт транзакций</string>
     <string name="import_unknown_error">Неизвестная ошибка импорта</string>
-    
-    <!-- Дополнительные строки -->
-    <string name="category_transfer">Перевод</string>
-    <string name="select_wallets">Выбрать кошельки</string>
 </resources>

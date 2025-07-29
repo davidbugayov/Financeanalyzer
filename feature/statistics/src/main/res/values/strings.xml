@@ -116,18 +116,16 @@
     <string name="savings_rate_15_percent">15%</string>
     <string name="savings_rate_30_percent">30%</string>
     <string name="savings_rate_50_percent">50%</string>
+    <string name="financial_health_ok_button">Понятно</string>
     <string name="statistics">Статистика</string>
     <string name="tips">Советы</string>
     <string name="income">Доходы</string>
+    <string name="expense">Расход</string>
     <string name="savings_rate_title">Норма сбережений</string>
     <string name="financial_cushion_title">Финансовая подушка</string>
     <string name="financial_health_title">Финансовое здоровье</string>
     <string name="financial_health_savings_rate_title">Норма сбережений</string>
     <string name="financial_health_financial_cushion_title">Финансовая подушка</string>
-    <string name="financial_health_ok_button">Понятно</string>
     <string name="chart_title_income">Доходы</string>
     <string name="chart_title_expense">Расходы</string>
-    
-    <!-- Дополнительные строки -->
-    <string name="expense">Расход</string>
 </resources>

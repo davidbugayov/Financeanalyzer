@@ -43,8 +43,8 @@
     <string name="app_info">Информация о приложении</string>
     <string name="app_version">Версия</string>
     <string name="build_version">Сборка</string>
-    <string name="permission_required_title">Требуется разрешение</string>
     <string name="edit_time">Изменить время</string>
+    <string name="permission_required_title">Требуется разрешение</string>
     <string name="done">Готово</string>
     <string name="ok">ОК</string>
     <string name="profile_title">Профиль</string>
@@ -56,7 +56,5 @@
     <string name="savings_rate">Норма сбережений</string>
     <string name="average_expense">Средний расход</string>
     <string name="sources_used">Используемые источники</string>
-    
-    <!-- Дополнительные строки -->
     <string name="cd_done">Готово</string>
 </resources>
