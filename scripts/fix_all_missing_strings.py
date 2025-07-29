@@ -1,143 +1,134 @@
 #!/usr/bin/env python3
 """
-Скрипт для автоматического добавления всех отсутствующих строк в соответствующие модули.
+Полный скрипт для добавления всех недостающих строк во все модули.
 """
-
-import os
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-class AllMissingStringsFixer:
-    def __init__(self, project_root: str):
-        self.project_root = Path(project_root)
-        
-    def add_missing_strings(self):
-        """Добавляет все недостающие строки в соответствующие модули."""
-        
-        # Модуль profile
-        profile_strings = {
-            'permission_required_title': 'Требуется разрешение',
-            'done': 'Готово',
-            'ok': 'ОК',
-            'profile_title': 'Профиль',
-            'budget': 'Бюджет',
-            'analytics_title': 'Аналитика',
-            'income': 'Доходы',
-            'expenses': 'Расходы',
-            'balance': 'Баланс',
-            'savings_rate': 'Норма сбережений',
-            'average_expense': 'Средний расход',
-            'sources_used': 'Используемые источники',
-            'cd_done': 'Готово'
-        }
-        
-        # Модуль statistics
-        statistics_strings = {
-            'statistics': 'Статистика',
-            'tips': 'Советы',
-            'income': 'Доходы',
-            'expense': 'Расход',
-            'savings_rate_title': 'Норма сбережений',
-            'financial_cushion_title': 'Финансовая подушка',
-            'financial_health_title': 'Финансовое здоровье',
-            'financial_health_savings_rate_title': 'Норма сбережений',
-            'financial_health_financial_cushion_title': 'Финансовая подушка',
-            'chart_title_income': 'Доходы',
-            'chart_title_expense': 'Расходы'
-        }
-        
-        # Модуль transaction
-        transaction_strings = {
-            'add_button': 'Добавить',
-            'select_category': 'Выбрать категорию',
-            'add_category': 'Добавить категорию',
-            'category_name': 'Название категории',
-            'select_icon': 'Выбрать иконку',
-            'category': 'Категория',
-            'add_custom_category': 'Добавить категорию',
-            'select_color': 'Выбрать цвет',
-            'add_custom_source': 'Добавить источник',
-            'source_name': 'Название источника',
-            'date': 'Дата',
-            'select_date_button': 'Выбрать дату',
-            'note_optional': 'Заметка (необязательно)',
-            'select_source': 'Выбрать источник',
-            'delete_source': 'Удалить источник',
-            'source': 'Источник',
-            'income_type': 'Доход',
-            'expense_type': 'Расход',
-            'deduct_from_wallets': 'Списать с кошельков',
-            'add_to_wallets': 'Добавить в кошельки',
-            'header_date': 'Дата',
-            'header_amount': 'Сумма',
-            'csv_expense_value': 'Расход',
-            'back': 'Назад',
-            'import_transactions_title': 'Импорт транзакций',
-            'add_button_text': 'Добавить',
-            'category_other': 'Другое',
-            'category_transfers': 'Переводы',
-            'source_cash': 'Наличные',
-            'source_card': 'Карта',
-            'edit_transaction_title': 'Редактировать транзакцию',
-            'save_button_text': 'Сохранить',
-            'category_transfer': 'Перевод',
-            'select_wallets': 'Выбрать кошельки',
-            'error_title': 'Ошибка',
-            'dialog_cancel': 'Отмена',
-            'delete_category_title': 'Удалить категорию',
-            'dialog_delete': 'Удалить',
-            'delete_source_title': 'Удалить источник',
-            'import_button': 'Импортировать',
-            'import_transactions_content_description': 'Импорт транзакций',
-            'import_unknown_error': 'Неизвестная ошибка импорта'
-        }
-        
-        # Добавляем строки в модули
-        self.add_strings_to_module('feature/profile', profile_strings)
-        self.add_strings_to_module('feature/statistics', statistics_strings)
-        self.add_strings_to_module('feature/transaction', transaction_strings)
-        
-        print("Все недостающие строки добавлены!")
+def add_missing_strings_to_profile():
+    """Добавляет недостающие строки в profile модуль"""
+    file_path = Path("feature/profile/src/main/res/values/strings.xml")
     
-    def add_strings_to_module(self, module_path: str, strings: dict):
-        """Добавляет строки в указанный модуль."""
-        strings_file = self.project_root / module_path / "src/main/res/values/strings.xml"
-        
-        if not strings_file.exists():
-            print(f"Файл {strings_file} не найден!")
-            return
-        
-        try:
-            with open(strings_file, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            root = ET.fromstring(content)
-            
-            # Добавляем новые строки
-            for name, value in strings.items():
-                # Проверяем, не существует ли уже строка
-                existing = root.find(f".//string[@name='{name}']")
-                if existing is None:
-                    new_string = ET.SubElement(root, 'string')
-                    new_string.set('name', name)
-                    new_string.text = value
-            
-            # Сохраняем файл
-            tree = ET.ElementTree(root)
-            ET.indent(tree, space="    ")
-            
-            with open(strings_file, 'w', encoding='utf-8') as f:
-                f.write('<?xml version=\'1.0\' encoding=\'utf-8\'?>\n')
-                tree.write(f, encoding='unicode', xml_declaration=False)
-            
-            print(f"Добавлено {len(strings)} строк в модуль {module_path}")
-            
-        except Exception as e:
-            print(f"Ошибка при добавлении строк в {module_path}: {e}")
+    missing_strings = {
+        'total_transactions': 'Всего транзакций',
+        'achievement_first_transaction_desc': 'Создана первая транзакция'
+    }
+    
+    add_strings_to_file(file_path, missing_strings, "profile")
 
-def main():
-    fixer = AllMissingStringsFixer(".")
-    fixer.add_missing_strings()
+def add_missing_strings_to_home():
+    """Добавляет недостающие строки в home модуль"""
+    file_path = Path("feature/home/src/main/res/values/strings.xml")
+    
+    missing_strings = {
+        'current_balance': 'Текущий баланс',
+        'financial_analyzer': 'Finance Analyzer',
+        'profile': 'Профиль',
+        'add_transaction': 'Добавить транзакцию',
+        'loading_data': 'Загрузка данных...',
+        'filter_today': 'Сегодня',
+        'filter_week': 'Неделя',
+        'filter_month': 'Месяц',
+        'filter_all_time': 'Все время',
+        'balance': 'Баланс',
+        'expense_categories': 'Категории расходов',
+        'income_categories': 'Категории доходов',
+        'hide': 'Скрыть',
+        'feedback_error': 'Ошибка'
+    }
+    
+    add_strings_to_file(file_path, missing_strings, "home")
+
+def add_missing_strings_to_history():
+    """Добавляет недостающие строки в history модуль"""
+    file_path = Path("feature/history/src/main/res/values/strings.xml")
+    
+    missing_strings = {
+        'select_category': 'Выбрать категорию',
+        'select_period': 'Выбрать период',
+        'apply': 'Применить',
+        'close': 'Закрыть',
+        'group_by_days': 'По дням',
+        'group_by_weeks': 'По неделям',
+        'group_by_months': 'По месяцам',
+        'collapse': 'Свернуть',
+        'expand': 'Развернуть',
+        'transaction_history': 'История транзакций',
+        'all_time': 'Все время',
+        'day': 'День',
+        'week': 'Неделя',
+        'month': 'Месяц',
+        'quarter': 'Квартал',
+        'year': 'Год',
+        'start_date': 'Начальная дата',
+        'end_date': 'Конечная дата',
+        'delete': 'Удалить',
+        'expenses': 'Расходы',
+        'incomes': 'Доходы'
+    }
+    
+    add_strings_to_file(file_path, missing_strings, "history")
+
+def add_missing_strings_to_budget():
+    """Добавляет недостающие строки в budget модуль"""
+    file_path = Path("feature/budget/src/main/res/values/strings.xml")
+    
+    missing_strings = {
+        'period_settings_title': 'Настройки периода',
+        'ok': 'ОК',
+        'wallet_not_found': 'Кошелек не найден',
+        'transactions_section': 'Секция транзакций',
+        'link_categories_title': 'Привязать категории',
+        'error_title': 'Ошибка',
+        'wallet_name_label': 'Название кошелька',
+        'wallet_name_hint': 'Введите название кошелька',
+        'wallet_type_label': 'Тип кошелька',
+        'wallet_spent_amount': 'Потрачено',
+        'wallet_remaining_amount': 'Осталось',
+        'wallet_budget_limit': 'Лимит бюджета',
+        'wallet_spend_action': 'Тратить'
+    }
+    
+    add_strings_to_file(file_path, missing_strings, "budget")
+
+def add_strings_to_file(file_path: Path, strings_dict: dict, module_name: str):
+    """Добавляет строки в файл"""
+    if not file_path.exists():
+        print(f"Файл {file_path} не найден!")
+        return
+    
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    
+    # Проверяем, какие строки уже существуют
+    existing_strings = set()
+    for string_elem in root.findall("string"):
+        name = string_elem.get("name")
+        existing_strings.add(name)
+    
+    # Добавляем только недостающие строки
+    added_count = 0
+    for name, value in strings_dict.items():
+        if name not in existing_strings:
+            string_elem = ET.SubElement(root, "string")
+            string_elem.set("name", name)
+            string_elem.text = value
+            added_count += 1
+    
+    if added_count > 0:
+        tree.write(file_path, encoding="utf-8", xml_declaration=True)
+        print(f"Добавлено {added_count} новых строк в {module_name} модуль")
+
+def fix_all_missing_strings():
+    """Исправляет все недостающие строки"""
+    print("Начинаем исправление всех недостающих строк...")
+    
+    add_missing_strings_to_profile()
+    add_missing_strings_to_home()
+    add_missing_strings_to_history()
+    add_missing_strings_to_budget()
+    
+    print("\nИсправление всех недостающих строк завершено!")
 
 if __name__ == "__main__":
-    main() 
+    fix_all_missing_strings() 

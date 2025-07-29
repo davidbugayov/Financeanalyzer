@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Общие ошибки -->
-    <string name="error_unknown">Неизвестная ошибка</string>
     <string name="error_unknown_type">Неизвестный тип результата</string>
     <string name="error_action_failed">Не удалось выполнить действие: %1$s</string>
     

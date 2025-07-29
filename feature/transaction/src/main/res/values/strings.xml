@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="log_transaction_wallets_loaded">ТРАНЗАКЦИЯ: Загружено %1$d кошельков</string>
-    <string name="log_error_loading_wallets">Ошибка при загрузке кошельков</string>
     <string name="log_transaction_validate_input">ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: \'%1$s\'</string>
     <string name="log_transaction_empty_amount_error">ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма</string>
     <string name="log_transaction_zero_amount_error">ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %1$f</string>
@@ -54,14 +53,12 @@
     <string name="log_source_usage_increased">SOURCE: Увеличен счетчик использования источника: %1$s</string>
     <string name="log_source_usage_count">SOURCE: Получено количество использований источника %1$s: %2$d</string>
     <string name="bank_sberbank_pdf">Сбербанк PDF</string>
-    <string name="bank_ozon">Озон</string>
     <string name="log_sberbank_indicator_found">[%1$s Handler] Найден индикатор Сбербанка в содержимом файла</string>
     <string name="log_sberbank_read_error">[%1$s Handler] Ошибка при чтении файла для определения: %1$s</string>
     <string name="log_sberbank_import_created">[%1$s Handler] Создание SberbankPdfImportUseCase</string>
     <string name="log_ozon_import_created">[%1$s Handler] Создание OzonPdfImportUseCase</string>
     <string name="error_unsupported_file_type">[%1$s Handler] не поддерживает тип файла: %2$s</string>
     <string name="sberbank_card_pattern">^(?:карте|карты)\\s+\\*{4}(\\d{4})$</string>
-    <string name="sberbank_name">Сбербанк</string>
     <string name="sberbank_statement">Выписка по счёту</string>
     <string name="sberbank_statement_alt">Выписка по счету</string>
     <string name="sberbank_operations_decoding">Расшифровка операций</string>
@@ -160,8 +157,6 @@
     <string name="choose_file_button">Выбрать файл для импорта</string>
     <string name="bank_instructions_title">Как получить выписку из %s</string>
     <string name="unavailable_instructions">Инструкции недоступны для этого банка.</string>
-    <string name="bank_tinkoff">Тинькофф</string>
-    <string name="bank_alfabank">Альфа-Банк</string>
     <string name="bank_csv">CSV файл</string>
     <string name="importing_file">Импортируем файл…</string>
     <string name="progress_percentage">%d%%</string>
@@ -192,53 +187,4 @@
     <string name="hide_categories">Скрыть категории</string>
     <string name="import_error_unknown">Неизвестная ошибка при импорте</string>
     <string name="import_section_title">Импорт</string>
-    <string name="error_unknown">Неизвестная ошибка</string>
-    <string name="select_category">Выбрать категорию</string>
-    <string name="category_name">Название категории</string>
-    <string name="select_icon">Выбрать иконку</string>
-    <string name="add_custom_category">Добавить категорию</string>
-    <string name="select_color">Выбрать цвет</string>
-    <string name="add_custom_source">Добавить источник</string>
-    <string name="source_name">Название источника</string>
-    <string name="select_date_button">Выбрать дату</string>
-    <string name="note_optional">Заметка (необязательно)</string>
-    <string name="select_source">Выбрать источник</string>
-    <string name="source">Источник</string>
-    <string name="deduct_from_wallets">Списать с кошельков</string>
-    <string name="add_to_wallets">Добавить в кошельки</string>
-    <string name="back">Назад</string>
-    <string name="import_transactions_title">Импорт транзакций</string>
-    <string name="add_button_text">Добавить</string>
-    <string name="save_button_text">Сохранить</string>
-    <string name="select_wallets">Выбрать кошельки</string>
-    <string name="error_title">Ошибка</string>
-    <string name="dialog_cancel">Отмена</string>
-    <string name="delete_category_title">Удалить категорию</string>
-    <string name="dialog_delete">Удалить</string>
-    <string name="delete_source_title">Удалить источник</string>
-    <string name="add_button">Добавить</string>
-    <string name="add_category">Добавить категорию</string>
-    <string name="category">Категория</string>
-    <string name="date">Дата</string>
-    <string name="delete_source">Удалить источник</string>
-    <string name="income_type">Доход</string>
-    <string name="expense_type">Расход</string>
-    <string name="header_date">Дата</string>
-    <string name="header_amount">Сумма</string>
-    <string name="transaction_source_alfa">Альфа-Банк</string>
-    <string name="csv_expense_value">Расход</string>
-    <string name="transaction_source_ozon">Озон</string>
-    <string name="transaction_source_tinkoff">Тинькофф</string>
-    <string name="got_it">Понятно</string>
-    <string name="bank_sberbank">Сбербанк</string>
-    <string name="log_error_loading_wallets_base">Ошибка при загрузке кошельков</string>
-    <string name="category_other">Другое</string>
-    <string name="category_transfers">Переводы</string>
-    <string name="source_cash">Наличные</string>
-    <string name="source_card">Карта</string>
-    <string name="edit_transaction_title">Редактировать транзакцию</string>
-    <string name="import_button">Импортировать</string>
-    <string name="import_transactions_content_description">Импорт транзакций</string>
-    <string name="import_unknown_error">Неизвестная ошибка импорта</string>
-    <string name="category_transfer">Перевод</string>
-    </resources>
+    <string name="add_button">Добавить</string><string name="select_category">Выбрать категорию</string><string name="add_category">Добавить категорию</string><string name="category_name">Название категории</string><string name="select_icon">Выбрать иконку</string><string name="category">Категория</string><string name="add_custom_category">Добавить категорию</string><string name="select_color">Выбрать цвет</string><string name="add_custom_source">Добавить источник</string><string name="source_name">Название источника</string><string name="date">Дата</string><string name="select_date_button">Выбрать дату</string><string name="note_optional">Заметка (необязательно)</string><string name="select_source">Выбрать источник</string><string name="delete_source">Удалить источник</string><string name="source">Источник</string><string name="income_type">Доход</string><string name="expense_type">Расход</string><string name="deduct_from_wallets">Списать с кошельков</string><string name="add_to_wallets">Добавить в кошельки</string><string name="select_wallets">Выбрать кошельки</string><string name="error_title">Ошибка</string><string name="dialog_cancel">Отмена</string><string name="delete_category_title">Удалить категорию</string><string name="dialog_delete">Удалить</string><string name="delete_source_title">Удалить источник</string><string name="import_transactions_title">Импорт транзакций</string><string name="import_button">Импортировать</string><string name="import_transactions_content_description">Импорт транзакций</string><string name="import_unknown_error">Неизвестная ошибка импорта</string><string name="header_date">Дата</string><string name="header_amount">Сумма</string><string name="transaction_source_alfa">Альфа-Банк</string><string name="csv_expense_value">Расход</string><string name="transaction_source_ozon">Озон</string><string name="transaction_source_tinkoff">Тинькофф</string><string name="back">Назад</string><string name="got_it">Понятно</string><string name="bank_sberbank">Сбербанк</string><string name="log_error_loading_wallets">Ошибка при загрузке кошельков</string><string name="log_error_loading_wallets_base">Ошибка при загрузке кошельков</string><string name="category_other">Другое</string><string name="category_transfers">Переводы</string><string name="source_cash">Наличные</string><string name="source_card">Карта</string><string name="bank_ozon">Озон</string><string name="sberbank_name">Сбербанк</string><string name="edit_transaction_title">Редактировать транзакцию</string><string name="save_button_text">Сохранить</string><string name="add_button_text">Добавить</string><string name="category_transfer">Перевод</string><string name="bank_tinkoff">Тинькофф</string><string name="bank_alfabank">Альфа-Банк</string><string name="error_unknown">Неизвестная ошибка</string></resources>

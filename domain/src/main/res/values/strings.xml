@@ -115,21 +115,6 @@
     <string name="wallet_type_goal_description">Специальные счета для достижения целей</string>
     <string name="wallet_type_other_description">Кредиты, долги, займы и другие финансовые инструменты</string>
     
-    
-    <string name="category_services">Услуги</string>
-    <string name="category_gifts">Подарки</string>
-    <string name="category_rental">Аренда</string>
-    <string name="category_transport">Транспорт</string>
-    <string name="category_utilities">Коммунальные услуги</string>
-    <string name="category_clothing">Одежда</string>
-    <string name="category_entertainment">Развлечения</string>
-    <string name="wallet_type_cash">Наличные</string>
-    <string name="wallet_type_card">Карта</string>
-    <string name="wallet_type_savings">Сбережения</string>
-    <string name="wallet_type_investment">Инвестиции</string>
-    <string name="wallet_type_other">Другое</string>
-    
-    
     <!-- Достижения -->
     <string name="achievement_first_steps">Первые шаги</string>
     <string name="achievement_first_steps_desc">Создана первая транзакция</string>
@@ -141,19 +126,30 @@
     <string name="achievement_night_owl">Ночная сова</string>
     <string name="achievement_export_master">Мастер экспорта</string>
     <string name="achievement_backup_enthusiast">Энтузиаст резервных копий</string>
-    
+
     <!-- Категории -->
     <string name="category_products">Продукты</string>
     <string name="category_other">Другое</string>
-    
+    <string name="category_services">Услуги</string>
+    <string name="category_gifts">Подарки</string>
+    <string name="category_rental">Аренда</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_utilities">Коммунальные услуги</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_entertainment">Развлечения</string>
+
     <!-- Рекомендации -->
     <string name="recommendation_increase_savings_rate">Увеличьте норму сбережений</string>
     <string name="recommendation_create_emergency_fund">Создайте резервный фонд</string>
-    
+
     <!-- Экспорт -->
     <string name="export_transaction_type_expense">Расход</string>
     <string name="export_transaction_type_income">Доход</string>
-    
-    <!-- Общие строки -->
-    <string name="expense">Расход</string>
+
+    <!-- Типы кошельков -->
+    <string name="wallet_type_cash">Наличные</string>
+    <string name="wallet_type_card">Карта</string>
+    <string name="wallet_type_savings">Сбережения</string>
+    <string name="wallet_type_investment">Инвестиции</string>
+    <string name="wallet_type_other">Другое</string>
 </resources>

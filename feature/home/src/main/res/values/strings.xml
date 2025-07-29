@@ -32,18 +32,5 @@
     <string name="feedback_warning">Предупреждение</string>
     
     
-    <string name="current_balance">Текущий баланс</string>
-    <string name="loading_data">Загрузка данных</string>
-    <string name="filter_all_time">Все время</string>
-    <string name="expense_categories">Категории расходов</string>
-    <string name="income_categories">Категории доходов</string>
-    <string name="financial_analyzer">Finance Analyzer</string>
-    <string name="profile">Профиль</string>
-    <string name="add_transaction">Добавить транзакцию</string>
-    <string name="filter_today">Сегодня</string>
-    <string name="filter_week">Неделя</string>
-    <string name="filter_month">Месяц</string>
-    <string name="balance">Баланс</string>
-    <string name="hide">Скрыть</string>
-    <string name="feedback_error">Ошибка</string>
-    </resources>
+
+    <string name="current_balance">Текущий баланс</string><string name="financial_analyzer">Finance Analyzer</string><string name="profile">Профиль</string><string name="add_transaction">Добавить транзакцию</string><string name="loading_data">Загрузка данных...</string><string name="filter_today">Сегодня</string><string name="filter_week">Неделя</string><string name="filter_month">Месяц</string><string name="filter_all_time">Все время</string><string name="balance">Баланс</string><string name="expense_categories">Категории расходов</string><string name="income_categories">Категории доходов</string><string name="hide">Скрыть</string><string name="feedback_error">Ошибка</string></resources>

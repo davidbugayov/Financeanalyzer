@@ -18,7 +18,6 @@
     <string name="onboarding_benefit_privacy">Полная конфиденциальность данных</string>
     <string name="onboarding_benefit_simple">Простой и понятный интерфейс</string>
     <string name="onboarding_start_button">Начать использование</string>
-    <string name="onboarding_skip_button">Пропустить</string>
     <string name="onboarding_page_1_title">Добро пожаловать!</string>
     <string name="onboarding_page_1_description">Деньги под Контролем поможет вам управлять личными финансами</string>
     <string name="onboarding_page_2_title">Отслеживайте расходы</string>

@@ -4,8 +4,6 @@
     
     <string name="default_source">Источник по умолчанию</string>
     <string name="default_destination">Назначение по умолчанию</string>
-    <string name="default_source_sber">Сбербанк</string>
-    
     <string name="log_wallet_migration_completed">Выполнена миграция %1$d кошельков с установкой type по умолчанию</string>
     <string name="log_error_getting_wallets">Ошибка при получении кошельков для транзакции %1$s</string>
     <string name="log_transaction_repository_not_set">TransactionRepository не установлен в WalletRepositoryImpl</string>
@@ -34,4 +32,5 @@
     <string name="log_migration_15_14_completed">Выполнена миграция с версии 15 на 14 (обратная совместимость)</string>
     <string name="log_migration_15_16_completed">Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title</string>
     <string name="log_migration_16_15_completed">Выполнена миграция с версии 16 на 15 (обратная совместимость)</string>
+    <string name="default_source_sber">Сбербанк</string>
 </resources>
