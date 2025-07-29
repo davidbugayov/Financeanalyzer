@@ -843,6 +843,8 @@ private fun getCategoryIcon(category: AchievementCategory): ImageVector {
         AchievementCategory.STATISTICS -> Icons.AutoMirrored.Filled.TrendingUp
         AchievementCategory.MILESTONES -> Icons.Filled.Badge
         AchievementCategory.SPECIAL -> Icons.Filled.EmojiEvents
+        AchievementCategory.IMPORT -> Icons.Filled.Download
+        AchievementCategory.EXPORT -> Icons.Filled.Sync
     }
 }
 
@@ -858,6 +860,8 @@ private fun getCategoryDisplayName(category: AchievementCategory): String {
         AchievementCategory.STATISTICS -> "Статистика"
         AchievementCategory.MILESTONES -> "Вехи"
         AchievementCategory.SPECIAL -> "Специальные"
+        AchievementCategory.IMPORT -> "Импорт"
+        AchievementCategory.EXPORT -> "Экспорт"
     }
 }
 
@@ -940,6 +944,8 @@ private fun getAchievementIconColor(
                     AchievementCategory.STATISTICS -> Color(0xFF1E40AF) // Тёмно-синий
                     AchievementCategory.MILESTONES -> Color(0xFF7C3AED) // Фиолетовый
                     AchievementCategory.SPECIAL -> Color(0xFFEF4444) // Красный
+                    AchievementCategory.IMPORT -> Color(0xFF06B6D4) // Cyan
+                    AchievementCategory.EXPORT -> Color(0xFF059669) // Тёмно-зелёный
                 }
         }
     }

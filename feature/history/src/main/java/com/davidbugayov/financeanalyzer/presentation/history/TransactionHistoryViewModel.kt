@@ -665,7 +665,7 @@ class TransactionHistoryViewModel(
 
                     // Используем более эффективный алгоритм группировки
                     val groups =
-                        groupTransactionsUseCase(
+                        groupTransactionsUseCase.invoke(
                             transactions = filteredTransactions,
                             groupingType = toDomainGroupingType(currentState.groupingType),
                         )

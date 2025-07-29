@@ -1,27 +1,28 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.core.util.Result
-import com.davidbugayov.financeanalyzer.core.util.safeCall
+import com.davidbugayov.financeanalyzer.core.model.AppException
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import timber.log.Timber
 
 /**
- * Use case для обновления существующей транзакции.
+ * UseCase для обновления транзакции.
+ * Обновляет существующую транзакцию в репозитории.
+ *
+ * @param transactionRepository Репозиторий транзакций.
  */
 class UpdateTransactionUseCase(
-    private val repository: TransactionRepository,
+    private val transactionRepository: TransactionRepository,
 ) {
-    /**
-     * Обновляет транзакцию в базе данных.
-     *
-     * @param transaction Обновленная транзакция
-     * @return Результат операции в виде Result<Unit>
-     */
     suspend operator fun invoke(transaction: Transaction): Result<Unit> {
-        return safeCall {
-            Timber.d("Обновление транзакции: $transaction")
-            repository.updateTransaction(transaction)
+        return try {
+            Timber.d(StringProvider.logTransactionUpdate(transaction.toString()))
+            transactionRepository.updateTransaction(transaction)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error(AppException.mapException(e))
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.util
 
-import com.davidbugayov.financeanalyzer.presentation.R
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date

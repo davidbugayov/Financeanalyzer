@@ -27,6 +27,139 @@ object StringProvider {
     val monthsShort: String get() = getString(R.string.months_short)
     val loadingDataDefault: String get() = getString(R.string.loading_data_default)
     val closeButton: String get() = getString(R.string.close_button)
+    val noDataToDisplay: String get() = getString(R.string.no_data_to_display)
+    val addTransactionsToSeeAnalytics: String get() = getString(R.string.add_transactions_to_see_analytics)
+    val refresh: String get() = getString(R.string.refresh)
+    val loadingError: String get() = getString(R.string.loading_error)
+    
+    // Common UI strings
+    val appName: String get() = getString(R.string.app_name)
+    val navHome: String get() = getString(R.string.nav_home)
+    val navBudget: String get() = getString(R.string.nav_budget)
+    val navHistory: String get() = getString(R.string.nav_history)
+    val navStatistics: String get() = getString(R.string.nav_statistics)
+    val navProfile: String get() = getString(R.string.nav_profile)
+    
+    // Common actions
+    val add: String get() = getString(R.string.add)
+    val edit: String get() = getString(R.string.edit)
+    val delete: String get() = getString(R.string.delete)
+    val save: String get() = getString(R.string.save)
+    val cancel: String get() = getString(R.string.cancel)
+    val close: String get() = getString(R.string.close)
+    val confirm: String get() = getString(R.string.confirm)
+    val back: String get() = getString(R.string.back)
+    val next: String get() = getString(R.string.next)
+    val finish: String get() = getString(R.string.finish)
+    
+    // Loading and error states
+    val loading: String get() = getString(R.string.loading)
+    val errorOccurred: String get() = getString(R.string.error_occurred)
+    val retry: String get() = getString(R.string.retry)
+    val noData: String get() = getString(R.string.no_data)
+    
+    // Transaction related
+    val transaction: String get() = getString(R.string.transaction)
+    val transactions: String get() = getString(R.string.transactions)
+    val addTransaction: String get() = getString(R.string.add_transaction)
+    val editTransaction: String get() = getString(R.string.edit_transaction)
+    val deleteTransaction: String get() = getString(R.string.delete_transaction)
+    val transactionAmount: String get() = getString(R.string.transaction_amount)
+    val transactionCategory: String get() = getString(R.string.transaction_category)
+    val transactionDate: String get() = getString(R.string.transaction_date)
+    val transactionNote: String get() = getString(R.string.transaction_note)
+    val transactionType: String get() = getString(R.string.transaction_type)
+    val transactionTypeIncome: String get() = getString(R.string.transaction_type_income)
+    val transactionTypeExpense: String get() = getString(R.string.transaction_type_expense)
+    val transactionTransfer: String get() = getString(R.string.transaction_transfer)
+    
+    // Categories
+    val categoryFood: String get() = getString(R.string.category_food)
+    val categoryTransport: String get() = getString(R.string.category_transport)
+    val categoryUtilities: String get() = getString(R.string.category_utilities)
+    val categoryEntertainment: String get() = getString(R.string.category_entertainment)
+    val categoryShopping: String get() = getString(R.string.category_shopping)
+    val categoryHealth: String get() = getString(R.string.category_health)
+    val categoryEducation: String get() = getString(R.string.category_education)
+    val categoryOther: String get() = getString(R.string.category_other)
+    val categoryRestaurant: String get() = getString(R.string.category_restaurant)
+    val categoryServices: String get() = getString(R.string.category_services)
+    
+    // Budget related
+    val budget: String get() = getString(R.string.budget)
+    val budgetLimit: String get() = getString(R.string.budget_limit)
+    val budgetSpent: String get() = getString(R.string.budget_spent)
+    val budgetRemaining: String get() = getString(R.string.budget_remaining)
+    val budgetExceeded: String get() = getString(R.string.budget_exceeded)
+    
+    // Wallet related
+    val wallet: String get() = getString(R.string.wallet)
+    val wallets: String get() = getString(R.string.wallets)
+    val addWallet: String get() = getString(R.string.add_wallet)
+    val editWallet: String get() = getString(R.string.edit_wallet)
+    val deleteWallet: String get() = getString(R.string.delete_wallet)
+    val walletName: String get() = getString(R.string.wallet_name)
+    val walletBalance: String get() = getString(R.string.wallet_balance)
+    val walletType: String get() = getString(R.string.wallet_type)
+    val walletTypeCash: String get() = getString(R.string.wallet_type_cash)
+    val walletTypeCard: String get() = getString(R.string.wallet_type_card)
+    val walletTypeSavings: String get() = getString(R.string.wallet_type_savings)
+    val walletTypeInvestment: String get() = getString(R.string.wallet_type_investment)
+    val walletTypeGoal: String get() = getString(R.string.wallet_type_goal)
+    val walletTypeOther: String get() = getString(R.string.wallet_type_other)
+    val walletTypeCashDescription: String get() = getString(R.string.wallet_type_cash_description)
+    val walletTypeCardDescription: String get() = getString(R.string.wallet_type_card_description)
+    val walletTypeSavingsDescription: String get() = getString(R.string.wallet_type_savings_description)
+    val walletTypeInvestmentDescription: String get() = getString(R.string.wallet_type_investment_description)
+    val walletTypeGoalDescription: String get() = getString(R.string.wallet_type_goal_description)
+    val walletTypeOtherDescription: String get() = getString(R.string.wallet_type_other_description)
+    
+    // Statistics
+    val statistics: String get() = getString(R.string.statistics)
+    val income: String get() = getString(R.string.income)
+    val expenses: String get() = getString(R.string.expenses)
+    val balance: String get() = getString(R.string.balance)
+    val total: String get() = getString(R.string.total)
+    val average: String get() = getString(R.string.average)
+    val largest: String get() = getString(R.string.largest)
+    val smallest: String get() = getString(R.string.smallest)
+    
+    // Time periods
+    val today: String get() = getString(R.string.today)
+    val yesterday: String get() = getString(R.string.yesterday)
+    val thisWeek: String get() = getString(R.string.this_week)
+    val thisMonth: String get() = getString(R.string.this_month)
+    val thisYear: String get() = getString(R.string.this_year)
+    val lastWeek: String get() = getString(R.string.last_week)
+    val lastMonth: String get() = getString(R.string.last_month)
+    val lastYear: String get() = getString(R.string.last_year)
+    
+    // Grouping options
+    val groupByDays: String get() = getString(R.string.group_by_days)
+    val groupByWeeks: String get() = getString(R.string.group_by_weeks)
+    val groupByMonths: String get() = getString(R.string.group_by_months)
+    
+    // Content descriptions
+    val expand: String get() = getString(R.string.expand)
+    val collapse: String get() = getString(R.string.collapse)
+    val headerContent: String get() = getString(R.string.header_content)
+    val appendLoading: String get() = getString(R.string.append_loading)
+    val fabSpacer: String get() = getString(R.string.fab_spacer)
+    
+    // Error messages
+    val errorLoadingAdditionalData: String get() = getString(R.string.error_loading_additional_data)
+    val errorLinkingCategories: String get() = getString(R.string.error_linking_categories)
+    
+    // Shortcuts
+    val addTransactionShort: String get() = getString(R.string.add_transaction_short)
+    val addTransactionLong: String get() = getString(R.string.add_transaction_long)
+    
+    // Achievement related
+    val trophyRotation: String get() = getString(R.string.trophy_rotation)
+    val achievementUnlocked: String get() = getString(R.string.achievement_unlocked)
+    fun rewardCoins(coins: Int): String = getString(R.string.reward_coins, coins)
+    val achievementFirstStepsTitle: String get() = getString(R.string.achievement_first_steps_title)
+    val achievementFirstStepsDescription: String get() = getString(R.string.achievement_first_steps_description)
     
     // Рекомендации - уровни
     val criticalLevel: String get() = getString(R.string.critical_level)
@@ -106,13 +239,6 @@ object StringProvider {
     fun criticalCountRecommendations(count: Int): String = getString(R.string.critical_count_recommendations, count)
     fun importantCountRecommendations(count: Int): String = getString(R.string.important_count_recommendations, count)
     val recommendationsRequireAttention: String get() = getString(R.string.recommendations_require_attention)
-    
-    // Дополнительные строки для Placeholders
-    val noDataToDisplay: String get() = getString(R.string.no_data_to_display)
-    val addTransactionsToSeeAnalytics: String get() = getString(R.string.add_transactions_to_see_analytics)
-    val refresh: String get() = getString(R.string.refresh)
-    val loadingError: String get() = getString(R.string.loading_error)
-    val retry: String get() = getString(R.string.retry)
     
     // Строки для SmartRecommendationSystem
     val smartCardDefaultTitle: String get() = getString(R.string.smart_card_default_title)

@@ -10,7 +10,9 @@ enum class AchievementCategory {
     HABITS,         // Привычки
     STATISTICS,     // Статистика
     MILESTONES,     // Важные вехи
-    SPECIAL         // Специальные события
+    SPECIAL,        // Специальные события
+    IMPORT,         // Импорт данных
+    EXPORT          // Экспорт данных
 }
 
 /**

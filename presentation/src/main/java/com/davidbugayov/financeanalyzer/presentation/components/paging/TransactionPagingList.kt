@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -24,6 +25,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import com.davidbugayov.financeanalyzer.ui.R
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
@@ -42,10 +44,15 @@ fun TransactionPagingList(
 ) {
     val lazyState = listState ?: rememberLazyListState()
 
+    val headerContentKey = stringResource(R.string.header_content)
+    val appendLoadingKey = stringResource(R.string.append_loading)
+    val fabSpacerKey = stringResource(R.string.fab_spacer)
+    val errorLoadingAdditionalData = stringResource(R.string.error_loading_additional_data)
+    
     LazyColumn(modifier = Modifier.fillMaxWidth(), state = lazyState) {
         // Optional header
         headerContent?.let { header ->
-            item(key = "header_content") {
+            item(key = headerContentKey) {
                 header()
             }
         }
@@ -82,7 +89,7 @@ fun TransactionPagingList(
         items.apply {
             when {
                 loadState.append is LoadState.Loading -> {
-                    item(key = "append_loading") {
+                    item(key = appendLoadingKey) {
                         Box(
                             modifier =
                                 Modifier
@@ -96,11 +103,11 @@ fun TransactionPagingList(
                 }
                 loadState.append is LoadState.Error -> {
                     val e = (loadState.append as LoadState.Error).error
-                    Timber.e(e, "Ошибка при загрузке дополнительных данных")
+                    Timber.e(e, errorLoadingAdditionalData)
                     CrashLoggerProvider.crashLogger.logException(e)
                 }
             }
         }
-        item(key = "fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
+        item(key = fabSpacerKey) { Spacer(modifier = Modifier.height(80.dp)) }
     }
 }

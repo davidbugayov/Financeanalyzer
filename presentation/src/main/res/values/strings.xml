@@ -1,40 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Категории расходов -->
-    <string name="category_food">Продукты</string>
-    <string name="category_transport">Транспорт</string>
-    <string name="category_entertainment">Развлечения</string>
-    <string name="category_restaurant">Рестораны</string>
-    <string name="category_health">Здоровье</string>
-    <string name="category_clothing">Одежда</string>
-    <string name="category_housing">Жилье</string>
-    <string name="category_communication">Связь</string>
-    <string name="category_pet">Питомцы</string>
-    <string name="category_services">Услуги</string>
-    <string name="category_charity">Благотворительность</string>
-    <string name="category_credit">Кредиты</string>
-    <string name="category_transfer">Переводы</string>
-    <string name="category_other_expense">Прочие расходы</string>
-    
-    <!-- Категории доходов -->
-    <string name="category_salary">Зарплата</string>
-    <string name="category_freelance">Фриланс</string>
-    <string name="category_gifts">Подарки</string>
-    <string name="category_interest">Проценты</string>
-    <string name="category_rental">Аренда</string>
-    <string name="category_other_income">Прочие доходы</string>
-    <string name="category_other">Прочее</string>
-    
-    <!-- Периоды -->
-    <string name="period_all_time">Все время</string>
-    <string name="period_day">День: %1$s</string>
-    <string name="period_week">Неделя: %1$s - %2$s</string>
-    <string name="period_month">Месяц: %1$s - %2$s</string>
-    <string name="period_quarter">Квартал: %1$s - %2$s</string>
-    <string name="period_year">Год: %1$s - %2$s</string>
-    <string name="period_custom">Произвольный: %1$s - %2$s</string>
-    
-    <!-- Транзакции -->
-    <string name="transaction_transfers">Переводы</string>
-    <string name="transaction_transfer">Перевод</string>
+    <!-- Все строки перенесены в ui-модуль для централизации -->
 </resources> 

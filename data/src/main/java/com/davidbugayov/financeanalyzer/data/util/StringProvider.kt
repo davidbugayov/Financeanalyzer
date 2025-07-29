@@ -24,6 +24,8 @@ object StringProvider {
     
     // Значения по умолчанию
     val defaultSource: String get() = getString(R.string.default_source)
+    val defaultDestination: String get() = getString(R.string.default_destination)
+    val defaultSourceSber: String get() = getString(R.string.default_source_sber)
     
     // Логирование
     fun logWalletMigrationCompleted(count: Int): String = getString(R.string.log_wallet_migration_completed, count)
@@ -42,6 +44,12 @@ object StringProvider {
     val errorMigration7_8: String get() = getString(R.string.error_migration_7_8)
     val errorMigration8_9: String get() = getString(R.string.error_migration_8_9)
     val errorMigration9_10: String get() = getString(R.string.error_migration_9_10)
+    val errorMigration10_11: String get() = getString(R.string.error_migration_10_11)
+    val errorMigration11_12: String get() = getString(R.string.error_migration_11_12)
+    val errorMigration12_13: String get() = getString(R.string.error_migration_12_13)
+    val errorMigration13_14: String get() = getString(R.string.error_migration_13_14)
+    val errorMigration14_15: String get() = getString(R.string.error_migration_14_15)
+    val errorMigration15_16: String get() = getString(R.string.error_migration_15_16)
     
     // Успешные миграции
     val logMigration14_15Completed: String get() = getString(R.string.log_migration_14_15_completed)

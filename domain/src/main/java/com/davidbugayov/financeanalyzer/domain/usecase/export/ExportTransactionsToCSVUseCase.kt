@@ -73,7 +73,7 @@ class ExportTransactionsToCSVUseCase(
                 }
             }
 
-            Timber.d(StringProvider.logCsvFileCreated(finalFile.absolutePath, finalFile.length()))
+            Timber.d(StringProvider.logCsvFileCreated(finalFile.absolutePath, finalFile.length().toInt()))
             return@withContext Result.Success(finalFile)
         } catch (e: IOException) {
             Timber.e(e, StringProvider.logExportError)

@@ -1,13 +1,16 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
+import android.content.Context
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
 
 /**
  * Репозиторий для управления достижениями
@@ -61,20 +64,21 @@ interface AchievementsRepository {
 }
 
 /**
- * Реализация репозитория достижений с постоянным хранением в SharedPreferences
+ * Реализация репозитория достижений, использующая SharedPreferences для хранения данных.
+ * Предоставляет методы для работы с достижениями пользователя.
+ *
+ * @param context Контекст приложения для доступа к SharedPreferences.
  */
-class AchievementsRepositoryImpl(
-    context: android.content.Context
-) : AchievementsRepository {
-
+class AchievementsRepositoryImpl(private val context: Context) : AchievementsRepository {
+    
     private val prefs = context.applicationContext.getSharedPreferences("achievements", android.content.Context.MODE_PRIVATE)
     
     // Предустановленные достижения
     private val defaultAchievements = listOf(
         Achievement(
             id = "first_transaction",
-                    title = "Первые шаги",
-        description = "Добавьте первую транзакцию",
+            title = StringProvider.achievementFirstSteps,
+            description = StringProvider.achievementFirstStepsDesc,
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -83,8 +87,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "transaction_master",
-                    title = "Мастер транзакций",
-        description = "Добавьте 100 транзакций",
+            title = StringProvider.achievementTransactionMaster,
+            description = StringProvider.achievementTransactionMasterDesc,
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
@@ -93,8 +97,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "data_analyst",
-                    title = "Аналитик данных",
-        description = "Просмотрите статистику 10 раз",
+            title = StringProvider.achievementDataAnalyst,
+            description = StringProvider.achievementDataAnalystDesc,
             iconRes = 0,
             category = AchievementCategory.STATISTICS,
             rarity = AchievementRarity.COMMON,
@@ -103,8 +107,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "first_budget",
-                    title = "Первый бюджет",
-        description = "Создайте свой первый бюджет",
+            title = StringProvider.achievementFirstBudget,
+            description = StringProvider.achievementFirstBudgetDesc,
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
@@ -113,8 +117,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "app_explorer",
-                    title = "Исследователь",
-        description = "Посетите все разделы приложения",
+            title = StringProvider.achievementExplorer,
+            description = StringProvider.achievementExplorerDesc,
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
@@ -123,8 +127,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "category_organizer",
-                    title = "Организатор категорий",
-        description = "Используйте 10 разных категорий",
+            title = StringProvider.achievementCategoryOrganizer,
+            description = StringProvider.achievementCategoryOrganizerDesc,
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -133,8 +137,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "early_bird",
-                    title = "Ранняя пташка",
-        description = "Добавьте транзакцию до 7 утра",
+            title = StringProvider.achievementEarlyBird,
+            description = StringProvider.achievementEarlyBirdDesc,
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -143,8 +147,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "night_owl",
-                    title = "Ночная сова",
-        description = "Добавьте транзакцию после 23:00",
+            title = StringProvider.achievementNightOwl,
+            description = StringProvider.achievementNightOwlDesc,
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -153,8 +157,8 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "first_savings",
-                    title = "Первая копейка",
-        description = "Накопите 1000 рублей",
+            title = StringProvider.achievementFirstSavings,
+            description = StringProvider.achievementFirstSavingsDesc,
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.COMMON,
@@ -163,139 +167,133 @@ class AchievementsRepositoryImpl(
         ),
         Achievement(
             id = "emergency_fund",
-            title = "Подушка безопасности",
-            description = "Накопите сумму на 3 месяца расходов",
+            title = StringProvider.achievementEmergencyFund,
+            description = StringProvider.achievementEmergencyFundDesc,
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
-            rarity = AchievementRarity.LEGENDARY,
+            rarity = AchievementRarity.RARE,
             targetProgress = 1,
-            rewardCoins = 200
+            rewardCoins = 100
         ),
         Achievement(
-            id = "budget_saver",
-            title = "Экономный",
-            description = "Потратьте менее 80% от бюджета за месяц",
+            id = "economical",
+            title = StringProvider.achievementEconomical,
+            description = StringProvider.achievementEconomicalDesc,
             iconRes = 0,
             category = AchievementCategory.BUDGET,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 30
+        ),
+        Achievement(
+            id = "regular_user",
+            title = StringProvider.achievementRegularUser,
+            description = StringProvider.achievementRegularUserDesc,
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 7,
+            rewardCoins = 25
+        ),
+        Achievement(
+            id = "loyal_user",
+            title = StringProvider.achievementLoyalUser,
+            description = StringProvider.achievementLoyalUserDesc,
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.RARE,
+            targetProgress = 30,
+            rewardCoins = 50
+        ),
+        Achievement(
+            id = "category_expert",
+            title = StringProvider.achievementCategoryExpert,
+            description = StringProvider.achievementCategoryExpertDesc,
+            iconRes = 0,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
             targetProgress = 1,
             rewardCoins = 40
         ),
         Achievement(
-            id = "consistent_user",
-            title = "Постоянный пользователь",
-            description = "Используйте приложение неделю подряд",
+            id = "tinkoff_integrator",
+            title = StringProvider.achievementTinkoffIntegrator,
+            description = StringProvider.achievementTinkoffIntegratorDesc,
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
-            rarity = AchievementRarity.RARE,
-            targetProgress = 1,
-            rewardCoins = 50
-        ),
-        Achievement(
-            id = "loyal_user",
-            title = "Верный пользователь",
-            description = "Используйте приложение месяц",
-            iconRes = 0,
-            category = AchievementCategory.MILESTONES,
-            rarity = AchievementRarity.EPIC,
-            targetProgress = 1,
-            rewardCoins = 100
-        ),
-        Achievement(
-            id = "category_expert",
-            title = "Эксперт категорий",
-            description = "Используйте все доступные категории",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.RARE,
-            targetProgress = 1,
-            rewardCoins = 60
-        ),
-        
-        // Достижения для импорта из банков
-        Achievement(
-            id = "tinkoff_importer",
-            title = "Тинькоff-интегратор",
-            description = "Импортируйте транзакции из Тинькофф",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.COMMON,
-            targetProgress = 1,
-            rewardCoins = 30
-        ),
-        Achievement(
-            id = "sberbank_importer", 
-            title = "Сбер-коллекционер",
-            description = "Импортируйте транзакции из Сбербанка",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.COMMON,
-            targetProgress = 1,
-            rewardCoins = 30
-        ),
-        Achievement(
-            id = "alfabank_importer",
-            title = "Альфа-аналитик", 
-            description = "Импортируйте транзакции из Альфа-Банка",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.COMMON,
-            targetProgress = 1,
-            rewardCoins = 30
-        ),
-        Achievement(
-            id = "ozon_importer",
-            title = "OZON-агрегатор",
-            description = "Импортируйте транзакции из OZON Банка",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.COMMON,
-            targetProgress = 1,
-            rewardCoins = 30
-        ),
-        Achievement(
-            id = "multi_bank_importer",
-            title = "Мульти-банковский коллектор", 
-            description = "Импортируйте данные из всех 4 банков",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.EPIC,
-            targetProgress = 4,
-            rewardCoins = 150
-        ),
-        
-        // Достижения для экспорта
-        Achievement(
-            id = "export_master",
-            title = "Мастер экспорта",
-            description = "Экспортируйте транзакции в CSV",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
+            category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 20
         ),
         Achievement(
-            id = "backup_enthusiast",
-            title = "Энтузиаст резервных копий",
-            description = "Создайте 5 экспортов данных",
+            id = "sber_collector",
+            title = StringProvider.achievementSberCollector,
+            description = StringProvider.achievementSberCollectorDesc,
             iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
-            rarity = AchievementRarity.RARE,
-            targetProgress = 5,
-            rewardCoins = 75
-        ),
-        
-        // Достижение для импорта CSV
-        Achievement(
-            id = "csv_importer",
-            title = "CSV-импортер",
-            description = "Импортируйте транзакции из CSV-файла",
-            iconRes = 0,
-            category = AchievementCategory.TRANSACTIONS,
+            category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 25
+            rewardCoins = 20
+        ),
+        Achievement(
+            id = "alpha_analyst",
+            title = StringProvider.achievementAlphaAnalyst,
+            description = StringProvider.achievementAlphaAnalystDesc,
+            iconRes = 0,
+            category = AchievementCategory.IMPORT,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 20
+        ),
+        Achievement(
+            id = "ozon_collector",
+            title = StringProvider.achievementOzonCollector,
+            description = StringProvider.achievementOzonCollectorDesc,
+            iconRes = 0,
+            category = AchievementCategory.IMPORT,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 20
+        ),
+        Achievement(
+            id = "multi_bank_collector",
+            title = StringProvider.achievementMultiBankCollector,
+            description = StringProvider.achievementMultiBankCollectorDesc,
+            iconRes = 0,
+            category = AchievementCategory.IMPORT,
+            rarity = AchievementRarity.EPIC,
+            targetProgress = 1,
+            rewardCoins = 100
+        ),
+        Achievement(
+            id = "export_master",
+            title = StringProvider.achievementExportMaster,
+            description = StringProvider.achievementExportMasterDesc,
+            iconRes = 0,
+            category = AchievementCategory.EXPORT,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 15
+        ),
+        Achievement(
+            id = "backup_enthusiast",
+            title = StringProvider.achievementBackupEnthusiast,
+            description = StringProvider.achievementBackupEnthusiastDesc,
+            iconRes = 0,
+            category = AchievementCategory.EXPORT,
+            rarity = AchievementRarity.RARE,
+            targetProgress = 5,
+            rewardCoins = 50
+        ),
+        Achievement(
+            id = "csv_importer",
+            title = StringProvider.achievementCsvImporter,
+            description = StringProvider.achievementCsvImporterDesc,
+            iconRes = 0,
+            category = AchievementCategory.IMPORT,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 15
         )
     )
 
@@ -319,7 +317,7 @@ class AchievementsRepositoryImpl(
                 )
             }
         } catch (e: Exception) {
-            timber.log.Timber.e(e, "Ошибка при загрузке достижений")
+            Timber.e(e, StringProvider.logErrorLoadingAchievements)
             defaultAchievements
         }
     }
@@ -338,9 +336,9 @@ class AchievementsRepositoryImpl(
                 }
             }
             editor.apply()
-            timber.log.Timber.d("🏆 Достижения сохранены в SharedPreferences")
+            Timber.d("🏆 Достижения сохранены в SharedPreferences")
         } catch (e: Exception) {
-            timber.log.Timber.e(e, "Ошибка при сохранении достижений")
+            Timber.e(e, StringProvider.logErrorSavingAchievements)
         }
     }
     
@@ -380,7 +378,7 @@ class AchievementsRepositoryImpl(
         }
         _achievements.value = updatedList
         saveAchievements(updatedList)
-        timber.log.Timber.d("🏆 Обновлено достижение: ${achievement.title} (прогресс: ${achievement.currentProgress}/${achievement.targetProgress})")
+        Timber.d("🏆 Обновлено достижение: ${achievement.title} (прогресс: ${achievement.currentProgress}/${achievement.targetProgress})")
     }
     
     override suspend fun unlockAchievement(id: String) {

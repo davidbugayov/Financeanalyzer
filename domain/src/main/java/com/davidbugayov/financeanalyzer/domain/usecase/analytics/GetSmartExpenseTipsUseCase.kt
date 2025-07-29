@@ -35,21 +35,21 @@ class GetSmartExpenseTipsUseCase {
         val subscriptions = transactions
             .filter { it.isExpense && (it.note?.contains("подписк", true) == true || it.title.contains("подписк", true)) }
         if (subscriptions.isNotEmpty()) {
-            tips.add(StringProvider.tipSubscriptionsFound)
+            tips.add(StringProvider.tipSubscriptionsFound(subscriptions.size))
         }
 
         // 3. Совет: Крупные разовые расходы
         val largeExpenses = transactions
             .filter { it.isExpense && it.amount.amount > 5000.toBigDecimal() }
         if (largeExpenses.isNotEmpty()) {
-            tips.add(StringProvider.tipLargeExpenses)
+            tips.add(StringProvider.tipLargeExpenses("крупные покупки"))
         }
 
         // 4. Совет: Много мелких трат
         val smallExpenses = transactions
             .filter { it.isExpense && it.amount.amount < 300.toBigDecimal() }
         if (smallExpenses.size > 10) {
-            tips.add(StringProvider.tipSmallExpenses)
+            tips.add(StringProvider.tipSmallExpenses("мелкие покупки"))
         }
 
         // 5. Совет: Нет накоплений

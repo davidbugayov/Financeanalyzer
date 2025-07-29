@@ -14,6 +14,60 @@
     <string name="log_achievement_category_used">🏆 Триггер: Использована категория %1$s</string>
     <string name="log_achievement_milestone_reached">🏆 Триггер: Достигнута веха %1$s</string>
 
+    <!-- Названия достижений -->
+    <string name="achievement_first_steps">Первые шаги</string>
+    <string name="achievement_first_steps_desc">Добавьте первую транзакцию</string>
+    <string name="achievement_transaction_master">Мастер транзакций</string>
+    <string name="achievement_transaction_master_desc">Добавьте 100 транзакций</string>
+    <string name="achievement_data_analyst">Аналитик данных</string>
+    <string name="achievement_data_analyst_desc">Просмотрите статистику 10 раз</string>
+    <string name="achievement_first_budget">Первый бюджет</string>
+    <string name="achievement_first_budget_desc">Создайте свой первый бюджет</string>
+    <string name="achievement_explorer">Исследователь</string>
+    <string name="achievement_explorer_desc">Посетите все разделы приложения</string>
+    <string name="achievement_category_organizer">Организатор категорий</string>
+    <string name="achievement_category_organizer_desc">Используйте 10 разных категорий</string>
+    <string name="achievement_early_bird">Ранняя пташка</string>
+    <string name="achievement_early_bird_desc">Добавьте транзакцию до 7 утра</string>
+    <string name="achievement_night_owl">Ночная сова</string>
+    <string name="achievement_night_owl_desc">Добавьте транзакцию после 23:00</string>
+    <string name="achievement_first_savings">Первая копейка</string>
+    <string name="achievement_first_savings_desc">Накопите 1000 рублей</string>
+    <string name="achievement_emergency_fund">Подушка безопасности</string>
+    <string name="achievement_emergency_fund_desc">Накопите сумму на 3 месяца расходов</string>
+    <string name="achievement_economical">Экономный</string>
+    <string name="achievement_economical_desc">Потратьте менее 80% от бюджета за месяц</string>
+    <string name="achievement_regular_user">Постоянный пользователь</string>
+    <string name="achievement_regular_user_desc">Используйте приложение неделю подряд</string>
+    <string name="achievement_loyal_user">Верный пользователь</string>
+    <string name="achievement_loyal_user_desc">Используйте приложение месяц</string>
+    <string name="achievement_category_expert">Эксперт категорий</string>
+    <string name="achievement_category_expert_desc">Используйте все доступные категории</string>
+    <string name="achievement_tinkoff_integrator">Тинькоff-интегратор</string>
+    <string name="achievement_tinkoff_integrator_desc">Импортируйте транзакции из Тинькофф</string>
+    <string name="achievement_sber_collector">Сбер-коллекционер</string>
+    <string name="achievement_sber_collector_desc">Импортируйте транзакции из Сбербанка</string>
+    <string name="achievement_alpha_analyst">Альфа-аналитик</string>
+    <string name="achievement_alpha_analyst_desc">Импортируйте транзакции из Альфа-Банка</string>
+    <string name="achievement_ozon_collector">OZON-коллекционер</string>
+    <string name="achievement_ozon_collector_desc">Импортируйте транзакции из OZON Банка</string>
+    <string name="achievement_multi_bank_collector">Мульти-банковский коллектор</string>
+    <string name="achievement_multi_bank_collector_desc">Импортируйте данные из всех 4 банков</string>
+    <string name="achievement_export_master">Мастер экспорта</string>
+    <string name="achievement_export_master_desc">Экспортируйте транзакции в CSV</string>
+    <string name="achievement_backup_enthusiast">Энтузиаст резервных копий</string>
+    <string name="achievement_backup_enthusiast_desc">Создайте 5 экспортов данных</string>
+    <string name="achievement_csv_importer">CSV-импортер</string>
+    <string name="achievement_csv_importer_desc">Импортируйте транзакции из CSV-файла</string>
+
+    <!-- Ошибки логирования -->
+    <string name="log_error_loading_achievements">Ошибка при загрузке достижений</string>
+    <string name="log_error_saving_achievements">Ошибка при сохранении достижений</string>
+    <string name="log_error_loading_achievement_progress">Ошибка при загрузке прогресса достижений</string>
+    <string name="log_error_updating_achievement_progress">Ошибка при обновлении прогресса достижения %1$s</string>
+    <string name="log_error_checking_achievement">Ошибка при проверке достижения %1$s</string>
+    <string name="log_error_profile_analytics">Ошибка при получении аналитики профиля</string>
+
     <!-- Советы по расходам -->
     <string name="tip_top_category_spending">Вы тратите больше всего на категорию: \'%1$s\'. Подумайте, можно ли сократить эти расходы.</string>
     <string name="tip_subscriptions_found">У вас есть регулярные подписки. Проверьте, все ли из них вам действительно нужны.</string>
@@ -43,17 +97,21 @@
     <!-- Сравнение с аналогами -->
     <string name="income_range_insufficient_data">Недостаточно данных</string>
 
-    <!-- Категории расходов -->
+    <!-- Категории расходов (уникальные для domain) -->
     <string name="category_products">Продукты</string>
-    <string name="category_transport">Транспорт</string>
-    <string name="category_utilities">ЖКХ</string>
-    <string name="category_clothing">Одежда</string>
-    <string name="category_entertainment">Развлечения</string>
-    <string name="category_other">Прочее</string>
     <string name="category_subscription">Подписка</string>
-    <string name="category_services">Сервисы</string>
     <string name="category_cafe">Кафе</string>
     <string name="category_restaurant">Ресторан</string>
+    <string name="category_services">Услуги</string>
+    <string name="category_other_expense">Другое</string>
+    <string name="category_gifts">Подарки</string>
+    <string name="category_rental">Аренда</string>
+    <string name="category_other_income">Другое</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_utilities">Коммунальные услуги</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_other">Другое</string>
 
     <!-- Рекомендации по финансовому здоровью -->
     <string name="recommendation_improve_financial_health">Улучшите общее финансовое здоровье</string>
@@ -77,25 +135,7 @@
     <string name="recommendation_save_on_cafe">Экономьте на кафе и ресторанах</string>
     <string name="recommendation_save_on_cafe_desc">Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.</string>
 
-    <!-- Названия категорий -->
-    <string name="category_food">Продукты</string>
-    <string name="category_health">Здоровье</string>
-    <string name="category_housing">Жилье</string>
-    <string name="category_communication">Связь</string>
-    <string name="category_pet">Питомцы</string>
-    <string name="category_charity">Благотворительность</string>
-    <string name="category_credit">Кредиты</string>
-    <string name="category_transfer">Переводы</string>
-    <string name="category_other_expense">Другое</string>
-    <string name="category_salary">Зарплата</string>
-    <string name="category_freelance">Фриланс</string>
-    <string name="category_gifts">Подарки</string>
-    <string name="category_interest">Проценты</string>
-    <string name="category_rental">Аренда</string>
-    <string name="category_other_income">Другое</string>
-
-    <!-- Периоды -->
-    <string name="period_all_time">Все время</string>
+    <!-- Периоды (уникальные для domain) -->
     <string name="period_day">День: %1$s</string>
     <string name="period_week">Неделя: %1$s - %2$s</string>
     <string name="period_month">Месяц: %1$s - %2$s</string>
@@ -119,7 +159,22 @@
     <string name="wallet_type_goal_description">Специальные счета для достижения целей</string>
     <string name="wallet_type_other_description">Кредиты, долги, займы и другие финансовые инструменты</string>
 
-    <!-- Транзакции -->
-    <string name="transaction_transfers">Переводы</string>
-    <string name="transaction_transfer">Перевод</string>
+    <!-- Логирование транзакций -->
+    <string name="log_transaction_update">Обновление транзакции: %1$s</string>
+    <string name="log_transaction_add">Добавление транзакции: сумма=%1$s, категория=%2$s</string>
+    <string name="log_transaction_not_found">Транзакция с id=%1$s не найдена</string>
+
+    <!-- Месяцы для группировки -->
+    <string name="month_january">январь</string>
+    <string name="month_february">февраль</string>
+    <string name="month_march">март</string>
+    <string name="month_april">апрель</string>
+    <string name="month_may">май</string>
+    <string name="month_june">июнь</string>
+    <string name="month_july">июль</string>
+    <string name="month_august">август</string>
+    <string name="month_september">сентябрь</string>
+    <string name="month_october">октябрь</string>
+    <string name="month_november">ноябрь</string>
+    <string name="month_december">декабрь</string>
 </resources>

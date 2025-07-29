@@ -17,6 +17,7 @@
     <string name="select_all">Выбрать все</string>
     <string name="apply">Применить</string>
     <string name="close">Закрыть</string>
+    <string name="cancel">Отмена</string>
 
     <!-- Группы категорий -->
     <string name="expenses">Расходы</string>
@@ -47,7 +48,6 @@
     <string name="category_filter">Фильтр по категории</string>
     <string name="source_filter">Фильтр по источнику</string>
     <string name="filter">Фильтр</string>
-    <string name="add_transaction">Добавить транзакцию</string>
 
     <!-- Периоды -->
     <string name="all_time">Все время</string>
@@ -64,12 +64,13 @@
     <string name="categories_selected">Категории: %1$s</string>
     <string name="sources_selected">Источники: %1$s</string>
 
-    <!-- Загрузка -->
-    <string name="loading_data">Загрузка данных…</string>
-
     <!-- Ошибки -->
     <string name="error_loading_transactions">Ошибка при загрузке транзакций</string>
 
     <!-- Форматирование -->
     <string name="week_format">Неделя %1$d, %2$d</string>
+    
+    <!-- Недостающие строки -->
+    <string name="delete">Удалить</string>
+    <string name="deleteSourceConfirmationMessage">Вы уверены, что хотите удалить источник "%1$s"? Все связанные транзакции также будут удалены.</string>
 </resources>

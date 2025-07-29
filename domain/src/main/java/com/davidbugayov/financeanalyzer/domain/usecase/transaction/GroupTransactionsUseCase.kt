@@ -2,27 +2,28 @@ package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 /**
- * Use case для группировки транзакций по временным периодам.
+ * UseCase для группировки транзакций по различным временным периодам.
  * Поддерживает группировку по дням, неделям и месяцам.
- * Использует локализованные форматы дат на русском языке.
- * Следует принципу единственной ответственности (SRP) из SOLID.
  */
 class GroupTransactionsUseCase {
-
+    
     /**
-     * Группирует транзакции по выбранному типу группировки.
-     * Сортирует транзакции по убыванию даты внутри каждой группы.
+     * Группирует транзакции по указанному типу группировки.
      *
      * @param transactions Список транзакций для группировки
      * @param groupingType Тип группировки (день, неделя, месяц)
-     * @return Карта, где ключ - название периода, значение - список транзакций
+     * @return Карта сгруппированных транзакций, где ключ - период, значение - список транзакций
      */
-    operator fun invoke(transactions: List<Transaction>, groupingType: GroupingType): Map<String, List<Transaction>> {
+    fun invoke(
+        transactions: List<Transaction>,
+        groupingType: GroupingType,
+    ): Map<String, List<Transaction>> {
         return when (groupingType) {
             GroupingType.DAY -> groupByDay(transactions)
             GroupingType.WEEK -> groupByWeek(transactions)
@@ -32,28 +33,24 @@ class GroupTransactionsUseCase {
 
     /**
      * Группирует транзакции по дням.
-     * Формат даты: "DD MMMM YYYY" (например, "1 января 2024")
+     * Формат периода: "DD.MM.YYYY" (например, "01.01.2024")
      *
      * @param transactions Список транзакций
      * @return Карта сгруппированных по дням транзакций
      */
     private fun groupByDay(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+        val format = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         val groupedTransactions = transactions
             .sortedByDescending { it.date }
-            .groupBy { dateFormat.format(it.date).replaceFirstChar { it.uppercase() } }
+            .groupBy { format.format(it.date) }
 
         // Сортируем группы по убыванию даты
         return groupedTransactions.toList()
             .sortedByDescending { (key, _) ->
-                // Парсим дату из ключа
-                val parts = key.split(" ")
+                val parts = key.split(".")
                 val day = parts.getOrNull(0)?.toIntOrNull() ?: 0
-                val monthName = parts.getOrNull(1) ?: ""
-                val month = getMonthNumber(monthName)
+                val month = parts.getOrNull(1)?.toIntOrNull() ?: 0
                 val year = parts.getOrNull(2)?.toIntOrNull() ?: 0
-
-                // Создаем числовое представление для сортировки (год*10000 + месяц*100 + день)
                 year * 10000 + month * 100 + day
             }
             .toMap()
@@ -138,18 +135,18 @@ class GroupTransactionsUseCase {
      */
     private fun getMonthNumber(monthName: String): Int {
         return when (monthName.lowercase()) {
-                    "январь" -> 1
-        "февраль" -> 2
-        "март" -> 3
-        "апрель" -> 4
-        "май" -> 5
-        "июнь" -> 6
-        "июль" -> 7
-        "август" -> 8
-        "сентябрь" -> 9
-        "октябрь" -> 10
-        "ноябрь" -> 11
-        "декабрь" -> 12
+            StringProvider.monthJanuary -> 1
+            StringProvider.monthFebruary -> 2
+            StringProvider.monthMarch -> 3
+            StringProvider.monthApril -> 4
+            StringProvider.monthMay -> 5
+            StringProvider.monthJune -> 6
+            StringProvider.monthJuly -> 7
+            StringProvider.monthAugust -> 8
+            StringProvider.monthSeptember -> 9
+            StringProvider.monthOctober -> 10
+            StringProvider.monthNovember -> 11
+            StringProvider.monthDecember -> 12
             else -> 0
         }
     }

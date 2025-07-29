@@ -42,22 +42,6 @@ object StringProvider {
     val close: String get() = getString(R.string.close)
     val cancel: String get() = getString(UiR.string.cancel)
     
-    // Группы категорий
-    val expenses: String get() = getString(R.string.expenses)
-    val incomes: String get() = getString(R.string.incomes)
-    
-    // Удаление категории
-    val deleteCategoryTitle: String get() = getString(R.string.delete_category_title)
-    fun deleteCategoryConfirmIrreversible(category: String): String = getString(R.string.delete_category_confirm_irreversible, category)
-    fun deleteCategoryConfirmMove(category: String): String = getString(R.string.delete_category_confirm_move, category)
-    val delete: String get() = getString(UiR.string.delete)
-    
-    // Удаление источника
-    fun deleteSourceConfirmationMessage(source: String): String = getString(R.string.delete_source_confirmation_message, source)
-    
-    // Защищенные категории
-    val categoryOther: String get() = getString(R.string.category_other)
-    
     // Группировка
     val groupByDays: String get() = getString(R.string.group_by_days)
     val groupByWeeks: String get() = getString(R.string.group_by_weeks)
@@ -72,7 +56,6 @@ object StringProvider {
     val categoryFilter: String get() = getString(R.string.category_filter)
     val sourceFilter: String get() = getString(R.string.source_filter)
     val filter: String get() = getString(R.string.filter)
-    val addTransaction: String get() = getString(R.string.add_transaction)
     
     // Периоды
     val allTime: String get() = getString(R.string.all_time)
@@ -89,12 +72,13 @@ object StringProvider {
     fun categoriesSelected(categories: String): String = getString(R.string.categories_selected, categories)
     fun sourcesSelected(sources: String): String = getString(R.string.sources_selected, sources)
     
-    // Загрузка
-    val loadingData: String get() = getString(R.string.loading_data)
-    
     // Ошибки
     val errorLoadingTransactions: String get() = getString(R.string.error_loading_transactions)
     
     // Форматирование
-    fun weekFormat(week: Int, year: Int): String = getString(R.string.week_format, week, year)
+    fun weekFormat(weekNumber: Int, year: Int): String = getString(R.string.week_format, weekNumber, year)
+    
+    // Недостающие строки
+    val delete: String get() = getString(R.string.delete)
+    fun deleteSourceConfirmationMessage(source: String): String = getString(R.string.deleteSourceConfirmationMessage, source)
 } 

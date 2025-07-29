@@ -84,7 +84,8 @@ import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.feature.budget.R
+import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,7 +142,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
     Scaffold(
         topBar = {
             AppTopBar(
-                title = "Бюджет",
+                title = stringResource(R.string.budget),
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
@@ -153,13 +154,13 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                     }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Добавить доход",
+                            contentDescription = stringResource(R.string.add_income),
                         )
                     }
                     IconButton(onClick = { showPeriodSettingsDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "Настройки периода",
+                            contentDescription = stringResource(R.string.period_settings),
                         )
                     }
                 },
@@ -194,7 +195,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             color = MaterialTheme.colorScheme.background,
                         ) {
                             Text(
-                                text = "Мои кошельки",
+                                text = stringResource(R.string.my_wallets),
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier =
                                     Modifier
@@ -229,7 +230,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
             if (showAddCategoryDialog) {
                 AlertDialog(
                     onDismissRequest = { showAddCategoryDialog = false },
-                    title = { Text("Добавить новый кошелек") },
+                    title = { Text(stringResource(R.string.add_new_wallet)) },
                     text = {
                         Column {
                             OutlinedTextField(

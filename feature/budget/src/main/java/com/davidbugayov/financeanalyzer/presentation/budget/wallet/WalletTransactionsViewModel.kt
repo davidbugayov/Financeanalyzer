@@ -211,7 +211,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error linking categories")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка привязки категорий",
+                        error = e.message ?: BudgetStringProvider.errorLinkingCategories,
                     )
                 }
             }

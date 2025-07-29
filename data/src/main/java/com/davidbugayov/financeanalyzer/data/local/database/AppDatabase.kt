@@ -108,7 +108,7 @@ abstract class AppDatabase : RoomDatabase() {
                 try {
                     // Добавляем колонку source с значением по умолчанию "Наличные"
                     db.execSQL(
-                        "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'",
+                        "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT '${StringProvider.defaultSource}'",
                     )
                 } catch (e: Exception) {
                     CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_3_4", StringProvider.errorMigration3_4, e)
@@ -126,7 +126,7 @@ abstract class AppDatabase : RoomDatabase() {
                 try {
                     // Добавляем колонку destination с значением по умолчанию "Наличные"
                     db.execSQL(
-                        "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'",
+                        "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT '${StringProvider.defaultDestination}'",
                     )
                 } catch (e: Exception) {
                     CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_4_5", StringProvider.errorMigration4_5, e)
