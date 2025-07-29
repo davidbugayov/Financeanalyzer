@@ -26,7 +26,7 @@
     <string name="track_savings_description">Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.</string>
     <string name="charts">Графики</string>
     <string name="show_tip">Показать совет</string>
-    <string name="loading_data">Загрузка данных...</string>
+
     <string name="add_first_transaction">Добавьте первую транзакцию</string>
     <string name="see_analytics_magic">И увидите магию аналитики!</string>
     <string name="categories">Категории</string>
@@ -106,4 +106,28 @@
     <string name="savings_rate_15_percent">15%</string>
     <string name="savings_rate_30_percent">30%</string>
     <string name="savings_rate_50_percent">50%</string>
-    <string name="select_period">Выбрать период</string><string name="all_time">Все время</string><string name="day">День</string><string name="week">Неделя</string><string name="month">Месяц</string><string name="period_quarter">Квартал</string><string name="year">Год</string><string name="start_date">Начальная дата</string><string name="end_date">Конечная дата</string><string name="apply">Применить</string><string name="statistics">Статистика</string><string name="tips">Советы</string><string name="income">Доходы</string><string name="expense">Расход</string><string name="average_expenses_title">Средние расходы</string><string name="savings_rate_title">Норма сбережений</string><string name="financial_cushion_title">Финансовая подушка</string><string name="financial_health_title">Финансовое здоровье</string><string name="financial_health_savings_rate_title">Норма сбережений</string><string name="financial_health_average_expenses_title">Средние расходы</string><string name="financial_health_financial_cushion_title">Финансовая подушка</string><string name="financial_health_ok_button">Понятно</string><string name="chart_title_income">Доходы</string><string name="chart_title_expense">Расходы</string></resources>
+    <string name="select_period">Выбрать период</string>
+    <string name="all_time">Все время</string>
+    <string name="day">День</string>
+    <string name="week">Неделя</string>
+    <string name="month">Месяц</string>
+    <string name="period_quarter">Квартал</string>
+    <string name="year">Год</string>
+    <string name="start_date">Начальная дата</string>
+    <string name="end_date">Конечная дата</string>
+    <string name="apply">Применить</string>
+    <string name="statistics">Статистика</string>
+    <string name="tips">Советы</string>
+    <string name="income">Доходы</string>
+    <string name="expense">Расход</string>
+    <string name="average_expenses_title">Средние расходы</string>
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="financial_cushion_title">Финансовая подушка</string>
+    <string name="financial_health_title">Финансовое здоровье</string>
+    <string name="financial_health_savings_rate_title">Норма сбережений</string>
+    <string name="financial_health_average_expenses_title">Средние расходы</string>
+    <string name="financial_health_financial_cushion_title">Финансовая подушка</string>
+    <string name="financial_health_ok_button">Понятно</string>
+    <string name="chart_title_income">Доходы</string>
+    <string name="chart_title_expense">Расходы</string>
+    </resources>

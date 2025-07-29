@@ -495,9 +495,11 @@
     <string name="onboarding_skip_button">Пропустить</string>
     <string name="error_unknown">Неизвестная ошибка</string>
     <string name="all_time_filter">Все время</string>
-    <string name="quarter">Квартал</string>
+        <string name="quarter">Квартал</string>
     <string name="expense">Расход</string>
     <string name="add_transaction_long">Добавить транзакцию</string>
+    <string name="nav_budget">Бюджет</string>
+    <string name="nav_history">История</string>
     <string name="statistics">Статистика</string>
     <string name="add_button">Добавить</string>
     <string name="rec_critical_emergency_title">Создайте резервный фонд</string>
@@ -506,8 +508,6 @@
     <string name="rec_high_savings_impact">Цель: 15-20% от доходов</string>
     <string name="rec_normal_invest_title">Рассмотрите инвестиции</string>
     <string name="rec_onboarding_stats_title">Статистика</string>
-    <string name="nav_budget">Бюджет</string>
-    <string name="nav_history">История</string>
     <string name="transaction">Транзакция</string>
     <string name="transaction_amount">Сумма</string>
     <string name="transaction_category">Категория</string>
@@ -539,4 +539,19 @@
     <string name="period_month">%s - %s</string>
     <string name="period_quarter">%s - %s</string>
     <string name="period_year">%s - %s</string>
+    <string name="total_transactions">Всего транзакций</string>
+    <string name="achievement_first_transaction_desc">Создана первая транзакция</string>
+    <string name="period_settings_title">Настройки периода</string>
+    <string name="wallet_not_found">Кошелек не найден</string>
+    <string name="transactions_section">Секция транзакций</string>
+    <string name="link_categories_title">Привязать категории</string>
+    <string name="wallet_name_label">Название кошелька</string>
+    <string name="wallet_name_hint">Введите название кошелька</string>
+    <string name="wallet_type_label">Тип кошелька</string>
+    <string name="wallet_spent_amount">Потрачено</string>
+    <string name="wallet_remaining_amount">Осталось</string>
+    <string name="wallet_budget_limit">Лимит бюджета</string>
+    <string name="wallet_spend_action">Тратить</string>
+    <string name="ok">ОК</string>
+    <string name="error_title">Ошибка</string>
 </resources>

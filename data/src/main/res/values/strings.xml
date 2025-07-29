@@ -33,4 +33,4 @@
     <string name="log_migration_15_16_completed">Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title</string>
     <string name="log_migration_16_15_completed">Выполнена миграция с версии 16 на 15 (обратная совместимость)</string>
     <string name="default_source_sber">Сбербанк</string>
-</resources>
+    </resources>
