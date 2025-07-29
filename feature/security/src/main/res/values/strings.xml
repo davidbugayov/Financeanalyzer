@@ -45,5 +45,4 @@
     <string name="error_try_again">Попробуйте еще раз</string>
     <string name="auth_title">Введите PIN-код</string>
     <string name="auth_enter_pin">Введите PIN-код</string>
-    <string name="security_biometric_title">Биометрическая аутентификация</string>
     </resources>

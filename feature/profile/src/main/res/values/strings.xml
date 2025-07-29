@@ -38,25 +38,4 @@
     <string name="app_version">Версия</string>
     <string name="build_version">Сборка</string>
     <string name="edit_time">Изменить время</string>
-    <string name="total_transactions">Всего транзакций</string>
-    <string name="permission_required_title">Требуется разрешение</string>
-    <string name="profile_theme_light">Светлая</string>
-    <string name="profile_theme_dark">Тёмная</string>
-    <string name="profile_theme_system">Системная</string>
-    <string name="done">Готово</string>
-    <string name="ok">ОК</string>
-    <string name="profile_title">Профиль</string>
-    <string name="budget">Бюджет</string>
-    <string name="settings_theme_light">Светлая</string>
-    <string name="settings_theme_dark">Тёмная</string>
-    <string name="settings_theme_system">Системная</string>
-    <string name="analytics_title">Аналитика</string>
-    <string name="income">Доходы</string>
-    <string name="expenses">Расходы</string>
-    <string name="balance">Баланс</string>
-    <string name="savings_rate">Норма сбережений</string>
-    <string name="average_expense">Средний расход</string>
-    <string name="sources_used">Используемые источники</string>
-    <string name="cd_done">Готово</string>
-    <string name="achievement_first_transaction_desc">Создана первая транзакция</string>
-</resources>
+    </resources>
