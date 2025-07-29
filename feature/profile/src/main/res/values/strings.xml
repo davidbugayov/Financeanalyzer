@@ -23,9 +23,6 @@
     <string name="settings_reminder_time_format">Время: %1$d:%2$02d</string>
     <string name="off">Выкл.</string>
     <string name="profile_theme_select">Выбор темы</string>
-    <string name="profile_theme_light">Светлая</string>
-    <string name="profile_theme_dark">Тёмная</string>
-    <string name="profile_theme_system">Системная</string>
     <string name="select_reminder_time">Выберите время напоминания</string>
     <string name="notification_permission_required">Для уведомлений необходимо разрешение</string>
     <string name="request_permission">Разрешить</string>
@@ -44,17 +41,20 @@
     <string name="app_version">Версия</string>
     <string name="build_version">Сборка</string>
     <string name="edit_time">Изменить время</string>
-    <string name="permission_required_title">Требуется разрешение</string>
     <string name="done">Готово</string>
     <string name="ok">ОК</string>
+    <string name="analytics_title">Аналитика</string>
+    <string name="sources_used">Используемые источники</string>
     <string name="profile_title">Профиль</string>
     <string name="budget">Бюджет</string>
-    <string name="analytics_title">Аналитика</string>
     <string name="income">Доходы</string>
     <string name="expenses">Расходы</string>
     <string name="balance">Баланс</string>
     <string name="savings_rate">Норма сбережений</string>
     <string name="average_expense">Средний расход</string>
-    <string name="sources_used">Используемые источники</string>
     <string name="cd_done">Готово</string>
+    <string name="permission_required_title">Требуется разрешение</string>
+    <string name="profile_theme_light">Светлая</string>
+    <string name="profile_theme_dark">Тёмная</string>
+    <string name="profile_theme_system">Системная</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     
-    <!-- Значения по умолчанию -->
+    
     <string name="default_source">Источник по умолчанию</string>
     <string name="default_destination">Назначение по умолчанию</string>
     <string name="default_source_sber">Сбербанк</string>

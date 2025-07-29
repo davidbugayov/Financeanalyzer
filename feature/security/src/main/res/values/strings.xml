@@ -11,14 +11,11 @@
     
     
     <string name="auth_title">Введите PIN-код</string>
-    <string name="auth_biometric_title">Биометрическая аутентификация</string>
+    <string name="auth_enter_pin">Введите PIN-код</string>
     <string name="auth_biometric_subtitle">Подтвердите свою личность для входа в приложение</string>
     <string name="auth_biometric_negative">Использовать PIN</string>
     <string name="auth_use_biometric">Использовать биометрию</string>
     <string name="auth_wrong_pin">Неверный PIN-код</string>
-    <string name="auth_enter_pin">Введите PIN-код</string>
-    
-    
     <string name="pin_enter_new">Введите новый PIN-код</string>
     <string name="pin_confirm_new">Подтвердите новый PIN-код</string>
     <string name="pin_current">Введите текущий PIN-код</string>

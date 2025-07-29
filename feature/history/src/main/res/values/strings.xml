@@ -22,8 +22,6 @@
     <string name="sources_selected">Источники: %1$s</string>
     <string name="error_loading_transactions">Ошибка при загрузке транзакций</string>
     <string name="week_format">Неделя %1$d, %2$d</string>
-    <string name="deleteSourceConfirmationMessage">Вы уверены, что хотите удалить источник "%1$s"? Все связанные транзакции также будут удалены.</string>
-    <string name="history_title">История транзакций</string>
     <string name="select_period">Выбрать период</string>
     <string name="apply">Применить</string>
     <string name="all_time">Все время</string>
@@ -35,12 +33,6 @@
     <string name="start_date">Начальная дата</string>
     <string name="end_date">Конечная дата</string>
     <string name="loading_data">Загрузка данных</string>
-    <string name="delete">Удалить</string>
-    <string name="expenses">Расходы</string>
-    <string name="incomes">Доходы</string>
-    <string name="add_transaction">Добавить транзакцию</string>
-    
-    <!-- Дополнительные строки -->
     <string name="select_category">Выбрать категорию</string>
     <string name="close">Закрыть</string>
     <string name="group_by_days">По дням</string>
@@ -48,4 +40,9 @@
     <string name="group_by_months">По месяцам</string>
     <string name="collapse">Свернуть</string>
     <string name="expand">Развернуть</string>
+    <string name="delete">Удалить</string>
+    <string name="deleteSourceConfirmationMessage">Вы уверены, что хотите удалить источник?</string>
+    <string name="add_transaction">Добавить транзакцию</string>
+    <string name="expenses">Расходы</string>
+    <string name="incomes">Доходы</string>
 </resources>

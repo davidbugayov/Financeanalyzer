@@ -27,6 +27,5 @@
     <string name="onboarding_page_3_description">Получайте детальную статистику и планируйте бюджет</string>
     <string name="onboarding_page_4_description">Все данные хранятся только на вашем устройстве</string>
     <string name="onboarding_button_start">Начать</string>
-    <string name="onboarding_button_skip">Пропустить</string>
     <string name="onboarding_welcome_title">Добро пожаловать</string>
 </resources>

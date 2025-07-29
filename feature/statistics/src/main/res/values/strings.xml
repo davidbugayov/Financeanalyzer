@@ -103,7 +103,6 @@
     <string name="trend_neutral_description">Нейтральный тренд</string>
     <string name="financial_health_explanation">Объяснение финансового здоровья</string>
     <string name="financial_health_savings_rate_content">Содержание о норме сбережений</string>
-    <string name="financial_health_average_expenses_title">Средние расходы</string>
     <string name="financial_health_average_expenses_content">Содержание о средних расходах</string>
     <string name="financial_health_financial_cushion_content">Содержание о финансовой подушке</string>
     <string name="financial_health_tips_title">Советы по финансовому здоровью</string>
@@ -125,7 +124,8 @@
     <string name="financial_cushion_title">Финансовая подушка</string>
     <string name="financial_health_title">Финансовое здоровье</string>
     <string name="financial_health_savings_rate_title">Норма сбережений</string>
+    <string name="financial_health_average_expenses_title">Средние расходы</string>
     <string name="financial_health_financial_cushion_title">Финансовая подушка</string>
     <string name="chart_title_income">Доходы</string>
     <string name="chart_title_expense">Расходы</string>
-</resources>
+    </resources>
