@@ -33,7 +33,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -291,9 +293,9 @@ private fun CategoryGroupHeader(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription =
                     if (isExpanded) {
-                        "Свернуть"
+                        stringResource(UiR.string.dialog_collapse)
                     } else {
-                        "Развернуть"
+                        stringResource(UiR.string.dialog_expand)
                     },
                 modifier = Modifier.rotate(rotation),
                 tint = color,

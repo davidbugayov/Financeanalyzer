@@ -1,9 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="libraries_title">Используемые библиотеки</string>
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
     <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
     <string name="license_colon">Лицензия: %s</string>
-    <string name="budget">Бюджет</string>
     <string name="profile_budget_subtitle">Планирование расходов</string>
     <string name="export_import">Импорт/Экспорт</string>
     <string name="profile_export_import_subtitle">Файлы CSV, PDF, Excel</string>
@@ -26,36 +26,37 @@
     <string name="profile_theme_light">Светлая</string>
     <string name="profile_theme_dark">Тёмная</string>
     <string name="profile_theme_system">Системная</string>
-    <string name="done">Готово</string>
     <string name="select_reminder_time">Выберите время напоминания</string>
-    <string name="permission_required_title">Требуется разрешение</string>
     <string name="notification_permission_required">Для уведомлений необходимо разрешение</string>
     <string name="request_permission">Разрешить</string>
     <string name="enable_reminders">Включить напоминания</string>
     <string name="reminder_description">Получайте ежедневное напоминание</string>
     <string name="reminder_time">Время напоминания</string>
     <string name="reminder_time_description">Текущее время: %1$s</string>
-    <string name="edit_time">Изменить</string>
-    <string name="close">Закрыть</string>
+    <string name="expense_categories">Категорий расхода</string>
+    <string name="income_categories">Категорий дохода</string>
+    <string name="all_time">За всё время</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="notification_settings">Настройки уведомлений</string>
+    <string name="hours">ч</string>
+    <string name="minutes">м</string>
+    <string name="app_info">Информация о приложении</string>
+    <string name="app_version">Версия</string>
+    <string name="build_version">Сборка</string>
+    <string name="permission_required_title">Требуется разрешение</string>
+    <string name="edit_time">Изменить время</string>
+    <string name="done">Готово</string>
+    <string name="ok">ОК</string>
+    <string name="profile_title">Профиль</string>
+    <string name="budget">Бюджет</string>
     <string name="analytics_title">Аналитика</string>
     <string name="income">Доходы</string>
     <string name="expenses">Расходы</string>
     <string name="balance">Баланс</string>
-    <string name="savings_rate">Сбережения</string>
-    <string name="expense_categories">Категорий расхода</string>
-    <string name="income_categories">Категорий дохода</string>
+    <string name="savings_rate">Норма сбережений</string>
     <string name="average_expense">Средний расход</string>
     <string name="sources_used">Используемые источники</string>
-    <string name="all_time">За всё время</string>
-    <string name="unknown">Неизвестно</string>
-    <string name="profile_title">Профиль</string>
-    <string name="notification_settings">Настройки уведомлений</string>
-    <string name="hours">ч</string>
-    <string name="minutes">м</string>
-    <string name="cancel">Отмена</string>
-    <string name="ok">ОК</string>
-    <string name="app_info">Информация о приложении</string>
-    <string name="app_version">Версия</string>
-    <string name="build_version">Сборка</string>
+    
+    <!-- Дополнительные строки -->
     <string name="cd_done">Готово</string>
-</resources> 
+</resources>

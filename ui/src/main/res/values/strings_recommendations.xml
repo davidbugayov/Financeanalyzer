@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Рекомендации по сбережениям -->
+    <string name="recommendation_emergency_fund_title">Создайте финансовую подушку СРОЧНО</string>
+    <string name="recommendation_emergency_fund_description">У вас менее месяца расходов в резерве. Это критически опасно для финансовой стабильности</string>
+    <string name="recommendation_emergency_fund_impact">Защита от финансового краха при потере дохода</string>
+    
+    <string name="recommendation_savings_rate_low_title">Норма сбережений ниже критической</string>
+    <string name="recommendation_savings_rate_low_description">Вы откладываете менее 5% дохода. Это ставит под угрозу ваше финансовое будущее</string>
+    <string name="recommendation_savings_rate_low_impact">Начните с 10% - это минимум для финансовой безопасности</string>
+    
+    <string name="recommendation_increase_savings_title">Увеличьте норму сбережений</string>
+    <string name="recommendation_increase_savings_description">Стремитесь к сбережениям 15-20% от дохода для финансовой стабильности</string>
+    <string name="recommendation_increase_savings_impact">Увеличение на 5% улучшит финансовое здоровье</string>
+    
+    <!-- Рекомендации по инвестициям -->
+    <string name="recommendation_investments_title">Пора подумать об инвестициях</string>
+    <string name="recommendation_investments_description">У вас отличная финансовая дисциплина! Время приумножать капитал</string>
+    <string name="recommendation_investments_impact">Инвестиции помогут обогнать инфляцию</string>
+    
+    <!-- Рекомендации по достижениям -->
+    <string name="recommendation_achievements_title">Изучите свои достижения</string>
+    <string name="recommendation_achievements_description">Отслеживайте прогресс и получайте мотивацию</string>
+    
+    <!-- Общие рекомендации -->
+    <string name="recommendation_enhanced_title">Улучшенные рекомендации</string>
+    <string name="recommendation_enhanced_subtitle">Детальный анализ с приоритетами</string>
+    <string name="recommendation_compact_title">Компактные рекомендации</string>
+    
+    <!-- Категории рекомендаций -->
+    <string name="recommendation_category_savings">savings</string>
+    <string name="recommendation_category_expenses">expenses</string>
+    <string name="recommendation_category_emergency_fund">emergency_fund</string>
+    <string name="recommendation_category_investments">investments</string>
+    <string name="recommendation_category_planning">planning</string>
+    <string name="recommendation_category_general">general</string>
+    
+    <!-- Динамические рекомендации -->
+    <string name="recommendation_optimize_category_title">Сократите расходы по категории %1$s</string>
+    <string name="recommendation_plan_purchases_title">Планируйте покупки на %1$s</string>
+</resources> 

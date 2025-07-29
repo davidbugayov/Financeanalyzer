@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
@@ -306,7 +307,7 @@ fun TransactionHistoryScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = "История транзакций",
+                title = stringResource(R.string.transaction_history),
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
@@ -315,7 +316,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Category,
-                            contentDescription = "Фильтр по категории",
+                            contentDescription = stringResource(R.string.category_filter),
                         )
                     }
                     IconButton(
@@ -323,7 +324,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.AccountBalance,
-                            contentDescription = "Фильтр по источнику",
+                            contentDescription = stringResource(R.string.source_filter),
                         )
                     }
                     IconButton(
@@ -331,7 +332,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = "Фильтр",
+                            contentDescription = stringResource(R.string.filter),
                         )
                     }
                 },
@@ -346,7 +347,7 @@ fun TransactionHistoryScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                                            contentDescription = "Добавить транзакцию",
+                    contentDescription = stringResource(R.string.add_transaction),
                 )
             }
         },
@@ -410,7 +411,7 @@ fun TransactionHistoryScreen(
                         // Выбранные категории
                         if (state.selectedCategories.isNotEmpty()) {
                             Text(
-                                text = "Категории: ${state.selectedCategories.joinToString(", ")}",
+                                text = stringResource(R.string.categories_selected, state.selectedCategories.joinToString(", ")),
                                 fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
@@ -421,7 +422,7 @@ fun TransactionHistoryScreen(
                         // Выбранные источники
                         if (state.selectedSources.isNotEmpty()) {
                             Text(
-                                text = "Источники: ${state.selectedSources.joinToString(", ")}",
+                                text = stringResource(R.string.sources_selected, state.selectedSources.joinToString(", ")),
                                 fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
@@ -448,7 +449,7 @@ fun TransactionHistoryScreen(
                         onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) },
                     )
                 } else if (state.isLoading && !state.isLoadingMore) {
-                    CenteredLoadingIndicator(message = "Загрузка данных...")
+                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 } else if (state.filteredTransactions.isEmpty()) {
                     EmptyContent()
                 } else {
@@ -457,7 +458,7 @@ fun TransactionHistoryScreen(
 
                                             when {
                         pagingItems.loadState.refresh is LoadState.Loading -> {
-                            CenteredLoadingIndicator(message = "Загрузка данных...")
+                            CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                         }
                         pagingItems.loadState.refresh is LoadState.Error -> {
                             val e = (pagingItems.loadState.refresh as LoadState.Error).error

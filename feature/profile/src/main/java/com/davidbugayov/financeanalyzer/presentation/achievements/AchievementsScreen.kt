@@ -90,6 +90,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -388,7 +389,7 @@ private fun ModernStatsCard(achievements: List<Achievement>) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "Общий прогресс",
+                            text = stringResource(UiR.string.achievements_overall_progress),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -455,9 +456,9 @@ private fun ModernFilters(
                         Text(
                             text =
                                 when (filter) {
-                                    AchievementFilter.ALL -> "Все"
-                                    AchievementFilter.UNLOCKED -> "Разблокированные"
-                                    AchievementFilter.LOCKED -> "Заблокированные"
+                                    AchievementFilter.ALL -> stringResource(UiR.string.achievements_filter_all)
+                                    AchievementFilter.UNLOCKED -> stringResource(UiR.string.achievements_filter_unlocked)
+                                    AchievementFilter.LOCKED -> stringResource(UiR.string.achievements_filter_locked)
                                 },
                         )
                     },
@@ -495,7 +496,7 @@ private fun ModernFilters(
             FilterChip(
                 selected = selectedCategory == null,
                 onClick = { onCategorySelected(null) },
-                label = { Text("Все") },
+                label = { Text(stringResource(UiR.string.achievements_filter_all)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.AutoAwesome,
@@ -726,7 +727,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                     ) {
                         Icon(
                             imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = "Разблокировано",
+                            contentDescription = stringResource(UiR.string.achievements_unlocked),
                             tint = Color(0xFF10B981),
                             modifier = Modifier.size(24.dp),
                         )
@@ -744,7 +745,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = "Прогресс",
+                            text = stringResource(UiR.string.achievements_progress),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -851,29 +852,31 @@ private fun getCategoryIcon(category: AchievementCategory): ImageVector {
 /**
  * Получает отображаемое имя категории
  */
+@Composable
 private fun getCategoryDisplayName(category: AchievementCategory): String {
     return when (category) {
-        AchievementCategory.TRANSACTIONS -> "Транзакции"
-        AchievementCategory.BUDGET -> "Бюджет"
-        AchievementCategory.SAVINGS -> "Накопления"
-        AchievementCategory.HABITS -> "Привычки"
-        AchievementCategory.STATISTICS -> "Статистика"
-        AchievementCategory.MILESTONES -> "Вехи"
-        AchievementCategory.SPECIAL -> "Специальные"
-        AchievementCategory.IMPORT -> "Импорт"
-        AchievementCategory.EXPORT -> "Экспорт"
+        AchievementCategory.TRANSACTIONS -> stringResource(UiR.string.achievements_category_transactions)
+        AchievementCategory.BUDGET -> stringResource(UiR.string.achievements_category_budget)
+        AchievementCategory.SAVINGS -> stringResource(UiR.string.achievements_category_savings)
+        AchievementCategory.HABITS -> stringResource(UiR.string.achievements_category_habits)
+        AchievementCategory.STATISTICS -> stringResource(UiR.string.achievements_category_statistics)
+        AchievementCategory.MILESTONES -> stringResource(UiR.string.achievements_category_milestones)
+        AchievementCategory.SPECIAL -> stringResource(UiR.string.achievements_category_special)
+        AchievementCategory.IMPORT -> stringResource(UiR.string.achievements_category_import)
+        AchievementCategory.EXPORT -> stringResource(UiR.string.achievements_category_export)
     }
 }
 
 /**
  * Получает отображаемое имя редкости
  */
+@Composable
 private fun getRarityDisplayName(rarity: AchievementRarity): String {
     return when (rarity) {
-        AchievementRarity.COMMON -> "Обычное"
-        AchievementRarity.RARE -> "Редкое"
-        AchievementRarity.EPIC -> "Эпическое"
-        AchievementRarity.LEGENDARY -> "Легендарное"
+        AchievementRarity.COMMON -> stringResource(UiR.string.achievements_rarity_common)
+        AchievementRarity.RARE -> stringResource(UiR.string.achievements_rarity_rare)
+        AchievementRarity.EPIC -> stringResource(UiR.string.achievements_rarity_epic)
+        AchievementRarity.LEGENDARY -> stringResource(UiR.string.achievements_rarity_legendary)
     }
 }
 

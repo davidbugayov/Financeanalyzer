@@ -25,6 +25,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 
@@ -62,7 +63,7 @@ fun KeyMetricsCard(
                     .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = "Ключевые показатели",
+                text = stringResource(R.string.key_metrics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -81,7 +82,7 @@ fun KeyMetricsCard(
             ) {
                 Column {
                     Text(
-                        text = "Доход",
+                        text = stringResource(R.string.income),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -94,7 +95,7 @@ fun KeyMetricsCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Расход",
+                        text = stringResource(R.string.expense),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -216,22 +217,22 @@ fun KeyMetricsCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "0%",
+                    text = stringResource(R.string.savings_rate_0_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = "15%",
+                    text = stringResource(R.string.savings_rate_15_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = "30%",
+                    text = stringResource(R.string.savings_rate_30_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = "50%",
+                    text = stringResource(R.string.savings_rate_50_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

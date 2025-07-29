@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- Значения по умолчанию -->
-    <string name="default_source">Наличные</string>
-    <string name="default_destination">Наличные</string>
-    <string name="default_source_sber">Сбер</string>
     
-    <!-- Логирование -->
+    <!-- Значения по умолчанию -->
+    <string name="default_source">Источник по умолчанию</string>
+    <string name="default_destination">Назначение по умолчанию</string>
+    <string name="default_source_sber">Сбербанк</string>
+    
     <string name="log_wallet_migration_completed">Выполнена миграция %1$d кошельков с установкой type по умолчанию</string>
     <string name="log_error_getting_wallets">Ошибка при получении кошельков для транзакции %1$s</string>
     <string name="log_transaction_repository_not_set">TransactionRepository не установлен в WalletRepositoryImpl</string>
     <string name="log_error_getting_transaction">Ошибка при получении транзакции по ID: %1$s</string>
     <string name="log_error_string_conversion">Ошибка при преобразовании строки в список: %1$s</string>
     
-    <!-- Ошибки миграции базы данных -->
+    
     <string name="error_migration_1_2">Ошибка миграции с 1 на 2</string>
     <string name="error_migration_2_3">Ошибка миграции с 2 на 3</string>
     <string name="error_migration_3_4">Ошибка миграции с 3 на 4</string>
@@ -29,9 +29,9 @@
     <string name="error_migration_14_15">Ошибка миграции с 14 на 15</string>
     <string name="error_migration_15_16">Ошибка миграции с 15 на 16</string>
     
-    <!-- Успешные миграции -->
+    
     <string name="log_migration_14_15_completed">Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity</string>
     <string name="log_migration_15_14_completed">Выполнена миграция с версии 15 на 14 (обратная совместимость)</string>
     <string name="log_migration_15_16_completed">Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title</string>
     <string name="log_migration_16_15_completed">Выполнена миграция с версии 16 на 15 (обратная совместимость)</string>
-</resources> 
+</resources>

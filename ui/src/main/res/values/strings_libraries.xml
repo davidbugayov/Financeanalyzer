@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Библиотеки -->
+    <string name="library_jetpack_compose_name">Jetpack Compose</string>
+    <string name="library_jetpack_compose_description">Современный инструментарий для создания нативного UI на Android</string>
+    
+    <string name="library_kotlin_coroutines_name">Kotlin Coroutines</string>
+    <string name="library_kotlin_coroutines_description">Библиотека для асинхронного программирования в Kotlin</string>
+    
+    <string name="library_koin_name">Koin</string>
+    <string name="library_koin_description">Легковесная библиотека для внедрения зависимостей в Kotlin</string>
+    
+    <string name="library_room_name">Room</string>
+    <string name="library_room_description">Библиотека для работы с базами данных SQLite</string>
+    
+    <string name="library_material3_name">Material3</string>
+    <string name="library_material3_description">Компоненты Material Design 3 для Android</string>
+    
+    <string name="library_timber_name">Timber</string>
+    <string name="library_timber_description">Библиотека для логирования в Android</string>
+    
+    <string name="library_pdfbox_android_name">PDFBox Android</string>
+    <string name="library_pdfbox_android_description">Библиотека для работы с PDF-файлами в Android</string>
+    
+    <string name="library_apache_poi_name">Apache POI</string>
+    <string name="library_apache_poi_description">Библиотека для работы с документами Microsoft Office</string>
+    
+    <string name="library_navigation_compose_name">Navigation Compose</string>
+    <string name="library_navigation_compose_description">Библиотека для навигации в приложениях на Jetpack Compose</string>
+    
+    <string name="library_lifecycle_name">Lifecycle</string>
+    <string name="library_lifecycle_description">Библиотека для управления жизненным циклом компонентов Android</string>
+    
+    <string name="library_core_ktx_name">Core KTX</string>
+    <string name="library_core_ktx_description">Расширения Kotlin для основных библиотек Android</string>
+    
+    <string name="library_accompanist_name">Accompanist</string>
+    <string name="library_accompanist_description">Набор библиотек для расширения возможностей Jetpack Compose</string>
+    
+    <!-- Общие строки для библиотек -->
+    <string name="library_version_format">Версия: %1$s</string>
+    <string name="library_license_format">Лицензия: %1$s</string>
+</resources> 

@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.feature.profile.model
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 
 /**
  * Состояние экрана профиля.
@@ -20,8 +21,8 @@ data class ProfileState(
     // Настройки приложения
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isEditingTheme: Boolean = false,
-    val selectedLanguage: String = "Русский",
-    val selectedCurrency: String = "Рубль (₽)",
+    val selectedLanguage: String = "Русский", // TODO: Вынести в ресурсы
+    val selectedCurrency: String = "Рубль (₽)", // TODO: Вынести в ресурсы
     // Настройки уведомлений о транзакциях
     val isTransactionReminderEnabled: Boolean = false,
     val transactionReminderTime: Time? = null,
@@ -36,7 +37,7 @@ data class ProfileState(
     val totalIncomeCategories: Int = 0,
     val averageExpense: String = "0 ₽",
     val totalSourcesUsed: Int = 0,
-    val dateRange: String = "Все время",
+    val dateRange: String = StringResourceProvider.periodAllTime,
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,

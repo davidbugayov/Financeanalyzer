@@ -18,6 +18,8 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -321,11 +323,11 @@ class ProfileViewModel(
                                 val endStr = dateFormat.format(dateRange.second)
                                 "$startStr - $endStr"
                             } else {
-                                "Все время"
+                                StringResourceProvider.periodAllTime
                             }
                         } catch (exception: Exception) {
                             Timber.e(exception, "Ошибка при форматировании dateRange")
-                            "Все время"
+                            StringResourceProvider.periodAllTime
                         }
 
                     // Форматируем averageExpense в строку
@@ -362,7 +364,7 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = exception.message ?: "Неизвестная ошибка",
+                            error = exception.message ?: StringResourceProvider.errorUnknown,
                         )
                     }
                 } else {
@@ -370,7 +372,7 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = "Неизвестный тип результата",
+                            error = StringResourceProvider.errorUnknownType,
                         )
                     }
                 }
@@ -379,7 +381,7 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        error = "Неизвестная ошибка",
+                                                    error = StringResourceProvider.errorUnknown,
                     )
                 }
             }

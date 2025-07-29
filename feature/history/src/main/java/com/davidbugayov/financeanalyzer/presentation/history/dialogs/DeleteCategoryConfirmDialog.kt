@@ -5,7 +5,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог подтверждения удаления категории.
@@ -24,24 +26,24 @@ fun DeleteCategoryConfirmDialog(
 ) {
     val messageText =
         if (isDefaultCategory) {
-                    "Вы уверены, что хотите удалить категорию \"$category\"? Это действие нельзя отменить."
+            stringResource(UiR.string.dialog_delete_category_message_irreversible, category)
         } else {
-                    "Вы уверены, что хотите удалить категорию \"$category\"? Все транзакции в этой категории будут перемещены в категорию \"Другое\"."
+            stringResource(UiR.string.dialog_delete_category_message_default, category)
         }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Удалить") },
+        title = { Text(text = stringResource(UiR.string.dialog_delete_title)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = { Text(text = messageText) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(text = "Удалить")
+                Text(text = stringResource(UiR.string.dialog_delete_title))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "Отмена")
+                Text(text = stringResource(UiR.string.dialog_cancel))
             }
         },
     )

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие ошибки -->
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="error_unknown_type">Неизвестный тип результата</string>
+    <string name="error_action_failed">Не удалось выполнить действие: %1$s</string>
+    
+    <!-- Ошибки профиля -->
+    <string name="error_rustore_rating">Ошибка при запросе оценки в RuStore</string>
+    <string name="error_memory_tracking">Ошибка при отслеживании памяти</string>
+    
+    <!-- Ошибки истории транзакций -->
+    <string name="error_widgets_updated">Виджеты обновлены после удаления</string>
+    
+    <!-- Ошибки аналитики -->
+    <string name="error_profile_analytics">Ошибка при получении аналитики профиля</string>
+    
+    <!-- Ошибки достижений -->
+    <string name="error_achievements_loading">Ошибка при загрузке прогресса достижений</string>
+    <string name="error_achievement_progress_update">Ошибка при обновлении прогресса достижения %1$s</string>
+    <string name="error_achievement_check">Ошибка при проверке достижения %1$s</string>
+    
+    <!-- Ошибки кошельков -->
+    <string name="error_wallet_allocation_no_wallets">AllocateIncomeUseCase: нет кошельков, распределение не требуется</string>
+    <string name="error_wallet_allocation_no_limit">AllocateIncomeUseCase: общий лимит &lt;= 0, распределение пропущено</string>
+    <string name="error_wallet_allocation_failed">AllocateIncomeUseCase: ошибка распределения дохода: %1$s</string>
+    <string name="error_wallet_balance_rollback">UpdateWalletBalancesUseCase: Откат для %1$d оригинальных кошельков, сумма: %2$s</string>
+    <string name="error_wallet_balance_update_failed">UpdateWalletBalancesUseCase: Ошибка при обновлении баланса кошельков: %1$s</string>
+    
+    <!-- Ошибки валидации -->
+    <string name="error_validation_transaction">Validating transaction: amount=\'%1$s\', category=\'%2$s\', source=\'%3$s\'</string>
+    <string name="error_validation_result">Validation result: isValid=%1$s, amountError=%2$s, categoryError=%3$s, sourceError=%4$s, errorMsg=%5$s</string>
+</resources> 

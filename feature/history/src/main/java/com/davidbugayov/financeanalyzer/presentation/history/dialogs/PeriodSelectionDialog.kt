@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,7 +53,7 @@ fun PeriodSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text("Выбрать период") },
+                    title = { Text(stringResource(UiR.string.dialog_select_period_title)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -64,7 +66,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.ALL,
                     selectedPeriod = selectedPeriod,
-                    title = "Все время",
+                    title = stringResource(UiR.string.period_all_time),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -72,7 +74,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.DAY,
                     selectedPeriod = selectedPeriod,
-                    title = "День",
+                    title = stringResource(UiR.string.period_day),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -80,7 +82,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.WEEK,
                     selectedPeriod = selectedPeriod,
-                    title = "Неделя",
+                    title = stringResource(UiR.string.period_week),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -88,7 +90,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.MONTH,
                     selectedPeriod = selectedPeriod,
-                    title = "Месяц",
+                    title = stringResource(UiR.string.period_month),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -96,7 +98,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.QUARTER,
                     selectedPeriod = selectedPeriod,
-                    title = "Квартал",
+                    title = stringResource(UiR.string.period_quarter),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -104,7 +106,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.YEAR,
                     selectedPeriod = selectedPeriod,
-                    title = "Год",
+                    title = stringResource(UiR.string.period_year),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -112,7 +114,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.CUSTOM,
                     selectedPeriod = selectedPeriod,
-                    title = "Произвольный период",
+                    title = stringResource(UiR.string.period_custom),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -122,7 +124,7 @@ fun PeriodSelectionDialog(
 
                     // Поле начальной даты
                     DateField(
-                        label = "Начальная дата",
+                        label = stringResource(UiR.string.period_start_date),
                         date = startDate,
                         dateFormat = dateFormat,
                         onClick = onStartDateClick,
@@ -132,7 +134,7 @@ fun PeriodSelectionDialog(
 
                     // Поле конечной даты
                     DateField(
-                        label = "Конечная дата",
+                        label = stringResource(UiR.string.period_end_date),
                         date = endDate,
                         dateFormat = dateFormat,
                         onClick = onEndDateClick,
@@ -143,18 +145,18 @@ fun PeriodSelectionDialog(
         confirmButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onConfirm) {
-                    Text("Применить")
+                    Text(stringResource(UiR.string.dialog_apply))
                 }
             } else {
                 TextButton(onClick = onDismiss) {
-                    Text("Закрыть")
+                    Text(stringResource(UiR.string.dialog_close))
                 }
             }
         },
         dismissButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onDismiss) {
-                    Text("Отмена")
+                    Text(stringResource(UiR.string.dialog_cancel))
                 }
             }
         },

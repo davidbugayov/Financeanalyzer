@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.util.StringProvider
 
 /**
@@ -39,7 +41,7 @@ object RecommendationGenerator {
                     icon = Icons.Filled.Warning,
                     priority = UnifiedRecommendationPriority.CRITICAL,
                     impact = StringProvider.criticalLowSavingsImpact,
-                    category = "savings"
+                    category = stringResource(R.string.recommendation_category_savings)
                 )
             )
         }
@@ -53,7 +55,7 @@ object RecommendationGenerator {
                     icon = Icons.Filled.Savings,
                     priority = UnifiedRecommendationPriority.HIGH,
                     impact = StringProvider.improveSavingsRateImpact,
-                    category = "savings"
+                    category = stringResource(R.string.recommendation_category_savings)
                 )
             )
         }
@@ -67,7 +69,7 @@ object RecommendationGenerator {
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.MEDIUM,
                     impact = StringProvider.optimizeCategoryImpact,
-                    category = "expenses"
+                    category = stringResource(R.string.recommendation_category_expenses)
                 )
             )
         }
@@ -82,7 +84,7 @@ object RecommendationGenerator {
                     icon = Icons.Filled.PriorityHigh,
                     priority = priority,
                     impact = StringProvider.createEmergencyFundImpact,
-                    category = "emergency_fund"
+                    category = stringResource(R.string.recommendation_category_emergency_fund)
                 )
             )
         }
@@ -96,7 +98,7 @@ object RecommendationGenerator {
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.NORMAL,
                     impact = StringProvider.considerInvestmentsImpact,
-                    category = "investments"
+                    category = stringResource(R.string.recommendation_category_investments)
                 )
             )
         }
@@ -110,7 +112,7 @@ object RecommendationGenerator {
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.MEDIUM,
                     impact = StringProvider.manySmallExpensesImpact,
-                    category = "expenses"
+                    category = stringResource(R.string.recommendation_category_expenses)
                 )
             )
         }
@@ -133,10 +135,10 @@ object RecommendationGenerator {
         if (savingsRate < 10f) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Увеличьте сбережения",
+                    title = stringResource(R.string.recommendation_increase_savings_title),
                     icon = Icons.Filled.Savings,
                     priority = UnifiedRecommendationPriority.HIGH,
-                    category = "savings"
+                    category = stringResource(R.string.recommendation_category_savings)
                 )
             )
         }
@@ -144,10 +146,10 @@ object RecommendationGenerator {
         if (topExpenseCategory.isNotEmpty()) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Сократите расходы по категории $topExpenseCategory",
+                    title = stringResource(R.string.recommendation_optimize_category_title, topExpenseCategory),
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.MEDIUM,
-                    category = "expenses"
+                    category = stringResource(R.string.recommendation_category_expenses)
                 )
             )
         }
@@ -155,10 +157,10 @@ object RecommendationGenerator {
         if (monthsOfSavings < 3) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Создайте финансовую подушку",
+                    title = stringResource(R.string.recommendation_emergency_fund_title),
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.HIGH,
-                    category = "emergency_fund"
+                    category = stringResource(R.string.recommendation_category_emergency_fund)
                 )
             )
         }
@@ -166,10 +168,10 @@ object RecommendationGenerator {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Планируйте покупки на ${mostFrequentExpenseDay.lowercase()}",
+                    title = stringResource(R.string.recommendation_plan_purchases_title, mostFrequentExpenseDay.lowercase()),
                     icon = Icons.Filled.Lightbulb,
                     priority = UnifiedRecommendationPriority.NORMAL,
-                    category = "planning"
+                    category = stringResource(R.string.recommendation_category_planning)
                 )
             )
         }
@@ -180,6 +182,7 @@ object RecommendationGenerator {
     /**
      * Конвертация старых AdviceCard рекомендаций в унифицированный формат
      */
+    @Composable
     fun convertAdviceToUnified(
         title: String,
         description: String,
@@ -196,7 +199,7 @@ object RecommendationGenerator {
             description = description,
             icon = Icons.Filled.Lightbulb,
             priority = unifiedPriority,
-            category = "general"
+            category = stringResource(R.string.recommendation_category_general)
         )
     }
 }

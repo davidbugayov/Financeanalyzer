@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Общие строки достижений -->
+    <string name="achievements_overall_progress">Общий прогресс</string>
+    <string name="achievements_progress">Прогресс</string>
+    <string name="achievements_unlocked">Разблокировано</string>
+    
+    <!-- Фильтры достижений -->
+    <string name="achievements_filter_all">Все</string>
+    <string name="achievements_filter_unlocked">Разблокированные</string>
+    <string name="achievements_filter_locked">Заблокированные</string>
+    
+    <!-- Категории достижений -->
+    <string name="achievements_category_transactions">Транзакции</string>
+    <string name="achievements_category_budget">Бюджет</string>
+    <string name="achievements_category_savings">Накопления</string>
+    <string name="achievements_category_habits">Привычки</string>
+    <string name="achievements_category_statistics">Статистика</string>
+    <string name="achievements_category_milestones">Вехи</string>
+    <string name="achievements_category_special">Специальные</string>
+    <string name="achievements_category_import">Импорт</string>
+    <string name="achievements_category_export">Экспорт</string>
+    
+    <!-- Редкость достижений -->
+    <string name="achievements_rarity_common">Обычное</string>
+    <string name="achievements_rarity_rare">Редкое</string>
+    <string name="achievements_rarity_epic">Эпическое</string>
+    <string name="achievements_rarity_legendary">Легендарное</string>
+</resources> 

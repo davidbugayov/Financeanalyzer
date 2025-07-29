@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.statistics.R
@@ -762,22 +763,22 @@ private fun ProgressLabels() {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = "0%",
+            text = stringResource(R.string.savings_rate_0_percent),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-                            text = "15%",
+            text = stringResource(R.string.savings_rate_15_percent),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-                            text = "30%",
+            text = stringResource(R.string.savings_rate_30_percent),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-                            text = "50%",
+            text = stringResource(R.string.savings_rate_50_percent),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

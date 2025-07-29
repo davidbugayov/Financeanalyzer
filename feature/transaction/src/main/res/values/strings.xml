@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <!-- Логирование транзакций -->
     <string name="log_transaction_wallets_loaded">ТРАНЗАКЦИЯ: Загружено %1$d кошельков</string>
     <string name="log_error_loading_wallets">Ошибка при загрузке кошельков</string>
     <string name="log_transaction_validate_input">ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: \'%1$s\'</string>
@@ -10,13 +9,9 @@
     <string name="log_transaction_empty_category_error">ТРАНЗАКЦИЯ: Ошибка валидации - пустая категория</string>
     <string name="log_transaction_validation_result">ТРАНЗАКЦИЯ: validateInput - Результат: isValid=%1$b, hasAmountError=%2$b</string>
     <string name="log_transaction_initialize_screen">AddTransactionViewModel: initializeScreen завершена, forceExpense=%1$b, isExpense=%2$b</string>
-    
-    <!-- Ошибки валидации -->
     <string name="error_empty_amount">Пустая сумма</string>
     <string name="error_zero_amount">Сумма меньше или равна нулю: %1$s</string>
     <string name="error_empty_category">Пустая категория</string>
-    
-    <!-- Импорт CSV -->
     <string name="csv_date_format">yyyy-MM-dd</string>
     <string name="log_csv_delimiter_used">[%1$s] Использован разделитель: \'%2$s\', найдено колонок: %3$d</string>
     <string name="log_csv_date_not_found">[%1$s] Дата не найдена в колонке %2$d или не похожа на дату: \'%3$s\'</string>
@@ -24,8 +19,6 @@
     <string name="log_csv_amount_processed">[%1$s] Обработанная строка суммы: \'%2$s\', валюта: \'%3$s\'</string>
     <string name="log_csv_date_parsed">[%1$s] Успешно распарсили дату \'%2$s\' с форматом \'%3$s\'</string>
     <string name="error_date_parse_failed">Не удалось распарсить дату ни одним из доступных форматов</string>
-    
-    <!-- Базовый ViewModel -->
     <string name="log_error_updating_wallet_balance">Ошибка при обновлении баланса кошельков через UseCase</string>
     <string name="log_saving_expense_wallets">Сохраняем кошельки для списания: %1$d шт.</string>
     <string name="log_saving_income_wallets">Сохраняем кошельки для пополнения: %1$d шт.</string>
@@ -61,13 +54,6 @@
     <string name="log_category_usage_count">CATEGORY: Получено количество использований категории %1$s: %2$d</string>
     <string name="log_source_usage_increased">SOURCE: Увеличен счетчик использования источника: %1$s</string>
     <string name="log_source_usage_count">SOURCE: Получено количество использований источника %1$s: %2$d</string>
-    
-    <!-- Защищенные категории и источники -->
-    <string name="category_transfers">Переводы</string>
-    <string name="source_cash">Наличные</string>
-    <string name="source_card">Карта</string>
-    
-    <!-- Банки -->
     <string name="bank_sberbank_pdf">Сбербанк PDF</string>
     <string name="bank_ozon">Озон</string>
     <string name="log_sberbank_indicator_found">[%1$s Handler] Найден индикатор Сбербанка в содержимом файла</string>
@@ -75,8 +61,6 @@
     <string name="log_sberbank_import_created">[%1$s Handler] Создание SberbankPdfImportUseCase</string>
     <string name="log_ozon_import_created">[%1$s Handler] Создание OzonPdfImportUseCase</string>
     <string name="error_unsupported_file_type">[%1$s Handler] не поддерживает тип файла: %2$s</string>
-    
-    <!-- Сбербанк PDF -->
     <string name="sberbank_card_pattern">^(?:карте|карты)\\s+\\*{4}(\\d{4})$</string>
     <string name="sberbank_name">Сбербанк</string>
     <string name="sberbank_statement">Выписка по счёту</string>
@@ -85,14 +69,9 @@
     <string name="sberbank_date_operation">ДАТА ОПЕРАЦИИ</string>
     <string name="sberbank_category">КАТЕГОРИЯ</string>
     <string name="sberbank_headers">ДАТА ОПЕРАЦИИ (МСК),Дата обработки¹ и код авторизации,КАТЕГОРИЯ,Описание операции,СУММА В ВАЛЮТЕ СЧЁТА,Сумма в валюте,операции²,ОСТАТОК СРЕДСТВ,В ВАЛЮТЕ СЧЁТА</string>
-    
-    <!-- UI строки (уникальные для transaction) -->
-    <string name="edit_transaction_title">Редактировать транзакцию</string>
     <string name="add_transaction">Добавление транзакции</string>
     <string name="comment">Комментарий</string>
     <string name="import_transactions_hint">Нажмите, чтобы импортировать транзакции из разных банков</string>
-    
-    <!-- Кошельки (уникальные для transaction) -->
     <string name="wallet_selected_for_expense">Выбран кошелёк для списания</string>
     <string name="wallets_selected_for_expense">Выбрано %d кошельков для списания</string>
     <string name="wallet_selected_for_income">Выбран кошелёк для пополнения</string>
@@ -104,16 +83,12 @@
     <string name="selected_wallet_count">Выбран 1 кошелёк</string>
     <string name="selected_wallets_count">Выбрано: %d</string>
     <string name="select_wallets_content_description">Выбор кошельков</string>
-    
-    <!-- Диалоги (уникальные для transaction) -->
     <string name="attention_title">Внимание</string>
     <string name="unsaved_data_warning">У вас есть несохранённые данные. Если продолжите, изменения будут потеряны.</string>
     <string name="proceed_to_import">Перейти к импорту</string>
     <string name="transaction_saved_success">Транзакция успешно сохранена!</string>
     <string name="delete_category_confirmation">Вы уверены, что хотите удалить категорию «%1$s»?</string>
     <string name="delete_source_confirmation">Вы уверены, что хотите удалить источник «%1$s»?</string>
-    
-    <!-- Импорт/Экспорт (уникальные для transaction) -->
     <string name="import_error_unsupported_format">Неподдерживаемый формат файла. Пожалуйста, выберите CSV-файл или выписку из поддерживаемого банка.</string>
     <string name="import_error_unknown_format">Формат файла не распознан. Поддерживаются только CSV-файлы и выписки из банков.</string>
     <string name="import_error_file_read">Не удалось прочитать файл. Проверьте, что файл не поврежден.</string>
@@ -126,7 +101,6 @@
     <string name="import_error_pdf_extraction_failed">Не удалось извлечь текст из PDF или файл пуст: %1$s</string>
     <string name="import_error_invalid_format">Файл %1$s не является поддерживаемой выпиской или формат не поддерживается.</string>
     <string name="import_error_no_transactions_found">Не найдено ни одной транзакции в файле %1$s</string>
-    
     <string name="import_progress_starting">Начало импорта файла %1$s</string>
     <string name="import_progress_text_extracted_validating">Текст извлечен из %1$s, проверка формата…</string>
     <string name="import_progress_format_validated_skipping_headers">Формат файла %1$s проверен, пропуск заголовков…</string>
@@ -134,7 +108,6 @@
     <string name="import_progress_saving_transactions">Сохранение %1$d транзакций из файла %2$s…</string>
     <string name="import_progress_completed">Импорт файла %1$s завершен</string>
     <string name="import_success_message">Импортировано %1$d транзакций, пропущено %2$d из файла %3$s</string>
-    
     <string name="export_action_error">Не удалось выполнить действие: %1$s</string>
     <string name="error_no_csv_app">Нет приложения для открытия CSV-файлов. Вы можете открыть файл вручную через файловый менеджер или воспользоваться функцией "Поделиться".</string>
     <string name="export_section_title">Экспорт данных</string>
@@ -142,17 +115,13 @@
     <string name="export_section_title_emoji">📤 Экспорт данных</string>
     <string name="export_section_description_friendly">Скачайте все свои транзакции в формате CSV — удобно для Excel и других программ. Ваши данные всегда под рукой!</string>
     <string name="export_button_friendly">Экспортировать в CSV</string>
-    
-    <string name="import_permission_required">Требуется разрешение</string>
     <string name="import_instructions">1. Скачайте выписку из банка в формате CSV, PDF или XLSX\n2. Для Альфа-Банка лучше использовать формат XLSX\n3. Для Сбербанка поддерживается также PDF\n4. Нажмите кнопку ниже и выберите файл\n5. Дождитесь завершения импорта\n\nНажмите на банк ниже, чтобы узнать подробную инструкцию.</string>
     <string name="csv_requirements_title">Требования к CSV-файлу:</string>
     <string name="csv_requirements">• Столбцы: дата, сумма, категория\n• Разделитель: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
     <string name="import_in_progress">Импортируем транзакции…</string>
     <string name="import_progress_count">%1$d из %2$d транзакций</string>
     <string name="import_total_amount">Общая сумма: %d ₽</string>
-    <string name="import_section_title">Импорт транзакций</string>
     <string name="import_section_description">Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
-    <string name="import_button">Импортировать</string>
     <string name="csv_instructions_title">Формат CSV-файла для импорта:</string>
     <string name="csv_format_instructions">1. Первая строка может содержать заголовки столбцов\n2. Структура CSV файла должна содержать следующие столбцы:\n   - Столбец 1: ID или номер операции\n   - Столбец 2: Дата в формате yyyy-MM-dd_HH-mm-ss\n   - Столбец 3: Описание или категория\n   - Столбец 4: Сумма (с обозначением валюты)\n   - Столбец 5: Тип операции (Доход/Расход)\n   - Столбец 6: Примечание (опционально)\n   - Столбец 7: Источник средств (опционально)</string>
     <string name="csv_example_title">Пример содержимого файла:</string>
@@ -161,14 +130,11 @@
     <string name="csv_note">Убедитесь, что формат даты соответствует указанному шаблону yyyy-MM-dd_HH-mm-ss. Разделитель столбцов - запятая.</string>
     <string name="export_import">Экспорт и импорт</string>
     <string name="export_import_section">Секция экспорт и импорт</string>
-    <string name="import_transactions_content_description">Импорт транзакций</string>
     <string name="export_import_screen_title">Экспорт и импорт данных</string>
     <string name="profile_export_import_subtitle">Экспортируйте или импортируйте ваши данные</string>
     <string name="import_section_title_emoji">📥 Импорт транзакций</string>
     <string name="import_section_description_friendly">Загрузите выписку из банка или CSV-файл, чтобы добавить транзакции в приложение. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
     <string name="import_button_friendly">Импортировать из файла</string>
-    
-    <!-- CSV импорт -->
     <string name="csv_file_empty">CSV-файл пуст.</string>
     <string name="csv_format_check">Проверка формата CSV. Первая строка: %1$s. Разделитель: \'%2$s\'. Валиден: %3$s</string>
     <string name="csv_header_skipped">Пропущена строка заголовка: %1$s</string>
@@ -182,7 +148,6 @@
     <string name="csv_date_parse_error">Не удалось распарсить дату: \'%1$s\' с форматом \'%2$s\'. Строка: %3$s</string>
     <string name="csv_amount_parse_error">Не удалось распарсить сумму: \'%1$s\' (после очистки). Строка: %2$s</string>
     <string name="csv_amount_parse_exception">Ошибка при парсинге суммы: \'%1$s\'. %2$s</string>
-    <string name="csv_expense_value">Расход</string>
     <string name="csv_imported_note">Импортировано из Generic CSV</string>
     <string name="csv_parse_line_error">Ошибка при парсинге строки: %1$s. Config: %2$s</string>
     <string name="csv_skip_line_not_enough_columns">Пропуск строки из-за недостаточного количества колонок: %1$s</string>
@@ -190,10 +155,8 @@
     <string name="import_completed">Импорт завершён</string>
     <string name="import_summary">Импорт успешно завершен. Импортировано: %1$d, Пропущено: %2$d</string>
     <string name="header_date_operation">Дата операции</string>
-    <string name="header_date">Дата</string>
     <string name="header_operation">Операция</string>
     <string name="header_document">Документ</string>
-    <string name="header_amount">Сумма</string>
     <string name="supported_banks_title">Поддерживаемые банки</string>
     <string name="choose_file_button">Выбрать файл для импорта</string>
     <string name="bank_instructions_title">Как получить выписку из %s</string>
@@ -206,80 +169,78 @@
     <string name="importing_file">Импортируем файл…</string>
     <string name="progress_percentage">%d%%</string>
     <string name="how_to_import">Как импортировать транзакции</string>
-    
-    <!-- Инструкции по банкам -->
     <string name="sberbank_instructions_title">Через мобильное приложение Сбербанк:</string>
     <string name="sberbank_instructions">1. Войдите в приложение Сбербанк\n2. Нажмите на карту, по которой нужна выписка\n3. Нажмите на кнопку "Детали" (три точки в правом верхнем углу)\n4. Выберите "Выписка по счету"\n5. Укажите период, за который нужна выписка\n6. Нажмите "Сформировать выписку"\n7. После формирования нажмите "Скачать PDF"\n8. Сохраните файл на устройство\n9. Импортируйте этот PDF-файл в наше приложение</string>
     <string name="sberbank_note">Наше приложение поддерживает импорт PDF-выписок Сбербанка напрямую. Просто выберите скачанный PDF-файл и приложение автоматически распознает все транзакции.</string>
-    
     <string name="tinkoff_instructions_title">Через мобильное приложение Тинькофф:</string>
     <string name="tinkoff_instructions">1. Войдите в приложение Тинькофф\n2. Выберите карту или счет\n3. Нажмите на три точки в правом верхнем углу\n4. Выберите "Выписка и справки"\n5. Выберите "Выписка по счету"\n6. Выберите период выписки (например, за последний месяц)\n7. Нажмите "Заказать выписку"\n8. Дождитесь формирования выписки (обычно занимает несколько минут)\n9. Откройте полученную выписку и нажмите на значок "Поделиться"\n10. Сохраните PDF-файл на устройство\n11. Импортируйте сохраненный файл в наше приложение\n\nПриложение автоматически распознает новый формат выписок Тинькофф и корректно импортирует все транзакции.</string>
-    
     <string name="alfabank_instructions_title_mobile">Через мобильное приложение Альфа-Банк:</string>
     <string name="alfabank_instructions_mobile">1. Войдите в приложение Альфа-Банк\n2. Выберите карту или счет\n3. Нажмите на значок "Выписка" (иконка документа)\n4. Укажите период выписки\n5. Нажмите "Сформировать"\n6. После формирования нажмите "Скачать"\n7. Выберите формат XLSX (Excel)\n8. Сохраните файл на устройство\n9. Импортируйте этот XLSX-файл в наше приложение</string>
     <string name="alfabank_instructions_title_web">Через Альфа-Банк Онлайн (веб-версия):</string>
     <string name="alfabank_instructions_web">1. Войдите в личный кабинет Альфа-Банк Онлайн\n2. Выберите счет или карту\n3. Нажмите на кнопку "Выписка"\n4. Укажите период выписки\n5. Нажмите "Сформировать выписку"\n6. Выберите формат "Excel"\n7. Нажмите "Скачать"\n8. Импортируйте скачанный XLSX-файл в наше приложение</string>
     <string name="alfabank_note_important">Важно:</string>
     <string name="alfabank_note">Наше приложение поддерживает прямой импорт Excel-файлов (.xlsx) из Альфа-Банка. Просто выберите скачанный файл, и все транзакции будут автоматически распознаны.</string>
-    
     <string name="ozon_instructions_title">Через приложение Ozon Банк:</string>
     <string name="ozon_instructions">1. Войдите в приложение Ozon Банк\n2. Выберите карту или счет\n3. Перейдите во вкладку "Ещё" (внизу экрана)\n4. Выберите "Получить справку"\n5. Выберите "О движении средств"\n6. Выберите русский язык\n7. Выберите счет, по которому нужна выписка\n8. Укажите период выписки (например, последний месяц)\n9. Выберите тип операций (рекомендуем "Все операции")\n10. Нажмите "Сформировать"\n11. После формирования нажмите "Скачать PDF"\n12. Сохраните файл на устройство\n13. Импортируйте этот PDF-файл в наше приложение</string>
-    
     <string name="bank_generic_csv">Generic CSV (Configurable)</string>
-    
-    <!-- Источники транзакций -->
     <string name="transaction_source_sber">Сбер</string>
     <string name="transaction_source_alfa">Альфа-Банк</string>
     <string name="transaction_source_ozon">Озон</string>
     <string name="transaction_source_tinkoff">Тинькофф</string>
-    
-    <!-- Заметки транзакций -->
     <string name="transaction_note_time">Время: %1$s</string>
     <string name="transaction_note_auth_code">Код: %1$s</string>
     <string name="transaction_note_balance">Баланс: %1$s</string>
     <string name="transaction_note_details">Детали: %1$s</string>
     <string name="transaction_title_unknown">Неизвестная операция</string>
-    
-    <!-- Новые строки -->
     <string name="new_transaction_title">Новая транзакция</string>
     <string name="import_error">Ошибка при импорте</string>
-    <string name="import_unknown_error">Неизвестная ошибка</string>
-    
-    <!-- Недостающие строки для UI компонентов -->
-    <string name="add_button">Добавить</string>
-    <string name="add_button_text">Добавить</string>
-    <string name="save_button_text">Сохранить</string>
-    <string name="select_category">Выбрать категорию</string>
-    <string name="add_category">Добавить категорию</string>
-    <string name="add_custom_category">Добавить категорию</string>
-    <string name="category_name">Название категории</string>
-    <string name="select_icon">Выбрать иконку</string>
-    <string name="note_optional">Заметка (необязательно)</string>
-    <string name="select_source">Выбрать источник</string>
-    <string name="source_name">Название источника</string>
-    <string name="add_custom_source">Добавить источник</string>
-    <string name="delete_source">Удалить источник</string>
-    <string name="select_color">Выбрать цвет</string>
-    <string name="select_date_button">Выбрать дату</string>
-    <string name="income_type">Доход</string>
-    <string name="expense_type">Расход</string>
-    <string name="category">Категория</string>
-    <string name="source">Источник</string>
-    <string name="date">Дата</string>
     <string name="show_more_categories">Показать больше категорий</string>
     <string name="hide_categories">Скрыть категории</string>
+    <string name="import_error_unknown">Неизвестная ошибка при импорте</string>
+    <string name="add_button">Добавить</string>
+    <string name="select_category">Выбрать категорию</string>
+    <string name="add_category">Добавить категорию</string>
+    <string name="category_name">Название категории</string>
+    <string name="select_icon">Выбрать иконку</string>
+    <string name="category">Категория</string>
+    <string name="add_custom_category">Добавить категорию</string>
+    <string name="select_color">Выбрать цвет</string>
+    <string name="add_custom_source">Добавить источник</string>
+    <string name="source_name">Название источника</string>
+    <string name="date">Дата</string>
+    <string name="select_date_button">Выбрать дату</string>
+    <string name="note_optional">Заметка (необязательно)</string>
+    <string name="select_source">Выбрать источник</string>
+    <string name="delete_source">Удалить источник</string>
+    <string name="source">Источник</string>
+    <string name="income_type">Доход</string>
+    <string name="expense_type">Расход</string>
     <string name="deduct_from_wallets">Списать с кошельков</string>
     <string name="add_to_wallets">Добавить в кошельки</string>
-    <string name="select_wallets">Выбрать кошельки</string>
-    <string name="category_transfer">Перевод</string>
-    <string name="category_other">Другое</string>
+    <string name="header_date">Дата</string>
+    <string name="header_amount">Сумма</string>
+    <string name="csv_expense_value">Расход</string>
+    <string name="back">Назад</string>
+    <string name="import_section_title">Импорт</string>
+    <string name="import_transactions_title">Импорт транзакций</string>
+    <string name="add_button_text">Добавить</string>
     <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="category_other">Другое</string>
+    <string name="category_transfers">Переводы</string>
+    <string name="source_cash">Наличные</string>
+    <string name="source_card">Карта</string>
+    <string name="edit_transaction_title">Редактировать транзакцию</string>
+    <string name="save_button_text">Сохранить</string>
     <string name="error_title">Ошибка</string>
     <string name="dialog_cancel">Отмена</string>
-    <string name="dialog_delete">Удалить</string>
     <string name="delete_category_title">Удалить категорию</string>
+    <string name="dialog_delete">Удалить</string>
     <string name="delete_source_title">Удалить источник</string>
-    <string name="import_transactions_title">Импорт транзакций</string>
-    <string name="import_error_unknown">Неизвестная ошибка при импорте</string>
-    <string name="back">Назад</string>
+    <string name="import_button">Импортировать</string>
+    <string name="import_transactions_content_description">Импорт транзакций</string>
+    <string name="import_unknown_error">Неизвестная ошибка импорта</string>
+    
+    <!-- Дополнительные строки -->
+    <string name="category_transfer">Перевод</string>
+    <string name="select_wallets">Выбрать кошельки</string>
 </resources>

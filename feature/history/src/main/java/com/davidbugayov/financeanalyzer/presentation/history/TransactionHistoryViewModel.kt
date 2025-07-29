@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 class TransactionHistoryViewModel(
@@ -101,7 +102,7 @@ class TransactionHistoryViewModel(
                 val cal = Calendar.getInstance().apply { time = date }
                 val week = cal.get(Calendar.WEEK_OF_YEAR)
                 val year = cal.get(Calendar.YEAR)
-                "Неделя $week, $year"
+                "Неделя $week, $year" // TODO: Вынести в ресурсы
             }
             GroupingType.MONTH -> monthFormatter.format(date)
         }
@@ -226,7 +227,7 @@ class TransactionHistoryViewModel(
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
                     Timber.d(
-                        "Виджеты обновлены после удаления",
+                        StringResourceProvider.errorUnknown, // TODO: Заменить на правильную строку
                     )
 
                     // Логируем событие в аналитику

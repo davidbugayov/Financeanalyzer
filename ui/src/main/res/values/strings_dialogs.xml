@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Диалоги подтверждения -->
+    <string name="dialog_delete_title">Удалить</string>
+    <string name="dialog_confirm">Подтвердить</string>
+    <string name="dialog_apply">Применить</string>
+    <string name="dialog_close">Закрыть</string>
+    
+    <!-- Диалог удаления категории -->
+    <string name="dialog_delete_category_message_default">Вы уверены, что хотите удалить категорию \"%1$s\"? Все транзакции в этой категории будут перемещены в категорию \"Другое\".</string>
+    <string name="dialog_delete_category_message_irreversible">Вы уверены, что хотите удалить категорию \"%1$s\"? Это действие нельзя отменить.</string>
+    
+    <!-- Диалог выбора периода -->
+    <string name="dialog_select_period_title">Выбрать период</string>
+    <string name="period_start_date">Начальная дата</string>
+    <string name="period_end_date">Конечная дата</string>
+    
+    <!-- Диалог выбора категорий -->
+    <string name="dialog_select_all">Выбрать все</string>
+    <string name="dialog_collapse">Свернуть</string>
+    <string name="dialog_expand">Развернуть</string>
+</resources> 

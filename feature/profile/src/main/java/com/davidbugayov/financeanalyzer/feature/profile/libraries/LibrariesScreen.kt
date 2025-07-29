@@ -26,6 +26,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
@@ -63,13 +64,14 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                 )
             }
 
-            items(getLibraries()) { library ->
+            val libraries = getLibraries()
+            items(libraries) { library ->
                 LibraryItem(
-                    name = library.name,
+                    name = stringResource(library.nameResId),
                     version = library.version,
-                    description = library.description,
+                    description = stringResource(library.descriptionResId),
                     license = library.license,
-                    index = getLibraries().indexOf(library),
+                    index = libraries.indexOf(library),
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -145,7 +147,7 @@ private fun LibraryItem(
                 )
 
                 Text(
-                    text = "Версия: $version",
+                    text = stringResource(UiR.string.library_version_format, version),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor.copy(alpha = 0.9f),
                 )
@@ -184,84 +186,84 @@ private fun LibraryItem(
 }
 
 data class Library(
-    val name: String,
+    val nameResId: Int,
     val version: String,
-    val description: String,
+    val descriptionResId: Int,
     val license: String,
 )
 
 private fun getLibraries(): List<Library> {
     return listOf(
         Library(
-            name = "Jetpack Compose",
+            nameResId = UiR.string.library_jetpack_compose_name,
             version = "1.6.1",
-            description = "Современный инструментарий для создания нативного UI на Android",
+            descriptionResId = UiR.string.library_jetpack_compose_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Kotlin Coroutines",
+            nameResId = UiR.string.library_kotlin_coroutines_name,
             version = "1.8.0",
-            description = "Библиотека для асинхронного программирования в Kotlin",
+            descriptionResId = UiR.string.library_kotlin_coroutines_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Koin",
+            nameResId = UiR.string.library_koin_name,
             version = "3.5.3",
-            description = "Легковесная библиотека для внедрения зависимостей в Kotlin",
+            descriptionResId = UiR.string.library_koin_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Room",
+            nameResId = UiR.string.library_room_name,
             version = "2.6.1",
-            description = "Библиотека для работы с базами данных SQLite",
+            descriptionResId = UiR.string.library_room_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Material3",
+            nameResId = UiR.string.library_material3_name,
             version = "1.2.0",
-            description = "Компоненты Material Design 3 для Android",
+            descriptionResId = UiR.string.library_material3_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Timber",
+            nameResId = UiR.string.library_timber_name,
             version = "5.0.1",
-            description = "Библиотека для логирования в Android",
+            descriptionResId = UiR.string.library_timber_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "PDFBox Android",
+            nameResId = UiR.string.library_pdfbox_android_name,
             version = "2.0.27.0",
-            description = "Библиотека для работы с PDF-файлами в Android",
+            descriptionResId = UiR.string.library_pdfbox_android_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Apache POI",
+            nameResId = UiR.string.library_apache_poi_name,
             version = "5.2.5",
-            description = "Библиотека для работы с документами Microsoft Office",
+            descriptionResId = UiR.string.library_apache_poi_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Navigation Compose",
+            nameResId = UiR.string.library_navigation_compose_name,
             version = "2.7.7",
-            description = "Библиотека для навигации в приложениях на Jetpack Compose",
+            descriptionResId = UiR.string.library_navigation_compose_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Lifecycle",
+            nameResId = UiR.string.library_lifecycle_name,
             version = "2.7.0",
-            description = "Библиотека для управления жизненным циклом компонентов Android",
+            descriptionResId = UiR.string.library_lifecycle_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Core KTX",
+            nameResId = UiR.string.library_core_ktx_name,
             version = "1.12.0",
-            description = "Расширения Kotlin для основных библиотек Android",
+            descriptionResId = UiR.string.library_core_ktx_description,
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Accompanist",
+            nameResId = UiR.string.library_accompanist_name,
             version = "0.34.0",
-            description = "Набор библиотек для расширения возможностей Jetpack Compose",
+            descriptionResId = UiR.string.library_accompanist_description,
             license = "Apache License 2.0",
         ),
     )
