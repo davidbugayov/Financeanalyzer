@@ -11,17 +11,17 @@ import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics

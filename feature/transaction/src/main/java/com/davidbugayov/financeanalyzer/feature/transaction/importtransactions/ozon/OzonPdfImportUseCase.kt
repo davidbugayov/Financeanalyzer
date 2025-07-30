@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для импорта транзакций из PDF-выписок Ozon Банка
@@ -273,7 +273,11 @@ class OzonPdfImportUseCase(
                     savedCount++
                 } catch (e: Exception) {
                     Timber.e(e, "Ошибка при сохранении транзакции: ${e.message}")
-                    CrashLoggerProvider.crashLogger.logDatabaseError("saveBatchOfTransactions", "Ошибка при сохранении транзакции", e)
+                    CrashLoggerProvider.crashLogger.logDatabaseError(
+                        "saveBatchOfTransactions",
+                        "Ошибка при сохранении транзакции",
+                        e,
+                    )
                 }
             }
         } catch (e: Exception) {

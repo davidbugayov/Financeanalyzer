@@ -49,8 +49,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import com.davidbugayov.financeanalyzer.ui.R
+import kotlinx.coroutines.delay
 
 /**
  * Компонент для отображения уведомления о разблокированной ачивке

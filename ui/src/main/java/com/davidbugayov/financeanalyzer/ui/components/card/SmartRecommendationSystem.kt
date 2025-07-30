@@ -5,9 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,7 +27,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.ui.util.StringProvider
@@ -54,29 +51,33 @@ fun SmartRecommendationCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surface,
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        )
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        MaterialTheme.colorScheme.surface,
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    ),
+                            ),
                     )
-                )
-                .padding(20.dp)
+                    .padding(20.dp),
         ) {
             // Заголовок с улучшенной типографикой
             SmartCardHeader(
                 title = title,
                 subtitle = subtitle,
-                onDismiss = onDismiss
+                onDismiss = onDismiss,
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -86,20 +87,20 @@ fun SmartRecommendationCard(
                 SmartCardStyle.MINIMAL -> {
                     MinimalRecommendationsList(
                         recommendations = sortedRecommendations,
-                        onRecommendationClick = onRecommendationClick
+                        onRecommendationClick = onRecommendationClick,
                     )
                 }
                 SmartCardStyle.ENHANCED -> {
                     EnhancedRecommendationsList(
                         recommendations = sortedRecommendations,
                         showPriorityIndicator = showPriorityIndicator,
-                        onRecommendationClick = onRecommendationClick
+                        onRecommendationClick = onRecommendationClick,
                     )
                 }
                 SmartCardStyle.COMPACT -> {
                     CompactRecommendationsList(
                         recommendations = sortedRecommendations,
-                        onRecommendationClick = onRecommendationClick
+                        onRecommendationClick = onRecommendationClick,
                     )
                 }
             }
@@ -125,38 +126,40 @@ private fun SmartCardHeader(
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.5).sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface
+                style =
+                    MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.5).sp,
+                    ),
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.alpha(0.8f)
+                modifier = Modifier.alpha(0.8f),
             )
         }
 
         if (onDismiss != null) {
             IconButton(
                 onClick = onDismiss,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                    .size(36.dp)
+                modifier =
+                    Modifier
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                        .size(36.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = StringProvider.closeButton,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             }
         }
@@ -169,45 +172,49 @@ private fun SmartCardHeader(
 @Composable
 private fun MinimalRecommendationsList(
     recommendations: List<SmartRecommendation>,
-    onRecommendationClick: ((SmartRecommendation) -> Unit)?
+    onRecommendationClick: ((SmartRecommendation) -> Unit)?,
 ) {
     recommendations.forEach { recommendation ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = onRecommendationClick != null) {
-                    onRecommendationClick?.invoke(recommendation)
-                }
-                .padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = onRecommendationClick != null) {
+                        onRecommendationClick?.invoke(recommendation)
+                    }
+                    .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Иконка с анимацией
             var isPressed by remember { mutableStateOf(false) }
             val scale by animateFloatAsState(
                 targetValue = if (isPressed) 0.95f else 1f,
-                animationSpec = tween(150)
+                animationSpec = tween(150),
             )
 
             Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .scale(scale)
-                    .clip(CircleShape)
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                recommendation.priority.color.copy(alpha = 0.2f),
-                                recommendation.priority.color.copy(alpha = 0.1f)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(44.dp)
+                        .scale(scale)
+                        .clip(CircleShape)
+                        .background(
+                            brush =
+                                Brush.radialGradient(
+                                    colors =
+                                        listOf(
+                                            recommendation.priority.color.copy(alpha = 0.2f),
+                                            recommendation.priority.color.copy(alpha = 0.1f),
+                                        ),
+                                ),
+                        ),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = recommendation.icon,
                     contentDescription = null,
                     tint = recommendation.priority.color,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(22.dp),
                 )
             }
 
@@ -216,10 +223,11 @@ private fun MinimalRecommendationsList(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = recommendation.title,
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    style =
+                        MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 if (recommendation.description.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -227,7 +235,7 @@ private fun MinimalRecommendationsList(
                         text = recommendation.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.alpha(0.8f)
+                        modifier = Modifier.alpha(0.8f),
                     )
                 }
             }
@@ -242,7 +250,7 @@ private fun MinimalRecommendationsList(
 private fun EnhancedRecommendationsList(
     recommendations: List<SmartRecommendation>,
     showPriorityIndicator: Boolean,
-    onRecommendationClick: ((SmartRecommendation) -> Unit)?
+    onRecommendationClick: ((SmartRecommendation) -> Unit)?,
 ) {
     recommendations.forEachIndexed { index, recommendation ->
         var isVisible by remember { mutableStateOf(false) }
@@ -254,53 +262,60 @@ private fun EnhancedRecommendationsList(
 
         AnimatedVisibility(
             visible = isVisible,
-            enter = slideInVertically(
-                initialOffsetY = { it / 3 },
-                animationSpec = tween(400, easing = FastOutSlowInEasing)
-            ) + fadeIn(animationSpec = tween(400))
+            enter =
+                slideInVertically(
+                    initialOffsetY = { it / 3 },
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                ) + fadeIn(animationSpec = tween(400)),
         ) {
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.6f)
-                ),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.6f),
+                    ),
                 shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(enabled = onRecommendationClick != null) {
-                        onRecommendationClick?.invoke(recommendation)
-                    }
-                    .padding(bottom = 12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = onRecommendationClick != null) {
+                            onRecommendationClick?.invoke(recommendation)
+                        }
+                        .padding(bottom = 12.dp),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                 ) {
                     // Верхняя часть - компактная компоновка
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.Top
+                        verticalAlignment = Alignment.Top,
                     ) {
                         // Компактная иконка
                         Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            recommendation.priority.color.copy(alpha = 0.2f),
-                                            recommendation.priority.color.copy(alpha = 0.05f)
-                                        )
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        brush =
+                                            Brush.linearGradient(
+                                                colors =
+                                                    listOf(
+                                                        recommendation.priority.color.copy(alpha = 0.2f),
+                                                        recommendation.priority.color.copy(alpha = 0.05f),
+                                                    ),
+                                            ),
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 imageVector = recommendation.icon,
                                 contentDescription = null,
                                 tint = recommendation.priority.color,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                         }
 
@@ -308,23 +323,24 @@ private fun EnhancedRecommendationsList(
 
                         // Контент с ограниченной шириной
                         Column(
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         ) {
                             // Заголовок с приоритетом в одной строке
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
                                     text = recommendation.title,
-                                    style = MaterialTheme.typography.titleSmall.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
-                                    ),
+                                    style =
+                                        MaterialTheme.typography.titleSmall.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 15.sp,
+                                        ),
                                     color = MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f, fill = false),
-                                    maxLines = 2
+                                    maxLines = 2,
                                 )
 
                                 if (showPriorityIndicator) {
@@ -338,12 +354,13 @@ private fun EnhancedRecommendationsList(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = recommendation.description,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        lineHeight = 18.sp,
-                                        fontSize = 13.sp
-                                    ),
+                                    style =
+                                        MaterialTheme.typography.bodySmall.copy(
+                                            lineHeight = 18.sp,
+                                            fontSize = 13.sp,
+                                        ),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    maxLines = 3
+                                    maxLines = 3,
                                 )
                             }
                         }
@@ -355,7 +372,7 @@ private fun EnhancedRecommendationsList(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(16.dp),
                             )
                         }
                     }
@@ -367,27 +384,28 @@ private fun EnhancedRecommendationsList(
                         Surface(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Row(
                                 modifier = Modifier.padding(10.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(14.dp)
+                                    modifier = Modifier.size(14.dp),
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = recommendation.impact,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 12.sp
-                                    ),
+                                    style =
+                                        MaterialTheme.typography.bodySmall.copy(
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 12.sp,
+                                        ),
                                     color = MaterialTheme.colorScheme.primary,
-                                    maxLines = 2
+                                    maxLines = 2,
                                 )
                             }
                         }
@@ -404,39 +422,43 @@ private fun EnhancedRecommendationsList(
 @Composable
 private fun CompactRecommendationsList(
     recommendations: List<SmartRecommendation>,
-    onRecommendationClick: ((SmartRecommendation) -> Unit)?
+    onRecommendationClick: ((SmartRecommendation) -> Unit)?,
 ) {
     recommendations.forEachIndexed { index, recommendation ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = onRecommendationClick != null) {
-                    onRecommendationClick?.invoke(recommendation)
-                }
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.Top
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = onRecommendationClick != null) {
+                        onRecommendationClick?.invoke(recommendation)
+                    }
+                    .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.Top,
         ) {
             // Современная bullet точка
             Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(recommendation.priority.color)
-                    .padding(top = 8.dp)
+                modifier =
+                    Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(recommendation.priority.color)
+                        .padding(top = 8.dp),
             )
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Text(
-                text = if (recommendation.description.isNotEmpty()) {
-                    "${recommendation.title}: ${recommendation.description}"
-                } else {
-                    recommendation.title
-                },
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    lineHeight = 22.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface
+                text =
+                    if (recommendation.description.isNotEmpty()) {
+                        "${recommendation.title}: ${recommendation.description}"
+                    } else {
+                        recommendation.title
+                    },
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        lineHeight = 22.sp,
+                    ),
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }
@@ -450,21 +472,23 @@ private fun ModernPriorityBadge(priority: SmartRecommendationPriority) {
     Surface(
         shape = RoundedCornerShape(6.dp),
         color = priority.color.copy(alpha = 0.15f),
-        modifier = Modifier
-            .border(
-                width = 0.5.dp,
-                color = priority.color.copy(alpha = 0.4f),
-                shape = RoundedCornerShape(6.dp)
-            )
+        modifier =
+            Modifier
+                .border(
+                    width = 0.5.dp,
+                    color = priority.color.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(6.dp),
+                ),
     ) {
         Text(
             text = priority.emoji,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 11.sp
-            ),
+            style =
+                MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 11.sp,
+                ),
             color = priority.color,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
         )
     }
 }
@@ -479,34 +503,37 @@ private fun RecommendationStats(recommendations: List<SmartRecommendation>) {
 
     if (criticalCount > 0 || highCount > 0) {
         Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f),
+                ),
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Default.PriorityHigh,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = buildString {
-                        if (criticalCount > 0) append(StringProvider.criticalCountRecommendations(criticalCount))
-                        if (criticalCount > 0 && highCount > 0) append(", ")
-                        if (highCount > 0) append(StringProvider.importantCountRecommendations(highCount))
-                        append(StringProvider.recommendationsRequireAttention)
-                    },
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.Medium
-                    ),
-                    color = MaterialTheme.colorScheme.error
+                    text =
+                        buildString {
+                            if (criticalCount > 0) append(StringProvider.criticalCountRecommendations(criticalCount))
+                            if (criticalCount > 0 && highCount > 0) append(", ")
+                            if (highCount > 0) append(StringProvider.importantCountRecommendations(highCount))
+                            append(StringProvider.recommendationsRequireAttention)
+                        },
+                    style =
+                        MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
@@ -517,9 +544,9 @@ private fun RecommendationStats(recommendations: List<SmartRecommendation>) {
  * 🎨 Стили карточек
  */
 enum class SmartCardStyle {
-    MINIMAL,    // Минимальный стиль как HomeTipsCard
-    ENHANCED,   // Улучшенный с анимациями и приоритетами
-    COMPACT     // Компактный список
+    MINIMAL, // Минимальный стиль как HomeTipsCard
+    ENHANCED, // Улучшенный с анимациями и приоритетами
+    COMPACT, // Компактный список
 }
 
 /**
@@ -561,5 +588,5 @@ enum class RecommendationCategory(val label: String) {
     INVESTMENTS("Инвестиции"),
     EMERGENCY_FUND("Финансовая подушка"),
     HABITS("Привычки"),
-    GENERAL("Общие")
+    GENERAL("Общие"),
 }

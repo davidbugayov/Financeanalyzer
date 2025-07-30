@@ -286,4 +286,4 @@ class SecurityManager(
     fun disableBiometric() {
         preferencesManager.setBiometricEnabled(false)
     }
-} 
+}

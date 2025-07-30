@@ -16,4 +16,4 @@ val securityModule =
 
         // ViewModels
         viewModel { AuthViewModel(get()) }
-    } 
+    }

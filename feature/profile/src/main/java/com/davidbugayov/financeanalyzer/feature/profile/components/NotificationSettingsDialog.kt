@@ -36,12 +36,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import java.util.Locale
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог настройки уведомлений о транзакциях.

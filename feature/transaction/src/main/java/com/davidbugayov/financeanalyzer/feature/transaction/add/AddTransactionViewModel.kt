@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -16,6 +17,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseC
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -27,8 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
@@ -120,7 +120,9 @@ class AddTransactionViewModel(
                     Timber.d(
                         TransactionStringProvider.logTransactionZeroAmountError(amountValue.toFloat()),
                     )
-                    CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorZeroAmount(amountValue.toString())))
+                    CrashLoggerProvider.crashLogger.logException(
+                        Exception(TransactionStringProvider.errorZeroAmount(amountValue.toString())),
+                    )
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
@@ -145,7 +147,10 @@ class AddTransactionViewModel(
         }
 
         Timber.d(
-            TransactionStringProvider.logTransactionValidationResult(validationResult.isValid, validationResult.hasAmountError),
+            TransactionStringProvider.logTransactionValidationResult(
+                validationResult.isValid,
+                validationResult.hasAmountError,
+            ),
         )
         return validationResult.isValid
     }

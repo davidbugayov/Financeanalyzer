@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
@@ -53,7 +52,7 @@ fun SourceSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text(stringResource(R.string.select_sources)) },
+        title = { Text(stringResource(R.string.select_sources)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {

@@ -8,28 +8,35 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Утилитный класс для получения строковых ресурсов в модуле history
  */
 object StringProvider {
-    
     private var context: Context? = null
-    
+
     fun init(context: Context) {
         this.context = context.applicationContext
     }
-    
-    fun getString(@androidx.annotation.StringRes resId: Int): String {
+
+    fun getString(
+        @androidx.annotation.StringRes resId: Int,
+    ): String {
         return context?.getString(resId) ?: "String not found"
     }
-    
-    fun getString(@androidx.annotation.StringRes resId: Int, vararg formatArgs: Any): String {
+
+    fun getString(
+        @androidx.annotation.StringRes resId: Int,
+        vararg formatArgs: Any,
+    ): String {
         return context?.getString(resId, *formatArgs) ?: "String not found"
     }
-    
+
     // Статистика категорий
     val currentPeriod: String get() = getString(R.string.current_period)
     val previousPeriod: String get() = getString(R.string.previous_period)
+
     fun increaseByPercent(percent: Int): String = getString(R.string.increase_by_percent, percent)
+
     fun decreaseByPercent(percent: Int): String = getString(R.string.decrease_by_percent, percent)
+
     val noChanges: String get() = getString(R.string.no_changes)
-    
+
     // Диалоги выбора
     val selectCategory: String get() = getString(R.string.select_category)
     val selectSources: String get() = getString(R.string.select_sources)
@@ -41,22 +48,22 @@ object StringProvider {
     val apply: String get() = getString(R.string.apply)
     val close: String get() = getString(R.string.close)
     val cancel: String get() = getString(UiR.string.cancel)
-    
+
     // Группировка
     val groupByDays: String get() = getString(R.string.group_by_days)
     val groupByWeeks: String get() = getString(R.string.group_by_weeks)
     val groupByMonths: String get() = getString(R.string.group_by_months)
     val collapse: String get() = getString(R.string.collapse)
     val expand: String get() = getString(R.string.expand)
-    
+
     // Заголовки
     val transactionHistory: String get() = getString(R.string.transaction_history)
-    
+
     // Фильтры
     val categoryFilter: String get() = getString(R.string.category_filter)
     val sourceFilter: String get() = getString(R.string.source_filter)
     val filter: String get() = getString(R.string.filter)
-    
+
     // Периоды
     val allTime: String get() = getString(R.string.all_time)
     val day: String get() = getString(R.string.day)
@@ -67,18 +74,27 @@ object StringProvider {
     val customPeriod: String get() = getString(R.string.custom_period)
     val startDate: String get() = getString(R.string.start_date)
     val endDate: String get() = getString(R.string.end_date)
-    
+
     // Статистика
     fun categoriesSelected(categories: String): String = getString(R.string.categories_selected, categories)
+
     fun sourcesSelected(sources: String): String = getString(R.string.sources_selected, sources)
-    
+
     // Ошибки
     val errorLoadingTransactions: String get() = getString(R.string.error_loading_transactions)
-    
+
     // Форматирование
-    fun weekFormat(weekNumber: Int, year: Int): String = getString(R.string.week_format, weekNumber, year)
-    
+    fun weekFormat(
+        weekNumber: Int,
+        year: Int,
+    ): String = getString(R.string.week_format, weekNumber, year)
+
     // Недостающие строки
     val delete: String get() = getString(R.string.delete)
-    fun deleteSourceConfirmationMessage(source: String): String = getString(R.string.deleteSourceConfirmationMessage, source)
+
+    fun deleteSourceConfirmationMessage(source: String): String =
+        getString(
+            R.string.deleteSourceConfirmationMessage,
+            source,
+        )
 } 

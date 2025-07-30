@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Note
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,82 +50,86 @@ import java.util.Locale
  * @param transaction Транзакция для отображения
  */
 @Composable
-fun TransactionDetailContent(
-    transaction: Transaction,
-) {
+fun TransactionDetailContent(transaction: Transaction) {
     val isDarkTheme = isSystemInDarkTheme()
 
     Column(
-        modifier = Modifier.padding(vertical = 12.dp)
+        modifier = Modifier.padding(vertical = 12.dp),
     ) {
         // Основная сумма с цветом
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = if (transaction.isExpense) {
-                    LocalExpenseColor.current.copy(alpha = 0.08f)
-                } else {
-                    LocalIncomeColor.current.copy(alpha = 0.08f)
-                }
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor =
+                        if (transaction.isExpense) {
+                            LocalExpenseColor.current.copy(alpha = 0.08f)
+                        } else {
+                            LocalIncomeColor.current.copy(alpha = 0.08f)
+                        },
+                ),
             shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(0.dp)
+            elevation = CardDefaults.cardElevation(0.dp),
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Иконка в круге
                 Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (transaction.isExpense) {
-                                LocalExpenseColor.current.copy(alpha = 0.15f)
-                            } else {
-                                LocalIncomeColor.current.copy(alpha = 0.15f)
-                            }
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (transaction.isExpense) {
+                                    LocalExpenseColor.current.copy(alpha = 0.15f)
+                                } else {
+                                    LocalIncomeColor.current.copy(alpha = 0.15f)
+                                },
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Payments,
                         contentDescription = null,
-                        tint = if (transaction.isExpense) {
-                            LocalExpenseColor.current
-                        } else {
-                            LocalIncomeColor.current
-                        },
-                        modifier = Modifier.size(24.dp)
+                        tint =
+                            if (transaction.isExpense) {
+                                LocalExpenseColor.current
+                            } else {
+                                LocalIncomeColor.current
+                            },
+                        modifier = Modifier.size(24.dp),
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Text(
                     text = stringResource(R.string.amount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 Text(
-                    text = if (transaction.isExpense) {
-                        "-" + transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)
-                    } else {
-                        "+" + transaction.amount.formatForDisplay(useMinimalDecimals = true)
-                    },
+                    text =
+                        if (transaction.isExpense) {
+                            "-" + transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)
+                        } else {
+                            "+" + transaction.amount.formatForDisplay(useMinimalDecimals = true)
+                        },
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
-                    color = if (transaction.isExpense) {
-                        LocalExpenseColor.current
-                    } else {
-                        LocalIncomeColor.current
-                    },
-                    textAlign = TextAlign.Center
+                    color =
+                        if (transaction.isExpense) {
+                            LocalExpenseColor.current
+                        } else {
+                            LocalIncomeColor.current
+                        },
+                    textAlign = TextAlign.Center,
                 )
             }
         }
@@ -135,14 +139,15 @@ fun TransactionDetailContent(
         // Детали транзакции в карточке
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                ),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(0.dp)
+            elevation = CardDefaults.cardElevation(0.dp),
         ) {
             Column(
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
             ) {
                 // Категория
                 DetailRow(
@@ -153,14 +158,14 @@ fun TransactionDetailContent(
                             imageVector = Icons.Default.Category,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
-                    }
+                    },
                 )
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 )
 
                 // Дата
@@ -172,14 +177,14 @@ fun TransactionDetailContent(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
-                    }
+                    },
                 )
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 )
 
                 // Источник
@@ -189,11 +194,12 @@ fun TransactionDetailContent(
                     value = transaction.source,
                     icon = {
                         Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(effectiveSourceColor, CircleShape)
+                            modifier =
+                                Modifier
+                                    .size(20.dp)
+                                    .background(effectiveSourceColor, CircleShape),
                         )
-                    }
+                    },
                 )
 
                 // Заметка (если есть)
@@ -201,19 +207,19 @@ fun TransactionDetailContent(
                     if (note.isNotBlank()) {
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                         )
                         DetailRow(
                             label = stringResource(R.string.note),
                             value = note,
                             icon = {
                                 Icon(
-                                    imageVector = Icons.Default.Note,
+                                    imageVector = Icons.AutoMirrored.Filled.Note,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -226,34 +232,34 @@ fun TransactionDetailContent(
 private fun DetailRow(
     label: String,
     value: String,
-    icon: @Composable (() -> Unit)?
+    icon: @Composable (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // Иконка
         icon?.let {
             it()
             Spacer(modifier = Modifier.width(12.dp))
         }
-        
+
         // Контент
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

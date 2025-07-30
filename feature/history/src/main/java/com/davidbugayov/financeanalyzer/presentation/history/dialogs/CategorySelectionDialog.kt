@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 /**
@@ -78,7 +77,7 @@ fun CategorySelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text(stringResource(R.string.select_category)) },
+        title = { Text(stringResource(R.string.select_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(

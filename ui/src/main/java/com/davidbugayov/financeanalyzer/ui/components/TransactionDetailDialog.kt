@@ -36,23 +36,23 @@ fun TransactionDetailDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { 
+        title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = stringResource(R.string.transaction_details),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                ) 
+                    fontWeight = FontWeight.Bold,
+                )
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
@@ -63,12 +63,12 @@ fun TransactionDetailDialog(
         confirmButton = {
             TextButton(
                 onClick = onDismiss,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.close),
                     fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
                 )
             }
         },

@@ -5,12 +5,12 @@ import android.os.Build
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.CrashLogger
+import com.davidbugayov.financeanalyzer.analytics.CrashlyticsUtils
+import io.appmetrica.analytics.AppMetrica
 import java.io.PrintWriter
 import java.io.StringWriter
 import timber.log.Timber
-import io.appmetrica.analytics.AppMetrica
-import com.davidbugayov.financeanalyzer.analytics.CrashLogger
-import com.davidbugayov.financeanalyzer.analytics.CrashlyticsUtils
 
 /**
  * Централизованная система отчетности о сбоях, которая перехватывает неперехваченные исключения
@@ -21,6 +21,7 @@ object CrashReporter : CrashLogger {
 
     @Volatile
     var instance: CrashLogger = this
+
     @JvmStatic
     var isAppMetricaInitialized: Boolean = false
 
@@ -219,7 +220,11 @@ object CrashReporter : CrashLogger {
 
     override fun logException(throwable: Throwable) {
         if (!isAppMetricaInitialized) {
-            Timber.e(throwable, "[CrashReporter] AppMetrica не инициализирована, ошибка только в логах: %s", throwable.message)
+            Timber.e(
+                throwable,
+                "[CrashReporter] AppMetrica не инициализирована, ошибка только в логах: %s",
+                throwable.message,
+            )
             return
         }
         try {
@@ -229,7 +234,11 @@ object CrashReporter : CrashLogger {
         }
     }
 
-    override fun logDatabaseError(operation: String, errorMessage: String, throwable: Throwable?) {
+    override fun logDatabaseError(
+        operation: String,
+        errorMessage: String,
+        throwable: Throwable?,
+    ) {
         trackDatabaseError(operation, errorMessage, throwable)
     }
 

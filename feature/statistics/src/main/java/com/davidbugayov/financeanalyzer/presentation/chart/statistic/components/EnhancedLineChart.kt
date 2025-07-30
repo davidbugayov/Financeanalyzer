@@ -56,7 +56,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.hypot
-import timber.log.Timber
 
 // --- Constants for Dimensions ---
 private val DefaultSelectionThreshold: Dp = 30.dp

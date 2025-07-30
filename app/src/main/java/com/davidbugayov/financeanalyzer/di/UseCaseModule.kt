@@ -8,9 +8,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateFinanc
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculatePeerComparisonUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateRetirementForecastUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetCategoriesWithAmountUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl

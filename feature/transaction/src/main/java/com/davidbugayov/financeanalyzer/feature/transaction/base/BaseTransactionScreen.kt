@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
@@ -52,6 +51,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Tran
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog

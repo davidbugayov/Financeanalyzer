@@ -7,8 +7,8 @@ import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -12,7 +12,6 @@ import com.davidbugayov.financeanalyzer.ui.R
  * Создан профессиональным маркетологом с учетом психологии потребителей
  */
 object SmartRecommendationGenerator {
-
     /**
      * 🎯 Генерация критически важных рекомендаций для финансового здоровья
      */
@@ -24,7 +23,7 @@ object SmartRecommendationGenerator {
         topExpenseCategory: String = "",
         topCategoryPercentage: Float = 0f,
         totalTransactions: Int = 0,
-        unusualSpendingDetected: Boolean = false
+        unusualSpendingDetected: Boolean = false,
     ): List<SmartRecommendation> {
         val recommendations = mutableListOf<SmartRecommendation>()
 
@@ -39,8 +38,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.Warning,
                     priority = SmartRecommendationPriority.CRITICAL,
                     impact = stringResource(R.string.rec_critical_emergency_impact),
-                    category = RecommendationCategory.EMERGENCY_FUND
-                )
+                    category = RecommendationCategory.EMERGENCY_FUND,
+                ),
             )
         }
 
@@ -53,8 +52,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.PriorityHigh,
                     priority = SmartRecommendationPriority.CRITICAL,
                     impact = stringResource(R.string.rec_critical_savings_impact),
-                    category = RecommendationCategory.SAVINGS
-                )
+                    category = RecommendationCategory.SAVINGS,
+                ),
             )
         }
 
@@ -67,8 +66,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.Error,
                     priority = SmartRecommendationPriority.CRITICAL,
                     impact = stringResource(R.string.rec_critical_debt_impact, (debtToIncomeRatio * 100).toInt()),
-                    category = RecommendationCategory.EXPENSES
-                )
+                    category = RecommendationCategory.EXPENSES,
+                ),
             )
         }
 
@@ -83,8 +82,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.Savings,
                     priority = SmartRecommendationPriority.HIGH,
                     impact = stringResource(R.string.rec_high_emergency_impact),
-                    category = RecommendationCategory.EMERGENCY_FUND
-                )
+                    category = RecommendationCategory.EMERGENCY_FUND,
+                ),
             )
         }
 
@@ -97,8 +96,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.AccountBalance,
                     priority = SmartRecommendationPriority.HIGH,
                     impact = stringResource(R.string.rec_high_savings_impact),
-                    category = RecommendationCategory.SAVINGS
-                )
+                    category = RecommendationCategory.SAVINGS,
+                ),
             )
         }
 
@@ -111,8 +110,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.PieChart,
                     priority = SmartRecommendationPriority.HIGH,
                     impact = stringResource(R.string.rec_high_expense_impact),
-                    category = RecommendationCategory.EXPENSES
-                )
+                    category = RecommendationCategory.EXPENSES,
+                ),
             )
         }
 
@@ -127,8 +126,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.ShoppingCart,
                     priority = SmartRecommendationPriority.MEDIUM,
                     impact = stringResource(R.string.rec_medium_habits_impact),
-                    category = RecommendationCategory.HABITS
-                )
+                    category = RecommendationCategory.HABITS,
+                ),
             )
         }
 
@@ -141,8 +140,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.Default.Analytics,
                     priority = SmartRecommendationPriority.MEDIUM,
                     impact = stringResource(R.string.rec_medium_unusual_impact),
-                    category = RecommendationCategory.BUDGETING
-                )
+                    category = RecommendationCategory.BUDGETING,
+                ),
             )
         }
 
@@ -157,8 +156,8 @@ object SmartRecommendationGenerator {
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = SmartRecommendationPriority.NORMAL,
                     impact = stringResource(R.string.rec_normal_invest_impact),
-                    category = RecommendationCategory.INVESTMENTS
-                )
+                    category = RecommendationCategory.INVESTMENTS,
+                ),
             )
         }
 
@@ -170,8 +169,8 @@ object SmartRecommendationGenerator {
                 icon = Icons.Default.Schedule,
                 priority = SmartRecommendationPriority.NORMAL,
                 impact = stringResource(R.string.rec_normal_weekly_impact),
-                category = RecommendationCategory.HABITS
-            )
+                category = RecommendationCategory.HABITS,
+            ),
         )
 
         return recommendations.sortedBy { it.priority.order }
@@ -188,29 +187,29 @@ object SmartRecommendationGenerator {
                 description = stringResource(R.string.rec_onboarding_achievements_desc),
                 icon = Icons.Default.EmojiEvents,
                 priority = SmartRecommendationPriority.NORMAL,
-                category = RecommendationCategory.GENERAL
+                category = RecommendationCategory.GENERAL,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_onboarding_import_title),
                 description = stringResource(R.string.rec_onboarding_import_desc),
                 icon = Icons.Default.Upload,
                 priority = SmartRecommendationPriority.HIGH,
-                category = RecommendationCategory.GENERAL
+                category = RecommendationCategory.GENERAL,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_onboarding_stats_title),
                 description = stringResource(R.string.rec_onboarding_stats_desc),
                 icon = Icons.Default.Analytics,
                 priority = SmartRecommendationPriority.MEDIUM,
-                category = RecommendationCategory.GENERAL
+                category = RecommendationCategory.GENERAL,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_onboarding_tips_title),
                 description = stringResource(R.string.rec_onboarding_tips_desc),
                 icon = Icons.Default.Lightbulb,
                 priority = SmartRecommendationPriority.NORMAL,
-                category = RecommendationCategory.GENERAL
-            )
+                category = RecommendationCategory.GENERAL,
+            ),
         )
     }
 
@@ -219,27 +218,29 @@ object SmartRecommendationGenerator {
      */
     @Composable
     fun generateStatisticsTips(): List<SmartRecommendation> {
-        val tips = listOf(
-            stringResource(R.string.rec_stats_tip1),
-            stringResource(R.string.rec_stats_tip2),
-            stringResource(R.string.rec_stats_tip3),
-            stringResource(R.string.rec_stats_tip4),
-            stringResource(R.string.rec_stats_tip5)
-        )
+        val tips =
+            listOf(
+                stringResource(R.string.rec_stats_tip1),
+                stringResource(R.string.rec_stats_tip2),
+                stringResource(R.string.rec_stats_tip3),
+                stringResource(R.string.rec_stats_tip4),
+                stringResource(R.string.rec_stats_tip5),
+            )
 
         return tips.mapIndexed { index, tip ->
             SmartRecommendation(
                 title = tip,
                 description = stringResource(R.string.rec_stats_tip_desc, index + 1),
-                icon = when (index % 5) {
-                    0 -> Icons.Default.Compare
-                    1 -> Icons.Default.PieChart
-                    2 -> Icons.Default.AccountBalanceWallet
-                    3 -> Icons.Default.Savings
-                    else -> Icons.Default.Psychology
-                },
+                icon =
+                    when (index % 5) {
+                        0 -> Icons.Default.Compare
+                        1 -> Icons.Default.PieChart
+                        2 -> Icons.Default.AccountBalanceWallet
+                        3 -> Icons.Default.Savings
+                        else -> Icons.Default.Psychology
+                    },
                 priority = SmartRecommendationPriority.NORMAL,
-                category = RecommendationCategory.GENERAL
+                category = RecommendationCategory.GENERAL,
             )
         }
     }
@@ -256,7 +257,7 @@ object SmartRecommendationGenerator {
                 icon = Icons.Default.Percent,
                 priority = SmartRecommendationPriority.HIGH,
                 impact = stringResource(R.string.rec_budget_rule_impact),
-                category = RecommendationCategory.BUDGETING
+                category = RecommendationCategory.BUDGETING,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_budget_auto_title),
@@ -264,7 +265,7 @@ object SmartRecommendationGenerator {
                 icon = Icons.Default.AutoMode,
                 priority = SmartRecommendationPriority.HIGH,
                 impact = stringResource(R.string.rec_budget_auto_impact),
-                category = RecommendationCategory.SAVINGS
+                category = RecommendationCategory.SAVINGS,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_budget_track_title),
@@ -272,7 +273,7 @@ object SmartRecommendationGenerator {
                 icon = Icons.Default.Visibility,
                 priority = SmartRecommendationPriority.MEDIUM,
                 impact = stringResource(R.string.rec_budget_track_impact),
-                category = RecommendationCategory.HABITS
+                category = RecommendationCategory.HABITS,
             ),
             SmartRecommendation(
                 title = stringResource(R.string.rec_budget_category_title),
@@ -280,17 +281,15 @@ object SmartRecommendationGenerator {
                 icon = Icons.Default.Category,
                 priority = SmartRecommendationPriority.MEDIUM,
                 impact = stringResource(R.string.rec_budget_category_impact),
-                category = RecommendationCategory.BUDGETING
-            )
+                category = RecommendationCategory.BUDGETING,
+            ),
         )
     }
 
     /**
      * 🔄 Конвертация старых рекомендаций в новый формат
      */
-    fun convertLegacyRecommendations(
-        oldRecommendations: List<Any>
-    ): List<SmartRecommendation> {
+    fun convertLegacyRecommendations(oldRecommendations: List<Any>): List<SmartRecommendation> {
         // Здесь можно добавить логику конвертации старых форматов
         return emptyList()
     }

@@ -14,10 +14,9 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
-import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,7 +27,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import timber.log.Timber
 
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
@@ -44,16 +42,30 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
 
     private var allTransactions: List<Transaction> = emptyList()
 
-    private fun formatPeriod(periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType, startDate: java.util.Date, endDate: java.util.Date): String {
+    private fun formatPeriod(
+        periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType,
+        startDate: java.util.Date,
+        endDate: java.util.Date,
+    ): String {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         return when (periodType) {
             com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL -> "Все время"
             com.davidbugayov.financeanalyzer.navigation.model.PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.WEEK -> "Неделя: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.MONTH -> "Месяц: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.QUARTER -> "Квартал: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.YEAR -> "Год: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM -> "Произвольный: ${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.WEEK -> "Неделя: ${dateFormat.format(
+                startDate,
+            )} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.MONTH -> "Месяц: ${dateFormat.format(
+                startDate,
+            )} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.QUARTER -> "Квартал: ${dateFormat.format(
+                startDate,
+            )} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.YEAR -> "Год: ${dateFormat.format(
+                startDate,
+            )} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM -> "Произвольный: ${dateFormat.format(
+                startDate,
+            )} - ${dateFormat.format(endDate)}"
         }
     }
 

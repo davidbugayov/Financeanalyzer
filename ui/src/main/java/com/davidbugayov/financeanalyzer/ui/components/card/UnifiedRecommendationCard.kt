@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.ui.components.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,9 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 
 /**
@@ -52,14 +50,16 @@ fun UnifiedRecommendationCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             // Заголовок карточки
             Row(
@@ -94,19 +94,19 @@ fun UnifiedRecommendationCard(
                     RecommendationCardStyle.SIMPLE -> {
                         SimpleRecommendationsList(
                             recommendations = recommendations,
-                            onRecommendationClick = onRecommendationClick
+                            onRecommendationClick = onRecommendationClick,
                         )
                     }
                     RecommendationCardStyle.DETAILED -> {
                         DetailedRecommendationsList(
                             recommendations = recommendations,
-                            onRecommendationClick = onRecommendationClick
+                            onRecommendationClick = onRecommendationClick,
                         )
                     }
                     RecommendationCardStyle.COMPACT -> {
                         CompactRecommendationsList(
                             recommendations = recommendations,
-                            onRecommendationClick = onRecommendationClick
+                            onRecommendationClick = onRecommendationClick,
                         )
                     }
                 }
@@ -125,12 +125,13 @@ private fun SimpleRecommendationsList(
 ) {
     recommendations.forEach { recommendation ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = onRecommendationClick != null) {
-                    onRecommendationClick?.invoke(recommendation)
-                }
-                .padding(vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = onRecommendationClick != null) {
+                        onRecommendationClick?.invoke(recommendation)
+                    }
+                    .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -170,15 +171,17 @@ private fun DetailedRecommendationsList(
 ) {
     recommendations.forEachIndexed { index, recommendation ->
         Card(
-            colors = CardDefaults.cardColors(
-                containerColor = recommendation.priority.color.copy(alpha = 0.08f),
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = recommendation.priority.color.copy(alpha = 0.08f),
+                ),
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = onRecommendationClick != null) {
-                    onRecommendationClick?.invoke(recommendation)
-                },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = onRecommendationClick != null) {
+                        onRecommendationClick?.invoke(recommendation)
+                    },
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -188,10 +191,11 @@ private fun DetailedRecommendationsList(
                 ) {
                     // Иконка с приоритетом
                     Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(recommendation.priority.color.copy(alpha = 0.15f)),
+                        modifier =
+                            Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(recommendation.priority.color.copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -278,12 +282,13 @@ private fun CompactRecommendationsList(
 ) {
     recommendations.forEachIndexed { index, recommendation ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = onRecommendationClick != null) {
-                    onRecommendationClick?.invoke(recommendation)
-                }
-                .padding(vertical = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = onRecommendationClick != null) {
+                        onRecommendationClick?.invoke(recommendation)
+                    }
+                    .padding(vertical = 4.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Text(
@@ -292,11 +297,12 @@ private fun CompactRecommendationsList(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = if (recommendation.description.isNotEmpty()) {
-                    "${recommendation.title}: ${recommendation.description}"
-                } else {
-                    recommendation.title
-                },
+                text =
+                    if (recommendation.description.isNotEmpty()) {
+                        "${recommendation.title}: ${recommendation.description}"
+                    } else {
+                        recommendation.title
+                    },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -313,10 +319,11 @@ private fun CompactRecommendationsList(
 @Composable
 private fun PriorityBadge(priority: UnifiedRecommendationPriority) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(priority.color.copy(alpha = 0.15f))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(priority.color.copy(alpha = 0.15f))
+                .padding(horizontal = 6.dp, vertical = 2.dp),
     ) {
         Text(
             text = priority.label,
@@ -359,7 +366,7 @@ enum class UnifiedRecommendationPriority(
  * Стили отображения карточек рекомендаций
  */
 enum class RecommendationCardStyle {
-    SIMPLE,    // Простые строки с иконками (как BudgetTip)
-    DETAILED,  // Детальные карточки с приоритетами (как RecommendationsCard)
-    COMPACT,   // Компактный список с буллетами (как ActionableTipsCard)
+    SIMPLE, // Простые строки с иконками (как BudgetTip)
+    DETAILED, // Детальные карточки с приоритетами (как RecommendationsCard)
+    COMPACT, // Компактный список с буллетами (как ActionableTipsCard)
 }

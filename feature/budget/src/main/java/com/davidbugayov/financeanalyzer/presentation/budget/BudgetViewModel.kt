@@ -183,8 +183,9 @@ class BudgetViewModel(
         val totalWalletBalance = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.balance) }
 
         // Находим кошельки с превышением лимита
-        val overBudgetWallets = wallets.filter { it.limit.amount > java.math.BigDecimal.ZERO && it.spent.amount > it.limit.amount }
-            .map { it.name }
+        val overBudgetWallets =
+            wallets.filter { it.limit.amount > java.math.BigDecimal.ZERO && it.spent.amount > it.limit.amount }
+                .map { it.name }
 
         _state.update {
             it.copy(

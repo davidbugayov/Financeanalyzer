@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.ui.R
-
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
@@ -86,7 +85,10 @@ object CategoryProvider {
             )
         }
 
-    private fun getCategoryNameByKey(context: Context, key: String): String {
+    private fun getCategoryNameByKey(
+        context: Context,
+        key: String,
+    ): String {
         return when (key) {
             "food" -> context.getString(R.string.category_food)
             "transport" -> context.getString(R.string.category_transport)

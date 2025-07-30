@@ -457,7 +457,10 @@ private fun ModernFilters(
                             text =
                                 when (filter) {
                                     AchievementFilter.ALL -> stringResource(UiR.string.achievements_filter_all)
-                                    AchievementFilter.UNLOCKED -> stringResource(UiR.string.achievements_filter_unlocked)
+                                    AchievementFilter.UNLOCKED ->
+                                        stringResource(
+                                            UiR.string.achievements_filter_unlocked,
+                                        )
                                     AchievementFilter.LOCKED -> stringResource(UiR.string.achievements_filter_locked)
                                 },
                         )

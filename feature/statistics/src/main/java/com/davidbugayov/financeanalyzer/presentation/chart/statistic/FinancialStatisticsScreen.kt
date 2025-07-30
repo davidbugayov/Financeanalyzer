@@ -21,13 +21,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -72,21 +68,15 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.E
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
-import com.davidbugayov.financeanalyzer.ui.components.card.AdviceCard
-import com.davidbugayov.financeanalyzer.ui.components.card.AdvicePriority
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
-import com.davidbugayov.financeanalyzer.utils.DateUtils
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.random.Random
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import kotlin.random.Random
-import androidx.compose.material.icons.outlined.Lightbulb
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -131,13 +121,29 @@ fun FinancialStatisticsScreen(
     }
 
     // Список динамических советов
-    val tips = listOf(
-        Pair("Совет по статистике", "Изучайте свои финансовые привычки через графики и аналитику — это поможет принимать более осознанные решения!"),
-        Pair("Сравнивайте периоды", "Смотрите, как меняются ваши расходы и доходы от месяца к месяцу — ищите тренды!"),
-        Pair("Категории под контролем", "Анализируйте, на что уходит больше всего денег, и оптимизируйте свои траты."),
-        Pair("Планируйте бюджет", "Используйте аналитику для постановки финансовых целей и отслеживания прогресса."),
-        Pair("Следите за сбережениями", "Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.")
-    )
+    val tips =
+        listOf(
+            Pair(
+                "Совет по статистике",
+                "Изучайте свои финансовые привычки через графики и аналитику — это поможет принимать более осознанные решения!",
+            ),
+            Pair(
+                "Сравнивайте периоды",
+                "Смотрите, как меняются ваши расходы и доходы от месяца к месяцу — ищите тренды!",
+            ),
+            Pair(
+                "Категории под контролем",
+                "Анализируйте, на что уходит больше всего денег, и оптимизируйте свои траты.",
+            ),
+            Pair(
+                "Планируйте бюджет",
+                "Используйте аналитику для постановки финансовых целей и отслеживания прогресса.",
+            ),
+            Pair(
+                "Следите за сбережениями",
+                "Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.",
+            ),
+        )
     var tipIndex by remember { mutableStateOf(Random.nextInt(tips.size)) }
     val currentTip = tips[tipIndex]
     var tipRequestedFromTopBar by remember { mutableStateOf(false) }
@@ -219,11 +225,11 @@ fun FinancialStatisticsScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Lightbulb,
                                 contentDescription = "Показать совет",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
-                }
+                },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -265,7 +271,7 @@ fun FinancialStatisticsScreen(
                                 showTip = false
                                 tipRequestedFromTopBar = false
                             },
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                         )
                     }
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
@@ -588,15 +594,17 @@ fun FinancialStatisticsScreen(
                                     // Блок критических финансовых рекомендаций
                                     if (state.recommendations.isNotEmpty()) {
                                         // Генерируем умные рекомендации на основе реальных данных
-                                        val smartRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                                            savingsRate = state.savingsRate.toFloat(),
-                                            monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
-                                            topExpenseCategory = state.expensesByCategory.maxByOrNull { it.value.amount }?.key ?: "",
-                                            topCategoryPercentage = (state.expensesByCategory.maxByOrNull { it.value.amount }?.value?.amount?.toFloat() ?: 0f) /
-                                                (state.expense?.amount?.toFloat() ?: 1f) * 100f,
-                                            totalTransactions = state.transactions.size,
-                                            unusualSpendingDetected = false
-                                        )
+                                        val smartRecommendations =
+                                            SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                                                savingsRate = state.savingsRate.toFloat(),
+                                                monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
+                                                topExpenseCategory = state.expensesByCategory.maxByOrNull { it.value.amount }?.key ?: "",
+                                                topCategoryPercentage =
+                                                    (state.expensesByCategory.maxByOrNull { it.value.amount }?.value?.amount?.toFloat() ?: 0f) /
+                                                        (state.expense?.amount?.toFloat() ?: 1f) * 100f,
+                                                totalTransactions = state.transactions.size,
+                                                unusualSpendingDetected = false,
+                                            )
 
                                         SmartRecommendationCard(
                                             recommendations = smartRecommendations,
@@ -604,9 +612,10 @@ fun FinancialStatisticsScreen(
                                             subtitle = "На основе анализа ваших финансов",
                                             style = SmartCardStyle.COMPACT,
                                             showPriorityIndicator = true,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(bottom = 12.dp)
+                                            modifier =
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(bottom = 12.dp),
                                         )
                                     }
 
@@ -618,9 +627,10 @@ fun FinancialStatisticsScreen(
                                         subtitle = "Проверенные принципы финансового планирования",
                                         style = SmartCardStyle.ENHANCED,
                                         showPriorityIndicator = true,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 4.dp)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 4.dp),
                                     )
                                 }
                             }

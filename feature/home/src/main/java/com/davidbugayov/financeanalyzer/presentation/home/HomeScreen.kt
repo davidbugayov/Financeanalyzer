@@ -9,9 +9,15 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Card
-import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,16 +61,6 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.*
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Composable
 
 /**
  * Главный экран приложения.
@@ -78,7 +74,7 @@ private fun HomeTopBar(
     profileIconModifier: Modifier = Modifier,
 ) {
     AppTopBar(
-                        title = StringProvider.financialAnalyzer,
+        title = StringProvider.financialAnalyzer,
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
@@ -114,7 +110,7 @@ private fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                                            contentDescription = StringProvider.profile,
+                    contentDescription = StringProvider.profile,
                 )
             }
         },
@@ -287,9 +283,9 @@ fun HomeScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-            val testDataGeneratedMsg = StringProvider.testDataGenerated
-        val transactionDeletedMsg = StringProvider.transactionDeleted
-        val emptyTransactionIdErrorMsg = StringProvider.emptyTransactionIdError
+    val testDataGeneratedMsg = StringProvider.testDataGenerated
+    val transactionDeletedMsg = StringProvider.transactionDeleted
+    val emptyTransactionIdErrorMsg = StringProvider.emptyTransactionIdError
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {

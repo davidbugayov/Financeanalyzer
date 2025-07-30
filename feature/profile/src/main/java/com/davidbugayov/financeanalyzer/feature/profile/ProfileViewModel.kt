@@ -15,11 +15,10 @@ import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
+import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
-import com.davidbugayov.financeanalyzer.ui.R as UiR
-import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -381,7 +380,7 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                                                    error = StringResourceProvider.errorUnknown,
+                        error = StringResourceProvider.errorUnknown,
                     )
                 }
             }

@@ -31,9 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
@@ -425,7 +425,11 @@ fun TransactionHistoryScreen(
                         // Выбранные категории
                         if (state.selectedCategories.isNotEmpty()) {
                             Text(
-                                text = stringResource(R.string.categories_selected, state.selectedCategories.joinToString(", ")),
+                                text =
+                                    stringResource(
+                                        R.string.categories_selected,
+                                        state.selectedCategories.joinToString(", "),
+                                    ),
                                 fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
@@ -436,7 +440,11 @@ fun TransactionHistoryScreen(
                         // Выбранные источники
                         if (state.selectedSources.isNotEmpty()) {
                             Text(
-                                text = stringResource(R.string.sources_selected, state.selectedSources.joinToString(", ")),
+                                text =
+                                    stringResource(
+                                        R.string.sources_selected,
+                                        state.selectedSources.joinToString(", "),
+                                    ),
                                 fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
@@ -470,7 +478,7 @@ fun TransactionHistoryScreen(
                     // Paging список транзакций без группировки
                     val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
 
-                                            when {
+                    when {
                         pagingItems.loadState.refresh is LoadState.Loading -> {
                             CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                         }

@@ -21,10 +21,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора периода для фильтрации транзакций.

@@ -6,26 +6,19 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.home.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 
 /**
  * 🏠 Современная карточка советов для главного экрана
@@ -46,22 +39,23 @@ fun HomeTipsCard(
         exit = slideOutVertically(targetOffsetY = { it / 2 }) + fadeOut(),
     ) {
         Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures { _, dragAmount ->
-                        offsetX += dragAmount
-                        if (offsetX > 200f || offsetX < -200f) {
-                            visible = false
-                            onClose()
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures { _, dragAmount ->
+                            offsetX += dragAmount
+                            if (offsetX > 200f || offsetX < -200f) {
+                                visible = false
+                                onClose()
+                            }
                         }
-                    }
-                }
+                    },
         ) {
             // Используем новую систему рекомендаций
             val onboardingRecommendations = SmartRecommendationGenerator.generateOnboardingRecommendations()
-            
+
             SmartRecommendationCard(
                 recommendations = onboardingRecommendations,
                 title = stringResource(R.string.welcome_title),
@@ -72,10 +66,8 @@ fun HomeTipsCard(
                     visible = false
                     onClose()
                 },
-                modifier = Modifier.alpha(if (visible) 1f else 0f)
+                modifier = Modifier.alpha(if (visible) 1f else 0f),
             )
         }
     }
 }
-
- 

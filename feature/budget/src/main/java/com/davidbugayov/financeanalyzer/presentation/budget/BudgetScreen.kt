@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -73,6 +74,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
@@ -83,9 +85,6 @@ import java.util.Date
 import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.ui.R
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -755,13 +754,19 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
             onDismissRequest = {},
             title = { Text(text = stringResource(R.string.budget_over_limit_title)) },
             text = {
-                Text(text = stringResource(R.string.budget_over_limit_message, state.overBudgetWallets.joinToString(", ")))
+                Text(
+                    text =
+                        stringResource(
+                            R.string.budget_over_limit_message,
+                            state.overBudgetWallets.joinToString(", "),
+                        ),
+                )
             },
             confirmButton = {
-                Button(onClick = {/* TODO: скрыть предупреждение */}) {
+                Button(onClick = { /* TODO: скрыть предупреждение */ }) {
                     Text(text = stringResource(android.R.string.ok))
                 }
-            }
+            },
         )
     }
 }

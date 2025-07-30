@@ -34,7 +34,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,21 +49,18 @@ import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
-import com.davidbugayov.financeanalyzer.ui.components.card.PremiumStatisticsCard
-import com.davidbugayov.financeanalyzer.ui.components.card.PremiumInsightsCard
-import com.davidbugayov.financeanalyzer.ui.components.card.FinancialDataMapper
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.card.FinancialDataMapper
+import com.davidbugayov.financeanalyzer.ui.components.card.PremiumInsightsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.PremiumStatisticsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 /**
  * Экран подробной финансовой статистики
@@ -243,23 +243,24 @@ fun FinancialDetailStatisticsScreen(
                     LaunchedEffect(Unit) { shownStats = true }
                     AnimatedVisibility(visible = shownStats, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка статистики транзакций
-                        val transactionStats = FinancialDataMapper.createTransactionStatistics(
-                            totalTransactions = metrics.totalTransactions,
-                            incomeTransactionsCount = metrics.incomeTransactionsCount,
-                            expenseTransactionsCount = metrics.expenseTransactionsCount,
-                            averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
-                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
-                            maxIncome = metrics.maxIncome.format(true),
-                            maxExpense = metrics.maxExpense.format(true),
-                            savingsRate = metrics.savingsRate,
-                            monthsOfSavings = metrics.monthsOfSavings
-                        )
+                        val transactionStats =
+                            FinancialDataMapper.createTransactionStatistics(
+                                totalTransactions = metrics.totalTransactions,
+                                incomeTransactionsCount = metrics.incomeTransactionsCount,
+                                expenseTransactionsCount = metrics.expenseTransactionsCount,
+                                averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
+                                averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
+                                maxIncome = metrics.maxIncome.format(true),
+                                maxExpense = metrics.maxExpense.format(true),
+                                savingsRate = metrics.savingsRate,
+                                monthsOfSavings = metrics.monthsOfSavings,
+                            )
 
                         PremiumStatisticsCard(
                             title = stringResource(R.string.transaction_statistics),
                             icon = Icons.Default.Receipt,
                             statistics = transactionStats,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -273,23 +274,25 @@ fun FinancialDetailStatisticsScreen(
                     LaunchedEffect(Unit) { shownExpenseAnalysis = true }
                     AnimatedVisibility(visible = shownExpenseAnalysis, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка анализа расходов
-                        val expenseAnalysis = FinancialDataMapper.createExpenseAnalysis(
-                            averageDailyExpense = metrics.averageDailyExpense.format(true),
-                            averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
-                            topIncomeCategory = metrics.topIncomeCategory,
-                            topExpenseCategory = metrics.topExpenseCategory,
-                            topExpenseCategories = metrics.topExpenseCategories.map {
-                                it.first to it.second.format(true)
-                            },
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
-                        )
+                        val expenseAnalysis =
+                            FinancialDataMapper.createExpenseAnalysis(
+                                averageDailyExpense = metrics.averageDailyExpense.format(true),
+                                averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
+                                topIncomeCategory = metrics.topIncomeCategory,
+                                topExpenseCategory = metrics.topExpenseCategory,
+                                topExpenseCategories =
+                                    metrics.topExpenseCategories.map {
+                                        it.first to it.second.format(true)
+                                    },
+                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                            )
 
                         PremiumStatisticsCard(
                             title = stringResource(R.string.expense_analysis),
                             icon = Icons.Default.Analytics,
                             statistics = expenseAnalysis,
                             accentColor = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -334,20 +337,22 @@ fun FinancialDetailStatisticsScreen(
                     LaunchedEffect(Unit) { shownExpenseInsights = true }
                     AnimatedVisibility(visible = shownExpenseInsights, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка инсайтов расходов
-                        val expenseInsights = FinancialDataMapper.createExpenseInsights(
-                            topExpenseCategories = metrics.topExpenseCategories.map {
-                                it.first to it.second.format(true)
-                            },
-                            savingsRate = metrics.savingsRate,
-                            monthsOfSavings = metrics.monthsOfSavings,
-                            totalTransactions = metrics.expenseTransactionsCount,
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
-                        )
+                        val expenseInsights =
+                            FinancialDataMapper.createExpenseInsights(
+                                topExpenseCategories =
+                                    metrics.topExpenseCategories.map {
+                                        it.first to it.second.format(true)
+                                    },
+                                savingsRate = metrics.savingsRate,
+                                monthsOfSavings = metrics.monthsOfSavings,
+                                totalTransactions = metrics.expenseTransactionsCount,
+                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                            )
 
                         PremiumInsightsCard(
                             title = stringResource(R.string.expense_analysis),
                             insights = expenseInsights,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -361,16 +366,17 @@ fun FinancialDetailStatisticsScreen(
                     LaunchedEffect(Unit) { shownSpendingPatterns = true }
                     AnimatedVisibility(visible = shownSpendingPatterns, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка паттернов трат
-                        val spendingPatterns = FinancialDataMapper.createSpendingPatternInsights(
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                            expenseTransactionsCount = metrics.expenseTransactionsCount,
-                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat()
-                        )
+                        val spendingPatterns =
+                            FinancialDataMapper.createSpendingPatternInsights(
+                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                                expenseTransactionsCount = metrics.expenseTransactionsCount,
+                                averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
+                            )
 
                         PremiumInsightsCard(
                             title = stringResource(R.string.spending_patterns),
                             insights = spendingPatterns,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -403,15 +409,17 @@ fun FinancialDetailStatisticsScreen(
                     LaunchedEffect(Unit) { shownCriticalTips = true }
                     AnimatedVisibility(visible = shownCriticalTips, enter = fadeIn(), exit = fadeOut()) {
                         // Генерируем критические финансовые рекомендации на основе реальных данных
-                        val criticalRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                            savingsRate = metrics.savingsRate,
-                            monthsOfEmergencyFund = metrics.monthsOfSavings,
-                            topExpenseCategory = metrics.topExpenseCategory,
-                            topCategoryPercentage = metrics.expenseCategories
-                                .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
-                            totalTransactions = metrics.expenseTransactionsCount,
-                            unusualSpendingDetected = false // TODO: добавить логику определения необычных трат
-                        )
+                        val criticalRecommendations =
+                            SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                                savingsRate = metrics.savingsRate,
+                                monthsOfEmergencyFund = metrics.monthsOfSavings,
+                                topExpenseCategory = metrics.topExpenseCategory,
+                                topCategoryPercentage =
+                                    metrics.expenseCategories
+                                        .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
+                                totalTransactions = metrics.expenseTransactionsCount,
+                                unusualSpendingDetected = false, // TODO: добавить логику определения необычных трат
+                            )
 
                         SmartRecommendationCard(
                             recommendations = criticalRecommendations,
@@ -419,7 +427,7 @@ fun FinancialDetailStatisticsScreen(
                             subtitle = stringResource(R.string.critical_recommendations_for_your_budget),
                             style = SmartCardStyle.ENHANCED,
                             showPriorityIndicator = true,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -441,7 +449,7 @@ fun FinancialDetailStatisticsScreen(
                             subtitle = stringResource(R.string.professional_budgeting_principles),
                             style = SmartCardStyle.COMPACT,
                             showPriorityIndicator = true,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }

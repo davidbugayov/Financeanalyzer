@@ -29,14 +29,12 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import timber.log.Timber
 
 /**
  * Компактный макет для телефонов
@@ -155,7 +153,6 @@ private fun CompactTransactionList(
     // Отслеживаем количество транзакций для анимации новых элементов
     val previousTransactionCount = remember { mutableStateOf(0) }
     val currentTransactionCount = state.filteredTransactions.size
-
 }
 
 @Composable

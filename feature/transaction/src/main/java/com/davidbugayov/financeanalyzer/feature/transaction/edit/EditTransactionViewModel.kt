@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -266,7 +266,7 @@ class EditTransactionViewModel(
                         "ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию после парсинга суммы",
                     )
                     CrashLoggerProvider.crashLogger.logException(
-                        Exception("Не удалось подготовить транзакцию к редактированию после парсинга суммы")
+                        Exception("Не удалось подготовить транзакцию к редактированию после парсинга суммы"),
                     )
                     return@launch
                 }
@@ -280,7 +280,9 @@ class EditTransactionViewModel(
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
                 Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла для суммы: $amountForValidation")
-                CrashLoggerProvider.crashLogger.logException(Exception("Валидация не прошла для суммы: $amountForValidation"))
+                CrashLoggerProvider.crashLogger.logException(
+                    Exception("Валидация не прошла для суммы: $amountForValidation"),
+                )
                 return@launch
             }
 

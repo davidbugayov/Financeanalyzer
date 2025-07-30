@@ -22,8 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 /**
  * Диалог для выбора категорий (импорта или связывания)

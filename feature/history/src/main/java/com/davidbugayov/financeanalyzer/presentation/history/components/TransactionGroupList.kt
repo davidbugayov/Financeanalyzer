@@ -266,7 +266,14 @@ private fun ExpandableGroupHeader(
         ) {
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = if (isExpanded) stringResource(R.string.collapse) else stringResource(R.string.expand),
+                contentDescription =
+                    if (isExpanded) {
+                        stringResource(
+                            R.string.collapse,
+                        )
+                    } else {
+                        stringResource(R.string.expand)
+                    },
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))

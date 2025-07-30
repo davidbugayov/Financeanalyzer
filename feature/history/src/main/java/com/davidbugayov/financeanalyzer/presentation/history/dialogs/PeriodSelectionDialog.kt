@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,7 +53,7 @@ fun PeriodSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text(stringResource(UiR.string.dialog_select_period_title)) },
+        title = { Text(stringResource(UiR.string.dialog_select_period_title)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(

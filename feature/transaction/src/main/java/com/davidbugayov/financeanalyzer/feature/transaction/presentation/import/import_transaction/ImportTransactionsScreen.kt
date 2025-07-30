@@ -68,6 +68,7 @@ import com.davidbugayov.financeanalyzer.presentation.import_transaction.componen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResults
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -78,7 +79,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран импорта транзакций.

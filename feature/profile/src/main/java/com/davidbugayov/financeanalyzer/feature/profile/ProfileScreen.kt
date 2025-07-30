@@ -47,10 +47,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.feature.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
@@ -60,6 +60,7 @@ import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSecti
 import com.davidbugayov.financeanalyzer.feature.profile.components.ThemeSelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
+import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
 import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -70,7 +71,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Экран профиля пользователя.
@@ -101,13 +101,14 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     val appVersion = remember { packageInfo?.versionName ?: StringProvider.unknown }
 
     @SuppressLint("NewApi")
-    val buildVersion = remember { 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            (packageInfo?.longVersionCode ?: 0L).toString()
-        } else {
-            (packageInfo?.versionCode ?: 0).toString()
+    val buildVersion =
+        remember {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                (packageInfo?.longVersionCode ?: 0L).toString()
+            } else {
+                (packageInfo?.versionCode ?: 0).toString()
+            }
         }
-    }
 
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }

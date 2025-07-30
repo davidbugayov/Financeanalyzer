@@ -29,7 +29,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
-import timber.log.Timber
 
 class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
     private val navigationManager: NavigationManager by inject()

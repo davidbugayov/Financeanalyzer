@@ -9,22 +9,22 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import com.davidbugayov.financeanalyzer.core.util.StringProvider
+import com.davidbugayov.financeanalyzer.data.util.StringProvider as DataStringProvider
 import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
+import com.davidbugayov.financeanalyzer.domain.util.StringProvider as DomainStringProvider
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
+import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as HistoryStringProvider
+import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
+import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider as ProfileStringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.ui.util.StringProvider as UiStringProvider
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
-import com.davidbugayov.financeanalyzer.core.util.StringProvider
-import com.davidbugayov.financeanalyzer.data.util.StringProvider as DataStringProvider
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider as DomainStringProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
-import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as HistoryStringProvider
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
-import com.davidbugayov.financeanalyzer.ui.util.StringProvider as UiStringProvider
-import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider as ProfileStringProvider
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -73,11 +73,12 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         // Инициализация AppMetrica только для релизных билдов
         if (!BuildConfig.DEBUG) {
             try {
-                val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
-                    .withLogs()
-                    .withSessionTimeout(60)
-                    .withCrashReporting(true)
-                    .build()
+                val config =
+                    AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+                        .withLogs()
+                        .withSessionTimeout(60)
+                        .withCrashReporting(true)
+                        .build()
                 AppMetrica.activate(this, config)
                 AppMetrica.enableActivityAutoTracking(this)
                 Timber.d("AppMetrica успешно инициализирована (release build)")
@@ -115,7 +116,10 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             initAchievements()
         } catch (e: Exception) {
             Timber.e(e, getString(R.string.achievements_init_error))
-            CrashReporter.trackError("AchievementsInit", getString(R.string.achievements_init_error_detail, e.message ?: ""))
+            CrashReporter.trackError(
+                "AchievementsInit",
+                getString(R.string.achievements_init_error_detail, e.message ?: ""),
+            )
         }
 
         try {
@@ -168,7 +172,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
     private fun initModules() {
         // Инициализация модуля транзакций
         TransactionModuleInitializer.initialize()
-                    Timber.d(getString(R.string.modules_initialized_success))
+        Timber.d(getString(R.string.modules_initialized_success))
     }
 
     /**

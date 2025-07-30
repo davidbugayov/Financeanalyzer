@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.util
 
-import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
+import com.davidbugayov.financeanalyzer.ui.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,11 +29,36 @@ object UiUtils {
         return when (periodType) {
             PeriodType.ALL -> context.getString(R.string.period_all_time)
             PeriodType.DAY -> context.getString(R.string.period_day, dateFormat.format(startDate))
-            PeriodType.WEEK -> context.getString(R.string.period_week, dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.MONTH -> context.getString(R.string.period_month, dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.QUARTER -> context.getString(R.string.period_quarter, dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.YEAR -> context.getString(R.string.period_year, dateFormat.format(startDate), dateFormat.format(endDate))
-            PeriodType.CUSTOM -> context.getString(R.string.period_custom, dateFormat.format(startDate), dateFormat.format(endDate))
+            PeriodType.WEEK ->
+                context.getString(
+                    R.string.period_week,
+                    dateFormat.format(startDate),
+                    dateFormat.format(endDate),
+                )
+            PeriodType.MONTH ->
+                context.getString(
+                    R.string.period_month,
+                    dateFormat.format(startDate),
+                    dateFormat.format(endDate),
+                )
+            PeriodType.QUARTER ->
+                context.getString(
+                    R.string.period_quarter,
+                    dateFormat.format(startDate),
+                    dateFormat.format(endDate),
+                )
+            PeriodType.YEAR ->
+                context.getString(
+                    R.string.period_year,
+                    dateFormat.format(startDate),
+                    dateFormat.format(endDate),
+                )
+            PeriodType.CUSTOM ->
+                context.getString(
+                    R.string.period_custom,
+                    dateFormat.format(startDate),
+                    dateFormat.format(endDate),
+                )
         }
     }
 

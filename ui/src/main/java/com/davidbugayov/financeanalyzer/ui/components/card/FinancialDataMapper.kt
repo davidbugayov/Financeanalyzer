@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.ui.components.card
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import com.davidbugayov.financeanalyzer.ui.util.StringProvider
 
@@ -12,7 +12,6 @@ import com.davidbugayov.financeanalyzer.ui.util.StringProvider
  * Создает красивые и информативные представления данных
  */
 object FinancialDataMapper {
-
     /**
      * 📊 Создание статистики транзакций
      */
@@ -26,7 +25,7 @@ object FinancialDataMapper {
         maxIncome: String,
         maxExpense: String,
         savingsRate: Float,
-        monthsOfSavings: Float
+        monthsOfSavings: Float,
     ): List<StatisticItem> {
         return listOf(
             StatisticItem(
@@ -34,73 +33,85 @@ object FinancialDataMapper {
                 value = totalTransactions.toString(),
                 description = StringProvider.statTotalTransactionsDesc,
                 icon = Icons.Default.Receipt,
-                type = StatisticType.NEUTRAL
+                type = StatisticType.NEUTRAL,
             ),
             StatisticItem(
                 label = StringProvider.statIncomeTransactions,
                 value = incomeTransactionsCount.toString(),
-                description = StringProvider.statIncomeTransactionsDesc((incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt()),
+                description =
+                    StringProvider.statIncomeTransactionsDesc(
+                        (incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
+                    ),
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                type = StatisticType.POSITIVE
+                type = StatisticType.POSITIVE,
             ),
             StatisticItem(
                 label = StringProvider.statExpenseTransactions,
                 value = expenseTransactionsCount.toString(),
-                description = StringProvider.statExpenseTransactionsDesc((expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt()),
+                description =
+                    StringProvider.statExpenseTransactionsDesc(
+                        (expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
+                    ),
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
-                type = StatisticType.NEGATIVE
+                type = StatisticType.NEGATIVE,
             ),
             StatisticItem(
                 label = StringProvider.statAvgIncome,
                 value = averageIncomePerTransaction,
                 description = StringProvider.statAvgIncomeDesc,
                 icon = Icons.Default.AttachMoney,
-                type = StatisticType.POSITIVE
+                type = StatisticType.POSITIVE,
             ),
             StatisticItem(
                 label = StringProvider.statAvgExpense,
                 value = averageExpensePerTransaction,
                 description = StringProvider.statAvgExpenseDesc,
                 icon = Icons.Default.Money,
-                type = StatisticType.NEGATIVE
+                type = StatisticType.NEGATIVE,
             ),
             StatisticItem(
                 label = StringProvider.statMaxIncome,
                 value = maxIncome,
                 description = StringProvider.statMaxIncomeDesc,
                 icon = Icons.Default.Star,
-                type = StatisticType.POSITIVE
+                type = StatisticType.POSITIVE,
             ),
             StatisticItem(
                 label = StringProvider.statMaxExpense,
                 value = maxExpense,
                 description = StringProvider.statMaxExpenseDesc,
                 icon = Icons.Default.Warning,
-                type = if (maxExpense.replace(Regex("[^\\d.]"), "").toFloatOrNull() ?: 0f > 50000f)
-                    StatisticType.WARNING else StatisticType.NEGATIVE
+                type =
+                    if (maxExpense.replace(Regex("[^\\d.]"), "").toFloatOrNull() ?: 0f > 50000f) {
+                        StatisticType.WARNING
+                    } else {
+                        StatisticType.NEGATIVE
+                    },
             ),
             StatisticItem(
                 label = StringProvider.statSavingsRate,
                 value = "${savingsRate.toInt()}%",
                 description = StringProvider.statSavingsRateDesc,
                 icon = Icons.Default.Savings,
-                type = when {
-                    savingsRate >= 20f -> StatisticType.POSITIVE
-                    savingsRate >= 10f -> StatisticType.WARNING
-                    else -> StatisticType.NEGATIVE
-                }
+                type =
+                    when {
+                        savingsRate >= 20f -> StatisticType.POSITIVE
+                        savingsRate >= 10f -> StatisticType.WARNING
+                        else -> StatisticType.NEGATIVE
+                    },
             ),
             StatisticItem(
                 label = StringProvider.statFinancialCushion,
                 value = "${monthsOfSavings.toInt()} ${StringProvider.monthsShort}",
                 description = StringProvider.statFinancialCushionDesc,
                 icon = Icons.Default.Shield,
-                type = when {
-                    monthsOfSavings >= 6f -> StatisticType.POSITIVE
-                    monthsOfSavings >= 3f -> StatisticType.WARNING
-                    else -> StatisticType.NEGATIVE
-                }
-            )
+                type =
+                    when {
+                        monthsOfSavings >= 6f -> StatisticType.POSITIVE
+                        monthsOfSavings >= 3f -> StatisticType.WARNING
+                        else -> StatisticType.NEGATIVE
+                    },
+            ),
         )
     }
 
@@ -114,30 +125,30 @@ object FinancialDataMapper {
         topIncomeCategory: String,
         topExpenseCategory: String,
         topExpenseCategories: List<Pair<String, String>>,
-        mostFrequentExpenseDay: String
+        mostFrequentExpenseDay: String,
     ): List<StatisticItem> {
         val statistics = mutableListOf<StatisticItem>()
-        
+
         statistics.add(
             StatisticItem(
                 label = StringProvider.statDailyExpense,
                 value = averageDailyExpense,
                 description = StringProvider.statDailyExpenseDesc,
                 icon = Icons.Default.CalendarToday,
-                type = StatisticType.NEUTRAL
-            )
+                type = StatisticType.NEUTRAL,
+            ),
         )
-        
+
         statistics.add(
             StatisticItem(
                 label = StringProvider.statMonthlyExpense,
                 value = averageMonthlyExpense,
                 description = StringProvider.statMonthlyExpenseDesc,
                 icon = Icons.Default.DateRange,
-                type = StatisticType.NEUTRAL
-            )
+                type = StatisticType.NEUTRAL,
+            ),
         )
-        
+
         if (topIncomeCategory.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
@@ -145,11 +156,11 @@ object FinancialDataMapper {
                     value = topIncomeCategory,
                     description = StringProvider.statMainIncomeCategoryDesc,
                     icon = Icons.Default.AccountBalance,
-                    type = StatisticType.POSITIVE
-                )
+                    type = StatisticType.POSITIVE,
+                ),
             )
         }
-        
+
         if (topExpenseCategory.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
@@ -157,11 +168,11 @@ object FinancialDataMapper {
                     value = topExpenseCategory,
                     description = StringProvider.statMainExpenseCategoryDesc,
                     icon = Icons.Default.PieChart,
-                    type = StatisticType.WARNING
-                )
+                    type = StatisticType.WARNING,
+                ),
             )
         }
-        
+
         if (mostFrequentExpenseDay.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
@@ -169,11 +180,11 @@ object FinancialDataMapper {
                     value = mostFrequentExpenseDay,
                     description = StringProvider.statMostFrequentExpenseDayDesc,
                     icon = Icons.Default.Schedule,
-                    type = StatisticType.NEUTRAL
-                )
+                    type = StatisticType.NEUTRAL,
+                ),
             )
         }
-        
+
         return statistics
     }
 
@@ -186,84 +197,95 @@ object FinancialDataMapper {
         savingsRate: Float,
         monthsOfSavings: Float,
         totalTransactions: Int,
-        mostFrequentExpenseDay: String
+        mostFrequentExpenseDay: String,
     ): List<InsightItem> {
         val insights = mutableListOf<InsightItem>()
-        
+
         // Анализ категорий расходов
         if (topExpenseCategories.isNotEmpty()) {
             val topCategory = topExpenseCategories.first()
-            val totalExpense = topExpenseCategories.sumOf { 
-                it.second.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0 
-            }
-            val percentage = if (totalExpense > 0) {
-                (((topCategory.second.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0) / totalExpense) * 100).toInt()
-            } else 0
-            
+            val totalExpense =
+                topExpenseCategories.sumOf {
+                    it.second.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0
+                }
+            val percentage =
+                if (totalExpense > 0) {
+                    (((topCategory.second.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0) / totalExpense) * 100).toInt()
+                } else {
+                    0
+                }
+
             insights.add(
                 InsightItem(
                     title = StringProvider.insightExpenseConcentration,
                     description = StringProvider.insightExpenseConcentrationDesc,
                     metric = StringProvider.insightExpenseConcentrationMetric,
                     icon = Icons.Default.PieChart,
-                    importance = when {
-                        percentage > 50 -> InsightImportance.HIGH
-                        percentage > 30 -> InsightImportance.MEDIUM
-                        else -> InsightImportance.LOW
-                    }
-                )
+                    importance =
+                        when {
+                            percentage > 50 -> InsightImportance.HIGH
+                            percentage > 30 -> InsightImportance.MEDIUM
+                            else -> InsightImportance.LOW
+                        },
+                ),
             )
         }
-        
+
         // Анализ нормы сбережений
         insights.add(
             InsightItem(
                 title = StringProvider.insightFinancialHealth,
-                description = when {
-                    savingsRate >= 20f -> StringProvider.insightFinancialHealthExcellent
-                    savingsRate >= 15f -> StringProvider.insightFinancialHealthGood
-                    savingsRate >= 10f -> StringProvider.insightFinancialHealthOk
-                    savingsRate >= 5f -> StringProvider.insightFinancialHealthLow
-                    else -> StringProvider.insightFinancialHealthCritical
-                },
+                description =
+                    when {
+                        savingsRate >= 20f -> StringProvider.insightFinancialHealthExcellent
+                        savingsRate >= 15f -> StringProvider.insightFinancialHealthGood
+                        savingsRate >= 10f -> StringProvider.insightFinancialHealthOk
+                        savingsRate >= 5f -> StringProvider.insightFinancialHealthLow
+                        else -> StringProvider.insightFinancialHealthCritical
+                    },
                 metric = StringProvider.insightFinancialHealthMetric(savingsRate.toInt()),
-                icon = when {
-                    savingsRate >= 15f -> Icons.AutoMirrored.Filled.TrendingUp
-                    savingsRate >= 10f -> Icons.Default.Balance
-                    else -> Icons.Default.Warning
-                },
-                importance = when {
-                    savingsRate < 5f -> InsightImportance.HIGH
-                    savingsRate < 15f -> InsightImportance.MEDIUM
-                    else -> InsightImportance.LOW
-                }
-            )
+                icon =
+                    when {
+                        savingsRate >= 15f -> Icons.AutoMirrored.Filled.TrendingUp
+                        savingsRate >= 10f -> Icons.Default.Balance
+                        else -> Icons.Default.Warning
+                    },
+                importance =
+                    when {
+                        savingsRate < 5f -> InsightImportance.HIGH
+                        savingsRate < 15f -> InsightImportance.MEDIUM
+                        else -> InsightImportance.LOW
+                    },
+            ),
         )
-        
+
         // Анализ финансовой подушки
         insights.add(
             InsightItem(
                 title = StringProvider.insightFinancialProtection,
-                description = when {
-                    monthsOfSavings >= 6f -> StringProvider.insightFinancialProtectionExcellent
-                    monthsOfSavings >= 3f -> StringProvider.insightFinancialProtectionGood
-                    monthsOfSavings >= 1f -> StringProvider.insightFinancialProtectionMinimal
-                    else -> StringProvider.insightFinancialProtectionNone
-                },
+                description =
+                    when {
+                        monthsOfSavings >= 6f -> StringProvider.insightFinancialProtectionExcellent
+                        monthsOfSavings >= 3f -> StringProvider.insightFinancialProtectionGood
+                        monthsOfSavings >= 1f -> StringProvider.insightFinancialProtectionMinimal
+                        else -> StringProvider.insightFinancialProtectionNone
+                    },
                 metric = StringProvider.insightFinancialProtectionMetric(monthsOfSavings.toInt()),
-                icon = when {
-                    monthsOfSavings >= 3f -> Icons.Default.Shield
-                    monthsOfSavings >= 1f -> Icons.Default.Security
-                    else -> Icons.Default.Warning
-                },
-                importance = when {
-                    monthsOfSavings < 1f -> InsightImportance.HIGH
-                    monthsOfSavings < 3f -> InsightImportance.MEDIUM
-                    else -> InsightImportance.LOW
-                }
-            )
+                icon =
+                    when {
+                        monthsOfSavings >= 3f -> Icons.Default.Shield
+                        monthsOfSavings >= 1f -> Icons.Default.Security
+                        else -> Icons.Default.Warning
+                    },
+                importance =
+                    when {
+                        monthsOfSavings < 1f -> InsightImportance.HIGH
+                        monthsOfSavings < 3f -> InsightImportance.MEDIUM
+                        else -> InsightImportance.LOW
+                    },
+            ),
         )
-        
+
         // Анализ количества транзакций
         if (totalTransactions > 100) {
             insights.add(
@@ -272,11 +294,11 @@ object FinancialDataMapper {
                     description = StringProvider.insightExpenseFrequencyDesc(totalTransactions),
                     metric = StringProvider.insightExpenseFrequencyMetric(totalTransactions),
                     icon = Icons.Default.ShoppingCart,
-                    importance = if (totalTransactions > 200) InsightImportance.MEDIUM else InsightImportance.LOW
-                )
+                    importance = if (totalTransactions > 200) InsightImportance.MEDIUM else InsightImportance.LOW,
+                ),
             )
         }
-        
+
         // Анализ паттернов трат
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
@@ -285,25 +307,25 @@ object FinancialDataMapper {
                     description = StringProvider.insightExpensePatternDesc(mostFrequentExpenseDay),
                     metric = StringProvider.insightExpensePatternMetric(mostFrequentExpenseDay),
                     icon = Icons.Default.Timeline,
-                    importance = InsightImportance.LOW
-                )
+                    importance = InsightImportance.LOW,
+                ),
             )
         }
-        
+
         return insights
     }
 
     /**
      * 📋 Создание инсайтов паттернов трат
      */
-    @Composable 
+    @Composable
     fun createSpendingPatternInsights(
         mostFrequentExpenseDay: String,
         expenseTransactionsCount: Int,
-        averageExpensePerTransaction: Float
+        averageExpensePerTransaction: Float,
     ): List<InsightItem> {
         val insights = mutableListOf<InsightItem>()
-        
+
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
                 InsightItem(
@@ -311,11 +333,11 @@ object FinancialDataMapper {
                     description = StringProvider.insightActiveWeekdayDesc(mostFrequentExpenseDay),
                     metric = StringProvider.insightActiveWeekdayMetric(mostFrequentExpenseDay),
                     icon = Icons.Default.CalendarToday,
-                    importance = InsightImportance.LOW
-                )
+                    importance = InsightImportance.LOW,
+                ),
             )
         }
-        
+
         // Анализ размера трат
         when {
             averageExpensePerTransaction < 500f -> {
@@ -325,8 +347,8 @@ object FinancialDataMapper {
                         description = StringProvider.insightSmallExpensesDesc,
                         metric = StringProvider.insightSmallExpensesMetric(averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.LocalGroceryStore,
-                        importance = InsightImportance.LOW
-                    )
+                        importance = InsightImportance.LOW,
+                    ),
                 )
             }
             averageExpensePerTransaction > 2000f -> {
@@ -336,12 +358,12 @@ object FinancialDataMapper {
                         description = StringProvider.insightLargeExpensesDesc,
                         metric = StringProvider.insightLargeExpensesMetric(averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.ShoppingBag,
-                        importance = InsightImportance.MEDIUM
-                    )
+                        importance = InsightImportance.MEDIUM,
+                    ),
                 )
             }
         }
-        
+
         // Анализ частоты трат
         if (expenseTransactionsCount > 150) {
             insights.add(
@@ -350,11 +372,11 @@ object FinancialDataMapper {
                     description = StringProvider.insightHighActivityDesc(expenseTransactionsCount),
                     metric = StringProvider.insightHighActivityMetric(expenseTransactionsCount),
                     icon = Icons.Default.Speed,
-                    importance = InsightImportance.MEDIUM
-                )
+                    importance = InsightImportance.MEDIUM,
+                ),
             )
         }
-        
+
         return insights
     }
 }

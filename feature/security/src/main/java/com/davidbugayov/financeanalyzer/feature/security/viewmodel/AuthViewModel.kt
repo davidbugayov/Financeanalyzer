@@ -85,4 +85,4 @@ data class AuthState(
     val canUseBiometric: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
-) 
+)

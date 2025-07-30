@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +37,6 @@ import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -200,7 +200,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
     ) {
         androidx.compose.material3.Icon(
             imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.empty_state_icon),
+            contentDescription = stringResource(R.string.empty_state_icon),
             tint = MaterialTheme.colorScheme.primary,
             modifier =
                 Modifier
@@ -208,7 +208,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                     .size(36.dp),
         )
         Text(
-                            text = stringResource(R.string.no_transactions),
+            text = stringResource(R.string.no_transactions),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
@@ -216,7 +216,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             modifier = Modifier.padding(bottom = 4.dp),
         )
         Text(
-                            text = stringResource(R.string.add_first_transaction_description),
+            text = stringResource(R.string.add_first_transaction_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 3,

@@ -28,6 +28,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -49,7 +50,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 class TransactionHistoryViewModel(

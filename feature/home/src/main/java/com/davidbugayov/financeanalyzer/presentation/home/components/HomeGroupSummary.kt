@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
@@ -175,7 +174,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = StringProvider.totalIncome,
+            text = StringProvider.totalIncome,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -195,7 +194,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = StringProvider.totalExpense,
+            text = StringProvider.totalExpense,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -215,7 +214,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-                            text = StringProvider.balance,
+            text = StringProvider.balance,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = textSecondary,

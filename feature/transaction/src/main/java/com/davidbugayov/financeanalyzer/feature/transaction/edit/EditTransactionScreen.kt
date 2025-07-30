@@ -4,10 +4,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 

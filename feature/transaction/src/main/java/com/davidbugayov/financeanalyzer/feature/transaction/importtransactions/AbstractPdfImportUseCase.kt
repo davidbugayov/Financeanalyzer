@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 abstract class AbstractPdfImportUseCase(
     context: Context,
@@ -231,7 +231,11 @@ abstract class AbstractPdfImportUseCase(
                                 e,
                                 "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}",
                             )
-                            CrashLoggerProvider.crashLogger.logDatabaseError("importTransactions", "Ошибка при сохранении транзакции: ${transaction.title}", e)
+                            CrashLoggerProvider.crashLogger.logDatabaseError(
+                                "importTransactions",
+                                "Ошибка при сохранении транзакции: ${transaction.title}",
+                                e,
+                            )
                         }
                     }
                     Timber.i(

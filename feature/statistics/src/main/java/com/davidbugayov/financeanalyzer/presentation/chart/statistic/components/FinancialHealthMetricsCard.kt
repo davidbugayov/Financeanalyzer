@@ -50,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.statistics.R
@@ -143,14 +142,17 @@ private fun CardHeader(onInfoClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Info,
-                                            contentDescription = stringResource(R.string.financial_health_info_description),
+                    contentDescription =
+                        stringResource(
+                            R.string.financial_health_info_description,
+                        ),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
         }
 
         Text(
-                            text = stringResource(R.string.financial_health_evaluation_description),
+            text = stringResource(R.string.financial_health_evaluation_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

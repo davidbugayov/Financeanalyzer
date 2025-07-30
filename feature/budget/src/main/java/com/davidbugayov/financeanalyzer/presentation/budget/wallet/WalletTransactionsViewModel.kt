@@ -1,12 +1,10 @@
 package com.davidbugayov.financeanalyzer.presentation.budget.wallet
 
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.feature.budget.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
