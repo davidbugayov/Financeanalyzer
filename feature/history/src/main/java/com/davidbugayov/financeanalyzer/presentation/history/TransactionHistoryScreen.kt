@@ -61,6 +61,7 @@ import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsHandler
+import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
 import org.koin.androidx.compose.koinViewModel
@@ -87,6 +88,8 @@ fun TransactionHistoryScreen(
     // Локальное состояние для контекстного меню транзакций
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
+    var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
+    var showDetailDialog by remember { mutableStateOf(false) }
 
     // Функция для обработки событий транзакций
     fun handleTransactionEvent(event: TransactionEvent) {
@@ -304,6 +307,17 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Диалог детальной информации о транзакции
+    if (showDetailDialog && selectedTransactionForDetail != null) {
+        TransactionDetailDialog(
+            transaction = selectedTransactionForDetail!!,
+            onDismiss = {
+                showDetailDialog = false
+                selectedTransactionForDetail = null
+            },
+        )
+    }
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -476,8 +490,8 @@ fun TransactionHistoryScreen(
                                     groups = state.groupedTransactions,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { tx ->
-                                        selectedTransaction = tx
-                                        showActionsDialog = true
+                                        selectedTransactionForDetail = tx
+                                        showDetailDialog = true
                                     },
                                     onTransactionLongClick = { tx ->
                                         selectedTransaction = tx
@@ -489,8 +503,8 @@ fun TransactionHistoryScreen(
                                     items = pagingItems,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { transaction ->
-                                        selectedTransaction = transaction
-                                        showActionsDialog = true
+                                        selectedTransactionForDetail = transaction
+                                        showDetailDialog = true
                                     },
                                     onTransactionLongClick = { transaction ->
                                         selectedTransaction = transaction

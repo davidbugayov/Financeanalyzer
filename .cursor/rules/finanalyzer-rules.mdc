@@ -48,3 +48,4 @@ fun createButton(text: String, onClick: () -> Unit): CustomButton {
 }
 ```
 
+На все запросы и ответы экономь токены

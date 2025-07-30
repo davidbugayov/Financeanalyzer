@@ -424,6 +424,7 @@
     <string name="today">Сегодня</string>
     <string name="total">Всего</string>
     <string name="transaction_actions">Действия с транзакцией</string>
+    <string name="transaction_details">Детали транзакции</string>
     <string name="transaction_transfers">Переводы</string>
     <string name="transaction_type">Тип</string>
     <string name="transactions">Транзакции</string>

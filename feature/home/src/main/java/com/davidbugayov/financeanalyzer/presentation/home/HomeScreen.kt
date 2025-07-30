@@ -48,6 +48,7 @@ import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
+import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
@@ -277,6 +278,8 @@ fun HomeScreen(
     var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
     var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
+    var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
+    var showDetailDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
 
     // Tips will be shown every time the screen opens; no persistence needed.
@@ -372,7 +375,8 @@ fun HomeScreen(
                 "transaction_amount" to transaction.amount.amount.toString(),
             ),
         )
-        viewModel.onEvent(HomeEvent.EditTransaction(transaction))
+        selectedTransactionForDetail = transaction
+        showDetailDialog = true
     }
     val onTransactionLongClick = { transaction: Transaction ->
         userEventTracker.trackUserAction(
@@ -531,6 +535,17 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
             },
         )
+
+        // Диалог детальной информации о транзакции
+        if (showDetailDialog && selectedTransactionForDetail != null) {
+            TransactionDetailDialog(
+                transaction = selectedTransactionForDetail!!,
+                onDismiss = {
+                    showDetailDialog = false
+                    selectedTransactionForDetail = null
+                },
+            )
+        }
 //        if (state.smartExpenseTips.isNotEmpty()) {
 //            Card(
 //                modifier = Modifier.padding(8.dp)
