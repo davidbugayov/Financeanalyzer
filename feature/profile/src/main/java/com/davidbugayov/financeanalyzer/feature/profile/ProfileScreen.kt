@@ -276,19 +276,19 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     },
                     modifier =
                         Modifier
-                            .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
-                            .clickable {
-                                // Логируем действие пользователя
-                                userEventTracker.trackUserAction(
-                                    PerformanceMetrics.Actions.BUTTON_CLICK,
-                                    mapOf(
-                                        "section" to "analytics",
-                                        "target" to "financial_statistics",
-                                    ),
-                                )
+                            .padding(horizontal = dimensionResource(R.dimen.profile_section_padding)),
+                    onSectionClick = {
+                        // Логируем действие пользователя
+                        userEventTracker.trackUserAction(
+                            PerformanceMetrics.Actions.BUTTON_CLICK,
+                            mapOf(
+                                "section" to "analytics",
+                                "target" to "financial_statistics",
+                            ),
+                        )
 
-                                viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
-                            },
+                        viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
+                    }
                 )
 
                 Spacer(
@@ -534,10 +534,8 @@ fun ProfileActionCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .clickable { onClick() },
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

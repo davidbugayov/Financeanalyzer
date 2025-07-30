@@ -47,10 +47,8 @@ fun AppInfoSection(
 ) {
     AnimatedVisibility(visible = true, enter = fadeIn()) {
         Card(
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .clickable { onNavigateToLibraries() },
+            onClick = onNavigateToLibraries,
+            modifier = modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

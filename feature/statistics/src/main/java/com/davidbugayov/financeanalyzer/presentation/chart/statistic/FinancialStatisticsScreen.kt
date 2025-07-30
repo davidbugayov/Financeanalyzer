@@ -36,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -271,10 +270,15 @@ fun FinancialStatisticsScreen(
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
-                        Surface(
+                        Card(
+                            onClick = {
+                                viewModel.handleIntent(
+                                    EnhancedFinanceChartIntent.AddTransactionClicked,
+                                )
+                            },
                             shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            tonalElevation = 2.dp,
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
@@ -368,15 +372,7 @@ fun FinancialStatisticsScreen(
                     // Горизонтальный пейджер для свайпа между графиками
                     HorizontalPager(
                         state = pagerState,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal =
-                                        dimensionResource(
-                                            R.dimen.finance_chart_screen_tab_row_padding,
-                                        ),
-                                ),
+                        modifier = Modifier.fillMaxWidth(),
                     ) { page ->
                         when (page) {
                             0 -> {
@@ -385,13 +381,7 @@ fun FinancialStatisticsScreen(
                                     modifier =
                                         Modifier
                                             .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .padding(
-                                                vertical =
-                                                    dimensionResource(
-                                                        R.dimen.finance_chart_screen_padding,
-                                                    ),
-                                            ),
+                                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData =
@@ -467,12 +457,7 @@ fun FinancialStatisticsScreen(
                                     modifier =
                                         Modifier
                                             .fillMaxWidth()
-                                            .padding(
-                                                vertical =
-                                                    dimensionResource(
-                                                        R.dimen.finance_chart_screen_padding,
-                                                    ),
-                                            ),
+                                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
                                 ) {
                                     // Линейный график
                                     LineChartTypeSelector(
@@ -501,11 +486,20 @@ fun FinancialStatisticsScreen(
                                     modifier =
                                         Modifier
                                             .fillMaxWidth()
-                                            .padding(top = 24.dp, bottom = 4.dp),
+                                            .padding(
+                                                top = 24.dp,
+                                                bottom = 4.dp,
+                                                start = dimensionResource(R.dimen.finance_chart_screen_padding),
+                                                end = dimensionResource(R.dimen.finance_chart_screen_padding),
+                                            ),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
                                     // Карточка "Полная статистика"
                                     Card(
+                                        onClick = {
+                                            // Переход на экран подробной статистики
+                                            viewModel.navigateToDetailedStatistics()
+                                        },
                                         modifier =
                                             Modifier
                                                 .fillMaxWidth()
@@ -514,11 +508,7 @@ fun FinancialStatisticsScreen(
                                                         dimensionResource(
                                                             R.dimen.finance_chart_screen_card_bottom_padding,
                                                         ),
-                                                )
-                                                .clickable {
-                                                    // Переход на экран подробной статистики
-                                                    viewModel.navigateToDetailedStatistics()
-                                                },
+                                                ),
                                         shape = RoundedCornerShape(16.dp),
                                         elevation =
                                             CardDefaults.cardElevation(

@@ -102,11 +102,12 @@ private fun SecurityActionCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
+        enabled = enabled,
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .clickable(enabled = enabled) { onClick() },
+                .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(20.dp),
         colors =
@@ -179,4 +180,4 @@ private fun SecurityActionCard(
             )
         }
     }
-} 
+}
