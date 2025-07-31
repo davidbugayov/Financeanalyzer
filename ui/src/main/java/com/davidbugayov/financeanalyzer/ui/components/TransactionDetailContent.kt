@@ -53,7 +53,9 @@ import java.util.Locale
 @Composable
 fun TransactionDetailContent(transaction: Transaction) {
     val isDarkTheme = isSystemInDarkTheme()
-    val valueColor = if (transaction.isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val valueColor = if (transaction.isExpense) expenseColor else incomeColor
 
     Column(
         modifier = Modifier.padding(vertical = 16.dp),
@@ -65,9 +67,9 @@ fun TransactionDetailContent(transaction: Transaction) {
                 CardDefaults.cardColors(
                     containerColor =
                         if (transaction.isExpense) {
-                            MaterialTheme.colorScheme.error.copy(alpha = 0.05f)
+                            expenseColor.copy(alpha = 0.05f)
                         } else {
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                            incomeColor.copy(alpha = 0.05f)
                         },
                 ),
             shape = RoundedCornerShape(20.dp),
@@ -83,13 +85,13 @@ fun TransactionDetailContent(transaction: Transaction) {
                         Modifier
                             .size(56.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                            .background(valueColor.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Payments,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = valueColor,
                         modifier = Modifier.size(28.dp),
                     )
                 }

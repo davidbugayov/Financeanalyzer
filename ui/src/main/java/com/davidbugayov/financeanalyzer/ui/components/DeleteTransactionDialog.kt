@@ -36,6 +36,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -58,6 +60,9 @@ fun DeleteTransactionDialog(
     val moneyFormatter = transaction.amount
 
     val isDarkTheme = isSystemInDarkTheme()
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val transactionColor = if (transaction.isExpense) expenseColor else incomeColor
     val effectiveSourceColor =
         remember(
             transaction.source,
@@ -140,7 +145,7 @@ fun DeleteTransactionDialog(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         ),
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = transactionColor,
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
