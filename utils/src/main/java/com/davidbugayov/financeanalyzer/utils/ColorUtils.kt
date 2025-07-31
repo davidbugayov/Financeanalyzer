@@ -14,6 +14,10 @@ import com.davidbugayov.financeanalyzer.ui.theme.BankTinkoff
 import com.davidbugayov.financeanalyzer.ui.theme.BankVTB
 import com.davidbugayov.financeanalyzer.ui.theme.BankYoomoney
 import com.davidbugayov.financeanalyzer.ui.theme.CashColor
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorDark
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 
 object ColorUtils {
     /**
@@ -74,10 +78,10 @@ object ColorUtils {
         // В крайнем случае, цвет по умолчанию в зависимости от типа транзакции и темы
         // Эту логику лучше вынести в Composable, используя LocalIncomeColor/LocalExpenseColor
         return when {
-            isExpense && isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
-            isExpense && !isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
-            !isExpense && isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.IncomeColorDark
-            else -> com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
+            isExpense && isDarkTheme -> ExpenseColorDark
+            isExpense && !isDarkTheme -> ExpenseColorLight
+            !isExpense && isDarkTheme -> IncomeColorDark
+            else -> IncomeColorLight
         }
     }
 

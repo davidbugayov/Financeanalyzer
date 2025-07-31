@@ -3,8 +3,8 @@ package com.davidbugayov.financeanalyzer.utils
 import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
-import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 import java.util.Calendar
 import java.util.Date
 import kotlin.random.Random
@@ -114,7 +114,7 @@ object TestDataGenerator {
                     source = source,
                     sourceColor =
                         ColorUtils.getSourceColorByName(source)?.toArgb()
-                            ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
+                            ?: if (isExpense) ExpenseColorLight.toArgb() else IncomeColorLight.toArgb(),
                 ),
             )
         }

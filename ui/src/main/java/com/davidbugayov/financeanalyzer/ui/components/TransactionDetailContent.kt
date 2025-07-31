@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R
@@ -52,9 +53,10 @@ import java.util.Locale
 @Composable
 fun TransactionDetailContent(transaction: Transaction) {
     val isDarkTheme = isSystemInDarkTheme()
+    val valueColor = if (transaction.isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
 
     Column(
-        modifier = Modifier.padding(vertical = 12.dp),
+        modifier = Modifier.padding(vertical = 16.dp),
     ) {
         // Основная сумма с цветом
         Card(
@@ -63,56 +65,45 @@ fun TransactionDetailContent(transaction: Transaction) {
                 CardDefaults.cardColors(
                     containerColor =
                         if (transaction.isExpense) {
-                            LocalExpenseColor.current.copy(alpha = 0.08f)
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.05f)
                         } else {
-                            LocalIncomeColor.current.copy(alpha = 0.08f)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
                         },
                 ),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(0.dp),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Иконка в круге
                 Box(
                     modifier =
                         Modifier
-                            .size(48.dp)
+                            .size(56.dp)
                             .clip(CircleShape)
-                            .background(
-                                if (transaction.isExpense) {
-                                    LocalExpenseColor.current.copy(alpha = 0.15f)
-                                } else {
-                                    LocalIncomeColor.current.copy(alpha = 0.15f)
-                                },
-                            ),
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Payments,
                         contentDescription = null,
-                        tint =
-                            if (transaction.isExpense) {
-                                LocalExpenseColor.current
-                            } else {
-                                LocalIncomeColor.current
-                            },
-                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = stringResource(R.string.amount),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center,
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text =
@@ -121,20 +112,17 @@ fun TransactionDetailContent(transaction: Transaction) {
                         } else {
                             "+" + transaction.amount.formatForDisplay(useMinimalDecimals = true)
                         },
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color =
-                        if (transaction.isExpense) {
-                            LocalExpenseColor.current
-                        } else {
-                            LocalIncomeColor.current
-                        },
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = valueColor,
                     textAlign = TextAlign.Center,
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Детали транзакции в карточке
         Card(
@@ -143,11 +131,11 @@ fun TransactionDetailContent(transaction: Transaction) {
                 CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 ),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(0.dp),
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(24.dp),
             ) {
                 // Категория
                 DetailRow(
@@ -158,13 +146,14 @@ fun TransactionDetailContent(transaction: Transaction) {
                             imageVector = Icons.Default.Category,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                         )
                     },
+                    valueColor = null,
                 )
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 16.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 )
 
@@ -177,13 +166,14 @@ fun TransactionDetailContent(transaction: Transaction) {
                             imageVector = Icons.Default.DateRange,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(24.dp),
                         )
                     },
+                    valueColor = null,
                 )
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 12.dp),
+                    modifier = Modifier.padding(vertical = 16.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 )
 
@@ -196,17 +186,18 @@ fun TransactionDetailContent(transaction: Transaction) {
                         Box(
                             modifier =
                                 Modifier
-                                    .size(20.dp)
+                                    .size(24.dp)
                                     .background(effectiveSourceColor, CircleShape),
                         )
                     },
+                    valueColor = effectiveSourceColor,
                 )
 
                 // Заметка (если есть)
                 transaction.note?.let { note ->
                     if (note.isNotBlank()) {
                         HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 12.dp),
+                            modifier = Modifier.padding(vertical = 16.dp),
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                         )
                         DetailRow(
@@ -217,9 +208,10 @@ fun TransactionDetailContent(transaction: Transaction) {
                                     imageVector = Icons.AutoMirrored.Filled.Note,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(24.dp),
                                 )
                             },
+                            valueColor = null,
                         )
                     }
                 }
@@ -233,6 +225,7 @@ private fun DetailRow(
     label: String,
     value: String,
     icon: @Composable (() -> Unit)?,
+    valueColor: Color? = null,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -241,7 +234,7 @@ private fun DetailRow(
         // Иконка
         icon?.let {
             it()
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
         }
 
         // Контент
@@ -250,16 +243,16 @@ private fun DetailRow(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 fontWeight = FontWeight.Medium,
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = valueColor ?: MaterialTheme.colorScheme.onSurface,
             )
         }
     }
