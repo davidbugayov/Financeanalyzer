@@ -1,0 +1,4 @@
+• **Update:** App version increased to 2.24
+• **Improvement:** Updated dependencies and libraries to latest stable versions
+• **Optimization:** Improved performance and app stability
+• **Fixed:** Minor bugs and improved compatibility with new Android versions 
