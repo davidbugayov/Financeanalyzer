@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategorySection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.ColorPickerDialog
@@ -508,17 +510,19 @@ fun <E> BaseTransactionScreen(
                     )
                 }
                 // Поле ввода суммы и кнопки операций — после категории
-                AmountField(
-                    amount = state.amount,
-                    onAmountChange = { amount ->
-                        viewModel.onEvent(
-                            eventFactory(BaseTransactionEvent.SetAmount(amount)),
-                            context,
-                        )
-                    },
-                    isError = state.amountError,
-                    accentColor = currentColor,
-                )
+                key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
+                    AmountField(
+                        amount = state.amount,
+                        onAmountChange = { amount ->
+                            viewModel.onEvent(
+                                eventFactory(BaseTransactionEvent.SetAmount(amount)),
+                                context,
+                            )
+                        },
+                        isError = state.amountError,
+                        accentColor = currentColor,
+                    )
+                }
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 // Поле выбора даты
                 DateField(

@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Extension functions for Money class
@@ -57,9 +58,14 @@ fun Money.format(
     val formatter = DecimalFormat(pattern, symbols)
 
     val formattedAmount = formatter.format(amount)
-    return if (showCurrency) {
+    val result = if (showCurrency) {
         "$formattedAmount ${currency.symbol}"
     } else {
         formattedAmount
     }
+    
+    // Логируем для отладки
+    timber.log.Timber.d("Money.format: amount=$amount, currency=${currency.name}, symbol=${currency.symbol}, result='$result'")
+    
+    return result
 }

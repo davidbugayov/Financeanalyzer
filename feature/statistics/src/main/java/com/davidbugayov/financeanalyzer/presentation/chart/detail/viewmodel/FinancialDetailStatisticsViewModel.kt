@@ -100,6 +100,9 @@ class FinancialDetailStatisticsViewModel(
                 // Рассчитываем базовые метрики
                 val (income, expense) = calculateIncomeAndExpense(transactions)
 
+                // Рассчитываем расширенные метрики сразу
+                calculateFinancialMetrics(transactions, income, expense)
+
                 // Обновляем состояние
                 _state.value =
                     _state.value.copy(
@@ -109,9 +112,6 @@ class FinancialDetailStatisticsViewModel(
                         expense = expense,
                         period = formattedPeriod,
                     )
-
-                // Рассчитываем расширенные метрики
-                calculateFinancialMetrics(transactions, income, expense)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading financial statistics data")
                 _state.value =
@@ -177,14 +177,15 @@ class FinancialDetailStatisticsViewModel(
 
         // Рассчитываем среднедневной и среднемесячный расход
         val dayCount = ((endDate - startDate) / (24 * 60 * 60 * 1000)).toInt().coerceAtLeast(1)
+        val currentCurrency = CurrencyProvider.getCurrency()
         val averageDailyExpense =
             if (dayCount > 0) {
-                Money(expense.amount.divide(BigDecimal(dayCount), 2, RoundingMode.HALF_EVEN))
+                Money(expense.amount.divide(BigDecimal(dayCount), 2, RoundingMode.HALF_EVEN), currentCurrency)
             } else {
-                Money.zero(CurrencyProvider.getCurrency())
+                Money.zero(currentCurrency)
             }
 
-        val averageMonthlyExpense = Money(averageDailyExpense.amount.multiply(BigDecimal(30)))
+        val averageMonthlyExpense = Money(averageDailyExpense.amount.multiply(BigDecimal(30)), currentCurrency)
 
         // Находим основные категории
         val topExpenseCategory = expenseCategories.maxByOrNull { it.amount.amount }?.category ?: ""
@@ -213,16 +214,16 @@ class FinancialDetailStatisticsViewModel(
         // Средний доход и расход на транзакцию
         val averageIncomePerTransaction =
             if (incomeTransactionsCount > 0) {
-                Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN))
+                Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN), currentCurrency)
             } else {
-                Money.zero(CurrencyProvider.getCurrency())
+                Money.zero(currentCurrency)
             }
 
         val averageExpensePerTransaction =
             if (expenseTransactionsCount > 0) {
-                Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN))
+                Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN), currentCurrency)
             } else {
-                Money.zero(CurrencyProvider.getCurrency())
+                Money.zero(currentCurrency)
             }
 
         // Максимальный доход и расход

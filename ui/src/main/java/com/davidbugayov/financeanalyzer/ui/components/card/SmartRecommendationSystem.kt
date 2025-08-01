@@ -253,12 +253,7 @@ private fun EnhancedRecommendationsList(
     onRecommendationClick: ((SmartRecommendation) -> Unit)?,
 ) {
     recommendations.forEachIndexed { index, recommendation ->
-        var isVisible by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-            kotlinx.coroutines.delay(index * 100L) // Плавное появление
-            isVisible = true
-        }
+        var isVisible by remember { mutableStateOf(true) }
 
         AnimatedVisibility(
             visible = isVisible,

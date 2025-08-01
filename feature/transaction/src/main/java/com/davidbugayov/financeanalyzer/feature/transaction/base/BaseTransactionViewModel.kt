@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -817,6 +818,18 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
         // Загружаем источники с учетом сортировки по частоте использования
         loadSources()
+        
+        // Подписываемся на изменения валюты для обновления AmountField
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
+                Timber.d("BaseTransactionViewModel: Получено событие изменения валюты на ${newCurrency.name}")
+                // Принудительно обновляем состояние, чтобы AmountField перерисовался
+                _state.update { state ->
+                    Timber.d("BaseTransactionViewModel: Обновляем состояние для перерисовки AmountField")
+                    copyState(state)
+                }
+            }
+        }
     }
 
     // --- Универсальные поля и коллбэки для работы с транзакциями ---

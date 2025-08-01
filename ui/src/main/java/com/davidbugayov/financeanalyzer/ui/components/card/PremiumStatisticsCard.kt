@@ -39,12 +39,7 @@ fun PremiumStatisticsCard(
     accentColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier,
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(200)
-        isVisible = true
-    }
+    var isVisible by remember { mutableStateOf(true) }
 
     AnimatedVisibility(
         visible = isVisible,
@@ -305,12 +300,7 @@ fun PremiumInsightsCard(
     insights: List<InsightItem>,
     modifier: Modifier = Modifier,
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(300)
-        isVisible = true
-    }
+    var isVisible by remember { mutableStateOf(true) }
 
     AnimatedVisibility(
         visible = isVisible,

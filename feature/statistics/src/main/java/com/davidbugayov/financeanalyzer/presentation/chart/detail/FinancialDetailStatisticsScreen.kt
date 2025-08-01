@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -49,6 +47,7 @@ import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
+import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -147,79 +146,65 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    var shownOverview by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownOverview = true }
-                    AnimatedVisibility(visible = shownOverview, enter = fadeIn(), exit = fadeOut()) {
-                        // Заголовок с периодом
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors =
-                                CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                                ),
-                            border =
-                                BorderStroke(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                ),
+                    // Заголовок с периодом
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                            ),
+                        border =
+                            BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                            ),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
                         ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.financial_statistics_period),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                                Text(
-                                    text = state.period,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    var shownKeyMetrics by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownKeyMetrics = true }
-                    AnimatedVisibility(visible = shownKeyMetrics, enter = fadeIn(), exit = fadeOut()) {
-                        KeyMetricsCard(
-                            income = state.income,
-                            expense = state.expense,
-                            savingsRate = metrics.savingsRate,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                metrics.healthMetrics?.let { healthMetrics ->
-                    item {
-                        var shownHealthScore by remember { mutableStateOf(false) }
-                        LaunchedEffect(Unit) { shownHealthScore = true }
-                        AnimatedVisibility(visible = shownHealthScore, enter = fadeIn(), exit = fadeOut()) {
-                            FinancialHealthScoreCard(
-                                healthScore = healthMetrics.financialHealthScore,
-                                breakdown = healthMetrics.healthScoreBreakdown,
-                                modifier = Modifier.fillMaxWidth(),
+                            Text(
+                                text = stringResource(R.string.financial_statistics_period),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(
+                                text = state.period,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
-                    item {
-                        Spacer(
-                            modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                        )
-                    }
+                }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
+                item {
+                    KeyMetricsCard(
+                        income = state.income,
+                        expense = state.expense,
+                        savingsRate = metrics.savingsRate,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
+                item {
+                    FinancialHealthScoreCard(
+                        healthScore = metrics.healthMetrics?.financialHealthScore?.toDouble() ?: 0.0,
+                        breakdown = metrics.healthMetrics?.healthScoreBreakdown ?: HealthScoreBreakdown(),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
                 }
 
                 // Статистика
@@ -239,30 +224,26 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    var shownStats by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownStats = true }
-                    AnimatedVisibility(visible = shownStats, enter = fadeIn(), exit = fadeOut()) {
-                        // Премиум карточка статистики транзакций
-                        val transactionStats =
-                            FinancialDataMapper.createTransactionStatistics(
-                                totalTransactions = metrics.totalTransactions,
-                                incomeTransactionsCount = metrics.incomeTransactionsCount,
-                                expenseTransactionsCount = metrics.expenseTransactionsCount,
-                                averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
-                                averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
-                                maxIncome = metrics.maxIncome.format(true),
-                                maxExpense = metrics.maxExpense.format(true),
-                                savingsRate = metrics.savingsRate,
-                                monthsOfSavings = metrics.monthsOfSavings,
-                            )
-
-                        PremiumStatisticsCard(
-                            title = stringResource(R.string.transaction_statistics),
-                            icon = Icons.Default.Receipt,
-                            statistics = transactionStats,
-                            modifier = Modifier.fillMaxWidth(),
+                    // Премиум карточка статистики транзакций
+                    val transactionStats =
+                        FinancialDataMapper.createTransactionStatistics(
+                            totalTransactions = metrics.totalTransactions,
+                            incomeTransactionsCount = metrics.incomeTransactionsCount,
+                            expenseTransactionsCount = metrics.expenseTransactionsCount,
+                            averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
+                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
+                            maxIncome = metrics.maxIncome.format(true),
+                            maxExpense = metrics.maxExpense.format(true),
+                            savingsRate = metrics.savingsRate,
+                            monthsOfSavings = metrics.monthsOfSavings,
                         )
-                    }
+
+                    PremiumStatisticsCard(
+                        title = stringResource(R.string.transaction_statistics),
+                        icon = Icons.Default.Receipt,
+                        statistics = transactionStats,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(
@@ -270,31 +251,27 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    var shownExpenseAnalysis by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownExpenseAnalysis = true }
-                    AnimatedVisibility(visible = shownExpenseAnalysis, enter = fadeIn(), exit = fadeOut()) {
-                        // Премиум карточка анализа расходов
-                        val expenseAnalysis =
-                            FinancialDataMapper.createExpenseAnalysis(
-                                averageDailyExpense = metrics.averageDailyExpense.format(true),
-                                averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
-                                topIncomeCategory = metrics.topIncomeCategory,
-                                topExpenseCategory = metrics.topExpenseCategory,
-                                topExpenseCategories =
-                                    metrics.topExpenseCategories.map {
-                                        it.first to it.second.format(true)
-                                    },
-                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                            )
-
-                        PremiumStatisticsCard(
-                            title = stringResource(R.string.expense_analysis),
-                            icon = Icons.Default.Analytics,
-                            statistics = expenseAnalysis,
-                            accentColor = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.fillMaxWidth(),
+                    // Премиум карточка анализа расходов
+                    val expenseAnalysis =
+                        FinancialDataMapper.createExpenseAnalysis(
+                            averageDailyExpense = metrics.averageDailyExpense.format(true),
+                            averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
+                            topIncomeCategory = metrics.topIncomeCategory,
+                            topExpenseCategory = metrics.topExpenseCategory,
+                            topExpenseCategories =
+                                metrics.topExpenseCategories.map {
+                                    it.first to it.second.format(true)
+                                },
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                         )
-                    }
+
+                    PremiumStatisticsCard(
+                        title = stringResource(R.string.expense_analysis),
+                        icon = Icons.Default.Analytics,
+                        statistics = expenseAnalysis,
+                        accentColor = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(
@@ -304,8 +281,6 @@ fun FinancialDetailStatisticsScreen(
 
                 // Инсайты
                 item {
-                    var shownInsightsTitle by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownInsightsTitle = true }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -321,11 +296,7 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    var shownSavingsOpt by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownSavingsOpt = true }
-                    AnimatedVisibility(visible = shownSavingsOpt, enter = fadeIn(), exit = fadeOut()) {
-                        SavingsOptimizationCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
-                    }
+                    SavingsOptimizationCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                 }
                 item {
                     Spacer(
@@ -333,28 +304,24 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    var shownExpenseInsights by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownExpenseInsights = true }
-                    AnimatedVisibility(visible = shownExpenseInsights, enter = fadeIn(), exit = fadeOut()) {
-                        // Премиум карточка инсайтов расходов
-                        val expenseInsights =
-                            FinancialDataMapper.createExpenseInsights(
-                                topExpenseCategories =
-                                    metrics.topExpenseCategories.map {
-                                        it.first to it.second.format(true)
-                                    },
-                                savingsRate = metrics.savingsRate,
-                                monthsOfSavings = metrics.monthsOfSavings,
-                                totalTransactions = metrics.expenseTransactionsCount,
-                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                            )
-
-                        PremiumInsightsCard(
-                            title = stringResource(R.string.expense_analysis),
-                            insights = expenseInsights,
-                            modifier = Modifier.fillMaxWidth(),
+                    // Премиум карточка инсайтов расходов
+                    val expenseInsights =
+                        FinancialDataMapper.createExpenseInsights(
+                            topExpenseCategories =
+                                metrics.topExpenseCategories.map {
+                                    it.first to it.second.format(true)
+                                },
+                            savingsRate = metrics.savingsRate,
+                            monthsOfSavings = metrics.monthsOfSavings,
+                            totalTransactions = metrics.expenseTransactionsCount,
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                         )
-                    }
+
+                    PremiumInsightsCard(
+                        title = stringResource(R.string.expense_analysis),
+                        insights = expenseInsights,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(
@@ -362,23 +329,19 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    var shownSpendingPatterns by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownSpendingPatterns = true }
-                    AnimatedVisibility(visible = shownSpendingPatterns, enter = fadeIn(), exit = fadeOut()) {
-                        // Премиум карточка паттернов трат
-                        val spendingPatterns =
-                            FinancialDataMapper.createSpendingPatternInsights(
-                                mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                                expenseTransactionsCount = metrics.expenseTransactionsCount,
-                                averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
-                            )
-
-                        PremiumInsightsCard(
-                            title = stringResource(R.string.spending_patterns),
-                            insights = spendingPatterns,
-                            modifier = Modifier.fillMaxWidth(),
+                    // Премиум карточка паттернов трат
+                    val spendingPatterns =
+                        FinancialDataMapper.createSpendingPatternInsights(
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                            expenseTransactionsCount = metrics.expenseTransactionsCount,
+                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
                         )
-                    }
+
+                    PremiumInsightsCard(
+                        title = stringResource(R.string.spending_patterns),
+                        insights = spendingPatterns,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(
@@ -388,8 +351,6 @@ fun FinancialDetailStatisticsScreen(
 
                 // Советы
                 item {
-                    var shownTipsTitle by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownTipsTitle = true }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -405,31 +366,27 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    var shownCriticalTips by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownCriticalTips = true }
-                    AnimatedVisibility(visible = shownCriticalTips, enter = fadeIn(), exit = fadeOut()) {
-                        // Генерируем критические финансовые рекомендации на основе реальных данных
-                        val criticalRecommendations =
-                            SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                                savingsRate = metrics.savingsRate,
-                                monthsOfEmergencyFund = metrics.monthsOfSavings,
-                                topExpenseCategory = metrics.topExpenseCategory,
-                                topCategoryPercentage =
-                                    metrics.expenseCategories
-                                        .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
-                                totalTransactions = metrics.expenseTransactionsCount,
-                                unusualSpendingDetected = false, // TODO: добавить логику определения необычных трат
-                            )
-
-                        SmartRecommendationCard(
-                            recommendations = criticalRecommendations,
-                            title = stringResource(R.string.personal_financial_analysis),
-                            subtitle = stringResource(R.string.critical_recommendations_for_your_budget),
-                            style = SmartCardStyle.ENHANCED,
-                            showPriorityIndicator = true,
-                            modifier = Modifier.fillMaxWidth(),
+                    // Генерируем критические финансовые рекомендации на основе реальных данных
+                    val criticalRecommendations =
+                        SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                            savingsRate = metrics.savingsRate,
+                            monthsOfEmergencyFund = metrics.monthsOfSavings,
+                            topExpenseCategory = metrics.topExpenseCategory,
+                            topCategoryPercentage =
+                                metrics.expenseCategories
+                                    .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
+                            totalTransactions = metrics.expenseTransactionsCount,
+                            unusualSpendingDetected = false, // TODO: добавить логику определения необычных трат
                         )
-                    }
+
+                    SmartRecommendationCard(
+                        recommendations = criticalRecommendations,
+                        title = stringResource(R.string.personal_financial_analysis),
+                        subtitle = stringResource(R.string.critical_recommendations_for_your_budget),
+                        style = SmartCardStyle.ENHANCED,
+                        showPriorityIndicator = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(
@@ -437,21 +394,17 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    var shownBudgetingTips by remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) { shownBudgetingTips = true }
-                    AnimatedVisibility(visible = shownBudgetingTips, enter = fadeIn(), exit = fadeOut()) {
-                        // Генерируем топ бюджетные советы
-                        val budgetingTips = SmartRecommendationGenerator.generateTopBudgetingTips()
+                    // Генерируем топ бюджетные советы
+                    val budgetingTips = SmartRecommendationGenerator.generateTopBudgetingTips()
 
-                        SmartRecommendationCard(
-                            recommendations = budgetingTips,
-                            title = stringResource(R.string.golden_budgeting_rules),
-                            subtitle = stringResource(R.string.professional_budgeting_principles),
-                            style = SmartCardStyle.COMPACT,
-                            showPriorityIndicator = true,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    SmartRecommendationCard(
+                        recommendations = budgetingTips,
+                        title = stringResource(R.string.golden_budgeting_rules),
+                        subtitle = stringResource(R.string.professional_budgeting_principles),
+                        style = SmartCardStyle.COMPACT,
+                        showPriorityIndicator = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
                 item {
                     Spacer(

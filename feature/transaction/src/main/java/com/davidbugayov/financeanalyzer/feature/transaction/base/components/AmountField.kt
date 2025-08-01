@@ -45,18 +45,50 @@ fun AmountField(
     accentColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    // Внутреннее состояние для "сырого" значения, синхронизированное с amount от ViewModel
-    var internalRawAmount by remember { mutableStateOf(amount) }
-
     val currentCurrency = CurrencyProvider.getCurrencyFlow().collectAsState().value
     
+    // Внутреннее состояние для "сырого" значения, синхронизированное с amount от ViewModel
+    var internalRawAmount by remember(currentCurrency) { mutableStateOf(amount) }
+    
     // TextFieldValue для отображения в OutlinedTextField
-    var textFieldValueForDisplay by remember {
+    var textFieldValueForDisplay by remember(currentCurrency) {
         val numericAmount = amount.toDoubleOrNull()
         val initialText = if (numericAmount != null) Money(numericAmount, currentCurrency).format() else amount
         mutableStateOf(
             TextFieldValue(text = initialText, selection = TextRange(initialText.length)),
         )
+    }
+    
+    // Логируем изменения валюты для отладки и принудительно обновляем TextFieldValue
+    LaunchedEffect(currentCurrency) {
+        timber.log.Timber.d("AmountField: Валюта изменилась на ${currentCurrency.name}")
+        
+        // Принудительно обновляем TextFieldValue при смене валюты
+        val numericValue = internalRawAmount.toDoubleOrNull()
+        if (numericValue != null) {
+            val moneyObject = Money(numericValue, currentCurrency)
+            val formattedWithSymbol = moneyObject.format()
+            val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
+            val sep = moneyObject.currency.decimalSeparator.toString()
+            val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
+            val finalText = if (withoutSymbol.endsWith(zeroSuffix)) {
+                withoutSymbol.removeSuffix(zeroSuffix)
+            } else {
+                withoutSymbol
+            }
+            
+            textFieldValueForDisplay = TextFieldValue(
+                text = finalText,
+                selection = TextRange(finalText.length)
+            )
+            timber.log.Timber.d("AmountField: Принудительно обновлен TextFieldValue: '$finalText'")
+        }
+    }
+    
+    // Логируем создание Money объекта для отладки
+    LaunchedEffect(currentCurrency) {
+        val testMoney = Money(100.0, currentCurrency)
+        timber.log.Timber.d("AmountField: Тестовый Money объект: ${testMoney.format()}, валюта: ${testMoney.currency.name}")
     }
 
     var isFocused by remember { mutableStateOf(false) }
@@ -76,15 +108,20 @@ fun AmountField(
                 val numericValue = internalRawAmount.toDoubleOrNull()
                 if (numericValue != null) {
                     // Format number without currency symbol and drop trailing .00
-                    val formattedWithSymbol = Money(numericValue, currentCurrency).format()
+                    val moneyObject = Money(numericValue, currentCurrency)
+                    val formattedWithSymbol = moneyObject.format()
+                    timber.log.Timber.d("AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'")
+                    
                     val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
-                    val sep = Money(numericValue, currentCurrency).currency.decimalSeparator.toString()
-                    val zeroSuffix = sep + "0".repeat(Money(numericValue, currentCurrency).currency.decimalPlaces)
-                    if (withoutSymbol.endsWith(zeroSuffix)) {
+                    val sep = moneyObject.currency.decimalSeparator.toString()
+                    val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
+                    val finalText = if (withoutSymbol.endsWith(zeroSuffix)) {
                         withoutSymbol.removeSuffix(zeroSuffix)
                     } else {
                         withoutSymbol
                     }
+                    timber.log.Timber.d("AmountField: Финальный текст: '$finalText'")
+                    finalText
                 } else {
                     internalRawAmount
                 }
@@ -186,7 +223,7 @@ fun AmountField(
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
                 Text(
-                    text = "₽",
+                    text = currentCurrency.symbol,
                     style = MaterialTheme.typography.titleLarge,
                     color = accentColor,
                 )

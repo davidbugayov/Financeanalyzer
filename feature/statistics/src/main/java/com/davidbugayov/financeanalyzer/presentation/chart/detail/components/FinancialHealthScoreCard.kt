@@ -1,8 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,11 +52,6 @@ fun FinancialHealthScoreCard(
     breakdown: HealthScoreBreakdown,
     modifier: Modifier = Modifier,
 ) {
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        isVisible = true
-    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -106,7 +99,7 @@ fun FinancialHealthScoreCard(
                 // Круговая диаграмма с общим скором
                 HealthScoreCircle(
                     score = healthScore,
-                    isVisible = isVisible,
+                    isVisible = true,
                     modifier = Modifier.size(120.dp),
                 )
 
@@ -165,18 +158,8 @@ private fun HealthScoreCircle(
     isVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = if (isVisible) (score / 100.0).toFloat() else 0f,
-        animationSpec = tween(durationMillis = 1500),
-        label = "health_score_progress",
-    )
-
+    val progress = (score / 100.0).toFloat()
     val scoreColor = getHealthScoreColor(score)
-    val animatedColor by animateColorAsState(
-        targetValue = scoreColor,
-        animationSpec = tween(durationMillis = 1000),
-        label = "health_score_color",
-    )
 
     Box(
         modifier = modifier,
@@ -195,9 +178,9 @@ private fun HealthScoreCircle(
 
             // Прогресс
             drawArc(
-                color = animatedColor,
+                color = scoreColor,
                 startAngle = -90f,
-                sweepAngle = 360f * animatedProgress,
+                sweepAngle = 360f * progress,
                 useCenter = false,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
             )
@@ -210,7 +193,7 @@ private fun HealthScoreCircle(
                 text = "${score.toInt()}",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                color = animatedColor,
+                color = scoreColor,
             )
             Text(
                 text = "/ 100",
