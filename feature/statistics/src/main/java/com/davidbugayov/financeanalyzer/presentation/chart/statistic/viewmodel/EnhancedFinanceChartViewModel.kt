@@ -14,6 +14,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -41,6 +42,18 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     val effect: SharedFlow<EnhancedFinanceChartEffect> = _effect.asSharedFlow()
 
     private var allTransactions: List<Transaction> = emptyList()
+
+    init {
+        // Подписываемся на изменения валюты
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow()?.collect { newCurrency ->
+                // Пересчитываем данные с новой валютой
+                if (allTransactions.isNotEmpty()) {
+                    loadData()
+                }
+            }
+        }
+    }
 
     private fun formatPeriod(
         periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType,
@@ -131,24 +144,28 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val monthsOfSavings = metrics.monthsOfSavings
 
                 // Агрегируем по категориям
+                val currentCurrency = CurrencyProvider.getCurrency()
                 val expensesByCategory =
                     filteredTransactions
                         .filter { it.isExpense }
                         .groupBy { it.category.ifBlank { "Без категории" } }
                         .mapValues { (_, transactions) ->
-                            transactions.map { it.amount.abs() }.reduceOrNull {
-                                    acc,
-                                    money,
-                                ->
-                                acc + money
-                            } ?: Money.zero()
+                            transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                                // Приводим каждую транзакцию к текущей валюте
+                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                                acc + convertedAmount.abs()
+                            }
                         }
                 val incomeByCategory =
                     filteredTransactions
                         .filter { !it.isExpense }
                         .groupBy { it.category.ifBlank { "Без категории" } }
                         .mapValues { (_, transactions) ->
-                            transactions.map { it.amount }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                            transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                                // Приводим каждую транзакцию к текущей валюте
+                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                                acc + convertedAmount
+                            }
                         }
 
                 // --- Новое: подготовка данных для линейного графика ---
@@ -214,6 +231,9 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 (isIncome && !it.isExpense) || (!isIncome && it.isExpense)
             }
         if (filteredTransactions.isEmpty()) return emptyList()
+
+        val currentCurrency = CurrencyProvider.getCurrency()
+
         // Группируем по дате (без времени)
         val aggregatedData =
             filteredTransactions
@@ -227,8 +247,10 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     calendar.time
                 }
                 .mapValues { (_, transactions) ->
-                    transactions.fold(Money.zero()) { acc, transaction ->
-                        val value = if (isIncome) transaction.amount else transaction.amount.abs()
+                    transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                        // Приводим транзакцию к текущей валюте
+                        val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                        val value = if (isIncome) convertedAmount else convertedAmount.abs()
                         acc + value
                     }
                 }

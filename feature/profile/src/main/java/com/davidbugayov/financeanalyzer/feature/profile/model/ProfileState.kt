@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.profile.model
 
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
@@ -22,7 +23,8 @@ data class ProfileState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isEditingTheme: Boolean = false,
     val selectedLanguage: String = "Русский", // TODO: Вынести в ресурсы
-    val selectedCurrency: String = "Рубль (₽)", // TODO: Вынести в ресурсы
+    val selectedCurrency: Currency = Currency.RUB,
+    val showCurrencyDialog: Boolean = false,
     // Настройки уведомлений о транзакциях
     val isTransactionReminderEnabled: Boolean = false,
     val transactionReminderTime: Time? = null,

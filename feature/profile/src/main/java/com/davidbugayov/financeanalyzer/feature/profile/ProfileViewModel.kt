@@ -54,7 +54,12 @@ class ProfileViewModel(
 
         loadFinancialAnalytics()
 
-        _state.update { it.copy(themeMode = preferencesManager.getThemeMode()) }
+        _state.update {
+            it.copy(
+                themeMode = preferencesManager.getThemeMode(),
+                selectedCurrency = preferencesManager.getCurrency(),
+            )
+        }
         preferencesManager.themeModeFlow
             .onEach { newTheme ->
                 _state.update { it.copy(themeMode = newTheme) }
@@ -135,8 +140,20 @@ class ProfileViewModel(
                 // Здесь можно добавить сохранение настройки в DataStore
             }
             is ProfileEvent.ChangeCurrency -> {
-                _state.update { it.copy(selectedCurrency = event.currency) }
-                // Здесь можно добавить сохранение настройки в DataStore
+                viewModelScope.launch {
+                    // Сохраняем валюту в PreferencesManager
+                    preferencesManager.saveCurrency(event.currency)
+                    _state.update { it.copy(selectedCurrency = event.currency, showCurrencyDialog = false) }
+
+                    // Логируем изменение валюты
+                    AnalyticsUtils.logScreenView("currency_changed", event.currency.name)
+                }
+            }
+            is ProfileEvent.ShowCurrencyDialog -> {
+                _state.update { it.copy(showCurrencyDialog = true) }
+            }
+            is ProfileEvent.HideCurrencyDialog -> {
+                _state.update { it.copy(showCurrencyDialog = false) }
             }
             is ProfileEvent.ChangeNotifications -> {
                 Timber.d("[ProfileViewModel] ChangeNotifications: enabled=${event.enabled}")

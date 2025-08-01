@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,10 @@ class PreferencesManager(context: Context) {
             getThemeModeInternal(),
         ) // Используем внутренний метод для инициализации
     val themeModeFlow: StateFlow<ThemeMode> = _themeModeFlow.asStateFlow()
+
+    // Flow для валюты
+    private val _currencyFlow = MutableStateFlow(getCurrencyInternal())
+    val currencyFlow: StateFlow<Currency> = _currencyFlow.asStateFlow()
 
     /**
      * Сохраняет тему приложения в SharedPreferences и обновляет Flow
@@ -77,6 +82,9 @@ class PreferencesManager(context: Context) {
         private const val KEY_APP_LOCK_ENABLED = "app_lock_enabled"
         private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
         private const val KEY_PIN_CODE = "pin_code"
+
+        // Ключ для валюты
+        private const val KEY_CURRENCY = "currency"
     }
 
     /**
@@ -87,30 +95,7 @@ class PreferencesManager(context: Context) {
         return sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
     }
 
-    /**
-     * Получает boolean-значение из SharedPreferences
-     * @param key Ключ, по которому хранится значение
-     * @param defaultValue Значение по умолчанию
-     * @return Сохраненное значение или defaultValue
-     */
-    fun getBooleanPreference(
-        key: String,
-        defaultValue: Boolean,
-    ): Boolean {
-        return sharedPreferences.getBoolean(key, defaultValue)
-    }
 
-    /**
-     * Сохраняет boolean-значение в SharedPreferences
-     * @param key Ключ, по которому будет храниться значение
-     * @param value Значение для сохранения
-     */
-    fun setBooleanPreference(
-        key: String,
-        value: Boolean,
-    ) {
-        sharedPreferences.edit { putBoolean(key, value) }
-    }
 
     fun setTransactionReminderEnabled(enabled: Boolean) {
         sharedPreferences.edit { putBoolean(KEY_TRANSACTION_REMINDER_ENABLED, enabled) }
@@ -202,5 +187,36 @@ class PreferencesManager(context: Context) {
      */
     fun removePinCode() {
         sharedPreferences.edit { remove(KEY_PIN_CODE) }
+    }
+
+    // Методы для работы с валютой
+
+    /**
+     * Сохраняет выбранную валюту
+     */
+    fun saveCurrency(currency: Currency) {
+        sharedPreferences.edit { putString(KEY_CURRENCY, currency.name) }
+        _currencyFlow.value = currency
+        // Уведомляем CurrencyProvider об изменении
+        CurrencyProvider.setCurrency(currency)
+    }
+
+    /**
+     * Получает сохраненную валюту
+     */
+    fun getCurrency(): Currency {
+        return _currencyFlow.value
+    }
+
+    /**
+     * Внутренний метод для первоначальной загрузки валюты
+     */
+    private fun getCurrencyInternal(): Currency {
+        val currencyName = sharedPreferences.getString(KEY_CURRENCY, Currency.RUB.name)
+        return try {
+            Currency.valueOf(currencyName ?: Currency.RUB.name)
+        } catch (_: Exception) {
+            Currency.RUB
+        }
     }
 }

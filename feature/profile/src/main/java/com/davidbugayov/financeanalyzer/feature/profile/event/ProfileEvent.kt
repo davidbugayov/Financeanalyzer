@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.profile.event
 
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 
@@ -53,7 +54,17 @@ sealed class ProfileEvent {
      * Событие изменения валюты по умолчанию.
      * @param currency Выбранная валюта.
      */
-    data class ChangeCurrency(val currency: String) : ProfileEvent()
+    data class ChangeCurrency(val currency: Currency) : ProfileEvent()
+
+    /**
+     * Событие отображения диалога выбора валюты.
+     */
+    data object ShowCurrencyDialog : ProfileEvent()
+
+    /**
+     * Событие скрытия диалога выбора валюты.
+     */
+    data object HideCurrencyDialog : ProfileEvent()
 
     /**
      * Событие изменения настроек уведомлений.

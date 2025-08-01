@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.feature.profile.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
@@ -56,6 +56,7 @@ fun SettingsSection(
     onCurrencyClick: () -> Unit,
     onTransactionReminderClick: () -> Unit,
     themeMode: ThemeMode,
+    selectedCurrency: Currency,
     isTransactionReminderEnabled: Boolean,
     transactionReminderTime: Time?,
     hasNotificationPermission: Boolean,
@@ -104,7 +105,7 @@ fun SettingsSection(
                 icon = Icons.Default.Payments,
                 iconBackground = MaterialTheme.colorScheme.tertiary,
                 title = StringProvider.profileCurrencyTitle,
-                subtitle = StringProvider.settingsCurrencyCurrentValue,
+                subtitle = getCurrencyDisplayName(selectedCurrency),
                 onClick = onCurrencyClick,
             )
         }
@@ -128,6 +129,16 @@ fun SettingsSection(
                 onClick = onTransactionReminderClick,
             )
         }
+    }
+}
+
+private fun getCurrencyDisplayName(currency: Currency): String {
+    return when (currency) {
+        Currency.RUB -> "Российский рубль (₽)"
+        Currency.USD -> "Доллар США ($)"
+        Currency.EUR -> "Евро (€)"
+        Currency.CNY -> "Китайский юань (¥)"
+        else -> "${currency.name} (${currency.symbol})"
     }
 }
 

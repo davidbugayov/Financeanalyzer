@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +53,7 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.feature.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
+import com.davidbugayov.financeanalyzer.feature.profile.components.CurrencySelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.NotificationSettingsDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.ProfileTopBar
 import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSection
@@ -91,7 +91,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     // Получаем компоненты аналитики из ViewModel
     val userEventTracker = viewModel.userEventTracker
     // val errorTracker = viewModel.errorTracker
-    val crashLogger = CrashLoggerProvider.crashLogger
+    CrashLoggerProvider.crashLogger
 
     val packageInfo =
         remember {
@@ -103,11 +103,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     @SuppressLint("NewApi")
     val buildVersion =
         remember {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                (packageInfo?.longVersionCode ?: 0L).toString()
-            } else {
-                (packageInfo?.versionCode ?: 0).toString()
-            }
+            packageInfo?.longVersionCode?.toString() ?: "0"
         }
 
     // Отслеживаем время загрузки экрана
@@ -378,13 +374,14 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 SettingsSection(
                     onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
                     onLanguageClick = { /* Открыть диалог выбора языка */ },
-                    onCurrencyClick = { /* Открыть диалог выбора валюты */ },
+                    onCurrencyClick = { viewModel.onEvent(ProfileEvent.ShowCurrencyDialog) },
                     onTransactionReminderClick = {
                         viewModel.onEvent(
                             ProfileEvent.ShowNotificationSettingsDialog,
                         )
                     },
                     themeMode = state.themeMode,
+                    selectedCurrency = state.selectedCurrency,
                     isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                     transactionReminderTime = state.transactionReminderTime,
                     hasNotificationPermission = state.hasNotificationPermission,
@@ -521,6 +518,16 @@ private fun ShowDialogs(
         PinSetupDialog(
             onDismiss = { viewModel.onEvent(ProfileEvent.HidePinSetupDialog) },
             onPinSet = { pin -> viewModel.onEvent(ProfileEvent.SetPinCode(pin)) },
+        )
+    }
+
+    if (state.showCurrencyDialog) {
+        CurrencySelectionDialog(
+            currentCurrency = state.selectedCurrency,
+            onCurrencySelected = { currency ->
+                viewModel.onEvent(ProfileEvent.ChangeCurrency(currency))
+            },
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideCurrencyDialog) },
         )
     }
 }

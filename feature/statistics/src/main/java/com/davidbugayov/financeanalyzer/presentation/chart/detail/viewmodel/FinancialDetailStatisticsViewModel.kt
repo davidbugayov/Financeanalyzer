@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCatego
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -50,6 +51,25 @@ class FinancialDetailStatisticsViewModel(
 
     init {
         Timber.d("FinancialDetailStatisticsViewModel initialized with startDate=$startDate, endDate=$endDate")
+
+        // Подписываемся на изменения валюты
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow()?.collect { newCurrency ->
+                // Пересчитываем данные с новой валютой
+                if (_state.value.transactions.isNotEmpty()) {
+                    val transactions = _state.value.transactions
+                    val (income, expense) = calculateIncomeAndExpense(transactions)
+
+                    _state.value = _state.value.copy(
+                        income = income,
+                        expense = expense,
+                    )
+
+                    // Пересчитываем расширенные метрики
+                    calculateFinancialMetrics(transactions, income, expense)
+                }
+            }
+        }
     }
 
     /**
@@ -124,9 +144,10 @@ class FinancialDetailStatisticsViewModel(
             }
         }
 
+        val currentCurrency = CurrencyProvider.getCurrency()
         return Pair(
-            Money(totalIncome),
-            Money(totalExpense),
+            Money(totalIncome, currentCurrency),
+            Money(totalExpense, currentCurrency),
         )
     }
 
@@ -148,7 +169,7 @@ class FinancialDetailStatisticsViewModel(
             }
 
         // Рассчитываем статистику по категориям
-        val (categoryStats, totalIncome, totalExpense) = calculateCategoryStatsUseCase(transactions)
+        val (categoryStats, _, _) = calculateCategoryStatsUseCase(transactions)
 
         // Разделяем статистику на доходы и расходы
         val expenseCategories = categoryStats.filter { it.isExpense }
@@ -160,7 +181,7 @@ class FinancialDetailStatisticsViewModel(
             if (dayCount > 0) {
                 Money(expense.amount.divide(BigDecimal(dayCount), 2, RoundingMode.HALF_EVEN))
             } else {
-                Money.zero()
+                Money.zero(CurrencyProvider.getCurrency())
             }
 
         val averageMonthlyExpense = Money(averageDailyExpense.amount.multiply(BigDecimal(30)))
@@ -194,14 +215,14 @@ class FinancialDetailStatisticsViewModel(
             if (incomeTransactionsCount > 0) {
                 Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN))
             } else {
-                Money.zero()
+                Money.zero(CurrencyProvider.getCurrency())
             }
 
         val averageExpensePerTransaction =
             if (expenseTransactionsCount > 0) {
                 Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN))
             } else {
-                Money.zero()
+                Money.zero(CurrencyProvider.getCurrency())
             }
 
         // Максимальный доход и расход
@@ -209,13 +230,14 @@ class FinancialDetailStatisticsViewModel(
             transactions
                 .filter { it.amount.amount > BigDecimal.ZERO }
                 .maxByOrNull { it.amount.amount }
-                ?.amount ?: Money.zero()
+                ?.amount ?: Money.zero(CurrencyProvider.getCurrency())
 
         val maxExpense =
             transactions
                 .filter { it.amount.amount < BigDecimal.ZERO }
                 .minByOrNull { it.amount.amount }
-                ?.amount?.let { Money(it.amount.abs()) } ?: Money.zero()
+                ?.amount?.let { Money(it.amount.abs(), CurrencyProvider.getCurrency()) }
+                ?: Money.zero(CurrencyProvider.getCurrency())
 
         // Определяем самый частый день расходов
         val dayOfWeekMap =
