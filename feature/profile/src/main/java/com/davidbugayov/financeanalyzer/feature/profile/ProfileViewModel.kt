@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
@@ -65,6 +66,14 @@ class ProfileViewModel(
                 _state.update { it.copy(themeMode = newTheme) }
             }
             .launchIn(viewModelScope)
+
+        // Подписываемся на изменения валюты
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
+                _state.update { it.copy(selectedCurrency = newCurrency) }
+                loadFinancialAnalytics()
+            }
+        }
     }
 
     fun onEvent(event: ProfileEvent) {
@@ -315,7 +324,7 @@ class ProfileViewModel(
 
             try {
                 Timber.d("[ProfileViewModel] Calling getProfileAnalyticsUseCase")
-                val result = getProfileAnalyticsUseCase()
+                val result = getProfileAnalyticsUseCase(_state.value.selectedCurrency)
                 Timber.d("[ProfileViewModel] Got result from getProfileAnalyticsUseCase: $result")
 
                 if (result is CoreResult.Success) {

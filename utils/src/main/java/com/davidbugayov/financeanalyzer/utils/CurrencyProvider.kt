@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
  * Синглтон для предоставления глобального доступа к текущей валюте
  */
 object CurrencyProvider {
-
     private var _currentCurrency: Currency = Currency.RUB
     private val _currencyFlow = MutableStateFlow(_currentCurrency)
 
@@ -17,7 +16,8 @@ object CurrencyProvider {
      * Инициализация с валютой из PreferencesManager
      */
     fun init(preferencesManager: PreferencesManager) {
-        _currentCurrency = preferencesManager.getCurrency()
+        val currency = preferencesManager.getCurrency()
+        _currentCurrency = currency
         _currencyFlow.value = _currentCurrency
     }
 
@@ -37,5 +37,5 @@ object CurrencyProvider {
     /**
      * Получить Flow для отслеживания изменений валюты
      */
-    fun getCurrencyFlow(): StateFlow<Currency>? = _currencyFlow.asStateFlow()
+    fun getCurrencyFlow(): StateFlow<Currency> = _currencyFlow.asStateFlow()
 }

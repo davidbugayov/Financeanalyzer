@@ -26,6 +26,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
@@ -59,6 +60,9 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
         // Определяем, какую тему использует приложение и инициализируем AppTheme
         val themeMode = PreferencesManager(this).getThemeMode()
         AppTheme.setTheme(themeMode)
+
+        // Инициализируем CurrencyProvider
+        CurrencyProvider.init(preferencesManager)
 
         val isDarkTheme =
             when (themeMode) {

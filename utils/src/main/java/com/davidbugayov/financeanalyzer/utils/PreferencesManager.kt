@@ -205,7 +205,8 @@ class PreferencesManager(context: Context) {
      * Получает сохраненную валюту
      */
     fun getCurrency(): Currency {
-        return _currencyFlow.value
+        val currency = _currencyFlow.value
+        return currency
     }
 
     /**
@@ -213,10 +214,11 @@ class PreferencesManager(context: Context) {
      */
     private fun getCurrencyInternal(): Currency {
         val currencyName = sharedPreferences.getString(KEY_CURRENCY, Currency.RUB.name)
-        return try {
+        val currency = try {
             Currency.valueOf(currencyName ?: Currency.RUB.name)
         } catch (_: Exception) {
             Currency.RUB
         }
+        return currency
     }
 }

@@ -59,6 +59,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorDark
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorLight
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -167,14 +168,17 @@ fun TransactionItem(
             }
         }
 
+    val currentCurrency by CurrencyProvider.getCurrencyFlow().collectAsState()
+
     val formattedAmount =
         remember(
             transaction.amount,
             transaction.isExpense,
             transaction.category,
             transferCategoryString,
+            currentCurrency,
         ) {
-            val moneyAmount = transaction.amount
+            val moneyAmount = Money(transaction.amount.amount, currentCurrency)
 
             val isTransfer =
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||

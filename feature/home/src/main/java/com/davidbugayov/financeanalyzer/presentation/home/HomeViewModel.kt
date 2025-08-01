@@ -24,6 +24,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import java.text.SimpleDateFormat
@@ -142,6 +143,14 @@ class HomeViewModel(
         viewModelScope.launch {
             financialMetrics.totalExpense.collect { expense ->
                 _state.update { it.copy(expense = expense) }
+            }
+        }
+
+        // Подписываемся на изменения валюты
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
+                // Пересчитываем данные с новой валютой
+                loadTransactions()
             }
         }
     }
@@ -421,12 +430,16 @@ class HomeViewModel(
                 }
 
                 // Группируем транзакции по категориям и суммируем значения
+                val currentCurrency = CurrencyProvider.getCurrency()
                 val categoryTotals =
                     transactions
                         .filter { it.isExpense } // Считаем только расходы
                         .groupBy { it.category }
                         .mapValues { (_, txs) -> // Суммируем расходы по категории с использованием Money
-                            txs.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+                            txs.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                                acc + convertedAmount
+                            }
                         }
                         .toList()
                         .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
@@ -540,13 +553,15 @@ class HomeViewModel(
      */
     private fun calculateStats(transactions: List<Transaction>): Triple<Money, Money, Money> {
         if (transactions.isEmpty()) {
-            return Triple(Money.zero(), Money.zero(), Money.zero())
+            val currentCurrency = CurrencyProvider.getCurrency()
+            return Triple(Money.zero(currentCurrency), Money.zero(currentCurrency), Money.zero(currentCurrency))
         }
 
         // Находим минимальную и максимальную даты в транзакциях
         val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
         val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
-        val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
+        val currentCurrency = CurrencyProvider.getCurrency()
+        val metrics = calculateBalanceMetricsUseCase(transactions, currentCurrency, startDate, endDate)
         val income = metrics.income
         val expense = metrics.expense
         val balance = income - expense
@@ -602,7 +617,7 @@ class HomeViewModel(
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
 
             // Форматируем дату для отображения в UI
-            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             dateFormat.format(date)
 
             // Вычисляем общий баланс (доходы - расходы)

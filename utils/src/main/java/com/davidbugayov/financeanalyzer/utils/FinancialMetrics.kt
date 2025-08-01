@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
@@ -67,6 +66,18 @@ class FinancialMetrics private constructor() : KoinComponent {
                 Timber.e(e, "Ошибка при подписке на события изменения данных в FinancialMetrics")
             }
         }
+
+        // Подписываемся на изменения валюты
+        scope.launch {
+            try {
+                CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
+                    Timber.d("FinancialMetrics: Получено событие изменения валюты на ${newCurrency.name}, пересчитываем метрики")
+                    recalculateStats()
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при подписке на изменения валюты в FinancialMetrics")
+            }
+        }
     }
 
     /**
@@ -75,18 +86,25 @@ class FinancialMetrics private constructor() : KoinComponent {
     private fun recalculateStats() {
         scope.launch {
             try {
+                val currentCurrency = CurrencyProvider.getCurrency()
                 val visibleTransactions = repository.loadTransactions()
 
-                // Расчет доходов и расходов
+                // Расчет доходов и расходов с конвертацией в текущую валюту
                 val income =
                     visibleTransactions
                         .filter { !it.isExpense }
-                        .fold(Money.zero()) { acc, t -> acc + t.amount }
+                        .fold(Money.zero(currentCurrency)) { acc, t ->
+                            val convertedAmount = Money(t.amount.amount, currentCurrency)
+                            acc + convertedAmount
+                        }
 
                 val expense =
                     visibleTransactions
                         .filter { it.isExpense }
-                        .fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
+                        .fold(Money.zero(currentCurrency)) { acc, t ->
+                            val convertedAmount = Money(t.amount.amount, currentCurrency)
+                            acc + convertedAmount.abs()
+                        }
 
                 val balance = income - expense
 
@@ -121,7 +139,7 @@ class FinancialMetrics private constructor() : KoinComponent {
     /**
      * Инициализация метрик (публичный метод)
      */
-    fun initialize(context: Context) {
+    fun initialize() {
         Timber.d("Initializing financial metrics")
         // Здесь может быть код для загрузки настроек или предварительных данных
     }
@@ -129,7 +147,7 @@ class FinancialMetrics private constructor() : KoinComponent {
     /**
      * Инициализация метрик (устаревший метод для обратной совместимости)
      */
-    fun init(context: Context) {
-        initialize(context)
+    fun init() {
+        initialize()
     }
 }

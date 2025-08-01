@@ -54,7 +54,7 @@ class FinancialDetailStatisticsViewModel(
 
         // Подписываемся на изменения валюты
         viewModelScope.launch {
-            CurrencyProvider.getCurrencyFlow()?.collect { newCurrency ->
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
                 // Пересчитываем данные с новой валютой
                 if (_state.value.transactions.isNotEmpty()) {
                     val transactions = _state.value.transactions

@@ -1,6 +1,8 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -8,33 +10,35 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import java.util.Calendar
 import java.util.Date
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 class GetProfileAnalyticsUseCase(
     private val transactionRepository: TransactionRepository,
     private val walletRepository: WalletRepository,
 ) {
 
-    suspend operator fun invoke(): CoreResult<ProfileAnalytics> {
+    suspend operator fun invoke(currency: Currency): CoreResult<ProfileAnalytics> {
         return try {
             val transactions = transactionRepository.getAllTransactions()
             val wallets = walletRepository.getAllWallets().size
 
-            var totalIncome = Money.zero()
-            var totalExpense = Money.zero()
+            var totalIncome = Money.zero(currency)
+            var totalExpense = Money.zero(currency)
             val incomeCategories = mutableSetOf<String>()
             val expenseCategories = mutableSetOf<String>()
             val sources = mutableSetOf<String>()
 
             transactions.forEach { transaction ->
+                // Конвертируем сумму транзакции в текущую валюту
+                val convertedAmount = Money(transaction.amount.amount, currency)
+
                 if (transaction.amount.isPositive()) {
-                    totalIncome = totalIncome.plus(transaction.amount)
-                    transaction.category?.let { incomeCategories.add(it) }
+                    totalIncome = totalIncome.plus(convertedAmount)
+                    transaction.category.let { incomeCategories.add(it) }
                 } else {
-                    totalExpense = totalExpense.plus(transaction.amount.abs())
-                    transaction.category?.let { expenseCategories.add(it) }
+                    totalExpense = totalExpense.plus(convertedAmount.abs())
+                    transaction.category.let { expenseCategories.add(it) }
                 }
-                transaction.source?.let { sources.add(it) }
+                transaction.source.let { sources.add(it) }
             }
 
             val balance = totalIncome.minus(totalExpense)
@@ -47,7 +51,7 @@ class GetProfileAnalyticsUseCase(
             val averageExpense = if (expenseCategories.isNotEmpty()) {
                 totalExpense.div(expenseCategories.size.toDouble())
             } else {
-                Money.zero()
+                Money.zero(currency)
             }
 
             val currentDate = Date()
@@ -75,4 +79,4 @@ class GetProfileAnalyticsUseCase(
             CoreResult.Error(mapException(e))
         }
     }
-} 
+}

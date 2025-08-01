@@ -1,7 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -11,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,6 +27,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
 /**
  * Простой список с группировкой и «аккордеоном».
@@ -37,12 +43,18 @@ fun GroupedTransactionList(
     // Состояние свёрнутости по ключу группы (в памяти экрана)
     val expandedMap = remember { mutableStateMapOf<String, Boolean>() }
 
+    val currentCurrency = CurrencyProvider.getCurrencyFlow().collectAsState().value
+
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         // Сортируем ключи по убыванию (предположим, ключ содержит дату/текст)
         val sortedKeys = groups.keys.sortedDescending()
+
         sortedKeys.forEach { key ->
             val list = groups[key].orEmpty()
-            val total: Money = list.fold(Money.zero()) { acc, tx -> acc + tx.amount }
+            val total: Money = list.fold(Money.zero(currentCurrency)) { acc, tx ->
+                val convertedAmount = Money(tx.amount.amount, currentCurrency)
+                acc + convertedAmount
+            }
             val expanded = expandedMap.getOrPut(key) { true }
 
             // Header

@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.history
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -29,6 +28,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -39,7 +39,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,7 +59,6 @@ class TransactionHistoryViewModel(
     val categoriesViewModel: CategoriesViewModel,
     private val getTransactionsForPeriodFlowUseCase: GetTransactionsForPeriodFlowUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val application: Application,
     private val navigationManager: NavigationManager,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
 ) : ViewModel() {
@@ -80,7 +78,7 @@ class TransactionHistoryViewModel(
             .flatMapLatest {
                 val s = state.value
                 val pageSize = s.pageSize
-                if (s.periodType == com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL) {
+                if (s.periodType == PeriodType.ALL) {
                     repository.getAllPaged(pageSize)
                 } else {
                     repository.getByPeriodPaged(s.startDate, s.endDate, pageSize)
@@ -93,7 +91,7 @@ class TransactionHistoryViewModel(
     private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.forLanguageTag("ru"))
 
     private fun headerKey(
-        date: java.util.Date,
+        date: Date,
         grouping: GroupingType,
     ): String {
         return when (grouping) {
@@ -150,6 +148,14 @@ class TransactionHistoryViewModel(
         reloadPagedTransactions()
         loadCategories()
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
+
+        // Подписываемся на изменения валюты
+        viewModelScope.launch {
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
+                // Пересчитываем данные с новой валютой
+                resetAndReloadTransactions()
+            }
+        }
     }
 
     private fun loadCategories() {
@@ -883,13 +889,6 @@ class TransactionHistoryViewModel(
     }
 
     /**
-     * Возвращает сгруппированные транзакции для отображения в UI
-     */
-    fun getGroupedTransactions(): Map<String, List<Transaction>> {
-        return state.value.groupedTransactions
-    }
-
-    /**
      * Временный метод для проверки количества транзакций в базе данных
      */
     fun checkTransactionCount() {
@@ -935,8 +934,4 @@ class TransactionHistoryViewModel(
             NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)),
         )
     }
-
-    private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
-
-    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
 }

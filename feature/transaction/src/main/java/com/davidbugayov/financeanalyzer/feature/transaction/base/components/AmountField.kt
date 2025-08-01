@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
 /**
  * Поле ввода суммы транзакции с поддержкой арифметических выражений
@@ -46,10 +48,12 @@ fun AmountField(
     // Внутреннее состояние для "сырого" значения, синхронизированное с amount от ViewModel
     var internalRawAmount by remember { mutableStateOf(amount) }
 
+    val currentCurrency = CurrencyProvider.getCurrencyFlow().collectAsState().value
+    
     // TextFieldValue для отображения в OutlinedTextField
     var textFieldValueForDisplay by remember {
         val numericAmount = amount.toDoubleOrNull()
-        val initialText = if (numericAmount != null) Money(numericAmount).format() else amount
+        val initialText = if (numericAmount != null) Money(numericAmount, currentCurrency).format() else amount
         mutableStateOf(
             TextFieldValue(text = initialText, selection = TextRange(initialText.length)),
         )
@@ -59,7 +63,7 @@ fun AmountField(
 
     // Синхронизация внешнего 'amount' (от ViewModel) с 'internalRawAmount'
     // и обновление 'textFieldValueForDisplay' в зависимости от фокуса
-    LaunchedEffect(amount, isFocused) {
+    LaunchedEffect(amount, isFocused, currentCurrency) {
         // Если внешний 'amount' изменился, обновляем наше внутреннее "сырое" значение
         if (internalRawAmount != amount) {
             internalRawAmount = amount
@@ -72,10 +76,10 @@ fun AmountField(
                 val numericValue = internalRawAmount.toDoubleOrNull()
                 if (numericValue != null) {
                     // Format number without currency symbol and drop trailing .00
-                    val formattedWithSymbol = Money(numericValue).format()
+                    val formattedWithSymbol = Money(numericValue, currentCurrency).format()
                     val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
-                    val sep = Money(numericValue).currency.decimalSeparator.toString()
-                    val zeroSuffix = sep + "0".repeat(Money(numericValue).currency.decimalPlaces)
+                    val sep = Money(numericValue, currentCurrency).currency.decimalSeparator.toString()
+                    val zeroSuffix = sep + "0".repeat(Money(numericValue, currentCurrency).currency.decimalPlaces)
                     if (withoutSymbol.endsWith(zeroSuffix)) {
                         withoutSymbol.removeSuffix(zeroSuffix)
                     } else {

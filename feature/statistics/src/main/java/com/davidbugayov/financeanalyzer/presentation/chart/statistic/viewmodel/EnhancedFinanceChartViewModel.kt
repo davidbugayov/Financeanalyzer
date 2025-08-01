@@ -46,7 +46,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     init {
         // Подписываемся на изменения валюты
         viewModelScope.launch {
-            CurrencyProvider.getCurrencyFlow()?.collect { newCurrency ->
+            CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
                 // Пересчитываем данные с новой валютой
                 if (allTransactions.isNotEmpty()) {
                     loadData()
@@ -131,9 +131,11 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     )
                 allTransactions = filteredTransactions
 
+                val currentCurrency = CurrencyProvider.getCurrency()
                 val metrics =
                     calculateBalanceMetricsUseCase(
                         filteredTransactions,
+                        currentCurrency,
                         _state.value.startDate,
                         _state.value.endDate,
                     )
@@ -144,7 +146,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val monthsOfSavings = metrics.monthsOfSavings
 
                 // Агрегируем по категориям
-                val currentCurrency = CurrencyProvider.getCurrency()
                 val expensesByCategory =
                     filteredTransactions
                         .filter { it.isExpense }
