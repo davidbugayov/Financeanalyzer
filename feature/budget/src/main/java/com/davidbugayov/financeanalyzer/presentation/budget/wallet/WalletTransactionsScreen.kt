@@ -35,7 +35,7 @@ import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
-import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
@@ -61,7 +61,7 @@ fun WalletTransactionsScreen(
     var showImportCategoriesDialog by remember { mutableStateOf(false) }
 
     // Получаем доступ к CategoriesViewModel для импорта категорий
-    val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel =
+    val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel =
         koinViewModel()
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
 

@@ -39,7 +39,7 @@ import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -170,7 +170,7 @@ private fun HomeBottomBar(
 private fun HomeMainContent(
     windowSizeIsCompact: Boolean,
     state: HomeState,
-    categoriesViewModel: AppCategoriesViewModel,
+    categoriesViewModel: PersistentCategoriesViewModel,
     pagingItems: androidx.paging.compose.LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
@@ -258,7 +258,7 @@ private fun HomeFeedback(
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel =
+    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel =
         koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
     updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),

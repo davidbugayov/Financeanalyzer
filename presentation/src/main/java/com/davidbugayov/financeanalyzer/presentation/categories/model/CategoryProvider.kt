@@ -122,4 +122,38 @@ object CategoryProvider {
         val palette = if (isExpense) ExpenseChartPalette else IncomeChartPalette
         return palette.ifEmpty { listOf(DefaultCategoryColor) }.random()
     }
+
+    /**
+     * Получает иконку по имени
+     */
+    fun getIconByName(name: String): androidx.compose.ui.graphics.vector.ImageVector {
+        return CategoryIconProvider.getIconByName(name)
+    }
+
+    /**
+     * Получает имя иконки из ImageVector
+     */
+    fun getIconName(icon: androidx.compose.ui.graphics.vector.ImageVector): String {
+        // Простая реализация - возвращаем дефолтное имя
+        // В реальном приложении здесь должна быть более сложная логика
+        return "category"
+    }
+
+    /**
+     * Парсит цвет из hex строки
+     */
+    fun parseColorFromHex(hex: String): Color {
+        return try {
+            Color(android.graphics.Color.parseColor(hex))
+        } catch (e: Exception) {
+            DefaultCategoryColor
+        }
+    }
+
+    /**
+     * Конвертирует цвет в hex строку
+     */
+    fun colorToHex(color: Color): String {
+        return String.format("#%06X", (0xFFFFFF and color.value.toInt()))
+    }
 }

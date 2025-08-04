@@ -9,8 +9,8 @@ import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.setup.WalletSetupViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.SubWalletsViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
-import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
@@ -27,8 +27,8 @@ import org.koin.dsl.module
 val viewModelModule =
     module {
         // Categories ViewModel is shared across app
-        viewModelOf(::AppCategoriesViewModel)
-        singleOf(::AppCategoriesViewModel) { bind<CategoriesViewModel>() }
+        viewModelOf(::PersistentCategoriesViewModel)
+        singleOf(::PersistentCategoriesViewModel) { bind<CategoriesViewModel>() }
 
         viewModelOf(::AchievementsUiViewModel)
 
