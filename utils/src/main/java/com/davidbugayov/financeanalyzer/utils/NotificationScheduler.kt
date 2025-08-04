@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.davidbugayov.financeanalyzer.ui.R
 import java.util.Calendar
 import timber.log.Timber
 
@@ -15,7 +16,7 @@ import timber.log.Timber
 class NotificationScheduler(
     private val applicationContext: Context,
     private val preferencesManager: PreferencesManager, // Добавляем PreferencesManager как зависимость
-) : com.davidbugayov.financeanalyzer.utils.INotificationScheduler {
+) : INotificationScheduler {
     private val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
     private val TRANSACTION_REMINDER_REQUEST_CODE = 1001
 
@@ -23,8 +24,8 @@ class NotificationScheduler(
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
      */
     private fun createNotificationChannel() { // Убираем context из параметра
-        val name = "Напоминания о транзакциях"
-        val description = "Канал для уведомлений о необходимости внести транзакции"
+        val name = applicationContext.getString(R.string.notification_channel_name)
+        val description = applicationContext.getString(R.string.notification_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
         val channel =

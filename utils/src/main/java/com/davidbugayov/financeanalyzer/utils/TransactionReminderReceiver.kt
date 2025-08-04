@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import com.davidbugayov.financeanalyzer.ui.R
 import timber.log.Timber
 
 /**
@@ -79,9 +80,9 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         // Создаем уведомление
         val builder =
             NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle("Уведомления отключены")
-                .setContentText("Включите уведомления в настройках приложения")
+                .setSmallIcon(R.drawable.ic_notification_wallet)
+                .setContentTitle(context.getString(R.string.notification_permission_title_hardcoded))
+                .setContentText(context.getString(R.string.notification_permission_text_hardcoded))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
@@ -119,9 +120,9 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         // Создаем уведомление
         val builder =
             NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info) // Убедитесь, что у вас есть такая иконка
-                .setContentTitle("Напоминание о транзакции")
-                .setContentText("Не забудьте внести сегодняшние транзакции")
+                .setSmallIcon(R.drawable.ic_notification_wallet) // Используем иконку кошелька с деньгами
+                .setContentTitle(context.getString(R.string.notification_transaction_reminder_title))
+                .setContentText(context.getString(R.string.notification_transaction_reminder_text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)

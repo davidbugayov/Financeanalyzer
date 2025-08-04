@@ -221,7 +221,7 @@ fun AnalyticsSection(
                             title = stringResource(R.string.balance),
                             value = balance.formatForDisplay(useMinimalDecimals = true),
                             color = balanceColor,
-                            icon = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
+                            icon = painterResource(R.drawable.ic_rubble),
                             animationDelay = 200,
                             modifier = Modifier.weight(1f),
                         )

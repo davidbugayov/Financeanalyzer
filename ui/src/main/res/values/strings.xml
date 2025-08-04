@@ -519,4 +519,14 @@
     <string name="notification_permission_description">Получайте напоминания о транзакциях и важные уведомления о ваших финансах</string>
     <string name="notification_permission_allow">Разрешить</string>
     <string name="notification_permission_later">Позже</string>
+    
+    <!-- Каналы уведомлений -->
+    <string name="notification_channel_name">Напоминания о транзакциях</string>
+    <string name="notification_channel_description">Уведомления о необходимости внести транзакции</string>
+    
+    <!-- Уведомления о транзакциях -->
+    <string name="notification_permission_title_hardcoded">Уведомления отключены</string>
+    <string name="notification_permission_text_hardcoded">Включите уведомления в настройках приложения</string>
+    <string name="notification_transaction_reminder_title">Напоминание о транзакции</string>
+    <string name="notification_transaction_reminder_text">Не забудьте внести сегодняшние транзакции</string>
 </resources>
