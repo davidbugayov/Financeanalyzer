@@ -20,6 +20,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -100,14 +102,35 @@ fun NotificationSettingsDialog(
         )
     }
 
+    // ActivityResultLauncher для запроса разрешения на уведомления
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            hasNotificationPermission = true
+            if (pendingEnableNotifications) {
+                viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
+                pendingEnableNotifications = false
+            }
+        }
+        showPermissionDialog = false
+    }
+
     if (showPermissionDialog) {
         PermissionDialogs.RationalePermissionDialog(
             titleResId = R.string.permission_required_title,
             messageResId = R.string.notification_permission_required,
             onConfirm = {
-                showPermissionDialog = false
-                hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-                viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    showPermissionDialog = false
+                    hasNotificationPermission = true
+                    if (pendingEnableNotifications) {
+                        viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
+                        pendingEnableNotifications = false
+                    }
+                }
             },
             onDismiss = { showPermissionDialog = false },
         )
