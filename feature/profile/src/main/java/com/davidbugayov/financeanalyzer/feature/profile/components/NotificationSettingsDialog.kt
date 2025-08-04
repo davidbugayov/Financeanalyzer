@@ -42,6 +42,10 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import java.util.Locale
 import timber.log.Timber
 
@@ -62,6 +66,7 @@ fun NotificationSettingsDialog(
     var pendingEnableNotifications by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
     var hasNotificationPermission by remember {
         mutableStateOf(
             PermissionUtils.hasNotificationPermission(context),
@@ -112,6 +117,11 @@ fun NotificationSettingsDialog(
                 viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
                 pendingEnableNotifications = false
             }
+        } else {
+            // Если разрешение не предоставлено, проверяем, нужно ли показать диалог настроек
+            if (PermissionUtils.shouldShowSettingsDialog(context)) {
+                showSettingsDialog = true
+            }
         }
         showPermissionDialog = false
     }
@@ -133,6 +143,17 @@ fun NotificationSettingsDialog(
                 }
             },
             onDismiss = { showPermissionDialog = false },
+        )
+    }
+
+    // Диалог для перехода в настройки приложения
+    if (showSettingsDialog) {
+        PermissionDialogs.SettingsPermissionDialog(
+            onOpenSettings = {
+                openApplicationSettings(context)
+                showSettingsDialog = false
+            },
+            onDismiss = { showSettingsDialog = false },
         )
     }
 
@@ -260,5 +281,23 @@ fun NotificationSettingsDialog(
                 }
             }
         }
+    }
+}
+
+/**
+ * Открывает настройки приложения для изменения разрешений.
+ * @param context Контекст приложения.
+ */
+fun openApplicationSettings(context: Context) {
+    val intent =
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Timber.e(e, "Failed to open application settings")
+        // Опционально: показать Toast или Snackbar об ошибке
     }
 }
