@@ -87,6 +87,7 @@ class PermissionManager(context: Context) {
 
                 PermissionEvent.DISMISS_DIALOG -> {
                     when (currentState) {
+                        NotificationPermissionState.ONBOARDING_COMPLETED -> NotificationPermissionState.PERMANENTLY_DENIED
                         NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
                         else -> currentState
                     }
