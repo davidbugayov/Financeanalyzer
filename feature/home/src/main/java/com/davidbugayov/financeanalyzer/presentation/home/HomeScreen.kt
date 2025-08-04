@@ -53,10 +53,13 @@ import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
+import com.davidbugayov.financeanalyzer.presentation.home.components.NotificationPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.isCompact
+import com.davidbugayov.financeanalyzer.utils.PermissionManager
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -276,7 +279,9 @@ fun HomeScreen(
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
+    var showNotificationPermissionDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
+    val permissionManager = remember { PermissionManager(context) }
 
     // Tips will be shown every time the screen opens; no persistence needed.
 
@@ -346,6 +351,16 @@ fun HomeScreen(
             kotlin.runCatching { TransactionFilter.valueOf(savedFilterName) }.getOrNull()?.let { savedFilter ->
                 viewModel.onEvent(HomeEvent.SetFilter(savedFilter))
             }
+        }
+        
+        // Проверяем, нужно ли показать диалог разрешения на уведомления
+        val currentState = permissionManager.getCurrentState()
+        val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
+        
+        if (currentState == PermissionManager.NotificationPermissionState.ONBOARDING_COMPLETED && 
+            !hasNotificationPermission && 
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            showNotificationPermissionDialog = true
         }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -539,6 +554,25 @@ fun HomeScreen(
                 onDismiss = {
                     showDetailDialog = false
                     selectedTransactionForDetail = null
+                },
+            )
+        }
+        
+        // Диалог разрешения на уведомления
+        if (showNotificationPermissionDialog) {
+            NotificationPermissionDialog(
+                onDismiss = {
+                    showNotificationPermissionDialog = false
+                },
+                onPermissionGranted = {
+                    // Разрешение предоставлено
+                    permissionManager.processEvent(PermissionManager.PermissionEvent.GRANT_PERMISSION)
+                    showNotificationPermissionDialog = false
+                },
+                onPermissionDenied = {
+                    // Разрешение отклонено
+                    permissionManager.processEvent(PermissionManager.PermissionEvent.DENY_PERMISSION)
+                    showNotificationPermissionDialog = false
                 },
             )
         }

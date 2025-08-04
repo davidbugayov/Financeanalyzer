@@ -35,6 +35,7 @@ import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
+import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.GlobalScope
 import org.koin.android.ext.koin.androidApplication
@@ -58,6 +59,7 @@ val appModule =
         single { WalletPreferences.getInstance(androidContext()) }
         single { PreferencesManager(androidContext()) }
         single { OnboardingManager(androidContext()) }
+        single { PermissionManager(androidContext()) }
 
         // Repositories
         single<WalletRepository> { WalletRepositoryImpl(get()) }

@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.onboarding
 
 import androidx.lifecycle.ViewModel
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
+import com.davidbugayov.financeanalyzer.utils.PermissionManager
 
 /**
  * ViewModel для экрана онбординга.
@@ -10,6 +11,7 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
  */
 class OnboardingViewModel(
     private val onboardingManager: OnboardingManager,
+    private val permissionManager: PermissionManager,
 ) : ViewModel() {
     /**
      * Проверяет, нужно ли показывать онбординг пользователю.
@@ -25,5 +27,7 @@ class OnboardingViewModel(
      */
     fun completeOnboarding() {
         onboardingManager.setOnboardingCompleted()
+        // Отмечаем завершение онбординга в PermissionManager
+        permissionManager.processEvent(PermissionManager.PermissionEvent.FINISH_ONBOARDING)
     }
 }

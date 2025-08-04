@@ -31,4 +31,11 @@
     <string name="feedback_warning">Предупреждение</string>
     <string name="financial_analyzer">Финансовый Анализатор</string>
     <string name="feedback_error">Ошибка обратной связи</string>
-<string name="current_balance">Текущий баланс</string><string name="profile">Профиль</string><string name="add_transaction">Добавить транзакцию</string><string name="loading_data">Загрузка данных...</string><string name="filter_today">Сегодня</string><string name="filter_week">Неделя</string><string name="filter_month">Месяц</string><string name="filter_all_time">За все время</string><string name="balance">Баланс</string><string name="expense_categories">Категории расходов</string><string name="income_categories">Категории доходов</string><string name="hide">Скрыть</string></resources>
+<string name="current_balance">Текущий баланс</string><string name="profile">Профиль</string><string name="add_transaction">Добавить транзакцию</string><string name="loading_data">Загрузка данных...</string><string name="filter_today">Сегодня</string><string name="filter_week">Неделя</string><string name="filter_month">Месяц</string><string name="filter_all_time">За все время</string><string name="balance">Баланс</string><string name="expense_categories">Категории расходов</string><string name="income_categories">Категории доходов</string><string name="hide">Скрыть</string>
+
+    <!-- Диалог разрешения уведомлений -->
+    <string name="notification_permission_title">Разрешить уведомления</string>
+    <string name="notification_permission_description">Получайте напоминания о транзакциях и важные уведомления о ваших финансах</string>
+    <string name="notification_permission_allow">Разрешить</string>
+    <string name="notification_permission_later">Позже</string>
+</resources>

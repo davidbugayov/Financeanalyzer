@@ -52,7 +52,7 @@ val viewModelModule =
 
         viewModelOf(::ImportTransactionsViewModel)
 
-        viewModelOf(::OnboardingViewModel)
+        viewModel { OnboardingViewModel(get(), get()) }
 
         viewModel { AchievementsViewModel(get(), get()) }
 

@@ -513,4 +513,10 @@
     <string name="wallet_remaining_amount">Осталось</string>
     <string name="wallet_budget_limit">Лимит бюджета</string>
     <string name="error_title">Ошибка</string>
+
+    <!-- Диалог разрешения уведомлений -->
+    <string name="notification_permission_title">Разрешить уведомления</string>
+    <string name="notification_permission_description">Получайте напоминания о транзакциях и важные уведомления о ваших финансах</string>
+    <string name="notification_permission_allow">Разрешить</string>
+    <string name="notification_permission_later">Позже</string>
 </resources>
