@@ -13,17 +13,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.setScale
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
+import timber.log.Timber
 
 @Composable
 fun SavingsOptimizationCard(
     metrics: FinancialMetrics,
     modifier: Modifier = Modifier,
 ) {
+    // Временный лог для диагностики
+    Timber.d("SavingsOptimizationCard: savingsRate=${metrics.savingsRate}, monthsOfSavings=${metrics.monthsOfSavings}")
+    
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
@@ -40,7 +45,7 @@ fun SavingsOptimizationCard(
                     .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = "Оптимизация сбережений",
+                text = stringResource(R.string.savings_optimization),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -53,13 +58,13 @@ fun SavingsOptimizationCard(
             )
 
             MetricRow(
-                title = "Норма сбережений",
-                value = "${metrics.savingsRate.setScale(1)}%",
+                title = stringResource(R.string.savings_rate_title),
+                value = stringResource(R.string.savings_rate_percent, metrics.savingsRate.setScale(1).toString()),
             )
 
             MetricRow(
-                title = "Месяцев сбережений",
-                value = "${metrics.monthsOfSavings} мес.",
+                title = stringResource(R.string.months_of_savings),
+                value = stringResource(R.string.months_format, metrics.monthsOfSavings.toInt()),
             )
         }
     }

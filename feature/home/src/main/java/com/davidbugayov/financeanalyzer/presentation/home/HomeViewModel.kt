@@ -123,7 +123,6 @@ class HomeViewModel(
     init {
         // Первичная инициализация Paging
         pagerTrigger.tryEmit(Unit)
-        Timber.d("HomeViewModel initialized")
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
 
         // Наблюдаем за изменениями балансов
@@ -172,7 +171,6 @@ class HomeViewModel(
                 updateDataSmoothly()
             }
             is HomeEvent.LoadTransactions -> {
-                Timber.d("HOME: Загрузка транзакций запрошена")
                 loadTransactions()
             }
             is HomeEvent.GenerateTestData -> {
@@ -243,13 +241,8 @@ class HomeViewModel(
     ) {
         viewModelScope.launch {
             try {
-                Timber.d(
-                    "HOME: Начинаем удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}",
-                )
-
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
-                        Timber.d("HOME: Транзакция успешно удалена из базы данных")
                         _state.update { it.copy(transactionToDelete = null) }
 
                         // Логируем событие в аналитику
@@ -261,17 +254,12 @@ class HomeViewModel(
 
                         context?.let { ctx ->
                             updateWidgetsUseCase()
-                            Timber.d(
-                                "Виджеты обновлены после удаления транзакции из HomeViewModel.",
-                            )
                         } ?: Timber.w(
                             "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                         )
 
-                        Timber.d("HOME: Удаление транзакции завершено успешно")
                     },
                     onFailure = { exception ->
-                        Timber.e(exception, "HOME: Ошибка при удалении транзакции: ${exception.message}")
                         _state.update {
                             it.copy(
                                 error = exception.message ?: "Failed to delete transaction",
@@ -281,7 +269,6 @@ class HomeViewModel(
                     },
                 )
             } catch (e: Exception) {
-                Timber.e(e, "HOME: Исключение при удалении транзакции: ${e.message}")
                 _state.update {
                     it.copy(
                         error = e.message ?: "Error deleting transaction",
@@ -297,22 +284,16 @@ class HomeViewModel(
      */
     private fun subscribeToRepositoryChanges() {
         viewModelScope.launch {
-            Timber.d("HOME: Подписываемся на изменения данных в репозитории")
             repository.dataChangeEvents.collect { event ->
-                Timber.d("HOME: Получено событие изменения данных: $event")
                 when (event) {
                     is com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent.TransactionChanged -> {
                         val transactionId = event.transactionId
-                        Timber.d("HOME: Получено событие изменения транзакции: $transactionId")
 
                         // Плавное обновление без полной перезагрузки
                         updateDataSmoothly()
                     }
                     else -> {
                         // Для других типов изменений - полная перезагрузка
-                        Timber.d("HOME: Получено событие изменения данных, полная перезагрузка")
-                        Timber.d("HOME: Устанавливаем isLoading = true для полной перезагрузки")
-                        _state.update { it.copy(isLoading = true) }
                         loadTransactions()
                     }
                 }
@@ -326,16 +307,13 @@ class HomeViewModel(
     private fun updateDataSmoothly() {
         viewModelScope.launch {
             try {
-                Timber.d("HOME: Начинаем плавное обновление данных")
                 val currentState = _state.value
                 val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
                 // ОЧИЩАЕМ КЭШ ПЕРЕД ЗАГРУЗКОЙ
                 val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
-                Timber.d("HOME: Плавно загружено транзакций: %d", transactions.size)
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
             } catch (e: Exception) {
-                Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
-                Timber.d("HOME: Ошибка при плавном обновлении, переключаемся на полную перезагрузку")
+                Timber.e(e, "Ошибка при плавном обновлении: %s", e.message)
                 loadTransactions()
             }
         }
@@ -349,10 +327,6 @@ class HomeViewModel(
         transactions: List<Transaction>,
     ) {
         viewModelScope.launch {
-            Timber.d("HOME: updateFilteredTransactionsSmoothly - начинаем обновление")
-            Timber.d("HOME: Текущее количество транзакций: ${_state.value.filteredTransactions.size}")
-            Timber.d("HOME: Новое количество транзакций: ${transactions.size}")
-
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
                     val income = financialMetrics.getTotalIncomeAsMoney()
@@ -366,9 +340,7 @@ class HomeViewModel(
 
             val transactionGroups = groupTransactionsByDate(transactions)
 
-            Timber.d("HOME: Обновляем состояние с новыми данными")
             _state.update {
-                Timber.d("HOME: Внутри _state.update - старый isLoading: ${it.isLoading}")
                 it.copy(
                     filteredTransactions = transactions,
                     transactionGroups = transactionGroups,
@@ -378,7 +350,6 @@ class HomeViewModel(
                     isLoading = false, // Не показываем индикатор загрузки
                 )
             }
-            Timber.d("HOME: Состояние обновлено, новый isLoading: ${_state.value.isLoading}")
 
             // Обновляем статистику по категориям в фоне
             updateCategoryStats(transactions)
@@ -393,24 +364,15 @@ class HomeViewModel(
      */
     private fun loadTransactions(showLoading: Boolean = true) {
         viewModelScope.launch {
-            Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
-            Timber.d(
-                "HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}",
-            )
-
             if (showLoading) {
-                Timber.d("HOME: Устанавливаем isLoading = true")
                 _state.update { it.copy(isLoading = true) }
             }
 
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
-                Timber.d("HOME: Загружено транзакций: %d", transactions.size)
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
-                Timber.e(e, "HOME: Ошибка при загрузке транзакций: %s", e.message)
-                Timber.d("HOME: Устанавливаем isLoading = false из-за ошибки")
                 _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }
@@ -462,12 +424,10 @@ class HomeViewModel(
     private fun generateAndSaveTestData() {
         viewModelScope.launch {
             try {
-                Timber.d("Generating test data")
                 _state.update { it.copy(isLoading = true) }
                 val testTransactions = TestDataGenerator.generateTransactions(500)
                 var hasError = false
                 testTransactions.forEach { transaction ->
-                    Timber.d("Saving test transaction: ${transaction.category}")
                     addTransactionUseCase(transaction).fold(
                         onSuccess = { /* Transaction saved successfully */ },
                         onFailure = { exception: Throwable ->
@@ -504,14 +464,8 @@ class HomeViewModel(
      */
     private fun updateFilteredTransactions(filter: TransactionFilter) {
         viewModelScope.launch {
-            Timber.d("HOME: updateFilteredTransactions - начинаем обновление с фильтром: $filter")
-            Timber.d(
-                "HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}",
-            )
-
             val (startDate, endDate) = getPeriodDates(filter)
             val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
-            Timber.d("HOME: Получено отфильтрованных транзакций: ${filteredTransactions.size}")
 
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
@@ -538,8 +492,6 @@ class HomeViewModel(
                     expenseOptimizationRecommendations = recommendations, // сохраняем рекомендации
                 )
             }
-            Timber.d("HOME: filteredBalance = ${filteredBalance.amount}")
-            Timber.d("HOME: updateFilteredTransactions завершен, новый isLoading: ${_state.value.isLoading}")
             reloadPaged()
         }
     }

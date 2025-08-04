@@ -560,12 +560,8 @@ class ImportTransactionsViewModel(
      * Триггеры достижений за импорт из банков
      */
     private fun triggerBankImportAchievements(bankName: String?) {
-        Timber.d("🏆 Вызов триггеров достижений для банка: '$bankName'")
-        Timber.d("🏆 bankName?.lowercase() = '${bankName?.lowercase()}'")
-
         when (bankName?.lowercase()) {
             "тинькофф", "тинь", "tinkoff", "tbank", "тинькофф банк (pdf)", "тинькофф pdf" -> {
-                Timber.d("🏆 Триггер Тинькофф")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "tinkoff_importer",
                 )
@@ -574,7 +570,6 @@ class ImportTransactionsViewModel(
                 )
             }
             "сбербанк", "сбер", "sberbank", "сберbank", "sber", "pao сбербанк", "пао сбербанк", "sberbank pdf", "сбербанк pdf", "сбербанк (pdf)", "сбербанк pdf" -> {
-                Timber.d("🏆 Триггер Сбербанк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "sberbank_importer",
                 )
@@ -583,7 +578,6 @@ class ImportTransactionsViewModel(
                 )
             }
             "альфа-банк", "альфа", "alfa", "alpha" -> {
-                Timber.d("🏆 Триггер Альфа-Банк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "alfabank_importer",
                 )
@@ -591,8 +585,7 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
-            "озон банк", "озон", "ozon", "ozon банк (pdf)", "ozon pdf" -> {
-                Timber.d("🏆 Триггер OZON Банк")
+            "озон банк", "озон", "ozon", "ozон банк (pdf)", "ozon pdf" -> {
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "ozon_importer",
                 )
@@ -601,14 +594,9 @@ class ImportTransactionsViewModel(
                 )
             }
             "csv-выписка", "generic csv", "generic csv (configurable)" -> {
-                Timber.d("🏆 Триггер CSV импорт")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "csv_importer",
                 )
-            }
-            else -> {
-                Timber.w("🏆 Банк '$bankName' не распознан для достижений. Проверьте логику определения банка!")
-                Timber.w("🏆 Доступные варианты для Сбербанка: 'сбербанк', 'сбер', 'sberbank'")
             }
         }
     }

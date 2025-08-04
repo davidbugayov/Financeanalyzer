@@ -91,7 +91,7 @@ fun WalletSummaryCard(
                 )
                 AchievementTrigger.onBudgetProgress(progress)
             } else if (progress > 0.8f) {
-                timber.log.Timber.d("🏆 Превышен порог экономности: прогресс $progress > 0.8")
+                // Превышен порог экономности
             }
 
             progress

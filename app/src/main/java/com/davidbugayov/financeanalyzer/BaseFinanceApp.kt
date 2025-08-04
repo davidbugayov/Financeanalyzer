@@ -186,7 +186,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             // Инициализируем провайдер для доступа из UI
             AchievementEngineProvider.initialize(achievementEngine)
 
-            Timber.d("🏆 Система достижений успешно инициализирована")
+
         } catch (e: Exception) {
             Timber.e(e, getString(R.string.achievements_system_init_error))
         }
@@ -271,7 +271,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
                 AchievementTrigger.onMilestoneReached("month_active")
             }
 
-            Timber.d("🏆 Проверка активности: первое открытие=$firstOpenTime, текущее время=$currentTime")
+
         } catch (e: Exception) {
             Timber.e(e, getString(R.string.user_activity_check_error))
         }

@@ -18,14 +18,14 @@ object AchievementTrigger {
      */
     fun initialize(achievementEngine: AchievementEngine) {
         engine = achievementEngine
-        Timber.d(StringProvider.logAchievementTriggerInitialized)
+        // Timber.d(StringProvider.logAchievementTriggerInitialized)
     }
     
     /**
      * Вызывается при добавлении новой транзакции
      */
     fun onTransactionAdded() {
-        Timber.d(StringProvider.logAchievementTransactionAdded)
+        // Timber.d(StringProvider.logAchievementTransactionAdded)
         engine?.onTransactionAdded()
     }
     
@@ -33,7 +33,7 @@ object AchievementTrigger {
      * Вызывается при создании бюджета
      */
     fun onBudgetCreated() {
-        Timber.d(StringProvider.logAchievementBudgetCreated)
+        // Timber.d(StringProvider.logAchievementBudgetCreated)
         engine?.onBudgetCreated()
     }
     
@@ -41,7 +41,7 @@ object AchievementTrigger {
      * Вызывается при просмотре статистики
      */
     fun onStatisticsViewed() {
-        Timber.d(StringProvider.logAchievementStatisticsViewed)
+        // Timber.d(StringProvider.logAchievementStatisticsViewed)
         engine?.onStatisticsViewed()
     }
     
@@ -49,7 +49,7 @@ object AchievementTrigger {
      * Вызывается при посещении раздела приложения
      */
     fun onAppSectionVisited(sectionName: String) {
-        Timber.d(StringProvider.logAchievementSectionVisited(sectionName))
+        // Timber.d(StringProvider.logAchievementSectionVisited(sectionName))
         engine?.onAppSectionVisited(sectionName)
     }
     

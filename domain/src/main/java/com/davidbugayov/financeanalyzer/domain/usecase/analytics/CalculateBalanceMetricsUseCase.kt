@@ -27,7 +27,7 @@ class CalculateBalanceMetricsUseCase {
 
         // Дополнительные метрики, которые могут использовать даты
         val savingsRate = if (income > BigDecimal.ZERO) {
-            (income - expense).divide(income, 4, java.math.RoundingMode.HALF_UP).toDouble()
+            (income - expense).divide(income, 4, java.math.RoundingMode.HALF_UP).multiply(BigDecimal(100)).toDouble()
         } else {
             0.0
         }

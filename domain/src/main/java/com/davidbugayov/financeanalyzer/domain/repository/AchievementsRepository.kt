@@ -336,7 +336,6 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
                 }
             }
             editor.apply()
-            Timber.d("🏆 Достижения сохранены в SharedPreferences")
         } catch (e: Exception) {
             Timber.e(e, StringProvider.logErrorSavingAchievements)
         }
@@ -378,7 +377,6 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         }
         _achievements.value = updatedList
         saveAchievements(updatedList)
-        Timber.d("🏆 Обновлено достижение: ${achievement.title} (прогресс: ${achievement.currentProgress}/${achievement.targetProgress})")
     }
     
     override suspend fun unlockAchievement(id: String) {

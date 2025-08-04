@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 /**
  * ViewModel для экрана подробной финансовой статистики.
  * Следует принципам MVI (Model-View-Intent).
@@ -50,8 +51,6 @@ class FinancialDetailStatisticsViewModel(
     val effect: SharedFlow<FinancialDetailStatisticsContract.Effect> = _effect.asSharedFlow()
 
     init {
-        Timber.d("FinancialDetailStatisticsViewModel initialized with startDate=$startDate, endDate=$endDate")
-
         // Подписываемся на изменения валюты
         viewModelScope.launch {
             CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
@@ -113,7 +112,6 @@ class FinancialDetailStatisticsViewModel(
                         period = formattedPeriod,
                     )
             } catch (e: Exception) {
-                Timber.e(e, "Error loading financial statistics data")
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
@@ -136,11 +134,10 @@ class FinancialDetailStatisticsViewModel(
         var totalExpense = BigDecimal.ZERO
 
         for (transaction in transactions) {
-            val amount = transaction.amount.amount
-            if (amount > BigDecimal.ZERO) {
-                totalIncome = totalIncome.add(amount)
+            if (!transaction.isExpense) {
+                totalIncome = totalIncome.add(transaction.amount.amount)
             } else {
-                totalExpense = totalExpense.add(amount.abs())
+                totalExpense = totalExpense.add(transaction.amount.amount.abs())
             }
         }
 
@@ -163,7 +160,8 @@ class FinancialDetailStatisticsViewModel(
         val savingsRate =
             if (income.amount > BigDecimal.ZERO) {
                 val balance = income.amount.subtract(expense.amount)
-                balance.divide(income.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
+                val rate = balance.divide(income.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
+                rate.coerceIn(-100f, 100f)
             } else {
                 0f
             }
@@ -208,8 +206,8 @@ class FinancialDetailStatisticsViewModel(
             }
 
         // Рассчитываем статистику по транзакциям
-        val incomeTransactionsCount = transactions.count { it.amount.amount > BigDecimal.ZERO }
-        val expenseTransactionsCount = transactions.count { it.amount.amount < BigDecimal.ZERO }
+        val incomeTransactionsCount = transactions.count { !it.isExpense }
+        val expenseTransactionsCount = transactions.count { it.isExpense }
 
         // Средний доход и расход на транзакцию
         val averageIncomePerTransaction =
@@ -229,21 +227,21 @@ class FinancialDetailStatisticsViewModel(
         // Максимальный доход и расход
         val maxIncome =
             transactions
-                .filter { it.amount.amount > BigDecimal.ZERO }
+                .filter { !it.isExpense }
                 .maxByOrNull { it.amount.amount }
                 ?.amount ?: Money.zero(CurrencyProvider.getCurrency())
 
         val maxExpense =
             transactions
-                .filter { it.amount.amount < BigDecimal.ZERO }
-                .minByOrNull { it.amount.amount }
+                .filter { it.isExpense }
+                .maxByOrNull { it.amount.amount.abs() }
                 ?.amount?.let { Money(it.amount.abs(), CurrencyProvider.getCurrency()) }
                 ?: Money.zero(CurrencyProvider.getCurrency())
 
         // Определяем самый частый день расходов
         val dayOfWeekMap =
             transactions
-                .filter { it.amount.amount < BigDecimal.ZERO }
+                .filter { it.isExpense }
                 .groupBy { getDayOfWeekName(it.date) }
                 .mapValues { it.value.size }
 
@@ -256,6 +254,8 @@ class FinancialDetailStatisticsViewModel(
         val healthMetrics = calculateEnhancedFinancialMetricsUseCase?.invoke(transactions)
 
         // Обновляем метрики
+        Timber.d("ViewModel: Сохраняем метрики - savingsRate=$savingsRate, monthsOfSavings=$monthsOfSavings")
+        
         _metrics.value =
             FinancialMetrics(
                 savingsRate = savingsRate,

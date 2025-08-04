@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
+import timber.log.Timber
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
@@ -78,6 +79,10 @@ fun FinancialDetailStatisticsScreen(
     val viewModel: FinancialDetailStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
     val state = viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
+    
+    // Временный лог для диагностики
+    Timber.d("FinancialDetailStatisticsScreen: metrics.savingsRate=${metrics.savingsRate}, metrics.monthsOfSavings=${metrics.monthsOfSavings}")
+    
     rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
 

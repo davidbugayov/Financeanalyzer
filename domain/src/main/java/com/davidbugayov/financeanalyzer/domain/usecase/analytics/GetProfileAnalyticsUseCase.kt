@@ -9,7 +9,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import java.util.Calendar
 import java.util.Date
-import timber.log.Timber
 
 class GetProfileAnalyticsUseCase(
     private val transactionRepository: TransactionRepository,
@@ -31,7 +30,7 @@ class GetProfileAnalyticsUseCase(
                 // Конвертируем сумму транзакции в текущую валюту
                 val convertedAmount = Money(transaction.amount.amount, currency)
 
-                if (transaction.amount.isPositive()) {
+                if (!transaction.isExpense) {
                     totalIncome = totalIncome.plus(convertedAmount)
                     transaction.category.let { incomeCategories.add(it) }
                 } else {
@@ -75,7 +74,6 @@ class GetProfileAnalyticsUseCase(
 
             CoreResult.Success(profileAnalytics)
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении аналитики профиля")
             CoreResult.Error(mapException(e))
         }
     }

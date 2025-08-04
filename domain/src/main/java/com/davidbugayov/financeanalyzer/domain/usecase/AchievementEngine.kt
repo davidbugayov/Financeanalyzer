@@ -65,7 +65,7 @@ class AchievementEngine(
                 }
             }
             
-            Timber.d("🏆 Загружен прогресс: транзакции=$transactionCount, статистика=$statisticsViewCount, разделы=${sectionsVisited.size}, категории=${categoriesUsed.size}")
+            // Timber.d("🏆 Загружен прогресс: транзакции=$transactionCount, статистика=$statisticsViewCount, разделы=${sectionsVisited.size}, категории=${categoriesUsed.size}")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при загрузке прогресса достижений")
         }
@@ -75,7 +75,7 @@ class AchievementEngine(
      * Вызывается при добавлении новой транзакции
      */
     fun onTransactionAdded() {
-        Timber.d("🏆 Обработка: Транзакция добавлена")
+        // Timber.d("🏆 Обработка: Транзакция добавлена")
         
         scope.launch {
             transactionCount++
@@ -86,16 +86,16 @@ class AchievementEngine(
             
             // Проверяем время для специальных ачивок - используем checkAndUnlockAchievement
             val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            Timber.d("🏆 Текущий час: $hour")
+            // Timber.d("🏆 Текущий час: $hour")
             
             // Ранняя пташка: до 7 утра (0-6 часов)
             val isEarlyBird = hour < 7
-            Timber.d("🏆 Проверка early_bird: час=$hour, условие hour < 7 = $isEarlyBird")
+            // Timber.d("🏆 Проверка early_bird: час=$hour, условие hour < 7 = $isEarlyBird")
             checkAndUnlockAchievement("early_bird") { isEarlyBird }
             
             // Ночная сова: после 23:00 (23 час и позже)
             val isNightOwl = hour >= 23
-            Timber.d("🏆 Проверка night_owl: час=$hour, условие hour >= 23 = $isNightOwl")
+            // Timber.d("🏆 Проверка night_owl: час=$hour, условие hour >= 23 = $isNightOwl")
             checkAndUnlockAchievement("night_owl") { isNightOwl }
         }
     }
@@ -104,7 +104,6 @@ class AchievementEngine(
      * Вызывается при создании бюджета
      */
     fun onBudgetCreated() {
-        Timber.d("🏆 Обработка: Бюджет создан")
         
         scope.launch {
             updateAchievementProgress("first_budget", 1)
@@ -115,11 +114,8 @@ class AchievementEngine(
      * Вызывается при просмотре статистики
      */
     fun onStatisticsViewed() {
-        Timber.d("🏆 Обработка: Статистика просмотрена (текущий счетчик: $statisticsViewCount)")
-        
         scope.launch {
             statisticsViewCount++
-            Timber.d("🏆 Обработка: Увеличен счетчик статистики до $statisticsViewCount")
             updateAchievementProgress("data_analyst", statisticsViewCount)
         }
     }
@@ -128,7 +124,6 @@ class AchievementEngine(
      * Вызывается при посещении раздела приложения
      */
     fun onAppSectionVisited(sectionName: String) {
-        Timber.d("🏆 Обработка: Посещен раздел $sectionName")
         
         scope.launch {
             sectionsVisited.add(sectionName)
@@ -154,7 +149,6 @@ class AchievementEngine(
      * Вызывается при использовании новой категории
      */
     fun onCategoryUsed(categoryId: String) {
-        Timber.d("🏆 Обработка: Использована категория $categoryId")
         
         scope.launch {
             categoriesUsed.add(categoryId)
@@ -166,7 +160,6 @@ class AchievementEngine(
      * Вызывается при изменении баланса/накоплений
      */
     fun onSavingsChanged(newAmount: Long) {
-        Timber.d("🏆 Обработка: Накопления изменились: $newAmount копеек")
         
         scope.launch {
             // Конвертируем копейки в рубли для проверки
@@ -189,19 +182,16 @@ class AchievementEngine(
      * Вызывается при прогрессе по бюджету
      */
     fun onBudgetProgress(spentPercentage: Float) {
-        Timber.d("🏆 Обработка: Прогресс бюджета: ${(spentPercentage * 100).toInt()}%")
         
         scope.launch {
             // Ачивка "Экономный" разблокируется если пользователь активно тратит,
             // но держится в пределах 80% от бюджета в течение значимого времени
             if (spentPercentage > 0.5f && spentPercentage < 0.8f) {
-                Timber.d("🏆 Пользователь экономно тратит: ${(spentPercentage * 100).toInt()}% от бюджета")
                 checkAndUnlockAchievement("budget_saver") { true }
             }
             
             // Ачивка "Скупердяй" для тех, кто тратит менее 50%
             if (spentPercentage > 0.2f && spentPercentage < 0.5f) {
-                Timber.d("🏆 Пользователь очень экономно тратит: ${(spentPercentage * 100).toInt()}% от бюджета")
                 checkAndUnlockAchievement("penny_pincher") { true }
             }
         }
@@ -211,7 +201,6 @@ class AchievementEngine(
      * Вызывается при достижении целей или вехах
      */
     fun onMilestoneReached(milestoneType: String) {
-        Timber.d("🏆 Обработка: Достигнута веха $milestoneType")
         
         scope.launch {
             when (milestoneType) {
@@ -249,12 +238,9 @@ class AchievementEngine(
      */
     private suspend fun updateAchievementProgress(achievementId: String, newProgress: Int) {
         try {
-            Timber.d("🏆 Попытка обновить прогресс $achievementId: $newProgress")
             val achievement = achievementsRepository.getAchievementById(achievementId).first()
             
             if (achievement != null) {
-                Timber.d("🏆 Найдено достижение: ${achievement.title}, текущий прогресс: ${achievement.currentProgress}/${achievement.targetProgress}, разблокировано: ${achievement.isUnlocked}")
-                
                 if (!achievement.isUnlocked) {
                     val updatedProgress = minOf(newProgress, achievement.targetProgress)
                     val shouldUnlock = updatedProgress >= achievement.targetProgress
@@ -268,16 +254,9 @@ class AchievementEngine(
                     achievementsRepository.updateAchievement(updatedAchievement)
                     
                     if (shouldUnlock && !achievement.isUnlocked) {
-                        Timber.d("🏆 Разблокировано достижение: ${achievement.title}")
                         _newAchievements.emit(updatedAchievement)
-                    } else {
-                        Timber.d("🏆 Обновлен прогресс: ${achievement.title} - $updatedProgress/${achievement.targetProgress}")
                     }
-                } else {
-                    Timber.d("🏆 Достижение уже разблокировано: ${achievement.title}")
                 }
-            } else {
-                Timber.w("🏆 Достижение $achievementId не найдено!")
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при обновлении прогресса достижения $achievementId")
@@ -289,19 +268,13 @@ class AchievementEngine(
      */
     private suspend fun checkAndUnlockAchievement(achievementId: String, condition: () -> Boolean) {
         try {
-            Timber.d("🏆 Проверка достижения: $achievementId")
             val achievement = achievementsRepository.getAchievementById(achievementId).first()
             
             if (achievement != null) {
-                Timber.d("🏆 Найдено достижение: ${achievement.title}, разблокировано: ${achievement.isUnlocked}")
-                
                 if (!achievement.isUnlocked) {
                     val conditionResult = condition()
-                    Timber.d("🏆 Результат условия для $achievementId: $conditionResult")
                     
                     if (conditionResult) {
-                        Timber.d("🏆 Разблокировано достижение: ${achievement.title}")
-                        
                         val unlockedAchievement = achievement.copy(
                             isUnlocked = true,
                             dateUnlocked = System.currentTimeMillis(),
@@ -310,14 +283,8 @@ class AchievementEngine(
                         
                         achievementsRepository.updateAchievement(unlockedAchievement)
                         _newAchievements.emit(unlockedAchievement)
-                    } else {
-                        Timber.d("🏆 Условие не выполнено для: ${achievement.title}")
                     }
-                } else {
-                    Timber.d("🏆 Достижение уже разблокировано: ${achievement.title}")
                 }
-            } else {
-                Timber.w("🏆 Достижение $achievementId не найдено в репозитории!")
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при проверке достижения $achievementId")
