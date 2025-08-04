@@ -280,7 +280,6 @@ fun HomeScreen(
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
     var showNotificationPermissionDialog by remember { mutableStateOf(false) }
-    var hasShownPermissionDialogThisSession by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
     val permissionManager = remember { PermissionManager(context) }
 
@@ -362,13 +361,11 @@ fun HomeScreen(
         // 1. Онбординг завершен
         // 2. Нет разрешения на уведомления
         // 3. Android 13+ (где требуется разрешение)
-        // 4. Не показывали диалог в этой сессии
+        // 4. Состояние разрешения позволяет показать диалог
         if (currentState == PermissionManager.NotificationPermissionState.ONBOARDING_COMPLETED && 
             !hasNotificationPermission && 
-            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
-            !hasShownPermissionDialogThisSession) {
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             showNotificationPermissionDialog = true
-            hasShownPermissionDialogThisSession = true
         }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -579,10 +576,9 @@ fun HomeScreen(
                 },
                 onPermissionDenied = {
                     // Разрешение отклонено или нажато "Позже"
-                    // Не вызываем processEvent, чтобы диалог мог показаться снова
+                    // Отмечаем, что пользователь отложил запрос разрешения
+                    permissionManager.processEvent(PermissionManager.PermissionEvent.DISMISS_DIALOG)
                     showNotificationPermissionDialog = false
-                    // Сбрасываем флаг, чтобы диалог мог показаться при следующем входе
-                    hasShownPermissionDialogThisSession = false
                 },
             )
         }
