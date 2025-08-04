@@ -11,9 +11,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.feature.home.R
 
 /**
@@ -29,6 +32,28 @@ fun NotificationPermissionDialog(
 ) {
     val context = LocalContext.current
     val permissionManager = remember { PermissionManager(context) }
+    
+    // ActivityResultLauncher для запроса разрешения на уведомления
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            permissionManager.processEvent(PermissionManager.PermissionEvent.GRANT_PERMISSION)
+            onPermissionGranted()
+        } else {
+            // Если разрешение не предоставлено, проверяем, нужно ли показать диалог настроек
+            if (PermissionUtils.shouldShowSettingsDialog(context)) {
+                // Здесь можно показать диалог для перехода в настройки
+                // Пока просто отмечаем как отклоненное
+                permissionManager.processEvent(PermissionManager.PermissionEvent.DENY_PERMISSION)
+                onPermissionDenied()
+            } else {
+                permissionManager.processEvent(PermissionManager.PermissionEvent.DENY_PERMISSION)
+                onPermissionDenied()
+            }
+        }
+        onDismiss()
+    }
     
     Dialog(
         onDismissRequest = onDismiss,
@@ -104,15 +129,15 @@ fun NotificationPermissionDialog(
                             )
                             // Запрашиваем разрешение
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                                // Здесь должен быть ActivityResultLauncher, но пока просто отмечаем
+                                permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                // Для Android 12 и ниже разрешение считается предоставленным
                                 permissionManager.processEvent(
                                     PermissionManager.PermissionEvent.GRANT_PERMISSION
                                 )
                                 onPermissionGranted()
-                            } else {
-                                onPermissionGranted()
+                                onDismiss()
                             }
-                            onDismiss()
                         },
                         modifier = Modifier.weight(1f),
                     ) {
