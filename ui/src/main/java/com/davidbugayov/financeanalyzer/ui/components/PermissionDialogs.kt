@@ -23,6 +23,7 @@ object PermissionDialogs {
             onDismissRequest = onDismiss,
             title = { Text(stringResource(titleResId), style = MaterialTheme.typography.titleLarge) },
             text = { Text(stringResource(messageResId)) },
+            containerColor = MaterialTheme.colorScheme.surface,
             confirmButton = { Button(onClick = onOpenSettings) { Text(stringResource(confirmButtonTextResId)) } },
             dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(dismissButtonTextResId)) } },
         )
@@ -41,6 +42,7 @@ object PermissionDialogs {
             onDismissRequest = onDismiss,
             title = { Text(stringResource(titleResId), style = MaterialTheme.typography.titleLarge) },
             text = { Text(stringResource(messageResId)) },
+            containerColor = MaterialTheme.colorScheme.surface,
             confirmButton = { Button(onClick = onConfirm) { Text(stringResource(confirmButtonTextResId)) } },
             dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(dismissButtonTextResId)) } },
         )
