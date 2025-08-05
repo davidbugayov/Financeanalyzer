@@ -11,4 +11,5 @@ val databaseModule =
     module {
         single { AppDatabase.getInstance(androidContext()) }
         single { get<AppDatabase>().transactionDao() }
+        single { get<AppDatabase>().subcategoryDao() }
     }

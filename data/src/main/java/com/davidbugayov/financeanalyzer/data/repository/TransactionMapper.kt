@@ -28,6 +28,7 @@ class TransactionMapper {
             title = entity.title,
             isTransfer = entity.isTransfer,
             walletIds = entity.walletIds,
+            subcategoryId = entity.subcategoryId,
         )
     }
     
@@ -50,6 +51,7 @@ class TransactionMapper {
             title = transaction.title,
             isTransfer = transaction.isTransfer,
             walletIds = transaction.walletIds,
+            subcategoryId = transaction.subcategoryId,
         )
     }
 } 

@@ -1,11 +1,11 @@
 package com.davidbugayov.financeanalyzer.data.local.entity
 
 import androidx.room.ColumnInfo
-import com.davidbugayov.financeanalyzer.data.util.StringProvider
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.data.util.StringProvider
 import java.util.Date
 
 /**
@@ -31,4 +31,5 @@ data class TransactionEntity(
     val categoryId: String = "",
     val title: String = "",
     @ColumnInfo(name = "wallet_ids") val walletIds: List<String>? = null,
-) 
+    @ColumnInfo(name = "subcategory_id") val subcategoryId: Long? = null,
+)

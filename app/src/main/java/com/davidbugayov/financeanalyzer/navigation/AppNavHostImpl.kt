@@ -39,6 +39,7 @@ fun AppNavHostImpl(
     navController: NavHostController,
     navigationManager: NavigationManager,
     startDestination: String = Screen.Home.route,
+    onFirstLaunchCompleted: () -> Unit,
 ) {
     val appNavigation = AppNavigation()
 
@@ -64,6 +65,8 @@ fun AppNavHostImpl(
         onAuthScreen = {
             AuthScreen(
                 onAuthSuccess = {
+                    // Устанавливаем флаг первого запуска в сессии
+                    onFirstLaunchCompleted()
                     // После успешной аутентификации переходим на главный экран
                     navigationManager.navigate(
                         NavigationManager.Command.NavigateAndClearBackStack(

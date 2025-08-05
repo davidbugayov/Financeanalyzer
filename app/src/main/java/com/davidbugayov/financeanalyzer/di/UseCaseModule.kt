@@ -15,10 +15,25 @@ import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactions
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.*
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.DeleteSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetPagedTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCaseImpl
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.presentation.subcategories.InitializeDefaultSubcategoriesUseCase
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -86,4 +101,10 @@ val useCaseModule =
         }
 
         factory { com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase() }
+
+        // Subcategory-related
+        single { GetSubcategoriesByCategoryIdUseCase(get()) }
+        single { AddSubcategoryUseCase(get()) }
+        single { DeleteSubcategoryUseCase(get()) }
+        single { InitializeDefaultSubcategoriesUseCase(get()) }
     }

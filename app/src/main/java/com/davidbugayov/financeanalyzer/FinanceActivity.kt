@@ -39,6 +39,9 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
     // Начальный экран для навигации
     private var startDestination = Screen.Home.route
 
+    // Флаг для отслеживания первого запуска приложения в текущей сессии
+    private var isFirstLaunchInSession = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super<FragmentActivity>.onCreate(savedInstanceState)
@@ -50,7 +53,7 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
         startDestination =
             when {
                 !onboardingManager.isOnboardingCompleted() -> Screen.Onboarding.route
-                preferencesManager.isAppLockEnabled() -> Screen.Auth.route
+                preferencesManager.isAppLockEnabled() && isFirstLaunchInSession -> Screen.Auth.route
                 else -> Screen.Home.route
             }
 
@@ -131,26 +134,28 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
 
     private fun applyContent() {
         setContent {
-            FinanceAppContent(navigationManager, startDestination)
+            FinanceAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
         }
     }
 
     override fun onResume(owner: LifecycleOwner) {
         super<DefaultLifecycleObserver>.onResume(owner)
-        // Проверяем, нужна ли аутентификация при возврате в приложение
-        if (preferencesManager.isAppLockEnabled()) {
-            navigationManager.navigate(
-                NavigationManager.Command.NavigateAndClearBackStack(
-                    destination = Screen.Auth.route,
-                    popUpTo = Screen.Home.route,
-                ),
-            )
-        }
+        // Экран блокировки показывается только при запуске приложения,
+        // а не при сворачивании/разворачивании
     }
 
     override fun onDestroy() {
         super<FragmentActivity>.onDestroy()
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        // Сбрасываем флаг первого запуска при завершении приложения
+        isFirstLaunchInSession = true
+    }
+
+    /**
+     * Устанавливает флаг первого запуска в текущей сессии
+     */
+    fun setFirstLaunchCompleted() {
+        isFirstLaunchInSession = false
     }
 }
 
@@ -158,6 +163,7 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
 fun FinanceAppContent(
     navigationManager: NavigationManager,
     startDestination: String,
+    onFirstLaunchCompleted: () -> Unit,
 ) {
     // Получаем текущую тему из AppTheme и наблюдаем за изменениями
     val themeMode by AppTheme.currentTheme.collectAsState()
@@ -174,6 +180,7 @@ fun FinanceAppContent(
                     navController = navController,
                     navigationManager = navigationManager,
                     startDestination = startDestination,
+                    onFirstLaunchCompleted = onFirstLaunchCompleted,
                 )
             }
         }

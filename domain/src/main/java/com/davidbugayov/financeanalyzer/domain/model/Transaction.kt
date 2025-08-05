@@ -21,4 +21,5 @@ data class Transaction(
     val title: String = "",
     val isTransfer: Boolean = false,
     val walletIds: List<String>? = null,
+    val subcategoryId: Long? = null,
 )

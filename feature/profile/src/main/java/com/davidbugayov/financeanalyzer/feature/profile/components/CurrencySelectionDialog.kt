@@ -49,7 +49,7 @@ fun CurrencySelectionDialog(
                 text = "Выберите валюту",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
         text = {
@@ -77,8 +77,8 @@ fun CurrencySelectionDialog(
                     onDismiss()
                 },
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ),
             ) {
                 Text("Выбрать")
@@ -89,7 +89,7 @@ fun CurrencySelectionDialog(
                 Text("Отмена")
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
         tonalElevation = 0.dp,
         properties = androidx.compose.ui.window.DialogProperties(
@@ -104,7 +104,7 @@ private fun CurrencyItem(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val backgroundColor = Color.White
+    val backgroundColor = MaterialTheme.colorScheme.surface
     val textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
     val borderColor =
         if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
@@ -174,7 +174,7 @@ private fun CurrencyIcon(currency: Currency) {
         Text(
             text = currency.symbol,
             style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
         )
     }

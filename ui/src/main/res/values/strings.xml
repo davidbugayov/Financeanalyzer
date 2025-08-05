@@ -116,6 +116,96 @@
     <string name="category_transport">Транспорт</string>
     <string name="category_utilities">Коммунальные услуги</string>
     <string name="check_emoji">✅</string>
+
+  <!-- Подкатегории для продуктов -->
+  <string name="subcategory_pyaterochka">Пятёрочка</string>
+  <string name="subcategory_vkusvill">ВкусВилл</string>
+  <string name="subcategory_magnit">Магнит</string>
+  <string name="subcategory_lenta">Лента</string>
+  <string name="subcategory_metro">Метро</string>
+  <string name="subcategory_okey">О\'Кей</string>
+  <string name="subcategory_dixy">Дикси</string>
+  <string name="subcategory_billa">Билла</string>
+  <string name="subcategory_auchan">Ашан</string>
+  <string name="subcategory_carrefour">Карфур</string>
+
+  <!-- Подкатегории для ресторанов -->
+  <string name="subcategory_mcdonalds">McDonald\'s</string>
+  <string name="subcategory_kfc">KFC</string>
+  <string name="subcategory_burger_king">Burger King</string>
+  <string name="subcategory_subway">Subway</string>
+  <string name="subcategory_starbucks">Starbucks</string>
+  <string name="subcategory_dodo_pizza">Додо Пицца</string>
+  <string name="subcategory_dominos">Domino\'s Pizza</string>
+  <string name="subcategory_yandex_eda">Яндекс.Еда</string>
+  <string name="subcategory_delivery_club">Delivery Club</string>
+
+  <!-- Подкатегории для транспорта -->
+  <string name="subcategory_bus">Автобус</string>
+  <string name="subcategory_tram">Трамвай</string>
+  <string name="subcategory_trolleybus">Троллейбус</string>
+  <string name="subcategory_taxi">Такси</string>
+  <string name="subcategory_yandex_taxi">Яндекс.Такси</string>
+  <string name="subcategory_uber">Uber</string>
+  <string name="subcategory_gasoline">Бензин</string>
+  <string name="subcategory_parking">Парковка</string>
+  <string name="subcategory_car_service">Автосервис</string>
+
+  <!-- Подкатегории для развлечений -->
+  <string name="subcategory_cinema">Кинотеатр</string>
+  <string name="subcategory_theater">Театр</string>
+  <string name="subcategory_concert">Концерт</string>
+  <string name="subcategory_museum">Музей</string>
+  <string name="subcategory_exhibition">Выставка</string>
+  <string name="subcategory_amusement_park">Парк развлечений</string>
+  <string name="subcategory_bowling">Боулинг</string>
+  <string name="subcategory_billiards">Бильярд</string>
+  <string name="subcategory_karaoke">Караоке</string>
+
+  <!-- Подкатегории для здоровья -->
+  <string name="subcategory_pharmacy">Аптека</string>
+  <string name="subcategory_doctor">Врач</string>
+  <string name="subcategory_dentist">Стоматолог</string>
+  <string name="subcategory_hospital">Больница</string>
+  <string name="subcategory_clinic">Клиника</string>
+  <string name="subcategory_optics">Оптика</string>
+  <string name="subcategory_medical_tests">Анализы</string>
+  <string name="subcategory_physiotherapy">Физиотерапия</string>
+  <string name="subcategory_massage">Массаж</string>
+
+  <!-- Подкатегории для одежды -->
+  <string name="subcategory_zara">Zara</string>
+  <string name="subcategory_h_m">H&amp;M</string>
+  <string name="subcategory_uniqlo">Uniqlo</string>
+  <string name="subcategory_reserved">Reserved</string>
+  <string name="subcategory_mango">Mango</string>
+  <string name="subcategory_massimo_dutti">Massimo Dutti</string>
+  <string name="subcategory_bershka">Bershka</string>
+  <string name="subcategory_pull_bear">Pull&amp;Bear</string>
+  <string name="subcategory_stradivarius">Stradivarius</string>
+  <string name="subcategories_for_category">Подкатегории для %1$s</string>
+  <string name="no_subcategories">Нет подкатегорий</string>
+  <string name="usage_count">Использований: %1$d</string>
+  <string name="custom">Кастомная</string>
+  <string name="subcategory_name">Название подкатегории</string>
+  <string name="add_subcategory">Добавить подкатегорию</string>
+  <string name="categories_with_subcategories">Категории с подкатегориями</string>
+  <string name="no_categories">Нет категорий</string>
+  <string name="expense_category">Расходы</string>
+  <string name="income_category">Доходы</string>
+  <string name="view_subcategories">Посмотреть подкатегории</string>
+  <string name="subcategories_demo_title">Демонстрация подкатегорий</string>
+  <string name="subcategories_demo_description">Выберите категорию для просмотра подкатегорий</string>
+  <string name="subcategory_demo_food">Продукты</string>
+  <string name="subcategory_demo_restaurant">Рестораны</string>
+  <string name="subcategory_demo_transport">Транспорт</string>
+  <string name="subcategory_demo_entertainment">Развлечения</string>
+  <string name="initializing_subcategories">Инициализация подкатегорий...</string>
+  <string name="subcategories_ready">Подкатегории готовы!</string>
+  <string name="continue_to_app">Продолжить</string>
+  <string name="subcategories_main_title">Система подкатегорий</string>
+  <string name="subcategories_nav_demo">Демо</string>
+  <string name="subcategories_nav_init">Инициализация</string>
     <string name="close">Закрыть</string>
     <string name="close_button">Кнопка закрытия</string>
     <string name="collapse">Свернуть</string>
@@ -519,11 +609,11 @@
     <string name="notification_permission_description">Получайте напоминания о транзакциях и важные уведомления о ваших финансах</string>
     <string name="notification_permission_allow">Разрешить</string>
     <string name="notification_permission_later">Позже</string>
-    
+
     <!-- Каналы уведомлений -->
     <string name="notification_channel_name">Напоминания о транзакциях</string>
     <string name="notification_channel_description">Уведомления о необходимости внести транзакции</string>
-    
+
     <!-- Уведомления о транзакциях -->
     <string name="notification_permission_title_hardcoded">Уведомления отключены</string>
     <string name="notification_permission_text_hardcoded">Включите уведомления в настройках приложения</string>

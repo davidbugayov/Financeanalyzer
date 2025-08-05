@@ -7,15 +7,17 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.MoneyConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter
+import com.davidbugayov.financeanalyzer.data.local.dao.SubcategoryDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
+import com.davidbugayov.financeanalyzer.data.local.entity.SubcategoryEntity
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.data.util.StringProvider
+import timber.log.Timber
 
 /**
  * Класс базы данных Room для приложения.
@@ -24,8 +26,9 @@ import com.davidbugayov.financeanalyzer.data.util.StringProvider
 @Database(
     entities = [
         TransactionEntity::class,
+        SubcategoryEntity::class,
     ],
-    version = 16,
+    version = 17,
     exportSchema = true,
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class, StringListConverter::class)
@@ -35,6 +38,11 @@ abstract class AppDatabase : RoomDatabase() {
      * Предоставляет доступ к DAO для работы с транзакциями
      */
     abstract fun transactionDao(): TransactionDao
+
+    /**
+     * Предоставляет доступ к DAO для работы с подкатегориями
+     */
+    abstract fun subcategoryDao(): SubcategoryDao
 
     companion object {
 
@@ -458,6 +466,37 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 16 на версию 17
+         * Добавляет таблицу подкатегорий и поле subcategoryId в таблицу transactions
+         */
+        private val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем таблицу подкатегорий
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS subcategories (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        name TEXT NOT NULL,
+                        categoryId INTEGER NOT NULL,
+                        count INTEGER NOT NULL DEFAULT 0,
+                        isCustom INTEGER NOT NULL DEFAULT 0
+                    )
+                """,
+                )
+
+                // Создаем индекс для categoryId
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS index_subcategories_categoryId ON subcategories (categoryId)",
+                )
+
+                // Добавляем поле subcategoryId в таблицу transactions
+                db.execSQL("ALTER TABLE transactions ADD COLUMN subcategory_id INTEGER DEFAULT NULL")
+
+                Timber.i("Migration 16_17 completed: Added subcategories table and subcategory_id field")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -493,14 +532,16 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_15_14,
                         MIGRATION_15_16,
                         MIGRATION_16_15,
+                        MIGRATION_16_17,
                     )
                     .fallbackToDestructiveMigration(true)
-                    .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // Создаем таблицу с правильной структурой при первом создании базы данных
-                            db.execSQL(
-                                """
+                    .addCallback(
+                        object : Callback() {
+                            override fun onCreate(db: SupportSQLiteDatabase) {
+                                super.onCreate(db)
+                                // Создаем таблицу с правильной структурой при первом создании базы данных
+                                db.execSQL(
+                                    """
                                 CREATE TABLE IF NOT EXISTS transactions (
                                     id INTEGER PRIMARY KEY NOT NULL,
                                     id_string TEXT NOT NULL,
@@ -514,17 +555,37 @@ abstract class AppDatabase : RoomDatabase() {
                                     isTransfer INTEGER NOT NULL DEFAULT 0,
                                     categoryId TEXT NOT NULL DEFAULT '',
                                     title TEXT NOT NULL DEFAULT '',
-                                    wallet_ids TEXT DEFAULT NULL
+                                    wallet_ids TEXT DEFAULT NULL,
+                                    subcategory_id INTEGER DEFAULT NULL
                                 )
                             """,
-                            )
+                                )
 
-                            // Создаем индекс для id_string
-                            db.execSQL(
-                                "CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)",
-                            )
-                        }
-                    })
+                                // Создаем индекс для id_string
+                                db.execSQL(
+                                    "CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)",
+                                )
+
+                                // Создаем таблицу подкатегорий
+                                db.execSQL(
+                                    """
+                                CREATE TABLE IF NOT EXISTS subcategories (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                    name TEXT NOT NULL,
+                                    category_id INTEGER NOT NULL,
+                                    count INTEGER NOT NULL DEFAULT 0,
+                                    isCustom INTEGER NOT NULL DEFAULT 0
+                                )
+                            """,
+                                )
+
+                                // Создаем индекс для category_id
+                                db.execSQL(
+                                    "CREATE INDEX IF NOT EXISTS index_subcategories_category_id ON subcategories (category_id)",
+                                )
+                            }
+                        },
+                    )
                     .build()
                 INSTANCE = instance
                 instance

@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryV
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
+import com.davidbugayov.financeanalyzer.presentation.subcategories.SubcategoriesViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -65,4 +66,6 @@ val viewModelModule =
                 get(),
             )
         }
+
+        viewModel { SubcategoriesViewModel(get(), get(), get()) }
     }
