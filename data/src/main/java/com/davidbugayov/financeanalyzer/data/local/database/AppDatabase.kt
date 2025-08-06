@@ -28,7 +28,7 @@ import timber.log.Timber
         TransactionEntity::class,
         SubcategoryEntity::class,
     ],
-    version = 17,
+    version = 18,
     exportSchema = true,
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class, StringListConverter::class)
@@ -478,22 +478,86 @@ abstract class AppDatabase : RoomDatabase() {
                     CREATE TABLE IF NOT EXISTS subcategories (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         name TEXT NOT NULL,
-                        categoryId INTEGER NOT NULL,
+                        category_id INTEGER NOT NULL,
                         count INTEGER NOT NULL DEFAULT 0,
                         isCustom INTEGER NOT NULL DEFAULT 0
                     )
                 """,
                 )
 
-                // Создаем индекс для categoryId
+                // Создаем индекс для category_id
                 db.execSQL(
-                    "CREATE INDEX IF NOT EXISTS index_subcategories_categoryId ON subcategories (categoryId)",
+                    "CREATE INDEX IF NOT EXISTS index_subcategories_category_id ON subcategories (category_id)",
                 )
 
                 // Добавляем поле subcategoryId в таблицу transactions
                 db.execSQL("ALTER TABLE transactions ADD COLUMN subcategory_id INTEGER DEFAULT NULL")
 
                 Timber.i("Migration 16_17 completed: Added subcategories table and subcategory_id field")
+            }
+        }
+
+        /**
+         * Миграция с версии 17 на версию 18
+         * Исправляет структуру таблицы subcategories (переименовывает categoryId в category_id)
+         */
+        private val MIGRATION_17_18 = object : Migration(17, 18) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Проверяем, существует ли таблица subcategories
+                val cursor = db.query("SELECT name FROM sqlite_master WHERE type='table' AND name='subcategories'")
+                val tableExists = cursor.moveToFirst()
+                cursor.close()
+
+                if (tableExists) {
+                    // Проверяем, есть ли колонка categoryId (неправильная)
+                    val columnsCursor = db.query("PRAGMA table_info(subcategories)")
+                    var hasCategoryId = false
+                    var hasCategoryIdSnakeCase = false
+
+                    while (columnsCursor.moveToNext()) {
+                        val columnName = columnsCursor.getString(1) // name column
+                        if (columnName == "categoryId") {
+                            hasCategoryId = true
+                        } else if (columnName == "category_id") {
+                            hasCategoryIdSnakeCase = true
+                        }
+                    }
+                    columnsCursor.close()
+
+                    if (hasCategoryId && !hasCategoryIdSnakeCase) {
+                        // Переименовываем таблицу
+                        db.execSQL("ALTER TABLE subcategories RENAME TO subcategories_old")
+
+                        // Создаем новую таблицу с правильной структурой
+                        db.execSQL(
+                            """
+                            CREATE TABLE subcategories (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                name TEXT NOT NULL,
+                                category_id INTEGER NOT NULL,
+                                count INTEGER NOT NULL DEFAULT 0,
+                                isCustom INTEGER NOT NULL DEFAULT 0
+                            )
+                        """,
+                        )
+
+                        // Копируем данные
+                        db.execSQL(
+                            """
+                            INSERT INTO subcategories (id, name, category_id, count, isCustom)
+                            SELECT id, name, categoryId, count, isCustom FROM subcategories_old
+                        """,
+                        )
+
+                        // Удаляем старую таблицу
+                        db.execSQL("DROP TABLE subcategories_old")
+
+                        // Создаем индекс
+                        db.execSQL("CREATE INDEX IF NOT EXISTS index_subcategories_category_id ON subcategories (category_id)")
+                    }
+                }
+
+                Timber.i("Migration 17_18 completed: Fixed subcategories table structure")
             }
         }
 
@@ -533,6 +597,7 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_15_16,
                         MIGRATION_16_15,
                         MIGRATION_16_17,
+                        MIGRATION_17_18,
                     )
                     .fallbackToDestructiveMigration(true)
                     .addCallback(

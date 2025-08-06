@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -16,10 +15,15 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +41,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected val walletRepository: WalletRepository,
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     protected val resources: Resources,
+    private val addSubcategoryUseCase: AddSubcategoryUseCase,
+    private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
+    private val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
@@ -255,6 +262,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 sourceColor = 0,
                 customSource = "",
                 availableCategoryIcons = state.availableCategoryIcons,
+                subcategory = "",
+                subcategoryError = false,
+                showSubcategoryPicker = false,
+                showCustomSubcategoryDialog = false,
+                customSubcategory = "",
+                availableSubcategories = emptyList(),
             )
         }
     }
@@ -275,10 +288,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(state, title = event.title)
                 }
 
-            is BaseTransactionEvent.SetCategory ->
+            is BaseTransactionEvent.SetCategory -> {
                 _state.update { state ->
                     copyState(state, category = event.category, showCategoryPicker = false)
                 }
+                // Загружаем сабкатегории для выбранной категории
+                loadSubcategoriesForCurrentCategory()
+            }
 
             is BaseTransactionEvent.SetNote ->
                 _state.update { state ->
@@ -606,6 +622,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         it,
                         isExpense = !it.isExpense,
                         category = "", // Сбрасываем категорию при смене типа
+                        subcategory = "", // Сбрасываем сабкатегорию при смене типа
                     )
                 }
 
@@ -640,6 +657,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         amount = "",
                         amountError = false,
                         note = "", // Сбрасываем также поле примечания
+                        subcategory = "", // Сбрасываем сабкатегорию
                     )
                 }
             }
@@ -668,6 +686,85 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             is BaseTransactionEvent.SetAmountError ->
                 _state.update { state ->
                     copyState(state, amountError = event.isError)
+                }
+
+            is BaseTransactionEvent.SetExpenseCategory -> {
+                _state.update { state ->
+                    copyState(
+                        state,
+                        category = event.category,
+                        selectedExpenseCategory = event.category,
+                        categoryError = false,
+                    )
+                }
+                // Загружаем сабкатегории для выбранной категории
+                loadSubcategoriesForCurrentCategory()
+            }
+
+            is BaseTransactionEvent.SetIncomeCategory -> {
+                _state.update { state ->
+                    copyState(
+                        state,
+                        category = event.category,
+                        selectedIncomeCategory = event.category,
+                        categoryError = false,
+                    )
+                }
+                // Загружаем сабкатегории для выбранной категории
+                loadSubcategoriesForCurrentCategory()
+            }
+
+            // Обработка событий сабкатегорий
+            is BaseTransactionEvent.SetSubcategory ->
+                _state.update { state ->
+                    copyState(state, subcategory = event.subcategory, subcategoryError = false)
+                }
+
+            is BaseTransactionEvent.SetCustomSubcategory ->
+                _state.update { state ->
+                    copyState(state, customSubcategory = event.subcategory)
+                }
+
+            is BaseTransactionEvent.AddCustomSubcategory -> {
+                // Обработка добавления кастомной сабкатегории
+                viewModelScope.launch {
+                    val currentCategory = _state.value.category
+                    if (currentCategory.isNotBlank()) {
+                        val categoryId = getCategoryIdByName(currentCategory, _state.value.isExpense)
+                        if (categoryId != null) {
+                            addSubcategoryUseCase(event.subcategory, categoryId)
+                            loadSubcategoriesForCategory(categoryId)
+                        }
+                    }
+                }
+                _state.update { state ->
+                    copyState(
+                        state,
+                        showCustomSubcategoryDialog = false,
+                        customSubcategory = "",
+                        subcategory = event.subcategory,
+                    )
+                }
+            }
+
+            is BaseTransactionEvent.ShowSubcategoryPicker ->
+                _state.update { state ->
+                    copyState(state, showSubcategoryPicker = true)
+                }
+
+            is BaseTransactionEvent.HideSubcategoryPicker ->
+                _state.update { state ->
+                    copyState(state, showSubcategoryPicker = false)
+                }
+
+            is BaseTransactionEvent.ShowCustomSubcategoryDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomSubcategoryDialog = true)
+                }
+
+            is BaseTransactionEvent.HideCustomSubcategoryDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomSubcategoryDialog = false, customSubcategory = "")
                 }
 
             else -> {}
@@ -818,7 +915,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
         // Загружаем источники с учетом сортировки по частоте использования
         loadSources()
-        
+
         // Подписываемся на изменения валюты для обновления AmountField
         viewModelScope.launch {
             CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
@@ -910,6 +1007,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         selectedIncomeCategory: String = state.selectedIncomeCategory,
         availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons,
         customCategoryIcon: ImageVector? = state.customCategoryIcon,
+        subcategory: String = state.subcategory,
+        subcategoryError: Boolean = state.subcategoryError,
+        showSubcategoryPicker: Boolean = state.showSubcategoryPicker,
+        showCustomSubcategoryDialog: Boolean = state.showCustomSubcategoryDialog,
+        customSubcategory: String = state.customSubcategory,
+        availableSubcategories: List<UiSubcategory> = state.availableSubcategories,
     ): S
 
     // Utility methods
@@ -1134,5 +1237,68 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         val usage = usageMap[sourceName] ?: 0
         Timber.d("SOURCE: Получено количество использований источника %s: %d", sourceName, usage)
         return usage
+    }
+
+    /**
+     * Получает ID категории по имени
+     * @param categoryName Имя категории
+     * @param isExpense Является ли категория расходной
+     * @return ID категории или null
+     */
+    protected fun getCategoryIdByName(categoryName: String, isExpense: Boolean): Long? {
+        val categories = if (isExpense) {
+            categoriesViewModel.expenseCategories.value
+        } else {
+            categoriesViewModel.incomeCategories.value
+        }
+        return categories.find { it.name == categoryName }?.id
+    }
+
+    /**
+     * Загружает сабкатегории для выбранной категории
+     * @param categoryId ID категории
+     */
+    protected fun loadSubcategoriesForCategory(categoryId: Long) {
+        viewModelScope.launch {
+            try {
+                getSubcategoriesByCategoryIdUseCase(categoryId).collect { subcategories ->
+                    val uiSubcategories = subcategories.map { subcategory ->
+                        UiSubcategory.fromDomain(subcategory)
+                    }
+                    _state.update { state ->
+                        copyState(state, availableSubcategories = uiSubcategories)
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке сабкатегорий для категории $categoryId")
+            }
+        }
+    }
+
+    /**
+     * Загружает сабкатегории для текущей выбранной категории
+     */
+    protected fun loadSubcategoriesForCurrentCategory() {
+        val currentCategory = _state.value.category
+        if (currentCategory.isNotBlank()) {
+            val categoryId = getCategoryIdByName(currentCategory, _state.value.isExpense)
+            if (categoryId != null) {
+                loadSubcategoriesForCategory(categoryId)
+            }
+        }
+    }
+
+    /**
+     * Загружает подкатегорию по ID и возвращает её название
+     * @param subcategoryId ID подкатегории
+     * @return Название подкатегории или пустая строка, если не найдена
+     */
+    protected suspend fun loadSubcategoryById(subcategoryId: Long): String {
+        return try {
+            getSubcategoryByIdUseCase(subcategoryId)?.name ?: ""
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при загрузке подкатегории по ID: %d", subcategoryId)
+            ""
+        }
     }
 }

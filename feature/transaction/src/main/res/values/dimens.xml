@@ -69,4 +69,12 @@
     <dimen name="color_picker_item_size">40dp</dimen>
     <dimen name="border_width_small">1dp</dimen>
     <dimen name="border_width_medium">2dp</dimen>
-</resources> 
+
+  <!-- Subcategory specific -->
+  <dimen name="category_item_size">80dp</dimen>
+  <dimen name="category_icon_size">24dp</dimen>
+  <dimen name="category_icon_spacing">4dp</dimen>
+  <dimen name="category_item_padding">4dp</dimen>
+  <dimen name="dialog_content_padding">16dp</dimen>
+  <dimen name="dialog_spacing">8dp</dimen>
+</resources>

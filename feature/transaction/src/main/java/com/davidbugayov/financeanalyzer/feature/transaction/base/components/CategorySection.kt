@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,6 +56,9 @@ fun CategorySection(
     onAddCategoryClick: () -> Unit,
     onCategoryLongClick: (UiCategory) -> Unit = {},
     isError: Boolean = false,
+    // Новые параметры для кнопки подкатегории
+    onSubcategoryButtonClick: (() -> Unit)? = null,
+    selectedSubcategory: String = "",
 ) {
     val maxRows = 2
     val columns = 4
@@ -111,6 +115,39 @@ fun CategorySection(
                         ),
                     color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
+
+                // Кнопка выбора подкатегории (показывается только если выбрана категория)
+                if (selectedCategory.isNotBlank() && onSubcategoryButtonClick != null) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .clickable { onSubcategoryButtonClick() }
+                            .background(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                CircleShape,
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text(
+                                text = if (selectedSubcategory.isNotBlank()) selectedSubcategory else stringResource(R.string.subcategory),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                maxLines = 1,
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = stringResource(R.string.select_subcategory),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp),
+                            )
+                        }
+                    }
+                }
             }
             if (showExpand) {
                 Spacer(

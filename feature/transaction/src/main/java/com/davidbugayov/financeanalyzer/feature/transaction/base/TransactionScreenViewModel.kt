@@ -74,6 +74,14 @@ interface BaseTransactionState {
     val categories: List<UiCategory>
     val availableCategoryIcons: List<ImageVector>
     val customCategoryIcon: ImageVector?
+
+    // Поля для сабкатегорий
+    val subcategory: String
+    val subcategoryError: Boolean
+    val showSubcategoryPicker: Boolean
+    val showCustomSubcategoryDialog: Boolean
+    val customSubcategory: String
+    val availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory>
 }
 
 fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent =

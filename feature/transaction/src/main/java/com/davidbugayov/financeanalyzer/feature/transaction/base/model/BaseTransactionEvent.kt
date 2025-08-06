@@ -102,4 +102,19 @@ sealed class BaseTransactionEvent {
     data class SetCustomCategoryIcon(val icon: ImageVector) : BaseTransactionEvent()
 
     data class SetAmountError(val isError: Boolean) : BaseTransactionEvent()
+
+    // События для работы с сабкатегориями
+    data class SetSubcategory(val subcategory: String) : BaseTransactionEvent()
+
+    data class SetCustomSubcategory(val subcategory: String) : BaseTransactionEvent()
+
+    data class AddCustomSubcategory(val subcategory: String) : BaseTransactionEvent()
+
+    data object ShowSubcategoryPicker : BaseTransactionEvent()
+
+    data object HideSubcategoryPicker : BaseTransactionEvent()
+
+    data object ShowCustomSubcategoryDialog : BaseTransactionEvent()
+
+    data object HideCustomSubcategoryDialog : BaseTransactionEvent()
 }

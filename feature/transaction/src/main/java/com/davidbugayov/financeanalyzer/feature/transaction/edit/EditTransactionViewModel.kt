@@ -12,6 +12,9 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
@@ -37,15 +40,21 @@ class EditTransactionViewModel(
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val application: Application,
+    application: Application,
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val navigationManager: NavigationManager,
+    addSubcategoryUseCase: AddSubcategoryUseCase,
+    getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
+    getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
         categoriesViewModel,
         sourcePreferences,
         walletRepository,
         updateWalletBalancesUseCase,
         application.resources,
+    addSubcategoryUseCase,
+    getSubcategoriesByCategoryIdUseCase,
+    getSubcategoryByIdUseCase,
     ) {
     override val _state =
         MutableStateFlow(
@@ -372,7 +381,7 @@ class EditTransactionViewModel(
         }
     }
 
-    override fun submitTransaction(context: android.content.Context) {
+    override fun submitTransaction(context: Context) {
         submit()
     }
 
@@ -412,6 +421,21 @@ class EditTransactionViewModel(
         // Загружаем связанные с транзакцией кошельки
         loadTransactionWallets(transaction.id)
 
+        // Загружаем сабкатегории для выбранной категории
+        loadSubcategoriesForCurrentCategory()
+
+        // Загружаем сабкатегорию из транзакции, если она есть
+        var subcategory = ""
+        transaction.subcategoryId?.let { subcategoryId ->
+            viewModelScope.launch {
+                subcategory = loadSubcategoryByIdAsync(subcategoryId)
+                // Обновляем состояние с загруженной подкатегорией
+                _state.update { currentState ->
+                    currentState.copy(subcategory = subcategory)
+                }
+            }
+        }
+
         _state.update {
             it.copy(
                 transactionToEdit = transaction,
@@ -427,6 +451,7 @@ class EditTransactionViewModel(
                 selectedExpenseCategory = selectedExpenseCategory,
                 selectedIncomeCategory = selectedIncomeCategory,
                 addToWallet = addToWallet,
+                subcategory = subcategory,
             )
         }
 
@@ -467,6 +492,15 @@ class EditTransactionViewModel(
                 Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при загрузке связанных кошельков: %s", e.message)
             }
         }
+    }
+
+    /**
+     * Загружает название сабкатегории по ID (асинхронная версия)
+     * @param subcategoryId ID сабкатегории
+     * @return Название сабкатегории или пустая строка
+     */
+    private suspend fun loadSubcategoryByIdAsync(subcategoryId: Long): String {
+        return loadSubcategoryById(subcategoryId)
     }
 
     // Загрузка транзакции для редактирования по ID
@@ -593,6 +627,14 @@ class EditTransactionViewModel(
                 addToWallet = currentState.addToWallet,
                 selectedWallets = currentState.selectedWallets,
             )
+
+        // Получаем ID сабкатегории, если она выбрана
+        val subcategoryId = if (currentState.subcategory.isNotBlank()) {
+            currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
+        } else {
+            null
+        }
+
         return currentState.transactionToEdit?.copy(
             title = currentState.title,
             amount = finalAmount,
@@ -603,12 +645,13 @@ class EditTransactionViewModel(
             source = sourceToUse,
             sourceColor = sourceColorToUse,
             walletIds = selectedWalletIds,
+            subcategoryId = subcategoryId,
         )
     }
 
     override fun onEvent(
         event: BaseTransactionEvent,
-        context: android.content.Context,
+        context: Context,
     ) {
         // Обрабатываем события UI
         when (event) {
@@ -635,6 +678,8 @@ class EditTransactionViewModel(
                         )
                     newState
                 }
+                // Загружаем сабкатегории для выбранной категории
+                loadSubcategoriesForCurrentCategory()
             }
 
             is BaseTransactionEvent.SetIncomeCategory -> {
@@ -648,6 +693,8 @@ class EditTransactionViewModel(
                         )
                     newState
                 }
+                // Загружаем сабкатегории для выбранной категории
+                loadSubcategoriesForCurrentCategory()
             }
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
@@ -692,6 +739,7 @@ class EditTransactionViewModel(
                     it.copy(
                         isExpense = !it.isExpense,
                         category = "", // Сбрасываем категорию при смене типа
+                        subcategory = "", // Сбрасываем сабкатегорию при смене типа
                     )
                 }
 
@@ -789,6 +837,12 @@ class EditTransactionViewModel(
         selectedIncomeCategory: String,
         availableCategoryIcons: List<ImageVector>,
         customCategoryIcon: ImageVector?,
+        subcategory: String,
+        subcategoryError: Boolean,
+        showSubcategoryPicker: Boolean,
+        showCustomSubcategoryDialog: Boolean,
+        customSubcategory: String,
+        availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory>,
     ): EditTransactionState {
         return state.copy(
             title = title,
@@ -834,6 +888,12 @@ class EditTransactionViewModel(
             selectedIncomeCategory = selectedIncomeCategory,
             availableCategoryIcons = availableCategoryIcons,
             customCategoryIcon = customCategoryIcon,
+            subcategory = subcategory,
+            subcategoryError = subcategoryError,
+            showSubcategoryPicker = showSubcategoryPicker,
+            showCustomSubcategoryDialog = showCustomSubcategoryDialog,
+            customSubcategory = customSubcategory,
+            availableSubcategories = availableSubcategories,
         )
     }
 

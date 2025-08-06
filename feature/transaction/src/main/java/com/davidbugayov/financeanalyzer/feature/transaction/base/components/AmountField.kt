@@ -35,6 +35,38 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
 /**
+ * Валидирует ввод денежной суммы, ограничивая формат до x.xx или x,xx
+ * @param input Введенный текст
+ * @return Валидированный текст
+ */
+private fun validateMoneyInput(input: String): String {
+    if (input.isEmpty()) return input
+
+    // Заменяем запятые на точки для единообразия
+    val normalized = input.replace(',', '.')
+
+    // Разрешаем только цифры и одну точку
+    val validChars = normalized.filter { it.isDigit() || it == '.' }
+
+    // Проверяем количество точек
+    val dotCount = validChars.count { it == '.' }
+    if (dotCount > 1) {
+        // Если больше одной точки, оставляем только первую
+        val firstDotIndex = validChars.indexOf('.')
+        return validChars.substring(0, firstDotIndex + 1) +
+            validChars.substring(firstDotIndex + 1).replace(".", "")
+    }
+
+    // Ограничиваем до 2 знаков после точки
+    val dotIndex = validChars.indexOf('.')
+    return if (dotIndex != -1 && validChars.length > dotIndex + 3) {
+        validChars.substring(0, dotIndex + 3)
+    } else {
+        validChars
+    }
+}
+
+/**
  * Поле ввода суммы транзакции с поддержкой арифметических выражений
  */
 @Composable
@@ -46,10 +78,10 @@ fun AmountField(
     modifier: Modifier = Modifier,
 ) {
     val currentCurrency = CurrencyProvider.getCurrencyFlow().collectAsState().value
-    
+
     // Внутреннее состояние для "сырого" значения, синхронизированное с amount от ViewModel
     var internalRawAmount by remember(currentCurrency) { mutableStateOf(amount) }
-    
+
     // TextFieldValue для отображения в OutlinedTextField
     var textFieldValueForDisplay by remember(currentCurrency) {
         val numericAmount = amount.toDoubleOrNull()
@@ -58,11 +90,11 @@ fun AmountField(
             TextFieldValue(text = initialText, selection = TextRange(initialText.length)),
         )
     }
-    
+
     // Логируем изменения валюты для отладки и принудительно обновляем TextFieldValue
     LaunchedEffect(currentCurrency) {
         timber.log.Timber.d("AmountField: Валюта изменилась на ${currentCurrency.name}")
-        
+
         // Принудительно обновляем TextFieldValue при смене валюты
         val numericValue = internalRawAmount.toDoubleOrNull()
         if (numericValue != null) {
@@ -76,7 +108,7 @@ fun AmountField(
             } else {
                 withoutSymbol
             }
-            
+
             textFieldValueForDisplay = TextFieldValue(
                 text = finalText,
                 selection = TextRange(finalText.length)
@@ -84,7 +116,7 @@ fun AmountField(
             timber.log.Timber.d("AmountField: Принудительно обновлен TextFieldValue: '$finalText'")
         }
     }
-    
+
     // Логируем создание Money объекта для отладки
     LaunchedEffect(currentCurrency) {
         val testMoney = Money(100.0, currentCurrency)
@@ -111,7 +143,7 @@ fun AmountField(
                     val moneyObject = Money(numericValue, currentCurrency)
                     val formattedWithSymbol = moneyObject.format()
                     timber.log.Timber.d("AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'")
-                    
+
                     val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
                     val sep = moneyObject.currency.decimalSeparator.toString()
                     val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
@@ -150,14 +182,23 @@ fun AmountField(
                 // Удаляем пробелы из введенного текста перед обработкой.
                 val rawTextWithoutSpaces = newTextFieldValue.text.replace(" ", "")
 
-                // Обновляем internalRawAmount и вызываем onAmountChange с текстом без пробелов.
-                internalRawAmount = rawTextWithoutSpaces
+                // Валидация: разрешаем только числа, точки, запятые и арифметические операторы
+                val validatedText = if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
+                    // Если есть арифметические операторы, разрешаем как есть (для выражений)
+                    rawTextWithoutSpaces
+                } else {
+                    // Для простых чисел ограничиваем формат x.xx или x,xx
+                    validateMoneyInput(rawTextWithoutSpaces)
+                }
+
+                // Обновляем internalRawAmount и вызываем onAmountChange с валидированным текстом.
+                internalRawAmount = validatedText
                 onAmountChange(internalRawAmount)
 
                 // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
-                // также текстом без пробелов для мгновенной обратной связи при вводе.
+                // с валидированным текстом для мгновенной обратной связи при вводе.
                 if (isFocused) {
-                    // Важно сохранить позицию курсора относительно текста без пробелов
+                    // Важно сохранить позицию курсора относительно валидированного текста
                     val originalSelection = newTextFieldValue.selection
                     val newSelectionStart =
                         originalSelection.start -
@@ -174,11 +215,11 @@ fun AmountField(
 
                     textFieldValueForDisplay =
                         TextFieldValue(
-                            text = rawTextWithoutSpaces,
+                            text = validatedText,
                             selection =
                                 TextRange(
-                                    start = newSelectionStart.coerceIn(0, rawTextWithoutSpaces.length),
-                                    end = newSelectionEnd.coerceIn(0, rawTextWithoutSpaces.length),
+                                    start = newSelectionStart.coerceIn(0, validatedText.length),
+                                    end = newSelectionEnd.coerceIn(0, validatedText.length),
                                 ),
                         )
                 }

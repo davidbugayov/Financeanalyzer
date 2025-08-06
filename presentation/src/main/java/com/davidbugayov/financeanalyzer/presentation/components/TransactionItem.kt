@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -64,6 +65,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
+import timber.log.Timber
 
 object Formatters {
     fun formatAmount(
@@ -105,6 +108,27 @@ fun TransactionItem(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val context = LocalContext.current
+
+    // Получаем UseCase для загрузки подкатегорий
+    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+
+    // Состояние для названия подкатегории
+    var subcategoryName by remember { mutableStateOf("") }
+
+    // Загружаем подкатегорию, если есть subcategoryId
+    LaunchedEffect(transaction.subcategoryId) {
+        transaction.subcategoryId?.let { subcategoryId ->
+            try {
+                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                subcategoryName = subcategory?.name ?: ""
+            } catch (e: Exception) {
+                Timber.e(e.toString())
+                subcategoryName = ""
+            }
+        } ?: run {
+            subcategoryName = ""
+        }
+    }
 
     val transferCategoryString = context.getString(R.string.transaction_transfers).lowercase(Locale.getDefault())
 
@@ -323,6 +347,18 @@ fun TransactionItem(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
+
+                // Отображаем подкатегорию, если она есть
+                if (subcategoryName.isNotBlank()) {
+                    Text(
+                        text = subcategoryName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_tiny)),
+                    )
+                }
 
                 if (transaction.source.isNotBlank()) {
                     Text(

@@ -11,6 +11,9 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
@@ -39,12 +42,18 @@ class AddTransactionViewModel(
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val navigationManager: NavigationManager,
     application: Application,
+    addSubcategoryUseCase: AddSubcategoryUseCase,
+    getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
+    getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
         categoriesViewModel,
         sourcePreferences,
         walletRepository,
         updateWalletBalancesUseCase,
         application.resources,
+    addSubcategoryUseCase,
+    getSubcategoriesByCategoryIdUseCase,
+    getSubcategoryByIdUseCase,
     ) {
     override val _state = MutableStateFlow(AddTransactionState())
 
@@ -229,6 +238,13 @@ class AddTransactionViewModel(
                 selectedWallets = currentState.selectedWallets,
             )
 
+        // Получаем ID сабкатегории, если она выбрана
+        val subcategoryId = if (currentState.subcategory.isNotBlank()) {
+            currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
+        } else {
+            null
+        }
+
         return Transaction(
             id = UUID.randomUUID().toString(),
             title = currentState.title,
@@ -240,6 +256,7 @@ class AddTransactionViewModel(
             source = currentState.source,
             sourceColor = currentState.sourceColor,
             walletIds = selectedWalletIds,
+            subcategoryId = subcategoryId,
         )
     }
 
@@ -304,6 +321,12 @@ class AddTransactionViewModel(
         selectedIncomeCategory: String,
         availableCategoryIcons: List<ImageVector>,
         customCategoryIcon: ImageVector?,
+        subcategory: String,
+        subcategoryError: Boolean,
+        showSubcategoryPicker: Boolean,
+        showCustomSubcategoryDialog: Boolean,
+        customSubcategory: String,
+        availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory>,
     ): AddTransactionState {
         return state.copy(
             title = title,
@@ -349,6 +372,12 @@ class AddTransactionViewModel(
             selectedIncomeCategory = selectedIncomeCategory,
             availableCategoryIcons = availableCategoryIcons,
             customCategoryIcon = customCategoryIcon,
+            subcategory = subcategory,
+            subcategoryError = subcategoryError,
+            showSubcategoryPicker = showSubcategoryPicker,
+            showCustomSubcategoryDialog = showCustomSubcategoryDialog,
+            customSubcategory = customSubcategory,
+            availableSubcategories = availableSubcategories,
         )
     }
 
@@ -367,6 +396,9 @@ class AddTransactionViewModel(
         } else {
             _state.update { it.copy(category = category) }
         }
+
+        // Загружаем сабкатегории для выбранной категории
+        loadSubcategoriesForCurrentCategory()
     }
 
     /**

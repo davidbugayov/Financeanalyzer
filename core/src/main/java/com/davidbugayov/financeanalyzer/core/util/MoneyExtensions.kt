@@ -48,7 +48,7 @@ fun Money.format(
 
     // Choose pattern based on whether we should show decimals
     val pattern =
-        if (useMinimalDecimals || isWholeNumber || isZero) {
+        if (useMinimalDecimals && (isWholeNumber || isZero)) {
             "#,##0"
         } else {
             "#,##0.00"

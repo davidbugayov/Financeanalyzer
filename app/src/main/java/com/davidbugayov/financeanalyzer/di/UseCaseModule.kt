@@ -18,6 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manage
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.DeleteSubcategoryUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
@@ -104,6 +105,7 @@ val useCaseModule =
 
         // Subcategory-related
         single { GetSubcategoriesByCategoryIdUseCase(get()) }
+        single { GetSubcategoryByIdUseCase(get()) }
         single { AddSubcategoryUseCase(get()) }
         single { DeleteSubcategoryUseCase(get()) }
         single { InitializeDefaultSubcategoriesUseCase(get()) }

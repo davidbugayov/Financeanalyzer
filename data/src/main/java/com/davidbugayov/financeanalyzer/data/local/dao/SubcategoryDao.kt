@@ -34,14 +34,14 @@ interface SubcategoryDao {
      * @param categoryId ID родительской категории
      * @return Список подкатегорий для указанной категории
      */
-    @Query("SELECT * FROM subcategories WHERE categoryId = :categoryId ORDER BY count DESC, name ASC")
+    @Query("SELECT * FROM subcategories WHERE category_id = :categoryId ORDER BY count DESC, name ASC")
     suspend fun getSubcategoriesByCategoryId(categoryId: Long): List<SubcategoryEntity>
 
     /**
      * Поток подкатегорий для конкретной категории
      * @param categoryId ID родительской категории
      */
-    @Query("SELECT * FROM subcategories WHERE categoryId = :categoryId ORDER BY count DESC, name ASC")
+    @Query("SELECT * FROM subcategories WHERE category_id = :categoryId ORDER BY count DESC, name ASC")
     fun observeSubcategoriesByCategoryId(categoryId: Long): Flow<List<SubcategoryEntity>>
 
     /**
@@ -85,7 +85,7 @@ interface SubcategoryDao {
      * Удаляет все подкатегории для конкретной категории
      * @param categoryId ID родительской категории
      */
-    @Query("DELETE FROM subcategories WHERE categoryId = :categoryId")
+    @Query("DELETE FROM subcategories WHERE category_id = :categoryId")
     suspend fun deleteSubcategoriesByCategoryId(categoryId: Long)
 
     /**

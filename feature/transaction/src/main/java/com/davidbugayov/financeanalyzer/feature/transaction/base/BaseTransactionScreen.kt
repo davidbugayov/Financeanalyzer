@@ -26,8 +26,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.key
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,16 +39,17 @@ import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
-import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategorySection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.ColorPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CommentField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomCategoryDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomSourceDialog
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomSubcategoryDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.DateField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourcePickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourceSection
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SubcategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
@@ -61,6 +62,7 @@ import com.davidbugayov.financeanalyzer.ui.components.ReminderBubble
 import com.davidbugayov.financeanalyzer.ui.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -468,6 +470,16 @@ fun <E> BaseTransactionScreen(
                             }
                         },
                         isError = state.categoryError,
+                        // Новые параметры для кнопки подкатегории
+                        onSubcategoryButtonClick = if (state.category.isNotBlank()) {
+                            {
+                                viewModel.onEvent(
+                                    eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
+                                    context,
+                                )
+                            }
+                        } else null,
+                        selectedSubcategory = state.subcategory,
                     )
                 } else {
                     CategorySection(
@@ -490,6 +502,7 @@ fun <E> BaseTransactionScreen(
                                 "Category long click in BaseTransactionScreen: %s",
                                 selectedCategory.name,
                             )
+                            // Don't allow long press on "Другое" and "Переводы"
                             if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
                                 viewModel.onEvent(
                                     eventFactory(
@@ -507,8 +520,19 @@ fun <E> BaseTransactionScreen(
                             }
                         },
                         isError = state.categoryError,
+                        // Новые параметры для кнопки подкатегории
+                        onSubcategoryButtonClick = if (state.category.isNotBlank()) {
+                            {
+                                viewModel.onEvent(
+                                    eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
+                                    context,
+                                )
+                            }
+                        } else null,
+                        selectedSubcategory = state.subcategory,
                     )
                 }
+
                 // Поле ввода суммы и кнопки операций — после категории
                 key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
                     AmountField(
@@ -974,6 +998,58 @@ fun <E> BaseTransactionScreen(
                             context,
                         )
                     },
+                )
+            }
+
+            // Диалоги для сабкатегорий
+            if (state.showSubcategoryPicker) {
+                SubcategoryPickerDialog(
+                    subcategories = state.availableSubcategories,
+                    onSubcategorySelected = { subcategoryName ->
+                        viewModel.onEvent(
+                            eventFactory(BaseTransactionEvent.SetSubcategory(subcategoryName)),
+                            context,
+                        )
+                    },
+                    onCustomSubcategoryClick = {
+                        viewModel.onEvent(
+                            eventFactory(BaseTransactionEvent.ShowCustomSubcategoryDialog),
+                            context,
+                        )
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(
+                            eventFactory(BaseTransactionEvent.HideSubcategoryPicker),
+                            context,
+                        )
+                    },
+                )
+            }
+
+            if (state.showCustomSubcategoryDialog) {
+                CustomSubcategoryDialog(
+                    customSubcategory = state.customSubcategory,
+                    onCustomSubcategoryChange = { name ->
+                        viewModel.onEvent(
+                            eventFactory(BaseTransactionEvent.SetCustomSubcategory(name)),
+                            context,
+                        )
+                    },
+                    onConfirm = {
+                        viewModel.onEvent(
+                            eventFactory(
+                                BaseTransactionEvent.AddCustomSubcategory(state.customSubcategory),
+                            ),
+                            context,
+                        )
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(
+                            eventFactory(BaseTransactionEvent.HideCustomSubcategoryDialog),
+                            context,
+                        )
+                    },
+                    existingSubcategories = state.availableSubcategories, // Передаем существующие подкатегории
                 )
             }
         }

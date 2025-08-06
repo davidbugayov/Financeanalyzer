@@ -11,12 +11,12 @@ import androidx.room.PrimaryKey
  */
 @Entity(
     tableName = "subcategories",
-    indices = [Index(value = ["categoryId"])],
+    indices = [Index(value = ["category_id"])],
 )
 data class SubcategoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
-    @ColumnInfo(name = "categoryId") val categoryId: Long,
+    @ColumnInfo(name = "category_id") val categoryId: Long,
     val count: Int = 0,
     val isCustom: Boolean = false,
 ) 

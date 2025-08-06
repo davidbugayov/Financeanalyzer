@@ -56,4 +56,12 @@ data class AddTransactionState(
     override val categories: List<UiCategory> = emptyList(),
     override val customCategoryIcon: ImageVector? = null,
     override val availableCategoryIcons: List<ImageVector> = emptyList(),
+
+    // Поля для сабкатегорий
+    override val subcategory: String = "",
+    override val subcategoryError: Boolean = false,
+    override val showSubcategoryPicker: Boolean = false,
+    override val showCustomSubcategoryDialog: Boolean = false,
+    override val customSubcategory: String = "",
+    override val availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory> = emptyList(),
 ) : BaseTransactionState
