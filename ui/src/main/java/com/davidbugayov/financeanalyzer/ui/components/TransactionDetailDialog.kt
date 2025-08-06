@@ -37,35 +37,40 @@ import com.davidbugayov.financeanalyzer.ui.R
  *
  * @param transaction Транзакция для отображения
  * @param onDismiss Обработчик закрытия диалога
+ * @param subcategoryName Название подкатегории (если есть)
  */
 @Composable
 fun TransactionDetailDialog(
     transaction: Transaction,
     onDismiss: () -> Unit,
+    subcategoryName: String = "",
 ) {
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
+        properties =
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+            ),
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = androidx.compose.material3.CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            colors =
+                androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(24.dp),
             ) {
                 // Заголовок с крестиком
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -79,21 +84,22 @@ fun TransactionDetailDialog(
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = stringResource(R.string.transaction_details),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            ),
+                            style =
+                                MaterialTheme.typography.titleLarge.copy(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                ),
                         )
                     }
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                 }
@@ -101,14 +107,17 @@ fun TransactionDetailDialog(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Контент диалога
-                TransactionDetailContent(transaction = transaction)
+                TransactionDetailContent(
+                    transaction = transaction,
+                    subcategoryName = subcategoryName,
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Кнопка закрытия
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(
                         onClick = onDismiss,
@@ -124,4 +133,4 @@ fun TransactionDetailDialog(
             }
         }
     }
-} 
+}

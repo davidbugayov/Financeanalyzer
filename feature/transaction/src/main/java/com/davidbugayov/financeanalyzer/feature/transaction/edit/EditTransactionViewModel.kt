@@ -629,11 +629,12 @@ class EditTransactionViewModel(
             )
 
         // Получаем ID сабкатегории, если она выбрана
-        val subcategoryId = if (currentState.subcategory.isNotBlank()) {
-            currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
-        } else {
-            null
-        }
+        val subcategoryId =
+            if (currentState.subcategory.isNotBlank()) {
+                currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
+            } else {
+                null
+            }
 
         return currentState.transactionToEdit?.copy(
             title = currentState.title,

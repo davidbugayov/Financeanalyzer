@@ -257,7 +257,6 @@ class HomeViewModel(
                         } ?: Timber.w(
                             "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                         )
-
                     },
                     onFailure = { exception ->
                         _state.update {
@@ -287,7 +286,7 @@ class HomeViewModel(
             repository.dataChangeEvents.collect { event ->
                 when (event) {
                     is com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent.TransactionChanged -> {
-                        val transactionId = event.transactionId
+                        event.transactionId
 
                         // Плавное обновление без полной перезагрузки
                         updateDataSmoothly()
@@ -370,7 +369,7 @@ class HomeViewModel(
 
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
-                val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
+                getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, error = e.message) }

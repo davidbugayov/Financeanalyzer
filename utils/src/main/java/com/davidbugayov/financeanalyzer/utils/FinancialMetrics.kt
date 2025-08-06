@@ -71,7 +71,9 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             try {
                 CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
-                    Timber.d("FinancialMetrics: Получено событие изменения валюты на ${newCurrency.name}, пересчитываем метрики")
+                    Timber.d(
+                        "FinancialMetrics: Получено событие изменения валюты на ${newCurrency.name}, пересчитываем метрики",
+                    )
                     recalculateStats()
                 }
             } catch (e: Exception) {

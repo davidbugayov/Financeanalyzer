@@ -92,8 +92,8 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         }
 
         // Инициализация системы отчетов об ошибках
-        com.davidbugayov.financeanalyzer.utils.CrashReporter.init(this)
-        com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider.crashLogger = com.davidbugayov.financeanalyzer.utils.CrashReporter.instance
+        CrashReporter.init(this)
+        com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider.crashLogger = CrashReporter.instance
 
         try {
             // Инициализация Koin
@@ -185,8 +185,6 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
 
             // Инициализируем провайдер для доступа из UI
             AchievementEngineProvider.initialize(achievementEngine)
-
-
         } catch (e: Exception) {
             Timber.e(e, getString(R.string.achievements_system_init_error))
         }
@@ -244,7 +242,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         try {
             val prefs = getSharedPreferences("user_activity", MODE_PRIVATE)
             val currentTime = System.currentTimeMillis()
-            val lastOpenTime = prefs.getLong("last_open_time", 0)
+            prefs.getLong("last_open_time", 0)
             val firstOpenTime = prefs.getLong("first_open_time", currentTime)
 
             // Сохраняем время первого открытия если это первый запуск
@@ -270,8 +268,6 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             if (currentTime - firstOpenTime >= monthInMillis) {
                 AchievementTrigger.onMilestoneReached("month_active")
             }
-
-
         } catch (e: Exception) {
             Timber.e(e, getString(R.string.user_activity_check_error))
         }

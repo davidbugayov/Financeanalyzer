@@ -34,7 +34,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.presentation.subcategories.InitializeDefaultSubcategoriesUseCase
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -108,5 +107,4 @@ val useCaseModule =
         single { GetSubcategoryByIdUseCase(get()) }
         single { AddSubcategoryUseCase(get()) }
         single { DeleteSubcategoryUseCase(get()) }
-        single { InitializeDefaultSubcategoriesUseCase(get()) }
     }

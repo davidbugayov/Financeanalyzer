@@ -187,6 +187,7 @@
   <string name="no_subcategories">Нет подкатегорий</string>
   <string name="usage_count">Использований: %1$d</string>
   <string name="custom">Кастомная</string>
+  <string name="subcategory">Подкатегория</string>
   <string name="subcategory_name">Название подкатегории</string>
   <string name="add_subcategory">Добавить подкатегорию</string>
   <string name="categories_with_subcategories">Категории с подкатегориями</string>
@@ -200,7 +201,7 @@
   <string name="subcategory_demo_restaurant">Рестораны</string>
   <string name="subcategory_demo_transport">Транспорт</string>
   <string name="subcategory_demo_entertainment">Развлечения</string>
-  <string name="initializing_subcategories">Инициализация подкатегорий...</string>
+  <string name="initializing_subcategories">Инициализация подкатегорий…</string>
   <string name="subcategories_ready">Подкатегории готовы!</string>
   <string name="continue_to_app">Продолжить</string>
   <string name="subcategories_main_title">Система подкатегорий</string>

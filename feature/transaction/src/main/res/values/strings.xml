@@ -198,6 +198,9 @@
     <string name="subcategory_name">Название подкатегории</string>
     <string name="add_custom_subcategory">Добавить свою подкатегорию</string>
     <string name="no_subcategories_available">Нет доступных подкатегорий для этой категории</string>
+    <string name="subcategory_selected">Выбрана подкатегория</string>
+    <string name="no_subcategories">Нет подкатегорий</string>
+    <string name="has_subcategories">Есть подкатегории</string>
     <string name="show_less">Показать меньше</string>
     <string name="show_more">Показать больше</string>
 </resources>

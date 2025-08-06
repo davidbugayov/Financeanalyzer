@@ -20,11 +20,11 @@
     <dimen name="add_button_progress_stroke_width">2dp</dimen>
 
     <dimen name="category_section_padding_horizontal">16dp</dimen>
-    <dimen name="category_section_padding_vertical">16dp</dimen>
-    <dimen name="category_section_spacing">8dp</dimen>
-    <dimen name="category_header_spacing">8dp</dimen>
-    <dimen name="category_header_padding_horizontal">8dp</dimen>
-    <dimen name="category_header_padding_vertical">4dp</dimen>
+  <dimen name="category_section_padding_vertical">4dp</dimen>
+  <dimen name="category_section_spacing">4dp</dimen>
+  <dimen name="category_header_spacing">4dp</dimen>
+  <dimen name="category_header_padding_horizontal">4dp</dimen>
+  <dimen name="category_header_padding_vertical">2dp</dimen>
     <dimen name="category_expand_text_padding_vertical">4dp</dimen>
     <dimen name="category_expand_spacer_width">4dp</dimen>
     <dimen name="category_grid_spacing">4dp</dimen>

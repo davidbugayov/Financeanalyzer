@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.feature.profile.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,7 +64,10 @@ fun AppInfoSection(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        painter = painterResource(com.davidbugayov.financeanalyzer.ui.R.drawable.ic_notification_wallet),
+                        painter =
+                            painterResource(
+                                com.davidbugayov.financeanalyzer.ui.R.drawable.ic_notification_wallet,
+                            ),
                         contentDescription = stringResource(R.string.app_info),
                         tint = Color.White,
                         modifier = Modifier.size(28.dp),

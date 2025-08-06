@@ -7,9 +7,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
+import com.davidbugayov.financeanalyzer.ui.R
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.davidbugayov.financeanalyzer.ui.R
 import timber.log.Timber
 
 /**

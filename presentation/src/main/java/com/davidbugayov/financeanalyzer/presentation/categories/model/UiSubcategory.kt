@@ -15,13 +15,14 @@ data class UiSubcategory(
     val color: Color = Color.Gray,
     val original: Subcategory? = null,
 ) {
-
     companion object {
-
         /**
          * Создает UI подкатегорию из доменной модели
          */
-        fun fromDomain(subcategory: Subcategory, color: Color = Color.Gray): UiSubcategory {
+        fun fromDomain(
+            subcategory: Subcategory,
+            color: Color = Color.Gray,
+        ): UiSubcategory {
             return UiSubcategory(
                 id = subcategory.id,
                 name = subcategory.name,

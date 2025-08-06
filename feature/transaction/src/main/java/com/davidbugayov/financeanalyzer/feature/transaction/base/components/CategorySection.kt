@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -59,6 +60,7 @@ fun CategorySection(
     // Новые параметры для кнопки подкатегории
     onSubcategoryButtonClick: (() -> Unit)? = null,
     selectedSubcategory: String = "",
+    hasAvailableSubcategories: Boolean = false,
 ) {
     val maxRows = 2
     val columns = 4
@@ -81,26 +83,25 @@ fun CategorySection(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(
                     horizontal = dimensionResource(R.dimen.category_section_padding_horizontal),
-                    vertical = dimensionResource(R.dimen.category_section_padding_vertical),
+                    vertical = 0.dp,
                 ),
         verticalArrangement =
-            Arrangement.spacedBy(
-                dimensionResource(R.dimen.category_section_spacing),
-            ),
+            Arrangement.spacedBy(2.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement =
-                    Arrangement.spacedBy(
-                        dimensionResource(R.dimen.category_header_spacing),
-                    ),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.wrapContentHeight(),
             ) {
                 Text(
                     text = stringResource(R.string.category) + " *",
@@ -108,47 +109,64 @@ fun CategorySection(
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         ),
-                    modifier =
-                        Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.category_header_padding_horizontal),
-                            vertical = dimensionResource(R.dimen.category_header_padding_vertical),
-                        ),
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 0.dp),
                     color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
 
                 // Кнопка выбора подкатегории (показывается только если выбрана категория)
                 if (selectedCategory.isNotBlank() && onSubcategoryButtonClick != null) {
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .clickable { onSubcategoryButtonClick() }
-                            .background(
-                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                CircleShape,
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    Column {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .clip(CircleShape)
+                                    .clickable { onSubcategoryButtonClick() }
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                        CircleShape,
+                                    )
+                                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            Text(
-                                text = if (selectedSubcategory.isNotBlank()) selectedSubcategory else stringResource(R.string.subcategory),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                maxLines = 1,
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = stringResource(R.string.select_subcategory),
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(12.dp),
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                Text(
+                                    text =
+                                        if (selectedSubcategory.isNotBlank()) {
+                                            selectedSubcategory
+                                        } else {
+                                            stringResource(R.string.subcategory)
+                                        },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    maxLines = 1,
+                                )
+                                Icon(
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(12.dp),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                         }
+                        // Индикатор наличия подкатегорий
+                        Text(
+                            text = when {
+                                selectedSubcategory.isNotBlank() -> stringResource(R.string.subcategory_selected)
+                                hasAvailableSubcategories -> stringResource(R.string.has_subcategories)
+                                else -> stringResource(R.string.no_subcategories)
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = 8.dp, top = 1.dp),
+                        )
                     }
                 }
             }
+
             if (showExpand) {
                 Spacer(
                     modifier =

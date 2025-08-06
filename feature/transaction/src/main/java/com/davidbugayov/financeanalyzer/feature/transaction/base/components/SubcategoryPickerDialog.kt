@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -30,7 +29,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,7 +56,7 @@ fun SubcategoryPickerDialog(
                 color = MaterialTheme.colorScheme.onSurface,
             )
         },
-        containerColor = Color.White, // Белый фон как во всех диалогах
+        containerColor = MaterialTheme.colorScheme.surface, // Поддержка светлой и темной темы
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -118,10 +116,11 @@ fun SubcategoryPickerDialog(
 
                     // Разделитель
                     Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                     )
                 }
 
@@ -133,10 +132,11 @@ fun SubcategoryPickerDialog(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
-                    border = BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                    ),
+                    border =
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                        ),
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
                 ) {
                     Row(
@@ -191,16 +191,17 @@ fun SubcategoryItemButton(
     val contentColor = subcategory.color
 
     Surface(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp), // Более округлые углы
-        border = BorderStroke(
-            1.5.dp, // Немного толще граница
-            subcategory.color.copy(alpha = 0.3f),
-        ),
+        border =
+            BorderStroke(
+                1.5.dp, // Немного толще граница
+                subcategory.color.copy(alpha = 0.3f),
+            ),
         color = backgroundColor,
-        shadowElevation = 2.dp, // Легкая тень
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -217,9 +218,10 @@ fun SubcategoryItemButton(
                     imageVector = Icons.Default.Category,
                     contentDescription = subcategory.name,
                     tint = contentColor,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .padding(10.dp),
+                    modifier =
+                        Modifier
+                            .size(20.dp)
+                            .padding(10.dp),
                 )
             }
 
@@ -227,13 +229,15 @@ fun SubcategoryItemButton(
 
             Text(
                 text = subcategory.name,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                ),
+                style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                    ),
                 color = contentColor,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.height(32.dp),
             )
         }
     }

@@ -290,7 +290,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
             is BaseTransactionEvent.SetCategory -> {
                 _state.update { state ->
-                    copyState(state, category = event.category, showCategoryPicker = false)
+                    copyState(
+                        state,
+                        category = event.category,
+                        showCategoryPicker = false,
+                        subcategory = "",
+                    ) // Сбрасываем подкатегорию
                 }
                 // Загружаем сабкатегории для выбранной категории
                 loadSubcategoriesForCurrentCategory()
@@ -1245,12 +1250,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param isExpense Является ли категория расходной
      * @return ID категории или null
      */
-    protected fun getCategoryIdByName(categoryName: String, isExpense: Boolean): Long? {
-        val categories = if (isExpense) {
-            categoriesViewModel.expenseCategories.value
-        } else {
-            categoriesViewModel.incomeCategories.value
-        }
+    protected fun getCategoryIdByName(
+        categoryName: String,
+        isExpense: Boolean,
+    ): Long? {
+        val categories =
+            if (isExpense) {
+                categoriesViewModel.expenseCategories.value
+            } else {
+                categoriesViewModel.incomeCategories.value
+            }
         return categories.find { it.name == categoryName }?.id
     }
 
@@ -1262,9 +1271,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             try {
                 getSubcategoriesByCategoryIdUseCase(categoryId).collect { subcategories ->
-                    val uiSubcategories = subcategories.map { subcategory ->
-                        UiSubcategory.fromDomain(subcategory)
-                    }
+                    val uiSubcategories =
+                        subcategories.map { subcategory ->
+                            UiSubcategory.fromDomain(subcategory)
+                        }
                     _state.update { state ->
                         copyState(state, availableSubcategories = uiSubcategories)
                     }

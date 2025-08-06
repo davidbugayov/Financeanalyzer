@@ -32,10 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -43,12 +40,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import timber.log.Timber
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
-import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -61,6 +57,7 @@ import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGe
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 /**
  * Экран подробной финансовой статистики
@@ -79,10 +76,12 @@ fun FinancialDetailStatisticsScreen(
     val viewModel: FinancialDetailStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
     val state = viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
-    
+
     // Временный лог для диагностики
-    Timber.d("FinancialDetailStatisticsScreen: metrics.savingsRate=${metrics.savingsRate}, metrics.monthsOfSavings=${metrics.monthsOfSavings}")
-    
+    Timber.d(
+        "FinancialDetailStatisticsScreen: metrics.savingsRate=${metrics.savingsRate}, metrics.monthsOfSavings=${metrics.monthsOfSavings}",
+    )
+
     rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -201,7 +200,7 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     FinancialHealthScoreCard(
-                        healthScore = metrics.healthMetrics?.financialHealthScore?.toDouble() ?: 0.0,
+                        healthScore = metrics.healthMetrics?.financialHealthScore ?: 0.0,
                         breakdown = metrics.healthMetrics?.healthScoreBreakdown ?: HealthScoreBreakdown(),
                         modifier = Modifier.fillMaxWidth(),
                     )

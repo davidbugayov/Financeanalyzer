@@ -51,10 +51,11 @@ fun GroupedTransactionList(
 
         sortedKeys.forEach { key ->
             val list = groups[key].orEmpty()
-            val total: Money = list.fold(Money.zero(currentCurrency)) { acc, tx ->
-                val convertedAmount = Money(tx.amount.amount, currentCurrency)
-                acc + convertedAmount
-            }
+            val total: Money =
+                list.fold(Money.zero(currentCurrency)) { acc, tx ->
+                    val convertedAmount = Money(tx.amount.amount, currentCurrency)
+                    acc + convertedAmount
+                }
             val expanded = expandedMap.getOrPut(key) { true }
 
             // Header

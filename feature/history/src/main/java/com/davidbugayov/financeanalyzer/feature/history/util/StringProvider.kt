@@ -27,67 +27,8 @@ object StringProvider {
         return context?.getString(resId, *formatArgs) ?: "String not found"
     }
 
-    // Статистика категорий
-    val currentPeriod: String get() = getString(R.string.current_period)
-    val previousPeriod: String get() = getString(R.string.previous_period)
-
-    fun increaseByPercent(percent: Int): String = getString(R.string.increase_by_percent, percent)
-
-    fun decreaseByPercent(percent: Int): String = getString(R.string.decrease_by_percent, percent)
-
-    val noChanges: String get() = getString(R.string.no_changes)
-
-    // Диалоги выбора
-    val selectCategory: String get() = getString(R.string.select_category)
-    val selectSources: String get() = getString(R.string.select_sources)
-    val selectPeriod: String get() = getString(R.string.select_period)
-    val allCategories: String get() = getString(R.string.all_categories)
-    val allSources: String get() = getString(R.string.all_sources)
-    val clearSelection: String get() = getString(R.string.clear_selection)
-    val selectAll: String get() = getString(R.string.select_all)
     val apply: String get() = getString(R.string.apply)
-    val close: String get() = getString(R.string.close)
     val cancel: String get() = getString(UiR.string.cancel)
-
-    // Группировка
-    val groupByDays: String get() = getString(R.string.group_by_days)
-    val groupByWeeks: String get() = getString(R.string.group_by_weeks)
-    val groupByMonths: String get() = getString(R.string.group_by_months)
-    val collapse: String get() = getString(R.string.collapse)
-    val expand: String get() = getString(R.string.expand)
-
-    // Заголовки
-    val transactionHistory: String get() = getString(R.string.transaction_history)
-
-    // Фильтры
-    val categoryFilter: String get() = getString(R.string.category_filter)
-    val sourceFilter: String get() = getString(R.string.source_filter)
-    val filter: String get() = getString(R.string.filter)
-
-    // Периоды
-    val allTime: String get() = getString(R.string.all_time)
-    val day: String get() = getString(R.string.day)
-    val week: String get() = getString(R.string.week)
-    val month: String get() = getString(R.string.month)
-    val quarter: String get() = getString(R.string.quarter)
-    val year: String get() = getString(R.string.year)
-    val customPeriod: String get() = getString(R.string.custom_period)
-    val startDate: String get() = getString(R.string.start_date)
-    val endDate: String get() = getString(R.string.end_date)
-
-    // Статистика
-    fun categoriesSelected(categories: String): String = getString(R.string.categories_selected, categories)
-
-    fun sourcesSelected(sources: String): String = getString(R.string.sources_selected, sources)
-
-    // Ошибки
-    val errorLoadingTransactions: String get() = getString(R.string.error_loading_transactions)
-
-    // Форматирование
-    fun weekFormat(
-        weekNumber: Int,
-        year: Int,
-    ): String = getString(R.string.week_format, weekNumber, year)
 
     // Недостающие строки
     val delete: String get() = getString(R.string.delete)
@@ -97,4 +38,4 @@ object StringProvider {
             R.string.deleteSourceConfirmationMessage,
             source,
         )
-} 
+}

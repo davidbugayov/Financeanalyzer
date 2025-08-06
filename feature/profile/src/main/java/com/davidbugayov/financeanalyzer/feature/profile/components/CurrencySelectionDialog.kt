@@ -76,10 +76,11 @@ fun CurrencySelectionDialog(
                     onCurrencySelected(selectedCurrency)
                     onDismiss()
                 },
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+                colors =
+                    androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 Text("Выбрать")
             }
@@ -92,9 +93,10 @@ fun CurrencySelectionDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
         tonalElevation = 0.dp,
-        properties = androidx.compose.ui.window.DialogProperties(
-            usePlatformDefaultWidth = false,
-        ),
+        properties =
+            androidx.compose.ui.window.DialogProperties(
+                usePlatformDefaultWidth = false,
+            ),
     )
 }
 
@@ -110,17 +112,18 @@ private fun CurrencyItem(
         if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
-            .border(
-                width = if (isSelected) 2.dp else 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp),
-            )
-            .clickable { onClick() }
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(backgroundColor)
+                .border(
+                    width = if (isSelected) 2.dp else 1.dp,
+                    color = borderColor,
+                    shape = RoundedCornerShape(12.dp),
+                )
+                .clickable { onClick() }
+                .padding(16.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -147,9 +150,10 @@ private fun CurrencyItem(
                 imageVector = Icons.Default.Check,
                 contentDescription = "Выбрано",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(24.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(24.dp),
             )
         }
     }
@@ -157,18 +161,20 @@ private fun CurrencyItem(
 
 @Composable
 private fun CurrencyIcon(currency: Currency) {
-    val iconColor = when (currency) {
-        Currency.RUB -> Color(0xFF0066CC).copy(alpha = 0.8f)
-        Currency.USD -> Color(0xFF00AA00).copy(alpha = 0.8f)
-        Currency.EUR -> Color(0xFF0033CC).copy(alpha = 0.8f)
-        Currency.CNY -> Color(0xFFCC0000).copy(alpha = 0.8f)
-        else -> Color(0xFF666666).copy(alpha = 0.8f)
-    }
+    val iconColor =
+        when (currency) {
+            Currency.RUB -> Color(0xFF0066CC).copy(alpha = 0.8f)
+            Currency.USD -> Color(0xFF00AA00).copy(alpha = 0.8f)
+            Currency.EUR -> Color(0xFF0033CC).copy(alpha = 0.8f)
+            Currency.CNY -> Color(0xFFCC0000).copy(alpha = 0.8f)
+            else -> Color(0xFF666666).copy(alpha = 0.8f)
+        }
 
     Box(
-        modifier = Modifier
-            .size(40.dp)
-            .background(iconColor, RoundedCornerShape(8.dp)),
+        modifier =
+            Modifier
+                .size(40.dp)
+                .background(iconColor, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center,
     ) {
         Text(

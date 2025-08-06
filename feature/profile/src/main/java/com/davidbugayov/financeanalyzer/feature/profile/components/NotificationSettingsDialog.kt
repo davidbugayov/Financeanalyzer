@@ -1,6 +1,12 @@
 package com.davidbugayov.financeanalyzer.feature.profile.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +26,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,10 +46,6 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import java.util.Locale
 import timber.log.Timber
 
@@ -108,30 +108,31 @@ fun NotificationSettingsDialog(
     }
 
     // ActivityResultLauncher для запроса разрешения на уведомления
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            hasNotificationPermission = true
-            if (pendingEnableNotifications) {
-                viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
-                pendingEnableNotifications = false
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (isGranted) {
+                hasNotificationPermission = true
+                if (pendingEnableNotifications) {
+                    viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
+                    pendingEnableNotifications = false
+                }
+            } else {
+                // Если разрешение не предоставлено, проверяем, нужно ли показать диалог настроек
+                if (PermissionUtils.shouldShowSettingsDialog(context)) {
+                    showSettingsDialog = true
+                }
             }
-        } else {
-            // Если разрешение не предоставлено, проверяем, нужно ли показать диалог настроек
-            if (PermissionUtils.shouldShowSettingsDialog(context)) {
-                showSettingsDialog = true
-            }
+            showPermissionDialog = false
         }
-        showPermissionDialog = false
-    }
 
     if (showPermissionDialog) {
         PermissionDialogs.RationalePermissionDialog(
             titleResId = R.string.permission_required_title,
             messageResId = R.string.notification_permission_required,
             onConfirm = {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 } else {
                     showPermissionDialog = false

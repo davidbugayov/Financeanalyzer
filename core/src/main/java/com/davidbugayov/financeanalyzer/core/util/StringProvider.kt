@@ -33,4 +33,4 @@ object StringProvider {
     val errorFileRead: String get() = getString(R.string.error_file_read)
     val errorUnknown: String get() = getString(R.string.error_unknown)
     val errorApplication: String get() = getString(R.string.error_application)
-} 
+}

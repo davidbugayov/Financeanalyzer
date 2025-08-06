@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.feature.profile
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -285,7 +284,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         )
 
                         viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
-                    }
+                    },
                 )
 
                 Spacer(

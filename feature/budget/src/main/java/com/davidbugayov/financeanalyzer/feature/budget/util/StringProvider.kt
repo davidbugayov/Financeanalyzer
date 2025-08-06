@@ -36,7 +36,6 @@ object StringProvider {
     val errorWalletNotFound: String get() = getString(R.string.error_wallet_not_found)
     val errorLoadingWallet: String get() = getString(R.string.error_loading_wallet)
     val errorLoadingTransactions: String get() = getString(R.string.error_loading_transactions)
-    val errorBindingCategories: String get() = getString(R.string.error_binding_categories)
 
     // Валидация кошельков
     val errorEnterWalletName: String get() = getString(R.string.error_enter_wallet_name)
@@ -46,73 +45,14 @@ object StringProvider {
 
     fun errorCreatingWallet(message: String): String = getString(R.string.error_creating_wallet, message)
 
-    // Подкошельки
-    val subwallets: String get() = getString(R.string.subwallets)
-    val back: String get() = getString(R.string.back)
-    val addSubwallet: String get() = getString(R.string.add_subwallet)
-
     // Бюджет
     val budget: String get() = getString(R.string.budget)
-    val addIncome: String get() = getString(R.string.add_income)
-    val periodSettings: String get() = getString(R.string.period_settings)
-    val myWallets: String get() = getString(R.string.my_wallets)
-    val addNewWallet: String get() = getString(R.string.add_new_wallet)
-    val walletName: String get() = getString(R.string.wallet_name)
-    val expenseLimit: String get() = getString(R.string.expense_limit)
     val add: String get() = getString(R.string.add)
-
-    // Распределение дохода
-    val distributeIncome: String get() = getString(R.string.distribute_income)
-    val distributeIncomeDescription: String get() = getString(R.string.distribute_income_description)
-    val incomeAmount: String get() = getString(R.string.income_amount)
-    val distribute: String get() = getString(R.string.distribute)
-    val noWalletsAvailable: String get() = getString(R.string.no_wallets_available)
-    val addWithoutDistribution: String get() = getString(R.string.add_without_distribution)
-
-    // Траты
-    val spendFromWallet: String get() = getString(R.string.spend_from_wallet)
-
-    fun categoryLabel(category: String): String = getString(R.string.category_label, category)
-
-    val amount: String get() = getString(R.string.amount)
-    val spend: String get() = getString(R.string.spend)
-
-    // Переводы
-    val transferBetweenWallets: String get() = getString(R.string.transfer_between_wallets)
-
-    fun fromCategory(category: String): String = getString(R.string.from_category, category)
-
-    val toCategory: String get() = getString(R.string.to_category)
-
-    fun selectedWallet(wallet: String): String = getString(R.string.selected_wallet, wallet)
-
-    val transferAmount: String get() = getString(R.string.transfer_amount)
-    val transfer: String get() = getString(R.string.transfer)
-
-    // Настройки периода
-    val periodSettingsTitle: String get() = getString(R.string.period_settings_title)
-    val periodDurationDescription: String get() = getString(R.string.period_duration_description)
-    val daysCount: String get() = getString(R.string.days_count)
-    val save: String get() = getString(R.string.save)
 
     // Ошибки
     val error: String get() = getString(R.string.error)
-    val ok: String get() = getString(R.string.ok)
-    val errorDistributingIncome: String get() = getString(R.string.error_distributing_income)
-    val errorAddingFunds: String get() = getString(R.string.error_adding_funds)
-    val errorInsufficientFunds: String get() = getString(R.string.error_insufficient_funds)
-    val errorSpendingFunds: String get() = getString(R.string.error_spending_funds)
-    val errorInsufficientSourceFunds: String get() = getString(R.string.error_insufficient_source_funds)
-    val errorTransferringFunds: String get() = getString(R.string.error_transferring_funds)
-    val errorSettingPeriodDuration: String get() = getString(R.string.error_setting_period_duration)
-    val errorResettingPeriod: String get() = getString(R.string.error_resetting_period)
-    val errorResettingAllPeriods: String get() = getString(R.string.error_resetting_all_periods)
+
     val errorLinkingCategories: String get() = getString(R.string.error_linking_categories)
-
-    // Превышение бюджета
-    val budgetOverLimitTitle: String get() = getString(R.string.budget_over_limit_title)
-
-    fun budgetOverLimitMessage(wallets: String): String = getString(R.string.budget_over_limit_message, wallets)
 
     // Кошельки
     val walletNotFound: String get() = getString(R.string.wallet_not_found)
@@ -127,33 +67,4 @@ object StringProvider {
     val errorTitle: String get() = getString(R.string.error_title)
     val okButton: String get() = getString(R.string.ok_button)
 
-    // Настройка кошелька
-    val walletSetupTitle: String get() = getString(R.string.wallet_setup_title)
-    val walletSetupDescription: String get() = getString(R.string.wallet_setup_description)
-    val walletNameLabel: String get() = getString(R.string.wallet_name_label)
-    val walletNameHint: String get() = getString(R.string.wallet_name_hint)
-    val walletNameDescription: String get() = getString(R.string.wallet_name_description)
-    val walletTypeLabel: String get() = getString(R.string.wallet_type_label)
-    val walletTypeHint: String get() = getString(R.string.wallet_type_hint)
-    val walletGoalCheckbox: String get() = getString(R.string.wallet_goal_checkbox)
-    val walletGoalDescription: String get() = getString(R.string.wallet_goal_description)
-    val walletGoalAmountLabel: String get() = getString(R.string.wallet_goal_amount_label)
-    val walletGoalAmountHint: String get() = getString(R.string.wallet_goal_amount_hint)
-    val walletGoalAmountExample: String get() = getString(R.string.wallet_goal_amount_example)
-    val walletCreatedSuccess: String get() = getString(R.string.wallet_created_success)
-    val walletCreating: String get() = getString(R.string.wallet_creating)
-    val walletCreateButton: String get() = getString(R.string.wallet_create_button)
-    val walletSetupTip: String get() = getString(R.string.wallet_setup_tip)
-
-    // Карточка кошелька
-    val walletSpentAmount: String get() = getString(R.string.wallet_spent_amount)
-    val walletRemainingAmount: String get() = getString(R.string.wallet_remaining_amount)
-    val walletBudgetLimit: String get() = getString(R.string.wallet_budget_limit)
-    val walletOverview: String get() = getString(R.string.wallet_overview)
-    val walletManageAction: String get() = getString(R.string.wallet_manage_action)
-    val walletBudgetExceeded: String get() = getString(R.string.wallet_budget_exceeded)
-    val walletBudgetProgress: String get() = getString(R.string.wallet_budget_progress)
-    val walletAvailableBalance: String get() = getString(R.string.wallet_available_balance)
-    val walletSpendAction: String get() = getString(R.string.wallet_spend_action)
-    val walletAddFundsAction: String get() = getString(R.string.wallet_add_funds_action)
-} 
+}

@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -34,14 +33,14 @@ import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
+import com.davidbugayov.financeanalyzer.presentation.home.components.NotificationPermissionDialog
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -53,13 +52,12 @@ import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
-import com.davidbugayov.financeanalyzer.presentation.home.components.NotificationPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -72,9 +70,9 @@ import timber.log.Timber
  */
 @Composable
 private fun HomeTopBar(
+    profileIconModifier: Modifier = Modifier,
     onGenerateTestData: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    profileIconModifier: Modifier = Modifier,
 ) {
     AppTopBar(
         title = StringProvider.financialAnalyzer,
@@ -219,6 +217,7 @@ private fun HomeDialogs(
     transactionToDelete: Transaction?,
     onConfirmDelete: () -> Unit,
     onDismissDelete: () -> Unit,
+    subcategoryNameForActions: String,
 ) {
     if (showActionsDialog && selectedTransaction != null) {
         TransactionActionsDialog(
@@ -226,6 +225,7 @@ private fun HomeDialogs(
             onDismiss = onDismissActionsDialog,
             onDelete = onDeleteTransaction,
             onEdit = onEditTransaction,
+            subcategoryName = subcategoryNameForActions,
         )
     }
     transactionToDelete?.let { transaction ->
@@ -261,10 +261,8 @@ private fun HomeFeedback(
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel =
+    categoriesViewModel: PersistentCategoriesViewModel =
         koinViewModel(),
-    editViewModel: EditTransactionViewModel = koinViewModel(),
-    updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
     userEventTracker: UserEventTracker = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -279,6 +277,39 @@ fun HomeScreen(
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
+
+    // Состояние для подкатегории
+    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+    var subcategoryNameForActions by remember { mutableStateOf("") }
+    var subcategoryNameForDetail by remember { mutableStateOf("") }
+
+    // Загрузка подкатегории для диалога действий
+    LaunchedEffect(selectedTransactionForActions?.subcategoryId) {
+        selectedTransactionForActions?.subcategoryId?.let { subcategoryId ->
+            try {
+                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                subcategoryNameForActions = subcategory?.name ?: ""
+            } catch (_: Exception) {
+                subcategoryNameForActions = ""
+            }
+        } ?: run {
+            subcategoryNameForActions = ""
+        }
+    }
+
+    // Загрузка подкатегории для диалога детальной информации
+    LaunchedEffect(selectedTransactionForDetail?.subcategoryId) {
+        selectedTransactionForDetail?.subcategoryId?.let { subcategoryId ->
+            try {
+                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                subcategoryNameForDetail = subcategory?.name ?: ""
+            } catch (_: Exception) {
+                subcategoryNameForDetail = ""
+            }
+        } ?: run {
+            subcategoryNameForDetail = ""
+        }
+    }
     var showNotificationPermissionDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
     val permissionManager = remember { PermissionManager(context) }
@@ -290,7 +321,7 @@ fun HomeScreen(
 
     val testDataGeneratedMsg = StringProvider.testDataGenerated
     val transactionDeletedMsg = StringProvider.transactionDeleted
-    val emptyTransactionIdErrorMsg = StringProvider.emptyTransactionIdError
+    StringProvider.emptyTransactionIdError
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
@@ -352,19 +383,20 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.SetFilter(savedFilter))
             }
         }
-        
+
         // Проверяем, нужно ли показать диалог разрешения на уведомления
         val currentState = permissionManager.getCurrentState()
         val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-        
+
         // Показываем диалог, если:
         // 1. Онбординг завершен
         // 2. Нет разрешения на уведомления
         // 3. Android 13+ (где требуется разрешение)
         // 4. Состояние разрешения позволяет показать диалог
-        if (currentState == PermissionManager.NotificationPermissionState.ONBOARDING_COMPLETED && 
-            !hasNotificationPermission && 
-            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        if (currentState == PermissionManager.NotificationPermissionState.ONBOARDING_COMPLETED &&
+            !hasNotificationPermission &&
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+        ) {
             showNotificationPermissionDialog = true
         }
     }
@@ -550,6 +582,7 @@ fun HomeScreen(
             onDismissDelete = {
                 viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
             },
+            subcategoryNameForActions = subcategoryNameForActions,
         )
 
         // Диалог детальной информации о транзакции
@@ -560,9 +593,10 @@ fun HomeScreen(
                     showDetailDialog = false
                     selectedTransactionForDetail = null
                 },
+                subcategoryName = subcategoryNameForDetail,
             )
         }
-        
+
         // Диалог разрешения на уведомления
         if (showNotificationPermissionDialog) {
             NotificationPermissionDialog(

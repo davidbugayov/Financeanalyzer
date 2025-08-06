@@ -28,7 +28,7 @@ fun SavingsOptimizationCard(
 ) {
     // Временный лог для диагностики
     Timber.d("SavingsOptimizationCard: savingsRate=${metrics.savingsRate}, monthsOfSavings=${metrics.monthsOfSavings}")
-    
+
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),

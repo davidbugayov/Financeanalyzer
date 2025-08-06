@@ -39,6 +39,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
@@ -65,6 +66,7 @@ import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
@@ -90,6 +92,39 @@ fun TransactionHistoryScreen(
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
+
+    // Состояние для подкатегории
+    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+    var subcategoryNameForActions by remember { mutableStateOf("") }
+    var subcategoryNameForDetail by remember { mutableStateOf("") }
+
+    // Загрузка подкатегории для диалога действий
+    LaunchedEffect(selectedTransaction?.subcategoryId) {
+        selectedTransaction?.subcategoryId?.let { subcategoryId ->
+            try {
+                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                subcategoryNameForActions = subcategory?.name ?: ""
+            } catch (_: Exception) {
+                subcategoryNameForActions = ""
+            }
+        } ?: run {
+            subcategoryNameForActions = ""
+        }
+    }
+
+    // Загрузка подкатегории для диалога детальной информации
+    LaunchedEffect(selectedTransactionForDetail?.subcategoryId) {
+        selectedTransactionForDetail?.subcategoryId?.let { subcategoryId ->
+            try {
+                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                subcategoryNameForDetail = subcategory?.name ?: ""
+            } catch (_: Exception) {
+                subcategoryNameForDetail = ""
+            }
+        } ?: run {
+            subcategoryNameForDetail = ""
+        }
+    }
 
     // Функция для обработки событий транзакций
     fun handleTransactionEvent(event: TransactionEvent) {
@@ -261,6 +296,7 @@ fun TransactionHistoryScreen(
                 showActionsDialog = false
                 handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
             },
+            subcategoryName = subcategoryNameForActions,
         )
     }
 
@@ -315,6 +351,7 @@ fun TransactionHistoryScreen(
                 showDetailDialog = false
                 selectedTransactionForDetail = null
             },
+            subcategoryName = subcategoryNameForDetail,
         )
     }
 

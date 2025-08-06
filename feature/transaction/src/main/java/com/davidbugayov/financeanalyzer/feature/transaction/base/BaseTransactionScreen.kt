@@ -430,6 +430,7 @@ fun <E> BaseTransactionScreen(
                         isError = state.sourceError,
                     )
                 }
+                Spacer(Modifier.height(4.dp))
                 // Секция выбора категории
                 if (state.isExpense) {
                     CategorySection(
@@ -471,16 +472,35 @@ fun <E> BaseTransactionScreen(
                         },
                         isError = state.categoryError,
                         // Новые параметры для кнопки подкатегории
-                        onSubcategoryButtonClick = if (state.category.isNotBlank()) {
-                            {
+                        onSubcategoryButtonClick =
+                            if (state.category.isNotBlank()) {
+                                {
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
+                                        context,
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                        selectedSubcategory = state.subcategory,
+                        hasAvailableSubcategories = state.availableSubcategories.isNotEmpty(),
+                    )
+                    // Уменьшаем отступ между категорией и суммой
+                    Spacer(Modifier.height(4.dp))
+                    key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
+                        AmountField(
+                            amount = state.amount,
+                            onAmountChange = { amount ->
                                 viewModel.onEvent(
-                                    eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
+                                    eventFactory(BaseTransactionEvent.SetAmount(amount)),
                                     context,
                                 )
-                            }
-                        } else null,
-                        selectedSubcategory = state.subcategory,
-                    )
+                            },
+                            isError = state.amountError,
+                            accentColor = currentColor,
+                        )
+                    }
                 } else {
                     CategorySection(
                         categories = sortedIncomeCategories,
@@ -521,33 +541,24 @@ fun <E> BaseTransactionScreen(
                         },
                         isError = state.categoryError,
                         // Новые параметры для кнопки подкатегории
-                        onSubcategoryButtonClick = if (state.category.isNotBlank()) {
-                            {
-                                viewModel.onEvent(
-                                    eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
-                                    context,
-                                )
-                            }
-                        } else null,
+                        onSubcategoryButtonClick =
+                            if (state.category.isNotBlank()) {
+                                {
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowSubcategoryPicker),
+                                        context,
+                                    )
+                                }
+                            } else {
+                                null
+                            },
                         selectedSubcategory = state.subcategory,
+                        hasAvailableSubcategories = state.availableSubcategories.isNotEmpty(),
                     )
                 }
 
-                // Поле ввода суммы и кнопки операций — после категории
-                key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
-                    AmountField(
-                        amount = state.amount,
-                        onAmountChange = { amount ->
-                            viewModel.onEvent(
-                                eventFactory(BaseTransactionEvent.SetAmount(amount)),
-                                context,
-                            )
-                        },
-                        isError = state.amountError,
-                        accentColor = currentColor,
-                    )
-                }
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
                 // Поле выбора даты
                 DateField(
                     date = state.selectedDate,

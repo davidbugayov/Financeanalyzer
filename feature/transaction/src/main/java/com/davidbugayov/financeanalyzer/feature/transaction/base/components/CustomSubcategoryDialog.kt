@@ -31,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory
@@ -52,7 +52,7 @@ fun CustomSubcategoryDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Color.White, // Белый фон как во всех диалогах
+        containerColor = MaterialTheme.colorScheme.surface, // Поддержка светлой и темной темы
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -92,10 +92,11 @@ fun CustomSubcategoryDialog(
                         ) {
                             items(existingSubcategories) { subcategory ->
                                 Card(
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = subcategory.color.copy(alpha = 0.1f),
-                                        contentColor = subcategory.color,
-                                    ),
+                                    colors =
+                                        CardDefaults.cardColors(
+                                            containerColor = subcategory.color.copy(alpha = 0.1f),
+                                            contentColor = subcategory.color,
+                                        ),
                                     shape = RoundedCornerShape(16.dp),
                                 ) {
                                     Row(
@@ -121,10 +122,11 @@ fun CustomSubcategoryDialog(
 
                         // Разделитель
                         Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                         )
                     }
                 }

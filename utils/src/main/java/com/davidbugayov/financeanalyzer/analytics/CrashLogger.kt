@@ -8,4 +8,4 @@ interface CrashLogger {
         errorMessage: String,
         throwable: Throwable? = null,
     )
-} 
+}

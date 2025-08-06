@@ -51,7 +51,10 @@ import java.util.Locale
  * @param transaction Транзакция для отображения
  */
 @Composable
-fun TransactionDetailContent(transaction: Transaction) {
+fun TransactionDetailContent(
+    transaction: Transaction,
+    subcategoryName: String = "",
+) {
     val isDarkTheme = isSystemInDarkTheme()
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
@@ -114,10 +117,11 @@ fun TransactionDetailContent(transaction: Transaction) {
                         } else {
                             "+" + transaction.amount.formatForDisplay(useMinimalDecimals = true)
                         },
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style =
+                        MaterialTheme.typography.headlineLarge.copy(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
                     color = valueColor,
                     textAlign = TextAlign.Center,
                 )
@@ -153,6 +157,28 @@ fun TransactionDetailContent(transaction: Transaction) {
                     },
                     valueColor = null,
                 )
+
+                // Подкатегория (если есть)
+                if (subcategoryName.isNotBlank()) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                    )
+
+                    DetailRow(
+                        label = stringResource(R.string.subcategory),
+                        value = subcategoryName,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Category,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        },
+                        valueColor = MaterialTheme.colorScheme.secondary,
+                    )
+                }
 
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 16.dp),
@@ -276,4 +302,4 @@ private fun rememberSourceColor(
             isDarkTheme = isDarkTheme,
         )
     }
-} 
+}

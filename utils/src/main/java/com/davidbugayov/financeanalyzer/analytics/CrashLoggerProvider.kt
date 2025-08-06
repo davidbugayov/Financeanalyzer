@@ -11,4 +11,4 @@ object CrashLoggerProvider {
                 throwable: Throwable?,
             ) { /* no-op */ }
         }
-} 
+}

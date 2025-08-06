@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail.components
 
-
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +46,6 @@ fun FinancialHealthScoreCard(
     breakdown: HealthScoreBreakdown,
     modifier: Modifier = Modifier,
 ) {
-
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
@@ -99,7 +92,6 @@ fun FinancialHealthScoreCard(
                 // Круговая диаграмма с общим скором
                 HealthScoreCircle(
                     score = healthScore,
-                    isVisible = true,
                     modifier = Modifier.size(120.dp),
                 )
 
@@ -155,7 +147,6 @@ fun FinancialHealthScoreCard(
 @Composable
 private fun HealthScoreCircle(
     score: Double,
-    isVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val progress = (score / 100.0).toFloat()

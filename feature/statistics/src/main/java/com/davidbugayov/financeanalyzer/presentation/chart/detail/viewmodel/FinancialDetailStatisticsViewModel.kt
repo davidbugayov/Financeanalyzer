@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
 /**
  * ViewModel для экрана подробной финансовой статистики.
  * Следует принципам MVI (Model-View-Intent).
@@ -59,10 +58,11 @@ class FinancialDetailStatisticsViewModel(
                     val transactions = _state.value.transactions
                     val (income, expense) = calculateIncomeAndExpense(transactions)
 
-                    _state.value = _state.value.copy(
-                        income = income,
-                        expense = expense,
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            income = income,
+                            expense = expense,
+                        )
 
                     // Пересчитываем расширенные метрики
                     calculateFinancialMetrics(transactions, income, expense)
@@ -212,14 +212,20 @@ class FinancialDetailStatisticsViewModel(
         // Средний доход и расход на транзакцию
         val averageIncomePerTransaction =
             if (incomeTransactionsCount > 0) {
-                Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN), currentCurrency)
+                Money(
+                    income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN),
+                    currentCurrency,
+                )
             } else {
                 Money.zero(currentCurrency)
             }
 
         val averageExpensePerTransaction =
             if (expenseTransactionsCount > 0) {
-                Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN), currentCurrency)
+                Money(
+                    expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN),
+                    currentCurrency,
+                )
             } else {
                 Money.zero(currentCurrency)
             }
@@ -255,7 +261,7 @@ class FinancialDetailStatisticsViewModel(
 
         // Обновляем метрики
         Timber.d("ViewModel: Сохраняем метрики - savingsRate=$savingsRate, monthsOfSavings=$monthsOfSavings")
-        
+
         _metrics.value =
             FinancialMetrics(
                 savingsRate = savingsRate,

@@ -239,11 +239,12 @@ class AddTransactionViewModel(
             )
 
         // Получаем ID сабкатегории, если она выбрана
-        val subcategoryId = if (currentState.subcategory.isNotBlank()) {
-            currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
-        } else {
-            null
-        }
+        val subcategoryId =
+            if (currentState.subcategory.isNotBlank()) {
+                currentState.availableSubcategories.find { it.name == currentState.subcategory }?.id
+            } else {
+                null
+            }
 
         return Transaction(
             id = UUID.randomUUID().toString(),

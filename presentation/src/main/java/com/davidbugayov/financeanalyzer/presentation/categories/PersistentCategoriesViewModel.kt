@@ -17,9 +17,8 @@ import timber.log.Timber
 class PersistentCategoriesViewModel(
     application: Application,
 ) : AndroidViewModel(application), CategoriesViewModel {
-    
     private val categoryPreferences = CategoryPreferences.getInstance(application)
-    
+
     private val _expenseCategories = MutableStateFlow<List<UiCategory>>(emptyList())
     override val expenseCategories: StateFlow<List<UiCategory>> = _expenseCategories
 
@@ -37,40 +36,46 @@ class PersistentCategoriesViewModel(
         // Загружаем дефолтные категории
         val defaultExpenseCategories = CategoryProvider.getDefaultExpenseCategories(getApplication())
         val defaultIncomeCategories = CategoryProvider.getDefaultIncomeCategories(getApplication())
-        
+
         // Загружаем кастомные категории из preferences
         val customExpenseCategories = categoryPreferences.loadExpenseCategories()
         val customIncomeCategories = categoryPreferences.loadIncomeCategories()
-        
+
         // Конвертируем кастомные категории в UiCategory
-        val customExpenseUiCategories = customExpenseCategories.map { customCategory ->
-            UiCategory.custom(
-                name = customCategory.name,
-                isExpense = true,
-                icon = CategoryProvider.getIconByName(customCategory.iconName),
-                color = customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) } 
-                    ?: CategoryProvider.generateCategoryColorFromPalette(true)
-            )
-        }
-        
-        val customIncomeUiCategories = customIncomeCategories.map { customCategory ->
-            UiCategory.custom(
-                name = customCategory.name,
-                isExpense = false,
-                icon = CategoryProvider.getIconByName(customCategory.iconName),
-                color = customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) } 
-                    ?: CategoryProvider.generateCategoryColorFromPalette(false)
-            )
-        }
-        
+        val customExpenseUiCategories =
+            customExpenseCategories.map { customCategory ->
+                UiCategory.custom(
+                    name = customCategory.name,
+                    isExpense = true,
+                    icon = CategoryProvider.getIconByName(customCategory.iconName),
+                    color =
+                        customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
+                            ?: CategoryProvider.generateCategoryColorFromPalette(true),
+                )
+            }
+
+        val customIncomeUiCategories =
+            customIncomeCategories.map { customCategory ->
+                UiCategory.custom(
+                    name = customCategory.name,
+                    isExpense = false,
+                    icon = CategoryProvider.getIconByName(customCategory.iconName),
+                    color =
+                        customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
+                            ?: CategoryProvider.generateCategoryColorFromPalette(false),
+                )
+            }
+
         // Объединяем дефолтные и кастомные категории
         val allExpenseCategories = defaultExpenseCategories + customExpenseUiCategories
         val allIncomeCategories = defaultIncomeCategories + customIncomeUiCategories
-        
+
         _expenseCategories.value = allExpenseCategories
         _incomeCategories.value = allIncomeCategories
-        
-        Timber.d("Загружено ${allExpenseCategories.size} категорий расходов (${customExpenseUiCategories.size} кастомных)")
+
+        Timber.d(
+            "Загружено ${allExpenseCategories.size} категорий расходов (${customExpenseUiCategories.size} кастомных)",
+        )
         Timber.d("Загружено ${allIncomeCategories.size} категорий доходов (${customIncomeUiCategories.size} кастомных)")
     }
 
@@ -79,34 +84,36 @@ class PersistentCategoriesViewModel(
         isExpense: Boolean,
         icon: androidx.compose.ui.graphics.vector.ImageVector?,
     ) {
-        val newCategory = UiCategory.custom(
-            name = name,
-            isExpense = isExpense,
-            icon = icon,
-            color = CategoryProvider.generateCategoryColorFromPalette(isExpense),
-        )
-        
+        val newCategory =
+            UiCategory.custom(
+                name = name,
+                isExpense = isExpense,
+                icon = icon,
+                color = CategoryProvider.generateCategoryColorFromPalette(isExpense),
+            )
+
         // Добавляем в UI
         if (isExpense) {
             _expenseCategories.update { it + newCategory }
         } else {
             _incomeCategories.update { it + newCategory }
         }
-        
+
         // Сохраняем в preferences
-        val customCategoryData = CategoryPreferences.CustomCategoryData(
-            name = name,
-            iconName = icon?.let { CategoryProvider.getIconName(it) } ?: "category",
-            colorHex = CategoryProvider.colorToHex(newCategory.color),
-            isExpense = isExpense
-        )
-        
+        val customCategoryData =
+            CategoryPreferences.CustomCategoryData(
+                name = name,
+                iconName = icon?.let { CategoryProvider.getIconName(it) } ?: "category",
+                colorHex = CategoryProvider.colorToHex(newCategory.color),
+                isExpense = isExpense,
+            )
+
         if (isExpense) {
             categoryPreferences.addExpenseCategory(customCategoryData)
         } else {
             categoryPreferences.addIncomeCategory(customCategoryData)
         }
-        
+
         Timber.d("Добавлена кастомная категория: $name (${if (isExpense) "расход" else "доход"})")
     }
 

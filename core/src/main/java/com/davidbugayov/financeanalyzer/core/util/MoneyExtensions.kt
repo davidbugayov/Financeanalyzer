@@ -57,11 +57,12 @@ fun Money.format(
     val formatter = DecimalFormat(pattern, symbols)
 
     val formattedAmount = formatter.format(amount)
-    val result = if (showCurrency) {
-        "$formattedAmount ${currency.symbol}"
-    } else {
-        formattedAmount
-    }
-    
+    val result =
+        if (showCurrency) {
+            "$formattedAmount ${currency.symbol}"
+        } else {
+            formattedAmount
+        }
+
     return result
 }

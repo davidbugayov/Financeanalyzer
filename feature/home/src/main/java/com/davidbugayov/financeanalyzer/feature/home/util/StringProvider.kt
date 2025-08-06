@@ -26,25 +26,12 @@ object StringProvider {
         return context?.getString(resId, *formatArgs) ?: "String not found"
     }
 
-    // Заголовки и навигация
-    val currentBalance: String get() = getString(R.string.current_balance)
-    val hideSummary: String get() = getString(R.string.hide_summary)
-    val showSummary: String get() = getString(R.string.show_summary)
-    val transactionsToday: String get() = getString(R.string.transactions_today)
-    val transactionsWeek: String get() = getString(R.string.transactions_week)
-    val transactionsMonth: String get() = getString(R.string.transactions_month)
-    val transactionsAll: String get() = getString(R.string.transactions_all)
     val financialAnalyzer: String get() = getString(R.string.financial_analyzer)
-
-    // Приветствие
-    val welcomeTitle: String get() = getString(R.string.welcome_title)
-    val welcomeSubtitle: String get() = getString(R.string.welcome_subtitle)
 
     // Кнопки и действия
     val generateTestData: String get() = getString(R.string.generate_test_data)
     val profile: String get() = getString(R.string.profile)
     val addTransaction: String get() = getString(R.string.add_transaction)
-    val addFirstTransaction: String get() = getString(R.string.add_first_transaction)
 
     // Сообщения
     val testDataGenerated: String get() = getString(R.string.test_data_generated)
@@ -53,13 +40,6 @@ object StringProvider {
     val loadingData: String get() = getString(R.string.loading_data)
     val errorSavingTestTransactions: String get() = getString(R.string.error_saving_test_transactions)
     val errorGeneratingTestData: String get() = getString(R.string.error_generating_test_data)
-
-    // Фильтры
-    val filterToday: String get() = getString(R.string.filter_today)
-    val filterWeek: String get() = getString(R.string.filter_week)
-    val filterMonth: String get() = getString(R.string.filter_month)
-    val filterAll: String get() = getString(R.string.filter_all)
-    val filterAllTime: String get() = getString(R.string.filter_all_time)
 
     // Сводка
     val totalIncome: String get() = getString(R.string.total_income)
@@ -74,8 +54,6 @@ object StringProvider {
 
     fun andMoreCategories(count: Int): String = getString(R.string.and_more_categories, count)
 
-    val hide: String get() = getString(R.string.hide)
-
     // Пустое состояние
     val noTransactions: String get() = getString(R.string.no_transactions)
     val addFirstTransactionDescription: String get() = getString(R.string.add_first_transaction_description)
@@ -86,4 +64,4 @@ object StringProvider {
     val feedbackError: String get() = getString(R.string.feedback_error)
     val feedbackWarning: String get() = getString(R.string.feedback_warning)
     val feedbackInfo: String get() = getString(R.string.feedback_info)
-} 
+}

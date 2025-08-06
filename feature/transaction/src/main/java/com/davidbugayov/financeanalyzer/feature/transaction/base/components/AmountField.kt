@@ -103,16 +103,18 @@ fun AmountField(
             val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
             val sep = moneyObject.currency.decimalSeparator.toString()
             val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
-            val finalText = if (withoutSymbol.endsWith(zeroSuffix)) {
-                withoutSymbol.removeSuffix(zeroSuffix)
-            } else {
-                withoutSymbol
-            }
+            val finalText =
+                if (withoutSymbol.endsWith(zeroSuffix)) {
+                    withoutSymbol.removeSuffix(zeroSuffix)
+                } else {
+                    withoutSymbol
+                }
 
-            textFieldValueForDisplay = TextFieldValue(
-                text = finalText,
-                selection = TextRange(finalText.length)
-            )
+            textFieldValueForDisplay =
+                TextFieldValue(
+                    text = finalText,
+                    selection = TextRange(finalText.length),
+                )
             timber.log.Timber.d("AmountField: Принудительно обновлен TextFieldValue: '$finalText'")
         }
     }
@@ -120,7 +122,9 @@ fun AmountField(
     // Логируем создание Money объекта для отладки
     LaunchedEffect(currentCurrency) {
         val testMoney = Money(100.0, currentCurrency)
-        timber.log.Timber.d("AmountField: Тестовый Money объект: ${testMoney.format()}, валюта: ${testMoney.currency.name}")
+        timber.log.Timber.d(
+            "AmountField: Тестовый Money объект: ${testMoney.format()}, валюта: ${testMoney.currency.name}",
+        )
     }
 
     var isFocused by remember { mutableStateOf(false) }
@@ -142,16 +146,19 @@ fun AmountField(
                     // Format number without currency symbol and drop trailing .00
                     val moneyObject = Money(numericValue, currentCurrency)
                     val formattedWithSymbol = moneyObject.format()
-                    timber.log.Timber.d("AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'")
+                    timber.log.Timber.d(
+                        "AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'",
+                    )
 
                     val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
                     val sep = moneyObject.currency.decimalSeparator.toString()
                     val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
-                    val finalText = if (withoutSymbol.endsWith(zeroSuffix)) {
-                        withoutSymbol.removeSuffix(zeroSuffix)
-                    } else {
-                        withoutSymbol
-                    }
+                    val finalText =
+                        if (withoutSymbol.endsWith(zeroSuffix)) {
+                            withoutSymbol.removeSuffix(zeroSuffix)
+                        } else {
+                            withoutSymbol
+                        }
                     timber.log.Timber.d("AmountField: Финальный текст: '$finalText'")
                     finalText
                 } else {
@@ -183,13 +190,14 @@ fun AmountField(
                 val rawTextWithoutSpaces = newTextFieldValue.text.replace(" ", "")
 
                 // Валидация: разрешаем только числа, точки, запятые и арифметические операторы
-                val validatedText = if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
-                    // Если есть арифметические операторы, разрешаем как есть (для выражений)
-                    rawTextWithoutSpaces
-                } else {
-                    // Для простых чисел ограничиваем формат x.xx или x,xx
-                    validateMoneyInput(rawTextWithoutSpaces)
-                }
+                val validatedText =
+                    if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
+                        // Если есть арифметические операторы, разрешаем как есть (для выражений)
+                        rawTextWithoutSpaces
+                    } else {
+                        // Для простых чисел ограничиваем формат x.xx или x,xx
+                        validateMoneyInput(rawTextWithoutSpaces)
+                    }
 
                 // Обновляем internalRawAmount и вызываем onAmountChange с валидированным текстом.
                 internalRawAmount = validatedText

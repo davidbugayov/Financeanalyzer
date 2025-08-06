@@ -95,8 +95,6 @@ class PreferencesManager(context: Context) {
         return sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
     }
 
-
-
     fun setTransactionReminderEnabled(enabled: Boolean) {
         sharedPreferences.edit { putBoolean(KEY_TRANSACTION_REMINDER_ENABLED, enabled) }
     }
@@ -214,11 +212,12 @@ class PreferencesManager(context: Context) {
      */
     private fun getCurrencyInternal(): Currency {
         val currencyName = sharedPreferences.getString(KEY_CURRENCY, Currency.RUB.name)
-        val currency = try {
-            Currency.valueOf(currencyName ?: Currency.RUB.name)
-        } catch (_: Exception) {
-            Currency.RUB
-        }
+        val currency =
+            try {
+                Currency.valueOf(currencyName ?: Currency.RUB.name)
+            } catch (_: Exception) {
+                Currency.RUB
+            }
         return currency
     }
 }

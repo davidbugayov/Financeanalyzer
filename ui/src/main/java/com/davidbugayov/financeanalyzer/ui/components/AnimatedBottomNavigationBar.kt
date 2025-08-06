@@ -141,14 +141,22 @@ private fun NavButton(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(start = spacingXx, end = spacingXx, top = 4.dp)
-                .widthIn(min = buttonSize + spacingXx),
+            modifier =
+                Modifier
+                    .padding(start = spacingXx, end = spacingXx, top = 4.dp)
+                    .widthIn(min = buttonSize + spacingXx),
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primary).padding(8.dp).size(iconSize),
+                modifier =
+                    Modifier
+                        .clip(
+                            CircleShape,
+                        )
+                        .background(MaterialTheme.colorScheme.primary)
+                        .padding(8.dp)
+                        .size(iconSize),
                 tint = Color.White,
             )
 
