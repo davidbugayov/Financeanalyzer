@@ -23,10 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Source
-import com.davidbugayov.financeanalyzer.ui.theme.SourceItemBorderWidth
 import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorContentColor
-import com.davidbugayov.financeanalyzer.ui.theme.SourceItemNoBorderWidth
 
 /**
  * Элемент источника средств
@@ -44,31 +42,31 @@ fun SourceItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier
-                .width(80.dp)
+                .width(72.dp)
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,
                 )
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(60.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .background(
-                        if (isError) {
-                            SourceItemErrorBackgroundColor
-                        } else {
-                            Color(source.color)
+                        when {
+                            isError -> SourceItemErrorBackgroundColor
+                            isSelected -> Color(source.color)
+                            else -> Color(source.color).copy(alpha = 0.8f)
                         },
                     )
                     .border(
                         width =
                             when {
-                                isSelected -> SourceItemBorderWidth
-                                isError -> SourceItemBorderWidth
-                                else -> SourceItemNoBorderWidth
+                                isSelected -> 3.dp
+                                isError -> 2.dp
+                                else -> 0.dp
                             },
                         color =
                             when {
@@ -82,21 +80,28 @@ fun SourceItem(
         ) {
             // Здесь можно добавить иконку для источника
             Text(
-                text = source.name.first().toString(),
+                text = source.name.first().toString().uppercase(),
                 color = if (isError) SourceItemErrorContentColor else Color.White,
-                fontSize = 24.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             text = source.name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall.copy(
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            ),
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface,
+            color = when {
+                isError -> MaterialTheme.colorScheme.error
+                isSelected -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.onSurface
+            },
         )
     }
 }

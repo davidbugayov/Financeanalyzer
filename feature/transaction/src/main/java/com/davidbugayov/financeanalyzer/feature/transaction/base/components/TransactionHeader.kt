@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,7 +26,7 @@ import java.util.Locale
 import timber.log.Timber
 
 /**
- * Заголовок с датой и типом транзакции
+ * Улучшенный заголовок с акцентом на дату и типе транзакции
  */
 @Composable
 fun TransactionHeader(
@@ -45,38 +46,59 @@ fun TransactionHeader(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val dateFormat = SimpleDateFormat("dd MMMM", Locale.forLanguageTag("ru"))
+        // Кнопка выбора даты с улучшенным дизайном
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
         val formattedDate = dateFormat.format(date)
 
-        Text(
-            text = formattedDate,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier =
-                Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = onDateClick)
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-        )
+        Surface(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable(onClick = onDateClick),
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Text(
+                text = formattedDate,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
 
+        // Переключатели типа транзакции с улучшенным дизайном
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             FilterChip(
                 selected = !isExpense,
                 onClick = {
                     if (isExpense) onToggleTransactionType()
                 },
-                label = { Text(stringResource(R.string.income_type)) },
+                label = {
+                    Text(
+                        stringResource(R.string.income_type),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (!isExpense) FontWeight.SemiBold else FontWeight.Normal,
+                    )
+                },
                 colors =
                     FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = incomeColor.copy(alpha = 0.2f),
+                        selectedContainerColor = incomeColor.copy(alpha = 0.15f),
                         selectedLabelColor = incomeColor,
+                        containerColor = MaterialTheme.colorScheme.surface,
                     ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = !isExpense,
+                    borderColor = if (!isExpense) incomeColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    selectedBorderColor = incomeColor,
+                    borderWidth = if (!isExpense) 2.dp else 1.dp,
+                ),
             )
 
             FilterChip(
@@ -84,12 +106,26 @@ fun TransactionHeader(
                 onClick = {
                     if (!isExpense) onToggleTransactionType()
                 },
-                label = { Text(stringResource(R.string.expense_type)) },
+                label = {
+                    Text(
+                        stringResource(R.string.expense_type),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isExpense) FontWeight.SemiBold else FontWeight.Normal,
+                    )
+                },
                 colors =
                     FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = expenseColor.copy(alpha = 0.2f),
+                        selectedContainerColor = expenseColor.copy(alpha = 0.15f),
                         selectedLabelColor = expenseColor,
+                        containerColor = MaterialTheme.colorScheme.surface,
                     ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isExpense,
+                    borderColor = if (isExpense) expenseColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    selectedBorderColor = expenseColor,
+                    borderWidth = if (isExpense) 2.dp else 1.dp,
+                ),
             )
         }
     }

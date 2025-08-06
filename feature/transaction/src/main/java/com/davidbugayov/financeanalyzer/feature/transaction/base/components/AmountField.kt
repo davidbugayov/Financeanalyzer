@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +13,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
@@ -67,7 +70,7 @@ private fun validateMoneyInput(input: String): String {
 }
 
 /**
- * Поле ввода суммы транзакции с поддержкой арифметических выражений
+ * Поле ввода суммы транзакции с улучшенным дизайном и акцентом
  */
 @Composable
 fun AmountField(
@@ -176,67 +179,75 @@ fun AmountField(
         }
     }
 
-    Box(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 0.dp),
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        OutlinedTextField(
-            value = textFieldValueForDisplay,
-            onValueChange = { newTextFieldValue ->
-                // Когда пользователь вводит текст, это всегда "сырое" значение.
-                // Удаляем пробелы из введенного текста перед обработкой.
-                val rawTextWithoutSpaces = newTextFieldValue.text.replace(" ", "")
+        // Центральное поле суммы с одинаковыми отступами сверху и снизу
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 4.dp,
+            shadowElevation = 2.dp,
+        ) {
+            OutlinedTextField(
+                value = textFieldValueForDisplay,
+                onValueChange = { newTextFieldValue ->
+                    // Когда пользователь вводит текст, это всегда "сырое" значение.
+                    // Удаляем пробелы из введенного текста перед обработкой.
+                    val rawTextWithoutSpaces = newTextFieldValue.text.replace(" ", "")
 
-                // Валидация: разрешаем только числа, точки, запятые и арифметические операторы
-                val validatedText =
-                    if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
-                        // Если есть арифметические операторы, разрешаем как есть (для выражений)
-                        rawTextWithoutSpaces
-                    } else {
-                        // Для простых чисел ограничиваем формат x.xx или x,xx
-                        validateMoneyInput(rawTextWithoutSpaces)
+                    // Валидация: разрешаем только числа, точки, запятые и арифметические операторы
+                    val validatedText =
+                        if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
+                            // Если есть арифметические операторы, разрешаем как есть (для выражений)
+                            rawTextWithoutSpaces
+                        } else {
+                            // Для простых чисел ограничиваем формат x.xx или x,xx
+                            validateMoneyInput(rawTextWithoutSpaces)
+                        }
+
+                    // Обновляем internalRawAmount и вызываем onAmountChange с валидированным текстом.
+                    internalRawAmount = validatedText
+                    onAmountChange(internalRawAmount)
+
+                    // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
+                    // с валидированным текстом для мгновенной обратной связи при вводе.
+                    if (isFocused) {
+                        // Важно сохранить позицию курсора относительно валидированного текста
+                        val originalSelection = newTextFieldValue.selection
+                        val newSelectionStart =
+                            originalSelection.start -
+                                newTextFieldValue.text.substring(
+                                    0,
+                                    originalSelection.start,
+                                ).count { it == ' ' }
+                        val newSelectionEnd =
+                            originalSelection.end -
+                                newTextFieldValue.text.substring(
+                                    0,
+                                    originalSelection.end,
+                                ).count { it == ' ' }
+
+                        textFieldValueForDisplay =
+                            TextFieldValue(
+                                text = validatedText,
+                                selection =
+                                    TextRange(
+                                        start = newSelectionStart.coerceIn(0, validatedText.length),
+                                        end = newSelectionEnd.coerceIn(0, validatedText.length),
+                                    ),
+                            )
                     }
-
-                // Обновляем internalRawAmount и вызываем onAmountChange с валидированным текстом.
-                internalRawAmount = validatedText
-                onAmountChange(internalRawAmount)
-
-                // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
-                // с валидированным текстом для мгновенной обратной связи при вводе.
-                if (isFocused) {
-                    // Важно сохранить позицию курсора относительно валидированного текста
-                    val originalSelection = newTextFieldValue.selection
-                    val newSelectionStart =
-                        originalSelection.start -
-                            newTextFieldValue.text.substring(
-                                0,
-                                originalSelection.start,
-                            ).count { it == ' ' }
-                    val newSelectionEnd =
-                        originalSelection.end -
-                            newTextFieldValue.text.substring(
-                                0,
-                                originalSelection.end,
-                            ).count { it == ' ' }
-
-                    textFieldValueForDisplay =
-                        TextFieldValue(
-                            text = validatedText,
-                            selection =
-                                TextRange(
-                                    start = newSelectionStart.coerceIn(0, validatedText.length),
-                                    end = newSelectionEnd.coerceIn(0, validatedText.length),
-                                ),
-                        )
-                }
-                // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
-                // позаботится о форматировании и обновлении textFieldValueForDisplay.
-            },
-            modifier =
-                Modifier
+                    // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
+                    // позаботится о форматировании и обновлении textFieldValueForDisplay.
+                },
+                modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         // При потере фокуса (isFocused стало false),
@@ -244,88 +255,110 @@ fun AmountField(
                         // При получении фокуса (isFocused стало true),
                         // LaunchedEffect(amount, isFocused) отобразит "сырое" значение.
                     },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            textStyle =
-                MaterialTheme.typography.titleLarge.copy(
-                    textAlign = TextAlign.End,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                    textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     color = accentColor,
+                    fontSize = 32.sp,
                 ),
-            singleLine = true,
-            minLines = 1,
-            isError = isError,
-            placeholder = {
-                Text(
-                    text = "0",
-                    style =
-                        MaterialTheme.typography.titleLarge.copy(
-                            textAlign = TextAlign.End,
+                singleLine = true,
+                minLines = 1,
+                isError = isError,
+                placeholder = {
+                    Text(
+                        text = "0",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            textAlign = TextAlign.Center,
+                            fontSize = 32.sp,
                         ),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                )
-            },
-            supportingText = {
-                if (isError) Text("Введите корректную сумму")
-            },
-            shape = RoundedCornerShape(12.dp),
-            trailingIcon = {
-                Text(
-                    text = currentCurrency.symbol,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = accentColor,
-                )
-            },
-        )
-    }
-    Row(
-        horizontalArrangement =
-            Arrangement.spacedBy(
-                space = 6.dp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    )
+                },
+                supportingText = {
+                    if (isError) Text(
+                        "Введите корректную сумму",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                ),
+                shape = RoundedCornerShape(16.dp),
+                trailingIcon = {
+                    Text(
+                        text = currentCurrency.symbol,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        color = accentColor,
+                    )
+                },
+            )
+        }
+
+        // Компактные кнопки калькулятора - под полем суммы
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                space = 3.dp,
                 alignment = Alignment.CenterHorizontally,
             ),
-        modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val opButtons = listOf("+", "-", "×", "÷")
-        opButtons.forEach { op ->
-            OutlinedButton(
-                onClick = {
-                    // Работаем с internalRawAmount для добавления операторов
-                    val currentTextForOps = internalRawAmount
-                    val textWithPotentialSpace =
-                        if (currentTextForOps.isNotEmpty() && currentTextForOps.last().isDigit()) {
-                            "$currentTextForOps "
-                        } else {
-                            currentTextForOps
+                .padding(horizontal = 20.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val opButtons = listOf("+", "-", "×", "÷")
+            opButtons.forEach { op ->
+                OutlinedButton(
+                    onClick = {
+                        // Работаем с internalRawAmount для добавления операторов
+                        val currentTextForOps = internalRawAmount
+                        val textWithPotentialSpace =
+                            if (currentTextForOps.isNotEmpty() && currentTextForOps.last().isDigit()) {
+                                "$currentTextForOps "
+                            } else {
+                                currentTextForOps
+                            }
+                        val newRawText = "$textWithPotentialSpace$op "
+
+                        internalRawAmount = newRawText // Обновляем внутреннее "сырое" значение
+                        onAmountChange(newRawText) // Сообщаем ViewModel
+
+                        // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
+                        // для отображения добавленного оператора.
+                        if (isFocused) {
+                            textFieldValueForDisplay =
+                                TextFieldValue(
+                                    text = newRawText,
+                                    selection = TextRange(newRawText.length),
+                                )
                         }
-                    val newRawText = "$textWithPotentialSpace$op "
-
-                    internalRawAmount = newRawText // Обновляем внутреннее "сырое" значение
-                    onAmountChange(newRawText) // Сообщаем ViewModel
-
-                    // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
-                    // для отображения добавленного оператора.
-                    if (isFocused) {
-                        textFieldValueForDisplay =
-                            TextFieldValue(
-                                text = newRawText,
-                                selection = TextRange(newRawText.length),
-                            )
-                    }
-                    // Если поле не в фокусе, LaunchedEffect(amount, isFocused)
-                    // обновит textFieldValueForDisplay (скорее всего, оставит newRawText, т.к. это выражение).
-                },
-                modifier = Modifier.size(34.dp),
-                shape = CircleShape,
-                contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor),
-            ) {
-                Text(op, style = MaterialTheme.typography.titleMedium)
+                        // Если поле не в фокусе, LaunchedEffect(amount, isFocused)
+                        // обновит textFieldValueForDisplay (скорее всего, оставит newRawText, т.к. это выражение).
+                    },
+                    modifier = Modifier.size(28.dp),
+                    shape = CircleShape,
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.outline,
+                        containerColor = Color.Transparent,
+                    ),
+                    border = null,
+                ) {
+                    Text(
+                        text = op,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f),
+                    )
+                }
             }
         }
     }

@@ -203,4 +203,9 @@
     <string name="has_subcategories">Есть подкатегории</string>
     <string name="show_less">Показать меньше</string>
     <string name="show_more">Показать больше</string>
+
+  <!-- Строки для опционального поля комментария -->
+  <string name="add_note">Добавить примечание</string>
+  <string name="edit_note">Примечание</string>
+  <string name="hide_note">Скрыть примечание</string>
 </resources>

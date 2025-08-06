@@ -62,9 +62,9 @@ fun CategorySection(
     selectedSubcategory: String = "",
     hasAvailableSubcategories: Boolean = false,
 ) {
-    val maxRows = 2
+    val maxRows = 3
     val columns = 4
-    val maxVisibleCategories = maxRows * columns - 1 // 7 категорий + 1 кнопка
+    val maxVisibleCategories = maxRows * columns - 1 // 11 категорий + 1 кнопка
     val showExpand = categories.size > maxVisibleCategories
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
     val visibleCategories =
@@ -89,7 +89,7 @@ fun CategorySection(
                     vertical = 0.dp,
                 ),
         verticalArrangement =
-            Arrangement.spacedBy(2.dp),
+            Arrangement.spacedBy(1.dp),
     ) {
         Row(
             modifier = Modifier

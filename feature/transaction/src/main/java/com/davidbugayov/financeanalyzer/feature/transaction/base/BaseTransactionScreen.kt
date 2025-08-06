@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -42,11 +41,10 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Amou
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategorySection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.ColorPickerDialog
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CommentField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomCategoryDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomSourceDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CustomSubcategoryDialog
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.DateField
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.OptionalCommentField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourcePickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourceSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SubcategoryPickerDialog
@@ -369,7 +367,7 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                // Заголовок с датой и типом транзакции
+                // Заголовок с датой и типом транзакции (только сверху)
                 TransactionHeader(
                     date = state.selectedDate,
                     isExpense = state.isExpense,
@@ -389,8 +387,27 @@ fun <E> BaseTransactionScreen(
                     },
                     forceExpense = state.forceExpense,
                 )
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
-                // Секция "Откуда/Куда" (Source)
+
+                Spacer(Modifier.height(4.dp))
+
+                // ЦЕНТРАЛЬНАЯ ЗОНА - Поле суммы с большим акцентом
+                key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
+                    AmountField(
+                        amount = state.amount,
+                        onAmountChange = { amount ->
+                            viewModel.onEvent(
+                                eventFactory(BaseTransactionEvent.SetAmount(amount)),
+                                context,
+                            )
+                        },
+                        isError = state.amountError,
+                        accentColor = currentColor,
+                    )
+                }
+
+                Spacer(Modifier.height(4.dp))
+
+                // Секция "Откуда/Куда" (Source) - улучшенная
                 Column {
                     Timber.d(
                         "Rendering SourceSection with isExpense=%b, selectedSource=%s, sources count=%d",
@@ -430,8 +447,10 @@ fun <E> BaseTransactionScreen(
                         isError = state.sourceError,
                     )
                 }
+
                 Spacer(Modifier.height(4.dp))
-                // Секция выбора категории
+
+                // Секция выбора категории - улучшенная с видимыми подкатегориями
                 if (state.isExpense) {
                     CategorySection(
                         categories = sortedExpenseCategories,
@@ -486,21 +505,6 @@ fun <E> BaseTransactionScreen(
                         selectedSubcategory = state.subcategory,
                         hasAvailableSubcategories = state.availableSubcategories.isNotEmpty(),
                     )
-                    // Уменьшаем отступ между категорией и суммой
-                    Spacer(Modifier.height(4.dp))
-                    key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
-                        AmountField(
-                            amount = state.amount,
-                            onAmountChange = { amount ->
-                                viewModel.onEvent(
-                                    eventFactory(BaseTransactionEvent.SetAmount(amount)),
-                                    context,
-                                )
-                            },
-                            isError = state.amountError,
-                            accentColor = currentColor,
-                        )
-                    }
                 } else {
                     CategorySection(
                         categories = sortedIncomeCategories,
@@ -557,27 +561,10 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                Spacer(Modifier.height(4.dp))
 
-                // Поле выбора даты
-                DateField(
-                    date = state.selectedDate,
-                    onClick = {
-                        viewModel.onEvent(
-                            eventFactory(BaseTransactionEvent.ShowDatePicker),
-                            context,
-                        )
-                    },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
-                )
-
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
-
-                // Поле для комментария без иконки прикрепления
-                CommentField(
+                // Опциональное поле для комментария
+                OptionalCommentField(
                     note = state.note,
                     onNoteChange = { note ->
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.SetNote(note)), context)
