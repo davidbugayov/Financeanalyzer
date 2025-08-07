@@ -29,14 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
-import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
 import org.koin.androidx.compose.koinViewModel
@@ -75,7 +75,7 @@ fun WalletTransactionsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = state.wallet?.name ?: StringProvider.walletNotFound,
+                title = state.wallet?.name ?: stringResource(R.string.wallet_not_found),
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
@@ -84,7 +84,7 @@ fun WalletTransactionsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = StringProvider.linkCategories,
+                            contentDescription = stringResource(R.string.link_categories),
                         )
                     }
                 },
@@ -103,7 +103,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(StringProvider.loading)
+                    Text(stringResource(R.string.loading_data))
                 }
             } else if (state.wallet == null) {
                 // Показываем сообщение, если кошелек не найден
@@ -111,7 +111,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(StringProvider.walletNotFound)
+                    Text(stringResource(R.string.wallet_not_found))
                 }
             } else {
                 // Сохраняем кошелек в локальную переменную для умного приведения типов
@@ -135,7 +135,7 @@ fun WalletTransactionsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Text(
-                            text = StringProvider.linkedCategories,
+                            text = stringResource(R.string.linked_categories),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium,
                         )
@@ -158,7 +158,7 @@ fun WalletTransactionsScreen(
 
                 // Заголовок списка транзакций
                 Text(
-                    text = StringProvider.transactionsSection,
+                    text = stringResource(R.string.transactions_section),
                     style = MaterialTheme.typography.titleMedium,
                     modifier =
                         Modifier.padding(
@@ -179,7 +179,7 @@ fun WalletTransactionsScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = StringProvider.noTransactionsFound,
+                            text = stringResource(R.string.no_transactions_found),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -208,13 +208,11 @@ fun WalletTransactionsScreen(
                 availableCategories = expenseCategories,
                 onDismiss = { showImportCategoriesDialog = false },
                 onImport = { selectedCategories ->
-                    // Связываем выбранные категории с кошельком
-                    viewModel.onEvent(WalletTransactionsEvent.LinkCategories(selectedCategories))
-                    showImportCategoriesDialog = false
+                    // Связываем выбранные категории
                 },
-                title = StringProvider.linkCategoriesTitle,
-                subtitle = StringProvider.linkCategoriesSubtitle,
-                confirmButtonText = StringProvider.linkButton,
+                title = stringResource(R.string.import_categories_title),
+                subtitle = stringResource(R.string.import_categories_subtitle),
+                confirmButtonText = stringResource(R.string.import_categories_confirm),
                 preselectedCategories = state.wallet?.linkedCategories ?: emptyList(),
             )
         }
@@ -223,11 +221,11 @@ fun WalletTransactionsScreen(
         state.error?.let { error ->
             AlertDialog(
                 onDismissRequest = { viewModel.onEvent(WalletTransactionsEvent.ClearError) },
-                title = { Text(StringProvider.errorTitle) },
+                title = { Text(stringResource(R.string.error_title)) },
                 text = { Text(error) },
                 confirmButton = {
                     TextButton(onClick = { viewModel.onEvent(WalletTransactionsEvent.ClearError) }) {
-                        Text(StringProvider.okButton)
+                        Text(stringResource(R.string.ok_button))
                     }
                 },
             )

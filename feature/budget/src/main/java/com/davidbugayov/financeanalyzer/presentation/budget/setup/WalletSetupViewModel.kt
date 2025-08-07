@@ -3,16 +3,19 @@ package com.davidbugayov.financeanalyzer.presentation.budget.setup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
+import com.davidbugayov.financeanalyzer.feature.budget.R
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /** Состояние мастера создания кошелька */
 data class WalletSetupState(
@@ -29,7 +32,9 @@ data class WalletSetupState(
 class WalletSetupViewModel(
     private val walletRepository: WalletRepository,
     private val navigationManager: NavigationManager,
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+
+    private val resourceProvider: ResourceProvider by inject()
     private val _state = MutableStateFlow(WalletSetupState())
     val state: StateFlow<WalletSetupState> = _state
 
@@ -66,13 +71,6 @@ class WalletSetupViewModel(
     }
 
     /**
-     * Обновить дату достижения цели
-     */
-    fun updateGoalDate(millis: Long) {
-        _state.value = _state.value.copy(goalDateMillis = millis)
-    }
-
-    /**
      * Создать новый кошелёк
      */
     fun createWallet() {
@@ -80,12 +78,12 @@ class WalletSetupViewModel(
 
         // Валидация данных
         if (s.name.isBlank()) {
-            _state.value = s.copy(error = BudgetStringProvider.errorEnterWalletName)
+            _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_wallet_name))
             return
         }
 
         if (s.isGoal && s.goalAmountText.isBlank()) {
-            _state.value = s.copy(error = BudgetStringProvider.errorEnterTargetAmount)
+            _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_target_amount))
             return
         }
 
@@ -94,12 +92,12 @@ class WalletSetupViewModel(
                 try {
                     val amount = s.goalAmountText.toDouble()
                     if (amount <= 0) {
-                        _state.value = s.copy(error = BudgetStringProvider.errorTargetAmountPositive)
+                        _state.value = s.copy(error = resourceProvider.getString(R.string.error_target_amount_positive))
                         return
                     }
                     Money(amount)
-                } catch (e: Exception) {
-                    _state.value = s.copy(error = BudgetStringProvider.errorEnterValidAmount)
+                } catch (_: Exception) {
+                    _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_valid_amount))
                     return
                 }
             } else {
@@ -142,17 +140,10 @@ class WalletSetupViewModel(
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        error = BudgetStringProvider.errorCreatingWallet(e.message ?: ""),
+                        error = resourceProvider.getString(R.string.error_creating_wallet, e.message ?: ""),
                     )
             }
         }
-    }
-
-    /**
-     * Очистить ошибку
-     */
-    fun clearError() {
-        _state.value = _state.value.copy(error = null)
     }
 
     /**

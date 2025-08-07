@@ -2,6 +2,9 @@ package com.davidbugayov.financeanalyzer.core.model
 
 import com.davidbugayov.financeanalyzer.core.util.StringProvider
 
+// Используется статический StringProvider для сообщений из core модуля
+
+
 /**
  * Базовый класс для всех исключений в приложении
  */
@@ -26,7 +29,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class ValidationError(message: String? = null) : Data(message ?: StringProvider.errorValidation)
 
         class NotFound(message: String? = null) : Data(message ?: StringProvider.errorDataNotFound)
     }
@@ -61,14 +63,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message ?: StringProvider.errorUnknown, cause)
-
-    /**
-     * Общая ошибка приложения
-     */
-    class GenericAppException(
-        message: String? = null,
-        cause: Throwable? = null,
-    ) : AppException(message ?: StringProvider.errorApplication, cause)
 
     companion object {
         /**

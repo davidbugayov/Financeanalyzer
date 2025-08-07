@@ -18,7 +18,6 @@ import com.davidbugayov.financeanalyzer.domain.util.StringProvider as DomainStri
 import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
 import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as HistoryStringProvider
 import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
-import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider as ProfileStringProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
 import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
@@ -62,7 +61,6 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         HistoryStringProvider.init(this)
         BudgetStringProvider.init(this)
         UiStringProvider.init(this)
-        ProfileStringProvider.init(this)
         TransactionStringProvider.init(this)
 
         // Настройка Timber для логирования

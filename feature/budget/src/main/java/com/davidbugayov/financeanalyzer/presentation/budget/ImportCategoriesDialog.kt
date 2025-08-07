@@ -20,10 +20,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Диалог для выбора категорий (импорта или связывания)
@@ -41,9 +42,9 @@ fun ImportCategoriesDialog(
     onDismiss: () -> Unit,
     onImport: (List<String>) -> Unit,
     availableCategories: List<UiCategory>,
-    title: String = StringProvider.importCategoriesTitle,
-    subtitle: String = StringProvider.importCategoriesSubtitle,
-    confirmButtonText: String = StringProvider.importCategoriesConfirm,
+    title: String = stringResource(R.string.import_categories_title),
+    subtitle: String = stringResource(R.string.import_categories_subtitle),
+    confirmButtonText: String = stringResource(R.string.import_categories_confirm),
     preselectedCategories: List<String> = emptyList(),
 ) {
     // Список выбранных категорий
@@ -109,7 +110,7 @@ fun ImportCategoriesDialog(
             TextButton(
                 onClick = onDismiss,
             ) {
-                Text(text = StringProvider.cancel)
+                Text(text = stringResource(R.string.cancel))
             }
         },
     )

@@ -10,4 +10,12 @@
     <string name="wallet_spent_amount">Потрачено</string>
     <string name="wallet_remaining_amount">Осталось</string>
     <string name="wallet_budget_limit">Лимит бюджета</string>
+  <string name="error_enter_wallet_name">Введите название кошелька</string>
+  <string name="error_enter_target_amount">Введите целевую сумму</string>
+  <string name="error_target_amount_positive">Сумма цели должна быть положительной</string>
+  <string name="error_enter_valid_amount">Введите корректную сумму</string>
+  <string name="error_creating_wallet">Ошибка при создании кошелька: %1$s</string>
+  <string name="error_loading_wallet">Ошибка загрузки кошелька</string>
+  <string name="error_loading_transactions">Ошибка загрузки транзакций</string>
+  <string name="error_linking_categories">Ошибка привязки категорий</string>
 </resources>
