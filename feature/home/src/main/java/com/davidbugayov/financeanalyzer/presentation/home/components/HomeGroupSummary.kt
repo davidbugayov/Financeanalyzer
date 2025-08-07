@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryDivider
@@ -174,7 +175,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = StringProvider.totalIncome,
+            text = stringResource(R.string.total_income),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -194,7 +195,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = StringProvider.totalExpense,
+            text = stringResource(R.string.total_expense),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
@@ -214,7 +215,7 @@ private fun SummaryTotals(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = StringProvider.balance,
+            text = stringResource(R.string.balance),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = textSecondary,
@@ -243,7 +244,7 @@ private fun SummaryCategorySwitcher(
     ) {
         Text(
             text =
-                if (showExpenses) StringProvider.expenseCategories else StringProvider.incomeCategories,
+                if (showExpenses) stringResource(R.string.expense_categories) else stringResource(R.string.income_categories),
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
@@ -251,7 +252,7 @@ private fun SummaryCategorySwitcher(
         )
         Text(
             text =
-                if (showExpenses) StringProvider.showIncomes else StringProvider.showExpenses,
+                if (showExpenses) stringResource(R.string.show_incomes) else stringResource(R.string.show_expenses),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
@@ -311,7 +312,7 @@ private fun SummaryEmptyState(
 ) {
     Text(
         text =
-            if (showExpenses) StringProvider.noExpensesPeriod else StringProvider.noIncomesPeriod,
+            if (showExpenses) stringResource(R.string.no_expenses_period) else stringResource(R.string.no_incomes_period),
         fontSize = 13.sp,
         color = textSecondary,
         modifier = Modifier.padding(vertical = 8.dp),
@@ -325,7 +326,7 @@ private fun SummaryShowMoreButton(
     onClick: () -> Unit,
 ) {
     Text(
-        text = StringProvider.andMoreCategories(moreCount),
+        text = stringResource(R.string.and_more_categories, moreCount),
         fontSize = 12.sp,
         color = textSecondary,
         modifier =
@@ -343,7 +344,7 @@ private fun SummaryHideButton(
     onClick: () -> Unit,
 ) {
     Text(
-        text = "Скрыть",
+        text = stringResource(R.string.hide),
         fontSize = 12.sp,
         color = textSecondary,
         modifier =

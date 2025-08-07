@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -36,7 +37,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
@@ -75,7 +75,7 @@ private fun HomeTopBar(
     onNavigateToProfile: () -> Unit,
 ) {
     AppTopBar(
-        title = StringProvider.financialAnalyzer,
+        title = stringResource(R.string.financial_analyzer),
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
@@ -92,7 +92,7 @@ private fun HomeTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = StringProvider.generateTestData,
+                        contentDescription = stringResource(R.string.generate_test_data),
                     )
                 }
             }
@@ -111,7 +111,7 @@ private fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = StringProvider.profile,
+                    contentDescription = stringResource(R.string.profile),
                 )
             }
         },
@@ -319,9 +319,9 @@ fun HomeScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-    val testDataGeneratedMsg = StringProvider.testDataGenerated
-    val transactionDeletedMsg = StringProvider.transactionDeleted
-    StringProvider.emptyTransactionIdError
+    val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
+    val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
+    stringResource(R.string.empty_transaction_id_error)
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
@@ -496,7 +496,7 @@ fun HomeScreen(
                         .padding(paddingValues),
             ) {
                 if (state.isLoading && state.transactions.isEmpty()) {
-                    CenteredLoadingIndicator(message = StringProvider.loadingData)
+                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),
@@ -514,10 +514,10 @@ fun HomeScreen(
                 HomeFeedback(
                     title =
                         when (feedbackType) {
-                            FeedbackType.SUCCESS -> StringProvider.feedbackSuccess
-                            FeedbackType.ERROR -> StringProvider.feedbackError
-                            FeedbackType.WARNING -> StringProvider.feedbackWarning
-                            FeedbackType.INFO -> StringProvider.feedbackInfo
+                            FeedbackType.SUCCESS -> stringResource(R.string.feedback_success)
+                            FeedbackType.ERROR -> stringResource(R.string.feedback_error)
+                            FeedbackType.WARNING -> stringResource(R.string.feedback_warning)
+                            FeedbackType.INFO -> stringResource(R.string.feedback_info)
                         },
                     feedbackMessage = feedbackMessage,
                     feedbackType = feedbackType,
