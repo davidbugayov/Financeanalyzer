@@ -1,7 +1,8 @@
 package com.davidbugayov.financeanalyzer.feature.profile.components
 
 import androidx.compose.runtime.Composable
-import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 
 /**
@@ -12,7 +13,7 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 @Composable
 fun ProfileTopBar(onNavigateBack: () -> Unit) {
     AppTopBar(
-        title = StringProvider.profileTitle,
+        title = stringResource(R.string.profile_title),
         showBackButton = true,
         onBackClick = onNavigateBack,
     )

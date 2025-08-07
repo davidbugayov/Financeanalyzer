@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -59,7 +60,7 @@ import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSecti
 import com.davidbugayov.financeanalyzer.feature.profile.components.ThemeSelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.feature.profile.util.StringProvider
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -97,7 +98,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
             context.packageManager.getPackageInfo(context.packageName, 0)
         }
 
-    val appVersion = remember { packageInfo?.versionName ?: StringProvider.unknown }
+    val versionName = packageInfo?.versionName
+    val appVersion = versionName ?: stringResource(R.string.unknown)
 
     @SuppressLint("NewApi")
     val buildVersion =
@@ -293,8 +295,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = StringProvider.budget,
-                    subtitle = StringProvider.profileBudgetSubtitle,
+                    title = stringResource(R.string.budget),
+                    subtitle = stringResource(R.string.profile_budget_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -319,8 +321,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = StringProvider.exportImport,
-                    subtitle = StringProvider.profileExportImportSubtitle,
+                    title = stringResource(R.string.export_import),
+                    subtitle = stringResource(R.string.profile_export_import_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -346,8 +348,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 ProfileActionCard(
                     icon = Icons.Default.Star,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = StringProvider.achievements,
-                    subtitle = StringProvider.profileAchievementsSubtitle,
+                    title = stringResource(R.string.achievements),
+                    subtitle = stringResource(R.string.profile_achievements_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
