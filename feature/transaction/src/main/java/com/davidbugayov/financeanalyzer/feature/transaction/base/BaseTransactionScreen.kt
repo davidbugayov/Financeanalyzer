@@ -52,7 +52,8 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Tran
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
@@ -90,19 +91,17 @@ fun <E> BaseTransactionScreen(
     }
 
     // Устанавливаем значения по умолчанию для строковых ресурсов
-    val actualScreenTitle =
-        if (isEditMode) {
-            StringProvider.editTransactionTitle
-        } else {
-            screenTitle ?: StringProvider.addTransaction
-        }
+    val actualScreenTitle: String = if (isEditMode) {
+        stringResource(R.string.edit_transaction_title)
+    } else {
+        screenTitle ?: stringResource(R.string.add_transaction)
+    }
 
-    val actualButtonText =
-        if (isEditMode) {
-            StringProvider.saveButtonText
-        } else {
-            buttonText ?: StringProvider.addButtonText
-        }
+    val actualButtonText: String = if (isEditMode) {
+        stringResource(R.string.save_button_text)
+    } else {
+        buttonText ?: stringResource(R.string.add_button)
+    }
 
     // Сортируем категории по частоте использования при инициализации экрана
     val sortedExpenseCategories =
@@ -128,8 +127,8 @@ fun <E> BaseTransactionScreen(
         }
 
     // Строковые ресурсы для категорий
-    val categoryOther = StringProvider.categoryOther
-    val categoryTransfer = StringProvider.categoryTransfer
+    val categoryOther = stringResource(R.string.category_other)
+    val categoryTransfer = stringResource(R.string.category_transfer)
 
     // Устанавливаем первый источник из отсортированного списка при инициализации
     LaunchedEffect(sortedSources) {
@@ -235,13 +234,13 @@ fun <E> BaseTransactionScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = StringProvider.errorTitle,
+                    text = stringResource(R.string.error_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },
             text = {
                 Text(
-                    text = state.error ?: StringProvider.unknownErrorMessage,
+                    text = state.error ?: stringResource(UiR.string.unknown_error_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -249,7 +248,7 @@ fun <E> BaseTransactionScreen(
                 TextButton(onClick = {
                     viewModel.onEvent(eventFactory(BaseTransactionEvent.ClearError), context)
                 }) {
-                    Text(StringProvider.dialogOk)
+                    Text(stringResource(UiR.string.dialog_ok))
                 }
             },
         )
@@ -327,7 +326,7 @@ fun <E> BaseTransactionScreen(
                             Icon(
                                 imageVector = Icons.Default.Upload,
                                 contentDescription =
-                                    StringProvider.importTransactionsContentDescription,
+                                    stringResource(R.string.import_transactions_content_description),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -354,10 +353,10 @@ fun <E> BaseTransactionScreen(
                 if (!isEditMode && onNavigateToImport != null) {
                     ReminderBubble(
                         visible = showImportReminder,
-                        title = StringProvider.importTransactionsTitle,
-                        description = StringProvider.importTransactionsHint,
-                        actionButtonText = StringProvider.importButton,
-                        dismissButtonText = StringProvider.close,
+                        title = stringResource(R.string.import_transactions_title),
+                        description = stringResource(R.string.import_transactions_hint),
+                        actionButtonText = stringResource(R.string.import_button),
+                        dismissButtonText = stringResource(UiR.string.close),
                         onDismiss = { handleImportReminderDismiss() },
                         onAction = {
                             handleImportReminderDismiss()
@@ -630,8 +629,8 @@ fun <E> BaseTransactionScreen(
                 AlertDialog(
                     onDismissRequest = { showImportConfirmation = false },
                     containerColor = MaterialTheme.colorScheme.surface,
-                    title = { Text(StringProvider.attentionTitle) },
-                    text = { Text(StringProvider.unsavedDataWarning) },
+                    title = { Text(stringResource(R.string.attention_title)) },
+                    text = { Text(stringResource(R.string.unsaved_data_warning)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -643,14 +642,14 @@ fun <E> BaseTransactionScreen(
                                 }
                             },
                         ) {
-                            Text(StringProvider.proceedToImport)
+                            Text(stringResource(R.string.proceed_to_import))
                         }
                     },
                     dismissButton = {
                         TextButton(
                             onClick = { showImportConfirmation = false },
                         ) {
-                            Text(StringProvider.dialogCancel)
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     },
                 )
@@ -663,7 +662,7 @@ fun <E> BaseTransactionScreen(
                     exit = scaleOut(animationSpec = tween(400)),
                 ) {
                     SuccessDialog(
-                        message = StringProvider.transactionSavedSuccess,
+                        message = stringResource(R.string.transaction_saved_success),
                         onDismiss = {
                             Timber.d("UI: Нажато 'OK' в диалоге успеха, вызываем handleExit()")
                             viewModel.onEvent(
@@ -811,10 +810,10 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                        title = { Text(StringProvider.deleteCategoryTitle) },
+                        title = { Text(stringResource(R.string.delete_category_title)) },
                         text = {
                             Text(
-                                StringProvider.deleteCategoryConfirmation(category),
+                                stringResource(R.string.delete_category_confirmation, category),
                             )
                         },
                         confirmButton = {
@@ -826,7 +825,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(StringProvider.dialogDelete)
+                                Text(stringResource(R.string.dialog_delete))
                             }
                         },
                         dismissButton = {
@@ -840,7 +839,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(StringProvider.dialogCancel)
+                                Text(stringResource(R.string.dialog_cancel))
                             }
                         },
                     )
@@ -857,8 +856,8 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                        title = { Text(StringProvider.deleteSourceTitle) },
-                        text = { Text(StringProvider.deleteSourceConfirmation(source)) },
+                        title = { Text(stringResource(R.string.delete_source_title)) },
+                        text = { Text(stringResource(R.string.delete_source_confirmation, source)) },
                         confirmButton = {
                             Button(
                                 onClick = {
@@ -868,7 +867,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(StringProvider.dialogDelete)
+                                Text(stringResource(R.string.dialog_delete))
                             }
                         },
                         dismissButton = {
@@ -880,7 +879,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(StringProvider.dialogCancel)
+                                Text(stringResource(R.string.dialog_cancel))
                             }
                         },
                     )
