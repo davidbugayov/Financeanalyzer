@@ -103,14 +103,14 @@ fun AddSourceItem(onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             Modifier
-                .width(80.dp)
+                .width(72.dp)
                 .clickable(onClick = onClick)
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(60.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .border(
@@ -124,10 +124,11 @@ fun AddSourceItem(onClick: () -> Unit) {
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_custom_source),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp),
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             text = stringResource(R.string.add_custom_source),

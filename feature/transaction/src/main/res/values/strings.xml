@@ -208,4 +208,6 @@
   <string name="add_note">Добавить примечание</string>
   <string name="edit_note">Примечание</string>
   <string name="hide_note">Скрыть примечание</string>
+  <string name="amount_placeholder">0</string>
+  <string name="error_enter_valid_amount">Введите корректную сумму</string>
 </resources>

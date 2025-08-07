@@ -100,7 +100,7 @@ fun OptionalCommentField(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 4.dp),
                 shape = RoundedCornerShape(dimensionResource(R.dimen.comment_field_corner_radius)),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = dimensionResource(R.dimen.comment_field_elevation),
