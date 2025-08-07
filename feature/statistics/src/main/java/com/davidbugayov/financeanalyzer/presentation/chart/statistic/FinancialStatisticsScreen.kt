@@ -70,13 +70,11 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.E
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
+import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
+import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.random.Random
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -123,32 +121,21 @@ fun FinancialStatisticsScreen(
         }
     }
 
-    // Список динамических советов
-    val tips =
-        listOf(
-            Pair(
-                "Совет по статистике",
-                "Изучайте свои финансовые привычки через графики и аналитику — это поможет принимать более осознанные решения!",
-            ),
-            Pair(
-                "Сравнивайте периоды",
-                "Смотрите, как меняются ваши расходы и доходы от месяца к месяцу — ищите тренды!",
-            ),
-            Pair(
-                "Категории под контролем",
-                "Анализируйте, на что уходит больше всего денег, и оптимизируйте свои траты.",
-            ),
-            Pair(
-                "Планируйте бюджет",
-                "Используйте аналитику для постановки финансовых целей и отслеживания прогресса.",
-            ),
-            Pair(
-                "Следите за сбережениями",
-                "Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.",
-            ),
+    // Получаем персонализированные советы на основе данных пользователя
+    val personalizedTips = remember(state.income, state.expense, state.savingsRate, state.expenseLineChartData) {
+        // Рассчитываем рост расходов на основе данных линейного графика
+        val expenseGrowth = calculateExpenseGrowth(state.expenseLineChartData)
+
+        val totalIncome = state.income?.amount?.toDouble() ?: 0.0
+        state.expense?.amount?.toDouble() ?: 0.0
+
+        FinancialTipsManager.getPersonalizedTips(
+            savingsRate = state.savingsRate,
+            monthsOfSavings = state.monthsOfSavings,
+            hasRegularIncome = totalIncome > 0,
+            expenseGrowth = expenseGrowth,
         )
-    var tipIndex by remember { mutableStateOf(Random.nextInt(tips.size)) }
-    val currentTip = tips[tipIndex]
+    }
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
@@ -217,11 +204,6 @@ fun FinancialStatisticsScreen(
                     if (!showTip) {
                         IconButton(
                             onClick = {
-                                var newIndex: Int
-                                do {
-                                    newIndex = Random.nextInt(tips.size)
-                                } while (newIndex == tipIndex)
-                                tipIndex = newIndex
                                 showTip = true
                             },
                         ) {
@@ -259,21 +241,26 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
-                    if (showTip) {
-                        // Используем новую систему рекомендаций для статистики
-                        val statisticsTips = SmartRecommendationGenerator.generateStatisticsTips()
-                        val randomTip = statisticsTips.random()
-
-                        SmartRecommendationCard(
-                            recommendations = listOf(randomTip),
-                            title = currentTip.first,
-                            subtitle = currentTip.second,
-                            style = SmartCardStyle.MINIMAL,
-                            showPriorityIndicator = false,
+                    if (showTip && personalizedTips.isNotEmpty()) {
+                        // Показываем только лучшие 3 совета
+                        EnhancedTipCard(
+                            tips = personalizedTips.take(3),
                             onDismiss = {
                                 showTip = false
                             },
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            onActionClick = { tip ->
+                                // Обработка действий по советам
+                                when (tip.actionResId) {
+                                    com.davidbugayov.financeanalyzer.ui.R.string.action_add_transaction -> onAddTransaction()
+                                    com.davidbugayov.financeanalyzer.ui.R.string.action_start_saving, com.davidbugayov.financeanalyzer.ui.R.string.action_continue_saving -> {
+                                        // TODO: Навигация к разделу сбережений
+                                    }
+                                    com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
+                                        // Закрываем совет и фокусируемся на графиках
+                                        showTip = false
+                                    }
+                                }
+                            },
                         )
                     }
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
@@ -343,6 +330,30 @@ fun FinancialStatisticsScreen(
                                 .fillMaxWidth()
                                 .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
                     )
+
+                    // KPI финансового здоровья
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = dimensionResource(R.dimen.finance_chart_screen_padding),
+                                vertical = dimensionResource(R.dimen.finance_chart_screen_vertical_spacing),
+                            ),
+                    ) {
+                        Text(
+                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                        FinancialHealthMetricsCard(
+                            savingsRate = state.savingsRate,
+                            averageDailyExpense = state.averageDailyExpense,
+                            monthsOfSavings = state.monthsOfSavings,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
 
                     // Табы для переключения между типами графиков
                     TabRow(
@@ -586,16 +597,24 @@ fun FinancialStatisticsScreen(
                                     )
 
                                     // Удаляем отдельные блоки советов, оставляем один
-                                    val healthRecommendations =
-                                        SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                                            savingsRate = state.savingsRate.toFloat(),
-                                            monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
+                                    // Дополнительные персонализированные советы (если есть)
+                                    if (personalizedTips.size > 1) {
+                                        EnhancedTipCard(
+                                            tips = personalizedTips.drop(1).take(2), // Только 2 доп.совета
+                                            onDismiss = { /* Не показываем кнопку закрытия для дополнительных советов */ },
+                                            onActionClick = { tip ->
+                                                when (tip.actionResId) {
+                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_add_transaction -> onAddTransaction()
+                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_start_saving, com.davidbugayov.financeanalyzer.ui.R.string.action_continue_saving -> {
+                                                        // TODO: Навигация к разделу сбережений
+                                                    }
+                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
+                                                        // Фокус на графиках
+                                                    }
+                                                }
+                                            },
                                         )
-                                    SmartRecommendationCard(
-                                        recommendations = healthRecommendations,
-                                        title = "Ключевые рекомендации",
-                                        subtitle = "Для финансового здоровья",
-                                    )
+                                    }
 
                                     // Оставляем предсказания
                                     val predictExpensesUseCase =
@@ -605,22 +624,33 @@ fun FinancialStatisticsScreen(
                                         }
                                     val predictedExpenses = remember { predictExpensesUseCase(state.transactions) }
 
-                                    // В UI, добавляем карточку предсказаний
+                                    // В UI, добавляем карточку предсказаний (тональная)
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(16.dp),
-                                    ) {
-                                        Text(
-                                            text = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title),
-                                            style = MaterialTheme.typography.titleMedium,
-                                        )
-                                        Text(
-                                            text = stringResource(
-                                                id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
-                                                predictedExpenses.amount.toString(),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                                alpha = 0.4f,
                                             ),
-                                        )
+                                        ),
+                                    ) {
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            Text(
+                                                text = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title),
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = MaterialTheme.colorScheme.onSurface,
+                                            )
+                                            Spacer(Modifier.height(6.dp))
+                                            Text(
+                                                text = stringResource(
+                                                    id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                                    predictedExpenses.amount.toString(),
+                                                ),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
                                     }
 
                                     // Ключевые инвестиционные советы без дублей
@@ -640,22 +670,7 @@ fun FinancialStatisticsScreen(
                         }
                     }
 
-                    // Вторая карточка - метрики финансового здоровья
-                    FinancialHealthMetricsCard(
-                        savingsRate = state.savingsRate,
-                        averageDailyExpense = state.averageDailyExpense,
-                        monthsOfSavings = state.monthsOfSavings,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal = dimensionResource(R.dimen.finance_chart_screen_padding),
-                                    vertical =
-                                        dimensionResource(
-                                            R.dimen.finance_chart_screen_vertical_spacing,
-                                        ),
-                                ),
-                    )
+                    // (удалено) второй экземпляр KPI
 
                     // Если нужно прокручивать к карточке
                     if (shouldScrollToSummaryCard) {
@@ -670,4 +685,34 @@ fun FinancialStatisticsScreen(
             }
         }
     }
+}
+
+/**
+ * Рассчитывает рост расходов на основе данных линейного графика
+ *
+ * @param expenseData Данные расходов по периодам
+ * @return Коэффициент роста расходов (-1 до 1, где 0.1 = 10% рост, -0.1 = 10% снижение)
+ */
+private fun calculateExpenseGrowth(
+    expenseData: List<com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint>,
+): Double {
+    if (expenseData.size < 2) return 0.0
+
+    // Берем последние точки для анализа тренда
+    val recentPoints = expenseData.takeLast(minOf(7, expenseData.size)) // Последние 7 точек или все доступные
+
+    if (recentPoints.size < 2) return 0.0
+
+    // Рассчитываем простой линейный тренд
+    val firstValue = recentPoints.first().value.amount.toDouble()
+    val lastValue = recentPoints.last().value.amount.toDouble()
+
+    // Избегаем деления на ноль
+    if (firstValue <= 0.0) return 0.0
+
+    // Рассчитываем относительное изменение
+    val growth = (lastValue - firstValue) / firstValue
+
+    // Ограничиваем значение в разумных пределах (-1 до 1)
+    return growth.coerceIn(-1.0, 1.0)
 }

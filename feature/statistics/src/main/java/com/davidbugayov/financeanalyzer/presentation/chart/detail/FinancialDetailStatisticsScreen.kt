@@ -40,10 +40,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
@@ -198,13 +196,7 @@ fun FinancialDetailStatisticsScreen(
                         modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
                     )
                 }
-                item {
-                    FinancialHealthScoreCard(
-                        healthScore = metrics.healthMetrics?.financialHealthScore ?: 0.0,
-                        breakdown = metrics.healthMetrics?.healthScoreBreakdown ?: HealthScoreBreakdown(),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                // Анализ финансового здоровья перенесён на основной экран статистики
                 item {
                     Spacer(
                         modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),

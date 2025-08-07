@@ -638,4 +638,52 @@
   <string name="prediction_title">Предсказания расходов</string>
   <string name="prediction_next_month" formatted="false">Ожидаемые расходы на следующий месяц: %1$s</string>
   <string name="prediction_savings">Прогнозируемые сбережения: %1$s</string>
+
+  <!-- Enhanced Tips -->
+  <string name="personalized_tip">Персональный совет</string>
+  <string name="all_recommendations">Все рекомендации</string>
+  <string name="tips_expand">Развернуть советы</string>
+  <string name="tips_collapse">Свернуть советы</string>
+  <string name="tips_close">Закрыть советы</string>
+
+  <!-- Tips content -->
+  <string name="tip_create_emergency_fund_title">Создайте резервный фонд</string>
+  <string name="tip_create_emergency_fund_desc">У вас есть накопления только на %1$d мес. Рекомендуется иметь 3–6 месяцев расходов</string>
+  <string name="action_start_saving">Начать копить</string>
+
+  <string name="tip_increase_savings_title">Увеличьте норму сбережений</string>
+  <string name="tip_increase_savings_desc">Вы откладываете %1$d%% доходов. Цель — минимум 10–20%%</string>
+  <string name="action_review_budget">Пересмотреть бюджет</string>
+
+  <string name="tip_strengthen_safety_net_title">Укрепите финансовую подушку</string>
+  <string name="tip_strengthen_safety_net_desc">Отличный старт! Увеличьте резерв до 6 месяцев для полной защиты</string>
+  <string name="action_continue_saving">Продолжить накопления</string>
+
+  <string name="tip_track_trends_title">Отслеживайте тренды</string>
+  <string name="tip_track_trends_desc">Анализируйте графики доходов и расходов для выявления закономерностей</string>
+  <string name="action_study_statistics">Изучить статистику</string>
+
+  <string name="tip_control_expense_growth_title">Рост расходов: что делать</string>
+  <string name="tip_control_expense_growth_desc">Расходы выросли на %1$d%%. Проверьте подписки и крупные категории</string>
+  <string name="action_analyze_spending">Проанализировать траты</string>
+
+  <string name="tip_set_goals_title">Ставьте финансовые цели</string>
+  <string name="tip_set_goals_desc">Определите конкретные цели: отпуск, покупки, инвестиции</string>
+  <string name="action_create_plan">Создать план</string>
+
+  <string name="tip_automate_savings_title">Автоматизируйте сбережения</string>
+  <string name="tip_automate_savings_desc">Настройте автоперевод части зарплаты на накопительный счёт</string>
+  <string name="action_add_transaction">Добавить транзакцию</string>
+  <string name="tip_basic_tracking_title">Ведите учет доходов и расходов</string>
+  <string name="tip_basic_tracking_desc">Записывайте все траты — это основа финансовой грамотности</string>
+  <string name="tip_rule_50_30_20_title">Следуйте правилу 50/30/20</string>
+  <string name="tip_rule_50_30_20_desc">50% на нужды, 30% на желания, 20% на сбережения и инвестиции</string>
+
+  <!-- Extra tips -->
+  <string name="tip_easy_savings_title">Сохраните до 10% без усилий</string>
+  <string name="tip_easy_savings_desc">Сократите 2–3 наименее полезные категории (например, доставка/подписки)</string>
+  <string name="action_view_categories">Посмотреть категории</string>
+
+  <string name="tip_increase_income_title">Увеличьте доход на 5–10%</string>
+  <string name="tip_increase_income_desc">Рассмотрите фриланс/подработку или монетизацию навыков</string>
 </resources>

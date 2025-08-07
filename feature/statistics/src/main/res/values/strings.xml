@@ -75,9 +75,9 @@
     <string name="savings_rate_satisfactory_qualification">Удовлетворительно (5-15%)</string>
     <string name="savings_rate_needs_attention_qualification">Требует внимания (&lt;5%)</string>
     <string name="savings_rate_excellent_recommendation">Отличная работа! Ваша норма сбережений выше 30%. Продолжайте в том же духе и рассмотрите возможность инвестирования части сбережений для получения дополнительного дохода.</string>
-    <string name="savings_rate_good_recommendation">Хорошая норма сбережений 15-30%. Вы на правильном пути. Попробуйте увеличить сбережения до 20-25% для достижения финансовой независимости.</string>
-    <string name="savings_rate_satisfactory_recommendation">Удовлетворительная норма сбережений 5-15%. Есть возможности для улучшения. Начните с увеличения сбережений на 1-2% каждый месяц.</string>
-    <string name="savings_rate_needs_attention_recommendation">Норма сбережений ниже 5% требует внимания. Проанализируйте расходы, найдите возможности для экономии и начните откладывать хотя бы 10% от дохода.</string>
+  <string name="savings_rate_good_recommendation" formatted="false">Хорошая норма сбережений 15-30%. Вы на правильном пути. Попробуйте увеличить сбережения до 20-25% для достижения финансовой независимости.</string>
+  <string name="savings_rate_satisfactory_recommendation" formatted="false">Удовлетворительная норма сбережений 5-15%. Есть возможности для улучшения. Начните с увеличения сбережений на 1-2% каждый месяц.</string>
+  <string name="savings_rate_needs_attention_recommendation" formatted="false">Норма сбережений ниже 5% требует внимания. Проанализируйте расходы, найдите возможности для экономии и начните откладывать хотя бы 10% от дохода.</string>
     <string name="savings_rate_explanation">Норма сбережений показывает процент дохода, который вы откладываете. Рассчитывается как (Доходы - Расходы) / Доходы × 100%. Это ключевой показатель финансового здоровья.</string>
     <string name="savings_rate_percent">%1$s%%</string>
     <string name="financial_cushion_excellent_qualification">Отлично (6+ мес.)</string>
@@ -93,13 +93,13 @@
     <string name="trend_negative_description">Отрицательный тренд</string>
     <string name="trend_neutral_description">Нейтральный тренд</string>
     <string name="financial_health_explanation">Финансовое здоровье — это комплексный показатель, который оценивает ваше текущее финансовое состояние и устойчивость. Он учитывает норму сбережений, контроль расходов и наличие финансовой подушки безопасности.</string>
-    <string name="financial_health_savings_rate_content">Норма сбережений показывает, какой процент вашего дохода вы откладываете. Рассчитывается как (Доходы - Расходы) / Доходы × 100%. Рекомендуется откладывать 10-20% от дохода для достижения финансовых целей.</string>
+  <string name="financial_health_savings_rate_content" formatted="false">Норма сбережений показывает, какой процент вашего дохода вы откладываете. Рассчитывается как (Доходы - Расходы) / Доходы × 100%. Рекомендуется откладывать 10-20% от дохода для достижения финансовых целей.</string>
     <string name="financial_health_average_expenses_content">Средние расходы помогают понять ваши траты в динамике. Анализируются ежедневные, ежемесячные и годовые показатели. Контроль расходов позволяет выявить возможности для экономии и оптимизации бюджета.</string>
     <string name="financial_health_financial_cushion_content">Финансовая подушка — это сумма, которая позволит вам прожить 3-6 месяцев без дохода. Рассчитывается как среднемесячные расходы × количество месяцев. Это ваш запас прочности на случай непредвиденных ситуаций.</string>
     <string name="financial_health_tips_title">Советы по финансовому здоровью</string>
     <string name="financial_health_tips_content">• Откладывайте 10-20% от каждого дохода\n• Ведите учёт всех трат\n• Создайте резервный фонд на 3-6 месяцев\n• Диверсифицируйте источники дохода\n• Регулярно анализируйте свои финансы</string>
     <string name="financial_health_recommended_values_title">Рекомендуемые значения</string>
-    <string name="financial_health_recommended_values_content">• Норма сбережений: 10-20%\n• Финансовая подушка: 3-6 месяцев расходов\n• Контроль расходов: не более 90% от дохода\n• Диверсификация доходов: минимум 2 источника\n• Регулярный анализ: еженедельно</string>
+  <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: 10-20%\n• Финансовая подушка: 3-6 месяцев расходов\n• Контроль расходов: не более 90% от дохода\n• Диверсификация доходов: минимум 2 источника\n• Регулярный анализ: еженедельно</string>
     <string name="financial_health_tooltip_description">Нажмите для получения подробной информации о показателе и рекомендаций по улучшению</string>
     <string name="chart_title_both">Доходы и расходы</string>
     <string name="savings_rate_0_percent">0%</string>
