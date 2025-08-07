@@ -3,11 +3,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -47,8 +48,8 @@ fun EditTransactionScreen(
     BaseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = viewModel::onNavigateBack,
-        screenTitle = StringProvider.editTransactionTitle,
-        buttonText = StringProvider.saveButtonText,
+        screenTitle = stringResource(R.string.edit_transaction_title),
+        buttonText = stringResource(R.string.save_button_text),
         isEditMode = true,
         eventFactory = defaultTransactionEventFactory(true),
         submitEvent = BaseTransactionEvent.SubmitEdit,
