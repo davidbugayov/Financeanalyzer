@@ -47,7 +47,7 @@ private fun CompactBalanceAndFilters(
     onToggleGroupSummary: (Boolean) -> Unit,
     showGroupSummary: Boolean,
 ) {
-    BalanceCard(balance = state.balance)
+    BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
     state.error?.let {
         Text(
             text = it,
@@ -152,8 +152,8 @@ private fun CompactTransactionList(
     }
 
     // Отслеживаем количество транзакций для анимации новых элементов
-    val previousTransactionCount = remember { mutableStateOf(0) }
-    val currentTransactionCount = state.filteredTransactions.size
+    remember { mutableStateOf(0) }
+    state.filteredTransactions.size
 }
 
 @Composable
@@ -223,7 +223,6 @@ fun CompactLayout(
             else -> {
                 val context = LocalContext.current
                 val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
-                var showTips by remember { mutableStateOf(!prefs.getBoolean("tips_hidden", false)) }
 
                 val headerContent: (@Composable () -> Unit) = {
                     Column {

@@ -77,6 +77,14 @@ class FinancialDetailStatisticsViewModel(
     fun handleIntent(intent: FinancialDetailStatisticsContract.Intent) {
         when (intent) {
             is FinancialDetailStatisticsContract.Intent.LoadData -> loadData()
+            is FinancialDetailStatisticsContract.Intent.ToggleIncludeTransfers -> {
+                _state.value = _state.value.copy(includeTransfers = intent.include)
+                // TODO: применить к фильтрации транзакций в loadData / calculate
+            }
+            is FinancialDetailStatisticsContract.Intent.ToggleIncludeRefunds -> {
+                _state.value = _state.value.copy(includeRefunds = intent.include)
+                // TODO: применить к фильтрации транзакций в loadData / calculate
+            }
         }
     }
 

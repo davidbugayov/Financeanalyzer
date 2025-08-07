@@ -130,7 +130,7 @@ private fun CardHeader(onInfoClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.financial_health_analysis_title),
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -152,7 +152,7 @@ private fun CardHeader(onInfoClick: () -> Unit) {
         }
 
         Text(
-            text = stringResource(R.string.financial_health_evaluation_description),
+            text = stringResource(R.string.financial_health_info_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

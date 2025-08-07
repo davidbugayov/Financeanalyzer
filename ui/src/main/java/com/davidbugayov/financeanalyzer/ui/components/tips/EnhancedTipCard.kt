@@ -83,7 +83,7 @@ fun EnhancedTipCard(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),

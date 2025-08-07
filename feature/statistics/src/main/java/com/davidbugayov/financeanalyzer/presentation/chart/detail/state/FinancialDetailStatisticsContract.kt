@@ -11,12 +11,15 @@ object FinancialDetailStatisticsContract {
         val income: Money = Money.zero(),
         val expense: Money = Money.zero(),
         val period: String = "",
+        val includeTransfers: Boolean = false,
+        val includeRefunds: Boolean = false,
     )
 
     // Интенты (события)
     sealed class Intent {
         object LoadData : Intent()
-        // Добавь другие интенты по необходимости
+        data class ToggleIncludeTransfers(val include: Boolean) : Intent()
+        data class ToggleIncludeRefunds(val include: Boolean) : Intent()
     }
 
     // Эффекты (одноразовые события)

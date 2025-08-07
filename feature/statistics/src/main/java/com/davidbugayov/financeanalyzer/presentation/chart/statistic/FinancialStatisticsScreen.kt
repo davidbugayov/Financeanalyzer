@@ -54,13 +54,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedLineChart
-import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.FinancialHealthMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.LineChartTypeSelector
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
@@ -195,7 +193,7 @@ fun FinancialStatisticsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = "Графики",
+                title = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.analytics_title),
                 showBackButton = true,
                 onBackClick = {
                     onNavigateBack()
@@ -209,7 +207,7 @@ fun FinancialStatisticsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Lightbulb,
-                                contentDescription = "Показать совет",
+                                contentDescription = stringResource(R.string.show_tip),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -227,10 +225,11 @@ fun FinancialStatisticsScreen(
                     .background(backgroundGradient),
         ) {
             if (state.isLoading) {
-                CenteredLoadingIndicator(message = "Загрузка данных...")
+                CenteredLoadingIndicator(message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data_default))
             } else if (state.error != null) {
                 ErrorContent(
-                    error = state.error ?: "Неизвестная ошибка",
+                    error = state.error
+                        ?: stringResource(com.davidbugayov.financeanalyzer.ui.R.string.unknown_error_message),
                     onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) },
                 )
             } else {
@@ -258,6 +257,13 @@ fun FinancialStatisticsScreen(
                                     com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
                                         // Закрываем совет и фокусируемся на графиках
                                         showTip = false
+                                    }
+                                    com.davidbugayov.financeanalyzer.ui.R.string.action_view_categories -> {
+                                        onNavigateToTransactions?.invoke(
+                                            "",
+                                            state.startDate,
+                                            state.endDate,
+                                        )
                                     }
                                 }
                             },
@@ -302,12 +308,12 @@ fun FinancialStatisticsScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Добавьте первую транзакцию",
+                                        text = stringResource(R.string.add_first_transaction),
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.primary,
                                     )
                                     Text(
-                                        text = "И увидите магию аналитики!",
+                                        text = stringResource(R.string.see_analytics_magic),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.alpha(0.8f),
@@ -317,19 +323,7 @@ fun FinancialStatisticsScreen(
                         }
                     }
                     // Далее — все фильтры, табы, графики и т.д. (основной UI)
-                    // Карточка с общим балансом и периодом
-                    EnhancedSummaryCard(
-                        income = state.income ?: Money.zero(),
-                        expense = (state.expense ?: Money.zero()).abs(),
-                        startDate = state.startDate,
-                        endDate = state.endDate,
-                        periodType = state.periodType,
-                        viewModel = viewModel,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
-                    )
+                    // Убрали карточку на экране статистики по запросу — баланс теперь только на Home
 
                     // KPI финансового здоровья
                     Column(
@@ -340,13 +334,6 @@ fun FinancialStatisticsScreen(
                                 vertical = dimensionResource(R.dimen.finance_chart_screen_vertical_spacing),
                             ),
                     ) {
-                        Text(
-                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(bottom = 8.dp),
-                        )
                         FinancialHealthMetricsCard(
                             savingsRate = state.savingsRate,
                             averageDailyExpense = state.averageDailyExpense,
@@ -367,7 +354,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(0)
                                 }
                             },
-                            text = { Text("Категории") },
+                            text = { Text(stringResource(R.string.categories)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 1,
@@ -376,7 +363,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(1)
                                 }
                             },
-                            text = { Text("Динамика") },
+                            text = { Text(stringResource(R.string.dynamics)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 2,
@@ -385,7 +372,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(2)
                                 }
                             },
-                            text = { Text("Анализ") },
+                            text = { Text(stringResource(R.string.analysis)) },
                         )
                     }
 
@@ -431,8 +418,7 @@ fun FinancialStatisticsScreen(
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             Text(
-                                                text =
-                                                    "Нет данных",
+                                                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.no_data),
                                                 style = MaterialTheme.typography.bodyLarge,
                                             )
                                         }
@@ -495,7 +481,7 @@ fun FinancialStatisticsScreen(
                                         expenseData = state.expenseLineChartData,
                                         showIncome = lineChartDisplayMode.showIncome,
                                         showExpense = lineChartDisplayMode.showExpense,
-                                        title = "Динамика",
+                                        title = stringResource(R.string.dynamics),
                                         period = periodText,
                                     )
                                 }
@@ -559,16 +545,14 @@ fun FinancialStatisticsScreen(
                                         ) {
                                             Column {
                                                 Text(
-                                                    text =
-                                                        "Детальная финансовая статистика",
+                                                    text = stringResource(R.string.detailed_financial_statistics),
                                                     style = MaterialTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
                                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 )
 
                                                 Text(
-                                                    text =
-                                                        "Изучите свои финансовые показатели",
+                                                    text = stringResource(R.string.study_financial_indicators),
                                                     style = MaterialTheme.typography.bodyMedium,
                                                     color =
                                                         MaterialTheme.colorScheme.onPrimaryContainer.copy(
@@ -610,6 +594,13 @@ fun FinancialStatisticsScreen(
                                                     }
                                                     com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
                                                         // Фокус на графиках
+                                                    }
+                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_view_categories -> {
+                                                        onNavigateToTransactions?.invoke(
+                                                            "",
+                                                            state.startDate,
+                                                            state.endDate,
+                                                        )
                                                     }
                                                 }
                                             },
@@ -660,7 +651,7 @@ fun FinancialStatisticsScreen(
                                         stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks),
                                     )
                                     Column {
-                                        Text("Важные инвестиционные советы")
+                                        Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tips))
                                         keyInvestmentTips.forEach { tip ->
                                             Text(tip)
                                         }

@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,24 +14,32 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -43,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -74,6 +80,10 @@ fun FinancialDetailStatisticsScreen(
     val viewModel: FinancialDetailStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
     val state = viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
+
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    var includeTransfers by remember { mutableStateOf(false) }
+    var includeRefunds by remember { mutableStateOf(false) }
 
     // Временный лог для диагностики
     Timber.d(
@@ -131,222 +141,224 @@ fun FinancialDetailStatisticsScreen(
                         .fillMaxSize()
                         .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
             ) {
-                // Обзор
+                // Панель фильтров
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    ) {
-                        Icon(Icons.Default.Info, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.overview),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-                item {
-                    // Заголовок с периодом
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                            ),
-                        border =
-                            BorderStroke(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                            ),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                        ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Info, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
                             Text(
-                                text = stringResource(R.string.financial_statistics_period),
-                                style = MaterialTheme.typography.headlineSmall,
+                                text = stringResource(R.string.overview),
+                                style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
-                            Text(
-                                text = state.period,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                        }
+                        Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_small)))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                    alpha = 0.4f,
+                                ),
+                            ),
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = stringResource(R.string.financial_statistics_period),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text = state.period,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                Row {
+                                    val chips = listOf(
+                                        com.davidbugayov.financeanalyzer.ui.R.string.all_time,
+                                        com.davidbugayov.financeanalyzer.ui.R.string.year,
+                                        com.davidbugayov.financeanalyzer.ui.R.string.month,
+                                        com.davidbugayov.financeanalyzer.ui.R.string.week,
+                                        com.davidbugayov.financeanalyzer.ui.R.string.day,
+                                    )
+                                    chips.forEachIndexed { index, resId ->
+                                        AssistChip(
+                                            onClick = { /* TODO: hook to VM */ },
+                                            label = { Text(stringResource(id = resId)) },
+                                            colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surface),
+                                            modifier = Modifier.padding(end = 6.dp),
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.height(8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(checked = includeTransfers, onCheckedChange = { includeTransfers = it })
+                                    Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.include_transfers))
+                                    Spacer(Modifier.width(12.dp))
+                                    Checkbox(checked = includeRefunds, onCheckedChange = { includeRefunds = it })
+                                    Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.include_refunds))
+                                    Spacer(Modifier.weight(1f))
+                                    TextButton(
+                                        onClick = {
+                                            includeTransfers = false
+                                            includeRefunds = false
+                                        },
+                                    ) {
+                                        Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.reset_filters))
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    KeyMetricsCard(
-                        income = state.income,
-                        expense = state.expense,
-                        savingsRate = metrics.savingsRate,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                // Анализ финансового здоровья перенесён на основной экран статистики
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
 
-                // Статистика
+                // Табы
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                    ) {
-                        Icon(Icons.Default.BarChart, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.statistics),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
+                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                    TabRow(selectedTabIndex = selectedTabIndex) {
+                        Tab(
+                            selected = selectedTabIndex == 0,
+                            onClick = { selectedTabIndex = 0 },
+                            text = { Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_category)) },
+                        )
+                        Tab(
+                            selected = selectedTabIndex == 1,
+                            onClick = { selectedTabIndex = 1 },
+                            text = { Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_merchant)) },
+                        )
+                        Tab(
+                            selected = selectedTabIndex == 2,
+                            onClick = { selectedTabIndex = 2 },
+                            text = { Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_account)) },
+                        )
+                        Tab(
+                            selected = selectedTabIndex == 3,
+                            onClick = { selectedTabIndex = 3 },
+                            text = { Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_calendar)) },
+                        )
+                        Tab(
+                            selected = selectedTabIndex == 4,
+                            onClick = { selectedTabIndex = 4 },
+                            text = { Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_trends)) },
                         )
                     }
                 }
-                item {
-                    // Премиум карточка статистики транзакций
-                    val transactionStats =
-                        FinancialDataMapper.createTransactionStatistics(
-                            totalTransactions = metrics.totalTransactions,
-                            incomeTransactionsCount = metrics.incomeTransactionsCount,
-                            expenseTransactionsCount = metrics.expenseTransactionsCount,
-                            averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
-                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
-                            maxIncome = metrics.maxIncome.format(true),
-                            maxExpense = metrics.maxExpense.format(true),
-                            savingsRate = metrics.savingsRate,
-                            monthsOfSavings = metrics.monthsOfSavings,
-                        )
 
-                    PremiumStatisticsCard(
-                        title = stringResource(R.string.transaction_statistics),
-                        icon = Icons.Default.Receipt,
-                        statistics = transactionStats,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                // Контент по табам
                 item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    // Премиум карточка анализа расходов
-                    val expenseAnalysis =
-                        FinancialDataMapper.createExpenseAnalysis(
-                            averageDailyExpense = metrics.averageDailyExpense.format(true),
-                            averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
-                            topIncomeCategory = metrics.topIncomeCategory,
-                            topExpenseCategory = metrics.topExpenseCategory,
-                            topExpenseCategories =
-                                metrics.topExpenseCategories.map {
-                                    it.first to it.second.format(true)
-                                },
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                        )
+                    when (selectedTabIndex) {
+                        0 -> {
+                            // Категории: ключевые метрики + анализ расходов
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                KeyMetricsCard(
+                                    income = state.income,
+                                    expense = state.expense,
+                                    savingsRate = metrics.savingsRate,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                                val expenseAnalysis = FinancialDataMapper.createExpenseAnalysis(
+                                    averageDailyExpense = metrics.averageDailyExpense.format(true),
+                                    averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
+                                    topIncomeCategory = metrics.topIncomeCategory,
+                                    topExpenseCategory = metrics.topExpenseCategory,
+                                    topExpenseCategories = metrics.topExpenseCategories.map {
+                                        it.first to it.second.format(
+                                            true,
+                                        )
+                                    },
+                                    mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                                )
+                                PremiumStatisticsCard(
+                                    title = stringResource(R.string.expense_analysis),
+                                    icon = Icons.Default.Analytics,
+                                    statistics = expenseAnalysis,
+                                    accentColor = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
+                        }
+                        1 -> {
+                            // Контрагенты: паттерны и инсайты
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                val spendingPatterns = FinancialDataMapper.createSpendingPatternInsights(
+                                    mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                                    expenseTransactionsCount = metrics.expenseTransactionsCount,
+                                    averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
+                                )
+                                PremiumInsightsCard(
+                                    title = stringResource(R.string.spending_patterns),
+                                    insights = spendingPatterns,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            }
+                        }
+                        2 -> {
+                            // Счета: заглушка
+                            Text(
+                                text = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.no_data_to_display),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        3 -> {
+                            // Календарь: заглушка
+                            Text(
+                                text = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.no_data_to_display),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        4 -> {
+                            // Тренды: статистика транзакций + предсказания
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                val transactionStats = FinancialDataMapper.createTransactionStatistics(
+                                    totalTransactions = metrics.totalTransactions,
+                                    incomeTransactionsCount = metrics.incomeTransactionsCount,
+                                    expenseTransactionsCount = metrics.expenseTransactionsCount,
+                                    averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
+                                    averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
+                                    maxIncome = metrics.maxIncome.format(true),
+                                    maxExpense = metrics.maxExpense.format(true),
+                                    savingsRate = metrics.savingsRate,
+                                    monthsOfSavings = metrics.monthsOfSavings,
+                                )
+                                PremiumStatisticsCard(
+                                    title = stringResource(R.string.transaction_statistics),
+                                    icon = Icons.Default.Receipt,
+                                    statistics = transactionStats,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
 
-                    PremiumStatisticsCard(
-                        title = stringResource(R.string.expense_analysis),
-                        icon = Icons.Default.Analytics,
-                        statistics = expenseAnalysis,
-                        accentColor = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
-                    )
-                }
-
-                // Инсайты
-                item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                    ) {
-                        Icon(Icons.Default.Lightbulb, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.insights),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
+                                Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                                val predictExpensesUseCase =
+                                    remember {
+                                        org.koin.core.context.GlobalContext.get()
+                                            .get<PredictFutureExpensesUseCase>()
+                                    }
+                                val predictedExpenses =
+                                    remember { predictExpensesUseCase(transactions = state.transactions) }
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                ) {
+                                    Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title))
+                                    Text(
+                                        stringResource(
+                                            id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                            predictedExpenses.amount.toString(),
+                                        ),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
-                item {
-                    SavingsOptimizationCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    // Премиум карточка инсайтов расходов
-                    val expenseInsights =
-                        FinancialDataMapper.createExpenseInsights(
-                            topExpenseCategories =
-                                metrics.topExpenseCategories.map {
-                                    it.first to it.second.format(true)
-                                },
-                            savingsRate = metrics.savingsRate,
-                            monthsOfSavings = metrics.monthsOfSavings,
-                            totalTransactions = metrics.expenseTransactionsCount,
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                        )
 
-                    PremiumInsightsCard(
-                        title = stringResource(R.string.expense_analysis),
-                        insights = expenseInsights,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                // Советы (общая секция в конце)
                 item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    // Премиум карточка паттернов трат
-                    val spendingPatterns =
-                        FinancialDataMapper.createSpendingPatternInsights(
-                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                            expenseTransactionsCount = metrics.expenseTransactionsCount,
-                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
-                        )
-
-                    PremiumInsightsCard(
-                        title = stringResource(R.string.spending_patterns),
-                        insights = spendingPatterns,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
-                    )
-                }
-
-                // Советы
-                item {
+                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -360,52 +372,20 @@ fun FinancialDetailStatisticsScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
-                }
-                item {
-                    // Объединенный блок
                     val healthRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
                         savingsRate = metrics.savingsRate,
                         monthsOfEmergencyFund = metrics.monthsOfSavings,
                     )
                     SmartRecommendationCard(
                         recommendations = healthRecommendations,
-                        title = "Ключевые рекомендации",
-                        subtitle = "Для финансового здоровья",
-                    )
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
-                    )
-                }
-                item {
-                    // Предсказания
-                    val predictExpensesUseCase =
-                        remember { org.koin.core.context.GlobalContext.get().get<PredictFutureExpensesUseCase>() }
-                    val predictedExpenses = remember { predictExpensesUseCase(transactions = state.transactions) }
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    ) {
-                        Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title))
-                        Text(
-                            stringResource(
-                                id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
-                                predictedExpenses.amount.toString(),
-                            ),
-                        )
-                    }
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
+                        title = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.key_recommendations),
+                        subtitle = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.for_financial_health),
                     )
                 }
 
                 // Инвестиционные советы
                 item {
+                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -419,26 +399,19 @@ fun FinancialDetailStatisticsScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
-                }
-                item {
-                    // В разделе инвестиционных советов
-                    // Ключевые инвестиционные советы
                     val keyInvestmentTips = listOf(
                         stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_bonds),
                         stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_diversification),
                         stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks),
                     )
                     Column {
-                        Text("Важные инвестиционные советы", style = MaterialTheme.typography.titleMedium)
-                        keyInvestmentTips.forEach { tip ->
-                            Text(tip)
-                        }
+                        Text(
+                            stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tips),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        keyInvestmentTips.forEach { tip -> Text(tip) }
                     }
-                }
-                item {
-                    Spacer(
-                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
-                    )
+                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
                 }
             }
         }
