@@ -388,7 +388,7 @@ fun <E> BaseTransactionScreen(
                     forceExpense = state.forceExpense,
                 )
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
                 // ЦЕНТРАЛЬНАЯ ЗОНА - Поле суммы с большим акцентом
                 key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
@@ -405,7 +405,7 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
                 // Секция "Откуда/Куда" (Source) - улучшенная
                 Column {
@@ -571,7 +571,7 @@ fun <E> BaseTransactionScreen(
                     },
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                Spacer(Modifier.height(4.dp))
 
                 // Секция выбора кошельков (показывается только для доходов)
                 Timber.d(
@@ -597,7 +597,7 @@ fun <E> BaseTransactionScreen(
                     isExpense = state.isExpense,
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(Modifier.height(4.dp))
 
                 // Кнопка добавления/сохранения
                 AddButton(

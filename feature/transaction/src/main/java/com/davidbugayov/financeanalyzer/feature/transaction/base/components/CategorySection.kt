@@ -106,10 +106,10 @@ fun CategorySection(
                 Text(
                     text = stringResource(R.string.category) + " *",
                     style =
-                        MaterialTheme.typography.titleMedium.copy(
+                        MaterialTheme.typography.titleLarge.copy(
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         ),
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 0.dp),
+                    modifier = Modifier.padding(end = 8.dp),
                     color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
 
@@ -125,12 +125,12 @@ fun CategorySection(
                                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                                         CircleShape,
                                     )
-                                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 Text(
                                     text =
@@ -139,7 +139,7 @@ fun CategorySection(
                                         } else {
                                             stringResource(R.string.subcategory)
                                         },
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     maxLines = 1,
                                 )
@@ -159,57 +159,9 @@ fun CategorySection(
                                 else -> stringResource(R.string.no_subcategories)
                             },
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             modifier = Modifier.padding(start = 8.dp, top = 1.dp),
-                        )
-                    }
-                }
-            }
-
-            if (showExpand) {
-                Spacer(
-                    modifier =
-                        Modifier.width(
-                            dimensionResource(R.dimen.category_expand_spacer_width),
-                        ),
-                )
-                if (!expanded) {
-                    TextButton(
-                        onClick = { setExpanded(true) },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.show_more_categories),
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier =
-                                Modifier
-                                    .padding(
-                                        vertical =
-                                            dimensionResource(
-                                                R.dimen.category_expand_text_padding_vertical,
-                                            ),
-                                    ),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                } else {
-                    TextButton(
-                        onClick = { setExpanded(false) },
-                    ) {
-                        Text(
-                            text = stringResource(R.string.hide_categories),
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier =
-                                Modifier
-                                    .padding(
-                                        vertical =
-                                            dimensionResource(
-                                                R.dimen.category_expand_text_padding_vertical,
-                                            ),
-                                    ),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
@@ -331,6 +283,24 @@ fun CategorySection(
                                 vertical = dimensionResource(R.dimen.category_item_vertical_padding),
                             ),
                 )
+            }
+        }
+        // Expand/Collapse button под гридом
+        if (showExpand) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                TextButton(onClick = { setExpanded(!expanded) }) {
+                    Text(
+                        text = stringResource(if (expanded) R.string.hide_categories else R.string.show_more_categories),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
         }
     }
