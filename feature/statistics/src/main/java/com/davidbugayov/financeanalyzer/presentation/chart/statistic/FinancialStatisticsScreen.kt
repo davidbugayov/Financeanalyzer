@@ -49,11 +49,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedLineChart
@@ -76,6 +79,7 @@ import java.util.Locale
 import kotlin.random.Random
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -95,16 +99,16 @@ fun FinancialStatisticsScreen(
     startDate: Date? = null,
     endDate: Date? = null,
     onAddTransaction: () -> Unit,
+    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null,
 ) {
     // Используем новую ViewModel
-    val viewModel: EnhancedFinanceChartViewModel = viewModel()
+    val viewModel: EnhancedFinanceChartViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
     var shouldScrollToSummaryCard by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
     val pagerState = rememberPagerState(pageCount = { 3 }, initialPage = 0)
     var lineChartDisplayMode by remember { mutableStateOf(LineChartDisplayMode.BOTH) }
 
@@ -115,7 +119,7 @@ fun FinancialStatisticsScreen(
     // Показываем типс только один раз автоматически
     LaunchedEffect(Unit) {
         if (showTip) {
-            prefs.edit().putBoolean("show_statistics_tip", false).apply()
+            prefs.edit { putBoolean("show_statistics_tip", false) }
         }
     }
 
@@ -145,7 +149,6 @@ fun FinancialStatisticsScreen(
         )
     var tipIndex by remember { mutableStateOf(Random.nextInt(tips.size)) }
     val currentTip = tips[tipIndex]
-    var tipRequestedFromTopBar by remember { mutableStateOf(false) }
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
@@ -212,15 +215,16 @@ fun FinancialStatisticsScreen(
                 },
                 actions = {
                     if (!showTip) {
-                        IconButton(onClick = {
-                            var newIndex: Int
-                            do {
-                                newIndex = Random.nextInt(tips.size)
-                            } while (newIndex == tipIndex && tips.size > 1)
-                            tipIndex = newIndex
-                            showTip = true
-                            tipRequestedFromTopBar = true
-                        }) {
+                        IconButton(
+                            onClick = {
+                                var newIndex: Int
+                                do {
+                                    newIndex = Random.nextInt(tips.size)
+                                } while (newIndex == tipIndex)
+                                tipIndex = newIndex
+                                showTip = true
+                            },
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Lightbulb,
                                 contentDescription = "Показать совет",
@@ -268,7 +272,6 @@ fun FinancialStatisticsScreen(
                             showPriorityIndicator = false,
                             onDismiss = {
                                 showTip = false
-                                tipRequestedFromTopBar = false
                             },
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                         )
@@ -428,13 +431,12 @@ fun FinancialStatisticsScreen(
                                             items = state.pieChartData,
                                             selectedIndex = null,
                                             onSectorClick = { item ->
-                                                if (item != null) {
-                                                    selectedCategory = item.original?.name
-                                                    item.original?.name?.let { categoryName ->
-                                                        // onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
-                                                    }
-                                                } else {
-                                                    selectedCategory = null
+                                                item?.original?.name?.let { categoryName ->
+                                                    onNavigateToTransactions?.invoke(
+                                                        categoryName,
+                                                        state.startDate,
+                                                        state.endDate,
+                                                    )
                                                 }
                                             },
                                             modifier =
@@ -471,9 +473,11 @@ fun FinancialStatisticsScreen(
                                         onModeSelected = { lineChartDisplayMode = it },
                                     )
 
-                                    val periodText = "${dateFormat.format(state.startDate)} – ${dateFormat.format(
-                                        state.endDate,
-                                    )}"
+                                    val periodText = "${dateFormat.format(state.startDate)} – ${
+                                        dateFormat.format(
+                                            state.endDate,
+                                        )
+                                    }"
 
                                     EnhancedLineChart(
                                         incomeData = state.incomeLineChartData,
@@ -581,47 +585,56 @@ fun FinancialStatisticsScreen(
                                             ),
                                     )
 
-                                    // Блок критических финансовых рекомендаций
-                                    if (state.recommendations.isNotEmpty()) {
-                                        // Генерируем умные рекомендации на основе реальных данных
-                                        val smartRecommendations =
-                                            SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                                                savingsRate = state.savingsRate.toFloat(),
-                                                monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
-                                                topExpenseCategory = state.expensesByCategory.maxByOrNull { it.value.amount }?.key ?: "",
-                                                topCategoryPercentage =
-                                                    (state.expensesByCategory.maxByOrNull { it.value.amount }?.value?.amount?.toFloat() ?: 0f) /
-                                                        (state.expense?.amount?.toFloat() ?: 1f) * 100f,
-                                                totalTransactions = state.transactions.size,
-                                                unusualSpendingDetected = false,
-                                            )
+                                    // Удаляем отдельные блоки советов, оставляем один
+                                    val healthRecommendations =
+                                        SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                                            savingsRate = state.savingsRate.toFloat(),
+                                            monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
+                                        )
+                                    SmartRecommendationCard(
+                                        recommendations = healthRecommendations,
+                                        title = "Ключевые рекомендации",
+                                        subtitle = "Для финансового здоровья",
+                                    )
 
-                                        SmartRecommendationCard(
-                                            recommendations = smartRecommendations,
-                                            title = "🎯 Персональные советы",
-                                            subtitle = "На основе анализа ваших финансов",
-                                            style = SmartCardStyle.COMPACT,
-                                            showPriorityIndicator = true,
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(bottom = 12.dp),
+                                    // Оставляем предсказания
+                                    val predictExpensesUseCase =
+                                        remember {
+                                            org.koin.core.context.GlobalContext.get()
+                                                .get<PredictFutureExpensesUseCase>()
+                                        }
+                                    val predictedExpenses = remember { predictExpensesUseCase(state.transactions) }
+
+                                    // В UI, добавляем карточку предсказаний
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                    ) {
+                                        Text(
+                                            text = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title),
+                                            style = MaterialTheme.typography.titleMedium,
+                                        )
+                                        Text(
+                                            text = stringResource(
+                                                id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                                predictedExpenses.amount.toString(),
+                                            ),
                                         )
                                     }
 
-                                    // Блок профессиональных бюджетных советов
-                                    val budgetTips = SmartRecommendationGenerator.generateTopBudgetingTips()
-                                    SmartRecommendationCard(
-                                        recommendations = budgetTips,
-                                        title = "💰 Золотые правила бюджета",
-                                        subtitle = "Проверенные принципы финансового планирования",
-                                        style = SmartCardStyle.ENHANCED,
-                                        showPriorityIndicator = true,
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 4.dp),
+                                    // Ключевые инвестиционные советы без дублей
+                                    val keyInvestmentTips = listOf(
+                                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_bonds),
+                                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_diversification),
+                                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks),
                                     )
+                                    Column {
+                                        Text("Важные инвестиционные советы")
+                                        keyInvestmentTips.forEach { tip ->
+                                            Text(tip)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -630,7 +643,7 @@ fun FinancialStatisticsScreen(
                     // Вторая карточка - метрики финансового здоровья
                     FinancialHealthMetricsCard(
                         savingsRate = state.savingsRate,
-                        averageDailyExpense = state.averageDailyExpense ?: Money.zero(),
+                        averageDailyExpense = state.averageDailyExpense,
                         monthsOfSavings = state.monthsOfSavings,
                         modifier =
                             Modifier

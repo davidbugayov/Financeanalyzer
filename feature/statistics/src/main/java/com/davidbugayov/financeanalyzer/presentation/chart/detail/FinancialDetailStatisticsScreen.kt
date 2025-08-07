@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
@@ -51,7 +52,6 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.card.FinancialDataMapper
 import com.davidbugayov.financeanalyzer.ui.components.card.PremiumInsightsCard
 import com.davidbugayov.financeanalyzer.ui.components.card.PremiumStatisticsCard
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
 import kotlinx.coroutines.flow.collectLatest
@@ -370,26 +370,15 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    // Генерируем критические финансовые рекомендации на основе реальных данных
-                    val criticalRecommendations =
-                        SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                            savingsRate = metrics.savingsRate,
-                            monthsOfEmergencyFund = metrics.monthsOfSavings,
-                            topExpenseCategory = metrics.topExpenseCategory,
-                            topCategoryPercentage =
-                                metrics.expenseCategories
-                                    .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
-                            totalTransactions = metrics.expenseTransactionsCount,
-                            unusualSpendingDetected = false, // TODO: добавить логику определения необычных трат
-                        )
-
+                    // Объединенный блок
+                    val healthRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                        savingsRate = metrics.savingsRate,
+                        monthsOfEmergencyFund = metrics.monthsOfSavings,
+                    )
                     SmartRecommendationCard(
-                        recommendations = criticalRecommendations,
-                        title = stringResource(R.string.personal_financial_analysis),
-                        subtitle = stringResource(R.string.critical_recommendations_for_your_budget),
-                        style = SmartCardStyle.ENHANCED,
-                        showPriorityIndicator = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        recommendations = healthRecommendations,
+                        title = "Ключевые рекомендации",
+                        subtitle = "Для финансового здоровья",
                     )
                 }
                 item {
@@ -398,17 +387,61 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    // Генерируем топ бюджетные советы
-                    val budgetingTips = SmartRecommendationGenerator.generateTopBudgetingTips()
+                    // Предсказания
+                    val predictExpensesUseCase =
+                        remember { org.koin.core.context.GlobalContext.get().get<PredictFutureExpensesUseCase>() }
+                    val predictedExpenses = remember { predictExpensesUseCase(transactions = state.transactions) }
 
-                    SmartRecommendationCard(
-                        recommendations = budgetingTips,
-                        title = stringResource(R.string.golden_budgeting_rules),
-                        subtitle = stringResource(R.string.professional_budgeting_principles),
-                        style = SmartCardStyle.COMPACT,
-                        showPriorityIndicator = true,
-                        modifier = Modifier.fillMaxWidth(),
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    ) {
+                        Text(stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title))
+                        Text(
+                            stringResource(
+                                id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                predictedExpenses.amount.toString(),
+                            ),
+                        )
+                    }
+                }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
                     )
+                }
+
+                // Инвестиционные советы
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
+                    ) {
+                        Icon(Icons.Default.Lightbulb, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tips),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+                item {
+                    // В разделе инвестиционных советов
+                    // Ключевые инвестиционные советы
+                    val keyInvestmentTips = listOf(
+                        stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_bonds),
+                        stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_diversification),
+                        stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks),
+                    )
+                    Column {
+                        Text("Важные инвестиционные советы", style = MaterialTheme.typography.titleMedium)
+                        keyInvestmentTips.forEach { tip ->
+                            Text(tip)
+                        }
+                    }
                 }
                 item {
                     Spacer(

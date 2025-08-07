@@ -381,7 +381,7 @@
     <string name="optimize_category_impact">Проанализируйте каждую трату в этой категории</string>
     <string name="optimize_category_title">Оптимизируйте расходы в категории %s</string>
     <string name="path_copied">Путь скопирован</string>
-    <string name="period_custom">%s - %s</string>
+  <string name="period_custom" formatted="false">%s - %s</string>
     <string name="period_duration_description">Установите продолжительность периода в днях</string>
     <string name="period_settings">Настройки периода</string>
     <string name="permission_rationale">Для работы приложения необходимо разрешение.</string>
@@ -397,7 +397,7 @@
     <string name="rec_budget_category_desc">Разделите бюджет по категориям для лучшего контроля.</string>
     <string name="rec_budget_category_impact">Создайте лимиты по категориям</string>
     <string name="rec_budget_category_title">Категории бюджета</string>
-    <string name="rec_budget_rule_desc">Попробуйте правило 50% на нужды, 30% на желания, 20% на сбережения.</string>
+  <string name="rec_budget_rule_desc" formatted="false">Попробуйте правило 50% на нужды, 30% на желания, 20% на сбережения.</string>
     <string name="rec_budget_rule_impact">Создайте бюджет по этому принципу</string>
     <string name="rec_budget_rule_title">Правило 50/30/20</string>
     <string name="rec_budget_track_desc">Регулярно проверяйте соответствие трат бюджету.</string>
@@ -620,4 +620,22 @@
     <string name="notification_permission_text_hardcoded">Включите уведомления в настройках приложения</string>
     <string name="notification_transaction_reminder_title">Напоминание о транзакции</string>
     <string name="notification_transaction_reminder_text">Не забудьте внести сегодняшние транзакции</string>
+
+  <!-- Инвестиционные советы -->
+  <string name="investment_tips">Важные инвестиционные советы</string>
+  <string name="investment_tip_bonds">Рассмотрите облигации для стабильного дохода: корпоративные с доходностью 14-16% от надежных эмитентов.</string>
+  <string name="investment_tip_gold">Инвестируйте в золото как защитный актив против инфляции и нестабильности.</string>
+  <string name="investment_tip_business">Вложите в реальный бизнес через доли или займы для высокого дохода при умеренных рисках.</string>
+  <string name="investment_tip_diversification">Диверсифицируйте портфель, избегая высоких рисков и кредитного плеча.</string>
+  <string name="investment_tip_stocks">Инвестируйте в акции крупных устойчивых компаний, таких как Сбербанк или Газпром.</string>
+
+  <!-- Советы по финансовому анализу -->
+  <string name="analysis_tip_budget">Устанавливайте лимиты по категориям и мониторьте регулярные платежи.</string>
+  <string name="analysis_tip_forecast">Прогнозируйте изменения, включая кредиты и инвестиции.</string>
+  <string name="analysis_tip_sync">Синхронизируйте данные с банковскими счетами для актуальности.</string>
+
+  <!-- Предсказания -->
+  <string name="prediction_title">Предсказания расходов</string>
+  <string name="prediction_next_month" formatted="false">Ожидаемые расходы на следующий месяц: %1$s</string>
+  <string name="prediction_savings">Прогнозируемые сбережения: %1$s</string>
 </resources>

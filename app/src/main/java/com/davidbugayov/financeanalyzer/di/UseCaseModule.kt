@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetCategoriesWi
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
@@ -107,4 +108,6 @@ val useCaseModule =
         single { GetSubcategoryByIdUseCase(get()) }
         single { AddSubcategoryUseCase(get()) }
         single { DeleteSubcategoryUseCase(get()) }
+
+        single { PredictFutureExpensesUseCase() }
     }
