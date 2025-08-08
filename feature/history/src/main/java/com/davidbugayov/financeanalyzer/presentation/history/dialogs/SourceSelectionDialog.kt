@@ -80,7 +80,7 @@ fun SourceSelectionDialog(
                             } else if (localSelectedSources.size == sourceNames.size) {
                                 stringResource(R.string.clear_selection)
                             } else {
-                                stringResource(R.string.select_all)
+                                stringResource(UiR.string.dialog_select_all)
                             },
                         color =
                             if (localSelectedSources.isEmpty() ||

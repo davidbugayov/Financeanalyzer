@@ -12,10 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.GenericExcelImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.SheetSelector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractExcelBankHandler
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import java.io.BufferedInputStream
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import timber.log.Timber
 
@@ -180,16 +177,5 @@ class AlfaBankExcelHandler(
             )
         }
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
-    }
-
-    private fun parseDate(dateStr: String): Date? {
-        val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
-
-        return try {
-            simpleDateFormat.parse(dateStr)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка парсинга даты: $dateStr")
-            null
-        }
     }
 }

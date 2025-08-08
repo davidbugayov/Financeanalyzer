@@ -4,6 +4,7 @@
     <string name="empty_state_icon">Иконка пустого состояния</string>
     <string name="no_transactions">Нет транзакций</string>
     <string name="add_first_transaction_description">Добавьте первую транзакцию, чтобы начать отслеживать свои финансы</string>
+  <string name="filter_all">Все</string>
     <string name="filter_today">Сегодня</string>
     <string name="filter_week">Неделя</string>
     <string name="filter_month">Месяц</string>

@@ -111,7 +111,7 @@ fun CategorySelectionDialog(
                             } else if (localSelectedCategories.size == allCategories.size) {
                                 stringResource(R.string.clear_selection)
                             } else {
-                                stringResource(R.string.select_all)
+                                stringResource(UiR.string.dialog_select_all)
                             },
                         color =
                             if (localSelectedCategories.isEmpty() ||

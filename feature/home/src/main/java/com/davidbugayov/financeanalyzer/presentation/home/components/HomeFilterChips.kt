@@ -15,9 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.home.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
 /**
@@ -36,7 +35,7 @@ fun PermissionUtilsHomeFilterChips(
             FilterChipData(TransactionFilter.TODAY, stringResource(UiR.string.filter_today)),
             FilterChipData(TransactionFilter.WEEK, stringResource(UiR.string.filter_week)),
             FilterChipData(TransactionFilter.MONTH, stringResource(UiR.string.filter_month)),
-            FilterChipData(TransactionFilter.ALL, stringResource(R.string.filter_all)),
+            FilterChipData(TransactionFilter.ALL, stringResource(UiR.string.filter_all)),
         )
 
     Row(
