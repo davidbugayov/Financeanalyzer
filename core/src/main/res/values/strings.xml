@@ -6,4 +6,4 @@
     <string name="error_network_connection">Ошибка подключения к сети</string>
     <string name="error_validation">Ошибка валидации</string>
     <string name="error_unknown">Неизвестная ошибка</string>
-</resources>
+    </resources>
