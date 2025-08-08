@@ -14,7 +14,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * UseCase для экспорта транзакций в CSV-файл.
