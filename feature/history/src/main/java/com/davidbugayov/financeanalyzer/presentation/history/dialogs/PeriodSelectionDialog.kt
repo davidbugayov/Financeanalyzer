@@ -120,7 +120,7 @@ fun PeriodSelectionDialog(
 
                 // Если выбран произвольный период, показываем поля для выбора дат
                 if (selectedPeriod == PeriodType.CUSTOM) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
                     // Поле начальной даты
                     DateField(
@@ -130,7 +130,7 @@ fun PeriodSelectionDialog(
                         onClick = onStartDateClick,
                     )
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
 
                     // Поле конечной даты
                     DateField(
@@ -178,7 +178,7 @@ private fun PeriodOption(
             Modifier
                 .fillMaxWidth()
                 .clickable { onPeriodSelected(periodType) }
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
@@ -188,7 +188,7 @@ private fun PeriodOption(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
+            modifier = Modifier.padding(start = dimensionResource(UiR.dimen.spacing_small)),
         )
     }
 }
@@ -214,7 +214,7 @@ private fun DateField(
                 Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onClick)
-                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                    .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

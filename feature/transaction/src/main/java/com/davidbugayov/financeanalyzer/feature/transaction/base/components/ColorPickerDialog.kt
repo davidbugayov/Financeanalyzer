@@ -40,11 +40,11 @@ fun ColorPickerDialog(
                 FlowRow(
                     horizontalArrangement =
                         Arrangement.spacedBy(
-                            dimensionResource(R.dimen.spacing_medium),
+                            dimensionResource(UiR.dimen.spacing_medium),
                         ),
                     verticalArrangement =
                         Arrangement.spacedBy(
-                            dimensionResource(R.dimen.spacing_medium),
+                            dimensionResource(UiR.dimen.spacing_medium),
                         ),
                 ) {
                     ExpenseChartPalette.forEach { composeColor ->
@@ -52,11 +52,11 @@ fun ColorPickerDialog(
                         Box(
                             modifier =
                                 Modifier
-                                    .size(dimensionResource(R.dimen.color_picker_item_size))
+                                    .size(dimensionResource(UiR.dimen.color_picker_item_size))
                                     .clip(CircleShape)
                                     .background(composeColor)
                                     .border(
-                                        width = dimensionResource(R.dimen.border_width_medium),
+                                        width = dimensionResource(UiR.dimen.border_width_medium),
                                         color =
                                             if (argbColor == initialColor) {
                                                 MaterialTheme.colorScheme.primary

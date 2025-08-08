@@ -41,14 +41,14 @@ fun SourceColorPickerDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.source_color_picker_padding)),
+                modifier = Modifier.padding(dimensionResource(UiR.dimen.source_color_picker_padding)),
             ) {
                 // Горизонтальный скроллируемый ряд цветов
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement =
                         Arrangement.spacedBy(
-                            dimensionResource(R.dimen.source_color_picker_item_spacing),
+                            dimensionResource(UiR.dimen.source_color_picker_item_spacing),
                         ),
                 ) {
                     items(ExpenseChartPalette) { composeColor ->
@@ -79,8 +79,8 @@ private fun ColorItem(
     Box(
         modifier =
             Modifier
-                .padding(dimensionResource(R.dimen.source_color_picker_item_padding))
-                .size(dimensionResource(R.dimen.source_color_picker_item_size))
+                .padding(dimensionResource(UiR.dimen.source_color_picker_item_padding))
+                .size(dimensionResource(UiR.dimen.source_color_picker_item_size))
                 .clip(CircleShape)
                 .background(Color(color))
                 .clickable(onClick = onClick),
@@ -89,7 +89,7 @@ private fun ColorItem(
             Box(
                 modifier =
                     Modifier
-                        .size(dimensionResource(R.dimen.source_color_picker_item_size))
+                        .size(dimensionResource(UiR.dimen.source_color_picker_item_size))
                         .clip(CircleShape)
                         .background(Color.Black.copy(alpha = 0.2f)),
             )

@@ -54,13 +54,13 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-            contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_normal)),
+            contentPadding = PaddingValues(dimensionResource(UiR.dimen.spacing_normal)),
         ) {
             item {
                 Text(
                     text = stringResource(R.string.libraries_description),
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal)),
+                    modifier = Modifier.padding(bottom = dimensionResource(UiR.dimen.spacing_normal)),
                 )
             }
 
@@ -74,11 +74,11 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                     index = libraries.indexOf(library),
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
             }
 
             item {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_normal)))
 
                 Text(
                     text = stringResource(R.string.licenses_note),
@@ -86,7 +86,7 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_xxlarge)))
             }
         }
     }
@@ -119,10 +119,10 @@ private fun LibraryItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
+                .padding(bottom = dimensionResource(UiR.dimen.spacing_medium)),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.card_elevation).div(2),
+                defaultElevation = dimensionResource(UiR.dimen.card_elevation).div(2),
             ),
         colors =
             CardDefaults.cardColors(
@@ -155,26 +155,26 @@ private fun LibraryItem(
         }
 
         Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
+            modifier = Modifier.padding(dimensionResource(UiR.dimen.spacing_normal)),
         ) {
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
 
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
+            Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_normal)))
 
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.height_divider)),
+                        .height(dimensionResource(UiR.dimen.height_divider)),
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
             Text(
                 text = stringResource(R.string.license_colon, license),

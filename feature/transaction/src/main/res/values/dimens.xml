@@ -1,77 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="space_small">8dp</dimen>
-    <dimen name="space_medium">16dp</dimen>
     <dimen name="import_progress_indicator_height">4dp</dimen>
     <dimen name="import_icon_size">24dp</dimen>
-    <dimen name="import_icon_size_large">64dp</dimen>
     <dimen name="import_dialog_content_padding">16dp</dimen>
-    <dimen name="card_elevation">4dp</dimen>
-    <dimen name="radius_card">12dp</dimen>
-    <dimen name="spacing_tiny">3dp</dimen>
-    <dimen name="dialog_elevation">24dp</dimen>
-
-    <!-- Category and Add Transaction UI specific dimens copied from app -->
-    <dimen name="add_button_padding_horizontal">16dp</dimen>
-    <dimen name="add_button_padding_vertical">8dp</dimen>
-    <dimen name="add_button_height">56dp</dimen>
-    <dimen name="add_button_corner_radius">12dp</dimen>
-    <dimen name="add_button_progress_size">24dp</dimen>
-    <dimen name="add_button_progress_stroke_width">2dp</dimen>
-
-    <dimen name="category_section_padding_horizontal">16dp</dimen>
-  <dimen name="category_section_padding_vertical">4dp</dimen>
+    <dimen name="category_section_padding_vertical">4dp</dimen>
   <dimen name="category_section_spacing">4dp</dimen>
   <dimen name="category_header_spacing">4dp</dimen>
   <dimen name="category_header_padding_horizontal">4dp</dimen>
   <dimen name="category_header_padding_vertical">2dp</dimen>
-    <dimen name="category_expand_text_padding_vertical">4dp</dimen>
-    <dimen name="category_expand_spacer_width">4dp</dimen>
-    <dimen name="category_grid_spacing">4dp</dimen>
-    <dimen name="category_item_circle_size">36dp</dimen>
-    <dimen name="category_item_icon_size">20dp</dimen>
-    <dimen name="category_item_vertical_padding">2dp</dimen>
-    <dimen name="category_item_spacer_height">2dp</dimen>
-    <dimen name="category_max_height">400dp</dimen>
-    <dimen name="category_collapsed_height">120dp</dimen>
-
-    <dimen name="category_dialog_item_spacing">8dp</dimen>
-    <dimen name="category_dialog_item_border">1dp</dimen>
-    <dimen name="category_dialog_item_padding">4dp</dimen>
-    <dimen name="category_dialog_item_spacing_vertical">4dp</dimen>
-    <dimen name="category_dialog_icon_size">48dp</dimen>
-    <dimen name="category_dialog_icon_border">2dp</dimen>
-    <dimen name="category_dialog_icon_grid_max_height">300dp</dimen>
-
-    <dimen name="comment_field_padding_horizontal">16dp</dimen>
-    <dimen name="comment_field_padding_vertical">8dp</dimen>
-    <dimen name="comment_field_corner_radius">12dp</dimen>
-    <dimen name="comment_field_elevation">1dp</dimen>
-    <dimen name="comment_field_inner_padding_horizontal">16dp</dimen>
-    <dimen name="comment_field_inner_padding_vertical">8dp</dimen>
-
-    <dimen name="source_color_picker_padding">8dp</dimen>
-    <dimen name="source_color_picker_item_spacing">12dp</dimen>
-    <dimen name="source_color_picker_item_size">40dp</dimen>
-    <dimen name="source_color_picker_item_padding">4dp</dimen>
-
-    <dimen name="icon_size_small">20dp</dimen>
-
-    <!-- Spacing and Padding copied from app for transaction feature -->
-    <dimen name="spacing_small">4dp</dimen>
-    <dimen name="spacing_medium">16dp</dimen>
     <dimen name="spacing_normal">16dp</dimen>
-    <dimen name="padding_small">4dp</dimen>
-    <dimen name="padding_medium">8dp</dimen>
-
-    <!-- Category / Color picker specific -->
-    <dimen name="category_item_width">80dp</dimen>
-    <dimen name="color_picker_item_size">40dp</dimen>
-    <dimen name="border_width_small">1dp</dimen>
-    <dimen name="border_width_medium">2dp</dimen>
-
-  <!-- Subcategory specific -->
-  <dimen name="category_item_size">80dp</dimen>
+    <dimen name="category_item_size">80dp</dimen>
   <dimen name="category_icon_size">24dp</dimen>
   <dimen name="category_icon_spacing">4dp</dimen>
   <dimen name="category_item_padding">4dp</dimen>

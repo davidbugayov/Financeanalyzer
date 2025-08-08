@@ -40,11 +40,11 @@ fun KeyMetricsCard(
         modifier = modifier,
         shape =
             RoundedCornerShape(
-                dimensionResource(R.dimen.financial_statistics_card_corner_radius),
+                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_corner_radius),
             ),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+                defaultElevation = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_elevation),
             ),
         colors =
             CardDefaults.cardColors(
@@ -60,7 +60,7 @@ fun KeyMetricsCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+                    .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.key_metrics),
@@ -72,7 +72,7 @@ fun KeyMetricsCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large),
                     ),
             )
 
@@ -111,7 +111,7 @@ fun KeyMetricsCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large),
                     ),
             )
 
@@ -146,7 +146,7 @@ fun KeyMetricsCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_medium),
                     ),
             )
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -240,7 +240,7 @@ fun KeyMetricsCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_small),
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_small),
                     ),
             )
         }

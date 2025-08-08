@@ -255,7 +255,7 @@ private fun HomeFeedback(
         onDismiss = onDismiss,
         modifier =
             modifier
-                .padding(top = dimensionResource(R.dimen.padding_small)),
+                .padding(top = dimensionResource(UiR.dimen.padding_small)),
     )
 }
 

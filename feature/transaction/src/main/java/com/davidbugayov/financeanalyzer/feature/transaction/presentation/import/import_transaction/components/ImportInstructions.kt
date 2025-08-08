@@ -14,6 +14,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 /**
@@ -25,18 +26,18 @@ fun ImportInstructions() {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.space_medium)),
+                .padding(bottom = dimensionResource(UiR.dimen.space_medium)),
         colors =
             CardDefaults.cardColors(
                 containerColor = LocalFriendlyCardBackgroundColor.current,
             ),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_medium)),
+                    .padding(dimensionResource(UiR.dimen.space_medium)),
         ) {
             Text(
                 text = stringResource(R.string.how_to_import),
@@ -51,7 +52,7 @@ fun ImportInstructions() {
                 text = stringResource(R.string.import_instructions),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.space_small)),
+                modifier = Modifier.padding(top = dimensionResource(UiR.dimen.space_small)),
             )
         }
     }

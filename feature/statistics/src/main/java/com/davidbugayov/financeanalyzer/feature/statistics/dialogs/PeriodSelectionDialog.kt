@@ -120,7 +120,7 @@ fun PeriodSelectionDialog(
 
                 // Если выбран произвольный период, показываем поля для выбора дат
                 if (selectedPeriod == PeriodType.CUSTOM) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
                     // Поле начальной даты
                     DateField(
@@ -130,7 +130,7 @@ fun PeriodSelectionDialog(
                         onClick = onStartDateClick,
                     )
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
 
                     // Поле конечной даты
                     DateField(
@@ -214,7 +214,7 @@ private fun DateField(
                 Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onClick)
-                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                    .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

@@ -56,11 +56,11 @@ fun CategoryPickerDialog(
                 columns = GridCells.Fixed(3),
                 horizontalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(R.dimen.category_dialog_item_spacing),
+                        dimensionResource(UiR.dimen.category_dialog_item_spacing),
                     ),
                 verticalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(R.dimen.category_dialog_item_spacing),
+                        dimensionResource(UiR.dimen.category_dialog_item_spacing),
                     ),
             ) {
                 items(categories) { category ->
@@ -105,7 +105,7 @@ fun CategoryItemButton(
         shape = MaterialTheme.shapes.medium,
         border =
             BorderStroke(
-                dimensionResource(R.dimen.category_dialog_item_border),
+                dimensionResource(UiR.dimen.category_dialog_item_border),
                 backgroundColor.copy(alpha = 0.7f),
             ),
         color = backgroundColor,
@@ -113,7 +113,7 @@ fun CategoryItemButton(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(R.dimen.category_dialog_item_padding)),
+            modifier = Modifier.padding(dimensionResource(UiR.dimen.category_dialog_item_padding)),
         ) {
             Icon(
                 imageVector = category.icon ?: Icons.Default.Category,
@@ -123,7 +123,7 @@ fun CategoryItemButton(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.category_dialog_item_spacing_vertical),
+                        dimensionResource(UiR.dimen.category_dialog_item_spacing_vertical),
                     ),
             )
             Text(
@@ -163,7 +163,7 @@ fun CustomCategoryDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
                 if (availableIcons.isNotEmpty()) {
                     Text(
                         text = stringResource(R.string.select_icon),
@@ -173,15 +173,15 @@ fun CustomCategoryDialog(
                         columns = GridCells.Fixed(6),
                         horizontalArrangement =
                             Arrangement.spacedBy(
-                                dimensionResource(R.dimen.spacing_tiny),
+                                dimensionResource(UiR.dimen.spacing_tiny),
                             ),
                         verticalArrangement =
                             Arrangement.spacedBy(
-                                dimensionResource(R.dimen.spacing_tiny),
+                                dimensionResource(UiR.dimen.spacing_tiny),
                             ),
                         contentPadding =
                             PaddingValues(
-                                top = dimensionResource(R.dimen.spacing_tiny),
+                                top = dimensionResource(UiR.dimen.spacing_tiny),
                             ),
                         modifier =
                             Modifier
@@ -189,11 +189,11 @@ fun CustomCategoryDialog(
                                 .heightIn(
                                     min =
                                         dimensionResource(
-                                            R.dimen.category_dialog_icon_grid_max_height,
+                                            UiR.dimen.category_dialog_icon_grid_max_height,
                                         ) / 2,
                                     max =
                                         dimensionResource(
-                                            R.dimen.category_dialog_icon_grid_max_height,
+                                            UiR.dimen.category_dialog_icon_grid_max_height,
                                         ),
                                 ),
                     ) {
@@ -210,8 +210,8 @@ fun CustomCategoryDialog(
                                     },
                                 border =
                                     if (icon == selectedIcon) {
-                                        BorderStroke(
-                                            dimensionResource(R.dimen.category_dialog_icon_border),
+                                         BorderStroke(
+                                             dimensionResource(UiR.dimen.category_dialog_icon_border),
                                             MaterialTheme.colorScheme.primary,
                                         )
                                     } else {
@@ -219,7 +219,7 @@ fun CustomCategoryDialog(
                                     },
                                 modifier =
                                     Modifier
-                                        .size(dimensionResource(R.dimen.category_dialog_icon_size))
+                                        .size(dimensionResource(UiR.dimen.category_dialog_icon_size))
                                         .clickable { onIconSelected(icon) },
                             ) {
                                 Icon(
@@ -227,9 +227,9 @@ fun CustomCategoryDialog(
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier =
-                                        Modifier.padding(
-                                            dimensionResource(R.dimen.padding_small),
-                                        ),
+                                         Modifier.padding(
+                                             dimensionResource(UiR.dimen.padding_small),
+                                         ),
                                 )
                             }
                         }
@@ -242,7 +242,7 @@ fun CustomCategoryDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(R.dimen.spacing_small),
+                        dimensionResource(UiR.dimen.spacing_small),
                         Alignment.End,
                     ),
             ) {

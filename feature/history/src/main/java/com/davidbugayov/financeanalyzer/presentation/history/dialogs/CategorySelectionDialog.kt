@@ -101,7 +101,7 @@ fun CategorySelectionDialog(
                                         emptyList()
                                     }
                             }
-                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -142,11 +142,11 @@ fun CategorySelectionDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(dimensionResource(R.dimen.divider_height)),
+                             .height(dimensionResource(UiR.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
 
                 // Группа "Расходы" с выпадающим списком
                 CategoryGroupHeader(
@@ -189,11 +189,11 @@ fun CategorySelectionDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(dimensionResource(R.dimen.divider_height)),
+                             .height(dimensionResource(UiR.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
                 // Группа "Доходы" с выпадающим списком
                 CategoryGroupHeader(
@@ -270,7 +270,7 @@ private fun CategoryGroupHeader(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -328,7 +328,7 @@ private fun CategoryCheckboxItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.spacing_small))
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_small))
                 .clip(MaterialTheme.shapes.small)
                 .background(
                     if (isSelected) {
@@ -343,7 +343,7 @@ private fun CategoryCheckboxItem(
                 Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { onToggle(!isSelected) })
-                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                    .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
@@ -362,7 +362,7 @@ private fun CategoryCheckboxItem(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .padding(start = dimensionResource(R.dimen.spacing_small)),
+                        .padding(start = dimensionResource(UiR.dimen.spacing_small)),
             )
         }
     }

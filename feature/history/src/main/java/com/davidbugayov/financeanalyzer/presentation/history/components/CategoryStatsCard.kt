@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.math.BigDecimal
 
 /**
@@ -40,19 +41,19 @@ fun CategoryStatsCard(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
+            modifier = Modifier.padding(dimensionResource(UiR.dimen.spacing_normal)),
         ) {
             Text(
                 text = category,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -81,7 +82,7 @@ fun CategoryStatsCard(
                 }
             }
             if (percentChange != null) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
                 val percentChangeInt = percentChange.setScale(0, java.math.RoundingMode.FLOOR).toInt()
                 val changeText =
                     when {

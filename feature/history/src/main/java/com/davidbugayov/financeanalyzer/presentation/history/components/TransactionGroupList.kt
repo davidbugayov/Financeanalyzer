@@ -40,6 +40,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
@@ -160,7 +161,7 @@ fun TransactionGroupList(
                     HorizontalDivider(
                         modifier =
                             Modifier.padding(
-                                horizontal = dimensionResource(id = R.dimen.spacing_normal),
+                                horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
                             ),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     )
@@ -173,7 +174,7 @@ fun TransactionGroupList(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .height(dimensionResource(id = R.dimen.spacing_small)),
+                            .height(dimensionResource(id = UiR.dimen.spacing_small)),
                 )
             }
         }
@@ -185,11 +186,11 @@ fun TransactionGroupList(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(id = R.dimen.spacing_normal)),
+                            .padding(dimensionResource(id = UiR.dimen.spacing_normal)),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_small)),
+                        modifier = Modifier.padding(dimensionResource(id = UiR.dimen.spacing_small)),
                         color = MaterialTheme.colorScheme.primary,
                     )
                 }
@@ -244,10 +245,10 @@ private fun ExpandableGroupHeader(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = dimensionResource(id = R.dimen.spacing_normal),
-                    vertical = dimensionResource(id = R.dimen.spacing_small),
-                )
+                    .padding(
+                        horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
+                        vertical = dimensionResource(id = UiR.dimen.spacing_small),
+                    )
                 .clickable { onToggle(!isExpanded) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         border =
@@ -276,7 +277,7 @@ private fun ExpandableGroupHeader(
                     },
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
+            Spacer(modifier = Modifier.width(dimensionResource(id = UiR.dimen.spacing_medium)))
             Text(
                 text = date,
                 style = MaterialTheme.typography.bodyLarge,

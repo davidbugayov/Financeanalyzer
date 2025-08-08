@@ -287,7 +287,7 @@ fun FinancialStatisticsScreen(
                                     .padding(
                                         horizontal =
                                             dimensionResource(
-                                                R.dimen.finance_chart_screen_padding,
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
                                             ),
                                         vertical = 16.dp,
                                     )
@@ -330,8 +330,8 @@ fun FinancialStatisticsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                horizontal = dimensionResource(R.dimen.finance_chart_screen_padding),
-                                vertical = dimensionResource(R.dimen.finance_chart_screen_vertical_spacing),
+                                horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding),
+                                vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_vertical_spacing),
                             ),
                     ) {
                         FinancialHealthMetricsCard(
@@ -388,7 +388,7 @@ fun FinancialStatisticsScreen(
                                     modifier =
                                         Modifier
                                             .fillMaxWidth()
-                                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
+                                            .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding)),
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData =
@@ -406,13 +406,13 @@ fun FinancialStatisticsScreen(
                                                     .fillMaxWidth()
                                                     .height(
                                                         dimensionResource(
-                                                            R.dimen.finance_chart_screen_piechart_height,
+                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_piechart_height,
                                                         ),
                                                     )
                                                     .padding(
                                                         top =
                                                             dimensionResource(
-                                                                R.dimen.finance_chart_screen_padding,
+                                                                com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
                                                             ),
                                                     ),
                                             contentAlignment = Alignment.Center,
@@ -438,10 +438,7 @@ fun FinancialStatisticsScreen(
                                             },
                                             modifier =
                                                 Modifier.padding(
-                                                    top =
-                                                        dimensionResource(
-                                                            R.dimen.finance_chart_screen_padding,
-                                                        ),
+                                                    top = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding),
                                                 ),
                                             showExpenses = state.showExpenses,
                                             onShowExpensesChange = { showExpenses ->
@@ -462,7 +459,7 @@ fun FinancialStatisticsScreen(
                                     modifier =
                                         Modifier
                                             .fillMaxWidth()
-                                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
+                                            .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding)),
                                 ) {
                                     // Линейный график
                                     LineChartTypeSelector(
@@ -496,8 +493,8 @@ fun FinancialStatisticsScreen(
                                             .padding(
                                                 top = 24.dp,
                                                 bottom = 4.dp,
-                                                start = dimensionResource(R.dimen.finance_chart_screen_padding),
-                                                end = dimensionResource(R.dimen.finance_chart_screen_padding),
+                                                start = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding),
+                                                end = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding),
                                             ),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
@@ -513,7 +510,7 @@ fun FinancialStatisticsScreen(
                                                 .padding(
                                                     bottom =
                                                         dimensionResource(
-                                                            R.dimen.finance_chart_screen_card_bottom_padding,
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_card_bottom_padding,
                                                         ),
                                                 ),
                                         shape = RoundedCornerShape(16.dp),
@@ -537,7 +534,7 @@ fun FinancialStatisticsScreen(
                                                     .fillMaxWidth()
                                                     .padding(
                                                         dimensionResource(
-                                                            R.dimen.finance_chart_screen_card_content_padding,
+                                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_card_content_padding,
                                                         ),
                                                     ),
                                             verticalAlignment = Alignment.CenterVertically,
@@ -575,7 +572,7 @@ fun FinancialStatisticsScreen(
                                         modifier =
                                             Modifier.height(
                                                 dimensionResource(
-                                                    R.dimen.finance_chart_screen_vertical_spacing,
+                                                    com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_vertical_spacing,
                                                 ),
                                             ),
                                     )

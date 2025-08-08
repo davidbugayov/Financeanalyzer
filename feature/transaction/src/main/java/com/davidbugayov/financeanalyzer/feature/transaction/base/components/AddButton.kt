@@ -38,11 +38,11 @@ fun AddButton(
             modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = dimensionResource(R.dimen.add_button_padding_horizontal),
-                    vertical = dimensionResource(R.dimen.add_button_padding_vertical),
+                    horizontal = dimensionResource(UiR.dimen.add_button_padding_horizontal),
+                    vertical = dimensionResource(UiR.dimen.add_button_padding_vertical),
                 )
-                .height(dimensionResource(R.dimen.add_button_height)),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.add_button_corner_radius)),
+                .height(dimensionResource(UiR.dimen.add_button_height)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.add_button_corner_radius)),
         colors =
             ButtonDefaults.buttonColors(
                 containerColor = color,
@@ -52,9 +52,9 @@ fun AddButton(
         Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(dimensionResource(R.dimen.add_button_progress_size)),
+                    modifier = Modifier.size(dimensionResource(UiR.dimen.add_button_progress_size)),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = dimensionResource(R.dimen.add_button_progress_stroke_width),
+                    strokeWidth = dimensionResource(UiR.dimen.add_button_progress_stroke_width),
                 )
             } else {
                 Text(

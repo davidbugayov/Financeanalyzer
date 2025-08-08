@@ -32,10 +32,10 @@ fun SavingsOptimizationCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.financial_statistics_card_corner_radius)),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+                defaultElevation = dimensionResource(UiR.dimen.financial_statistics_card_elevation),
             ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
@@ -43,7 +43,7 @@ fun SavingsOptimizationCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+                    .padding(dimensionResource(UiR.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.savings_optimization),
@@ -54,7 +54,7 @@ fun SavingsOptimizationCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        dimensionResource(UiR.dimen.financial_statistics_spacer_large),
                     ),
             )
 

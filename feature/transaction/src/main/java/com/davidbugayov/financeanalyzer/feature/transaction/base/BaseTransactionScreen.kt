@@ -347,7 +347,7 @@ fun <E> BaseTransactionScreen(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                         .imePadding()
-                        .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+                        .padding(horizontal = dimensionResource(UiR.dimen.padding_medium)),
             ) {
                 // Показываем напоминание об импорте только на экране добавления транзакции
                 if (!isEditMode && onNavigateToImport != null) {
@@ -609,7 +609,7 @@ fun <E> BaseTransactionScreen(
                     isLoading = state.isLoading,
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
             }
 
             // Диалоги

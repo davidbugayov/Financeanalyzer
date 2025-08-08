@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSuccessColor
 
 /**
@@ -50,7 +51,7 @@ fun ImportResultsSection(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.space_small)),
+                .padding(bottom = dimensionResource(UiR.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -60,14 +61,14 @@ fun ImportResultsSection(
                 ),
             elevation =
                 CardDefaults.cardElevation(
-                    defaultElevation = dimensionResource(R.dimen.card_elevation),
+                    defaultElevation = dimensionResource(UiR.dimen.card_elevation),
                 ),
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.space_small)),
+                        .padding(dimensionResource(UiR.dimen.space_small)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Иконка успеха или ошибки
@@ -85,10 +86,10 @@ fun ImportResultsSection(
                         } else {
                             LocalSuccessColor.current
                         },
-                    modifier = Modifier.size(dimensionResource(R.dimen.import_icon_size_large)),
+                    modifier = Modifier.size(dimensionResource(UiR.dimen.import_icon_size_large)),
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_small)))
 
                 // Заголовок результата
                 Text(
@@ -109,7 +110,7 @@ fun ImportResultsSection(
 
                 // Отображение названия банка, если оно есть
                 if (!importResults.bankName.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_small)))
                     Text(
                         text = importResults.bankName,
                         style = MaterialTheme.typography.bodyLarge,
@@ -121,7 +122,7 @@ fun ImportResultsSection(
 
                 // Отображение имени файла, если оно есть
                 if (importResults.fileName.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_tiny)))
                     Text(
                         text = importResults.fileName,
                         style = MaterialTheme.typography.bodyMedium,
@@ -131,7 +132,7 @@ fun ImportResultsSection(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_small)))
 
                 // Текст с деталями
                 if (importResults.errorMessage != null) {
@@ -142,13 +143,13 @@ fun ImportResultsSection(
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.errorContainer,
                             ),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+                        shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
                     ) {
                         Text(
                             text = importResults.errorMessage,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.padding(dimensionResource(R.dimen.space_small)),
+                            modifier = Modifier.padding(dimensionResource(UiR.dimen.space_small)),
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -160,13 +161,13 @@ fun ImportResultsSection(
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                             ),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+                        shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
                     ) {
                         Column(
                             modifier =
                                 Modifier
-                                    .fillMaxWidth()
-                                    .padding(dimensionResource(R.dimen.space_small)),
+                                     .fillMaxWidth()
+                                 .padding(dimensionResource(UiR.dimen.space_small)),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
@@ -184,7 +185,7 @@ fun ImportResultsSection(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_small)))
 
                 // Удалена кнопка "Готово" по запросу пользователя
             }

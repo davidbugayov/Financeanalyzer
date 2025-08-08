@@ -38,8 +38,8 @@ fun GroupingChips(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(UiR.dimen.spacing_medium)),
     ) {
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,

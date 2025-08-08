@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Поле для комментария без иконки прикрепления
@@ -26,20 +27,20 @@ fun CommentField(
             modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = dimensionResource(R.dimen.comment_field_padding_horizontal),
-                    vertical = dimensionResource(R.dimen.comment_field_padding_vertical),
+                    horizontal = dimensionResource(UiR.dimen.comment_field_padding_horizontal),
+                    vertical = dimensionResource(UiR.dimen.comment_field_padding_vertical),
                 ),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.comment_field_corner_radius)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.comment_field_corner_radius)),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = dimensionResource(R.dimen.comment_field_elevation),
+        tonalElevation = dimensionResource(UiR.dimen.comment_field_elevation),
     ) {
         Row(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = dimensionResource(R.dimen.comment_field_inner_padding_horizontal),
-                        vertical = dimensionResource(R.dimen.comment_field_inner_padding_vertical),
+                        horizontal = dimensionResource(UiR.dimen.comment_field_inner_padding_horizontal),
+                        vertical = dimensionResource(UiR.dimen.comment_field_inner_padding_vertical),
                     ),
             verticalAlignment = Alignment.CenterVertically,
         ) {

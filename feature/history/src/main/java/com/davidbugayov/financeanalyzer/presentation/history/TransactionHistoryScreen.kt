@@ -414,7 +414,7 @@ fun TransactionHistoryScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
+                        .padding(horizontal = dimensionResource(UiR.dimen.spacing_normal)),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -433,7 +433,7 @@ fun TransactionHistoryScreen(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val context = LocalContext.current
@@ -445,7 +445,7 @@ fun TransactionHistoryScreen(
                                 state.startDate,
                                 state.endDate,
                             ),
-                        fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                        fontSize = dimensionResource(UiR.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                     )
@@ -457,7 +457,7 @@ fun TransactionHistoryScreen(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Выбранные категории
@@ -468,10 +468,10 @@ fun TransactionHistoryScreen(
                                         R.string.categories_selected,
                                         state.selectedCategories.joinToString(", "),
                                     ),
-                                fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                                fontSize = dimensionResource(UiR.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_medium)),
+                                modifier = Modifier.padding(end = dimensionResource(UiR.dimen.spacing_medium)),
                             )
                         }
 
@@ -483,7 +483,7 @@ fun TransactionHistoryScreen(
                                         R.string.sources_selected,
                                         state.selectedSources.joinToString(", "),
                                     ),
-                                fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                                fontSize = dimensionResource(UiR.dimen.text_size_small).value.sp,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Medium,
                             )

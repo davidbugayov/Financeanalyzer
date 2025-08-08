@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения прогресса импорта
@@ -64,7 +65,7 @@ fun ImportProgressSection(
         modifier =
             modifier
                 .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.space_small)),
+                .padding(bottom = dimensionResource(UiR.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -74,14 +75,14 @@ fun ImportProgressSection(
                 ),
             elevation =
                 CardDefaults.cardElevation(
-                    defaultElevation = dimensionResource(R.dimen.card_elevation),
+                    defaultElevation = dimensionResource(UiR.dimen.card_elevation),
                 ),
         ) {
             Column(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.space_small)),
+                        .padding(dimensionResource(UiR.dimen.space_small)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Отображаем банк и имя файла в одной строке, если есть банк
@@ -130,7 +131,7 @@ fun ImportProgressSection(
                     text = stringResource(R.string.importing_file),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.space_small)),
+                    modifier = Modifier.padding(bottom = dimensionResource(UiR.dimen.space_small)),
                 )
 
                 // Прогресс-бар в красивой карточке
@@ -140,13 +141,13 @@ fun ImportProgressSection(
                         CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                         ),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+                         shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
                 ) {
                     Column(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.space_small)),
+                                 .padding(dimensionResource(UiR.dimen.space_small)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator(
@@ -159,7 +160,7 @@ fun ImportProgressSection(
                             trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
                         )
 
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                        Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_small)))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -173,13 +174,13 @@ fun ImportProgressSection(
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier =
                                     Modifier
-                                        .size(dimensionResource(R.dimen.import_icon_size))
+                                        .size(dimensionResource(UiR.dimen.import_icon_size))
                                         .graphicsLayer {
                                             rotationZ = rotation.value
                                         },
                             )
 
-                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_small)))
+                            Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.space_small)))
 
                             Text(
                                 text = stringResource(R.string.progress_percentage, progress),
@@ -194,7 +195,7 @@ fun ImportProgressSection(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.space_small)),
+                             modifier = Modifier.padding(top = dimensionResource(UiR.dimen.space_small)),
                     textAlign = TextAlign.Center,
                 )
             }

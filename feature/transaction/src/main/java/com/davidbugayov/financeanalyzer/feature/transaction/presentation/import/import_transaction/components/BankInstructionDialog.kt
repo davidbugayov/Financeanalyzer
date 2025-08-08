@@ -36,14 +36,14 @@ fun BankInstructionDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_medium)),
+                    .padding(dimensionResource(UiR.dimen.space_medium)),
             colors =
                 CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
             elevation =
                 CardDefaults.cardElevation(
-                    defaultElevation = dimensionResource(R.dimen.dialog_elevation),
+                    defaultElevation = dimensionResource(UiR.dimen.dialog_elevation),
                 ),
         ) {
             Column(
@@ -61,7 +61,7 @@ fun BankInstructionDialog(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_medium)))
 
                 Column(
                     modifier =
@@ -73,7 +73,7 @@ fun BankInstructionDialog(
                     BankInstructionsContent(bankName = bankName)
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_medium)))
 
                 Button(
                     onClick = onDismiss,

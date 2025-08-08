@@ -86,7 +86,7 @@ fun CategorySection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(
-                    horizontal = dimensionResource(R.dimen.category_section_padding_horizontal),
+                    horizontal = dimensionResource(UiR.dimen.category_section_padding_horizontal),
                     vertical = 0.dp,
                 ),
         verticalArrangement =
@@ -177,19 +177,19 @@ fun CategorySection(
                     .then(
                         if (expanded || !showExpand) {
                             Modifier.heightIn(
-                                max = dimensionResource(R.dimen.category_max_height),
+                                max = dimensionResource(UiR.dimen.category_max_height),
                             )
                         } else {
-                            Modifier.height(dimensionResource(R.dimen.category_collapsed_height))
+                            Modifier.height(dimensionResource(UiR.dimen.category_collapsed_height))
                         },
                     ),
             horizontalArrangement =
                 Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_grid_spacing),
+                    dimensionResource(UiR.dimen.category_grid_spacing),
                 ),
             verticalArrangement =
                 Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_grid_spacing),
+                    dimensionResource(UiR.dimen.category_grid_spacing),
                 ),
             userScrollEnabled = expanded || !showExpand,
         ) {
@@ -201,19 +201,19 @@ fun CategorySection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier =
                         Modifier
-                            .width(dimensionResource(R.dimen.category_item_width))
+                            .width(dimensionResource(UiR.dimen.category_item_width))
                             .combinedClickable(
                                 onClick = { onCategorySelected(category) },
                                 onLongClick = { onCategoryLongClick(category) },
                             )
                             .padding(
-                                vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                                vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
                             ),
                 ) {
                     Box(
                         modifier =
                             Modifier
-                                .size(dimensionResource(R.dimen.category_item_circle_size))
+                                .size(dimensionResource(UiR.dimen.category_item_circle_size))
                                 .clip(CircleShape)
                                 .background(
                                     when {
@@ -250,14 +250,14 @@ fun CategorySection(
                                 },
                             modifier =
                                 Modifier.size(
-                                    dimensionResource(R.dimen.category_item_icon_size),
+                                     dimensionResource(UiR.dimen.category_item_icon_size),
                                 ),
                         )
                     }
                     Spacer(
                         modifier =
                             Modifier.height(
-                                dimensionResource(R.dimen.category_item_spacer_height),
+                                dimensionResource(UiR.dimen.category_item_spacer_height),
                             ),
                     )
                     Text(
@@ -279,9 +279,9 @@ fun CategorySection(
                     onClick = onAddCategoryClick,
                     modifier =
                         Modifier
-                            .width(dimensionResource(R.dimen.category_item_width))
+                            .width(dimensionResource(UiR.dimen.category_item_width))
                             .padding(
-                                vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                                 vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
                             ),
                 )
             }
@@ -319,18 +319,18 @@ fun AddCategoryItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier =
             modifier
-                .width(dimensionResource(R.dimen.category_item_width))
+                .width(dimensionResource(UiR.dimen.category_item_width))
                 .clickable(onClick = onClick)
-                .padding(vertical = dimensionResource(R.dimen.category_item_vertical_padding)),
+                .padding(vertical = dimensionResource(UiR.dimen.category_item_vertical_padding)),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(dimensionResource(R.dimen.category_item_circle_size))
+                    .size(dimensionResource(UiR.dimen.category_item_circle_size))
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .border(
-                        width = dimensionResource(R.dimen.border_width_small),
+                        width = dimensionResource(UiR.dimen.border_width_small),
                         color = MaterialTheme.colorScheme.outline,
                         shape = CircleShape,
                     ),
@@ -340,11 +340,11 @@ fun AddCategoryItem(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_custom_category),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(dimensionResource(R.dimen.category_item_icon_size)),
+                modifier = Modifier.size(dimensionResource(UiR.dimen.category_item_icon_size)),
             )
         }
 
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_item_spacer_height)))
+        Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.category_item_spacer_height)))
 
         Text(
             text = stringResource(R.string.add_custom_category),

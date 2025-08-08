@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Spacing dimensions -->
-    <dimen name="spacing_tiny">3dp</dimen>
+        <dimen name="spacing_tiny">3dp</dimen>
     <dimen name="spacing_small">4dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
     <dimen name="spacing_normal">16dp</dimen>
@@ -20,7 +19,7 @@
     <dimen name="space_medium">16dp</dimen>
     <dimen name="space_large">24dp</dimen>
 
-    <!-- Icon sizes -->
+    
     <dimen name="icon_size_small">20dp</dimen>
     <dimen name="icon_size_medium">32dp</dimen>
     <dimen name="icon_size_large">48dp</dimen>
@@ -34,7 +33,7 @@
     <dimen name="nav_icon_size">18dp</dimen>
     <dimen name="main_nav_icon_size">22dp</dimen>
 
-    <!-- Heights -->
+    
     <dimen name="height_toolbar">56dp</dimen>
     <dimen name="height_button">36dp</dimen>
     <dimen name="height_nav_bar">80dp</dimen>
@@ -58,7 +57,7 @@
     <dimen name="navigation_bar_height">48dp</dimen>
     <dimen name="nav_bar_height">62dp</dimen>
 
-    <!-- Text sizes -->
+    
     <dimen name="text_size_micro">11sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
@@ -73,7 +72,7 @@
     <dimen name="input_error_text_size">12sp</dimen>
     <dimen name="profile_header_text_size">18sp</dimen>
 
-    <!-- Radius and Elevation -->
+    
     <dimen name="radius_small">4dp</dimen>
     <dimen name="radius_medium">8dp</dimen>
     <dimen name="radius_large">16dp</dimen>
@@ -93,7 +92,7 @@
     <dimen name="dialog_elevation">24dp</dimen>
     <dimen name="elevation_small">2dp</dimen>
 
-    <!-- Stroke and Border -->
+    
     <dimen name="stroke_thin">1dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="stroke_thick">3dp</dimen>
@@ -102,14 +101,14 @@
     <dimen name="border_width_medium">2dp</dimen>
     <dimen name="border_width_large">3dp</dimen>
 
-    <!-- Button dimensions -->
+    
     <dimen name="button_min_width">88dp</dimen>
     <dimen name="button_padding">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="nav_button_size">42dp</dimen>
     <dimen name="main_nav_button_size">48dp</dimen>
 
-    <!-- Layout dimensions -->
+    
     <dimen name="card_content_padding">16dp</dimen>
     <dimen name="card_spacing">8dp</dimen>
     <dimen name="card_image_height">200dp</dimen>
@@ -128,12 +127,12 @@
     <dimen name="color_picker_item_size">40dp</dimen>
     <dimen name="bar_shape">16dp</dimen>
 
-    <!-- Animation dimensions -->
+    
     <dimen name="anim_offset_small">20dp</dimen>
     <dimen name="anim_offset_medium">40dp</dimen>
     <dimen name="anim_offset_large">60dp</dimen>
 
-    <!-- Chart common dimensions -->
+    
     <dimen name="chart_height">300dp</dimen>
     <dimen name="chart_height_large">300dp</dimen>
     <dimen name="chart_card_padding">16dp</dimen>
@@ -147,7 +146,7 @@
     <dimen name="chart_title_padding_bottom">8dp</dimen>
     <dimen name="chart_subtitle_padding_bottom">16dp</dimen>
 
-    <!-- Chart element dimensions -->
+    
     <dimen name="chart_bar_width">24dp</dimen>
     <dimen name="space_between_bars">24dp</dimen>
     <dimen name="bar_width">24dp</dimen>
@@ -165,7 +164,7 @@
     <dimen name="chart_label_text_size">12sp</dimen>
     <dimen name="chart_axis_text_size">10sp</dimen>
 
-    <!-- Chart legend dimensions -->
+    
     <dimen name="chart_legend_height">48dp</dimen>
     <dimen name="chart_legend_item_width">12dp</dimen>
     <dimen name="chart_legend_item_height">4dp</dimen>
@@ -176,7 +175,7 @@
     <dimen name="chart_legend_icon_size">12dp</dimen>
     <dimen name="legend_icon_size">10dp</dimen>
 
-    <!-- Pie chart specific dimensions -->
+    
     <dimen name="pie_chart_size">220dp</dimen>
     <dimen name="pie_chart_hole_radius">60dp</dimen>
     <dimen name="pie_chart_stroke_width">40dp</dimen>
@@ -194,7 +193,7 @@
     <dimen name="pie_chart_tap_threshold">30dp</dimen>
     <dimen name="pie_chart_min_sector_angle">15</dimen>
 
-    <!-- Line chart dimensions -->
+    
     <dimen name="line_chart_height">220dp</dimen>
     <dimen name="line_chart_padding">16dp</dimen>
     <dimen name="line_chart_stroke_width">2dp</dimen>
@@ -208,7 +207,7 @@
     <dimen name="line_chart_grid_label_size">12sp</dimen>
     <dimen name="line_chart_grid_lines">4</dimen>
 
-    <!-- Enhanced line chart dimensions -->
+    
     <dimen name="enhanced_line_chart_height">240dp</dimen>
     <dimen name="enhanced_line_chart_padding">20dp</dimen>
     <dimen name="enhanced_line_chart_stroke_width">2.5dp</dimen>
@@ -223,19 +222,19 @@
     <dimen name="enhanced_line_chart_legend_indicator_size">16dp</dimen>
     <dimen name="enhanced_line_chart_legend_spacing">12dp</dimen>
 
-    <!-- Spacing dimensions -->
+    
     <dimen name="chart_spacing_normal">8dp</dimen>
     <dimen name="chart_spacing_medium">12dp</dimen>
     <dimen name="chart_spacing_large">16dp</dimen>
     <dimen name="chart_selection_threshold">24dp</dimen>
 
-    <!-- Type selector dimensions -->
+    
     <dimen name="chart_type_selector_padding">8dp</dimen>
     <dimen name="chart_type_selector_spacing">8dp</dimen>
     <dimen name="chart_selector_button_padding">12dp</dimen>
     <dimen name="chart_selector_button_corner_radius">8dp</dimen>
 
-    <!-- Enhanced category pie chart dimensions -->
+    
     <dimen name="enhanced_pie_chart_size">220dp</dimen>
     <dimen name="enhanced_pie_chart_text_spacing_tiny">6dp</dimen>
     <dimen name="enhanced_pie_chart_text_spacing_small">10dp</dimen>
@@ -251,7 +250,7 @@
     <dimen name="enhanced_pie_chart_sector_inner_stroke_width">1dp</dimen>
     <dimen name="enhanced_pie_chart_animation_duration">800</dimen>
 
-    <!-- Enhanced Summary Card dimensions -->
+    
     <dimen name="enhanced_summary_card_corner_radius">20dp</dimen>
     <dimen name="enhanced_summary_card_elevation">12dp</dimen>
     <dimen name="enhanced_summary_card_padding_horizontal">20dp</dimen>
@@ -263,7 +262,7 @@
     <dimen name="enhanced_summary_card_icon_size">16dp</dimen>
     <dimen name="enhanced_summary_card_spacing">6dp</dimen>
 
-    <!-- Financial Health Metrics dimensions -->
+    
     <dimen name="financial_health_card_corner_radius">16dp</dimen>
     <dimen name="financial_health_card_elevation">4dp</dimen>
   <dimen name="financial_health_card_padding">12dp</dimen>
@@ -277,17 +276,17 @@
     <dimen name="financial_health_dialog_max_height">450dp</dimen>
     <dimen name="financial_health_progress_height">8dp</dimen>
 
-    <!-- Dimensions for EnhancedCategoryPieChart Legend -->
+    
     <dimen name="legend_item_height_approx">14dp</dimen>
     <dimen name="min_legend_height">50dp</dimen>
-    <dimen name="max_legend_height">280dp</dimen> <!-- Adjust based on MAX_CATEGORIES_VISIBLE * legend_item_height_approx -->
+    <dimen name="max_legend_height">280dp</dimen> 
     <dimen name="legend_indicator_size">12dp</dimen>
 
-    <!-- Standard Paddings (if not already present) -->
+    
     <dimen name="padding_extra_small">4dp</dimen>
     <dimen name="padding_tiny">2dp</dimen>
 
-    <!-- New dimensions for EnhancedFinanceChartScreen -->
+    
     <dimen name="finance_chart_screen_padding">16dp</dimen>
     <dimen name="finance_chart_screen_tab_row_padding">16dp</dimen>
     <dimen name="finance_chart_screen_card_bottom_padding">16dp</dimen>
@@ -296,7 +295,7 @@
     <dimen name="finance_chart_screen_analytics_text_padding">32dp</dimen>
     <dimen name="finance_chart_screen_piechart_height">250dp</dimen>
 
-    <!-- Financial Statistics Screen dimens -->
+    
     <dimen name="financial_statistics_card_padding">16dp</dimen>
     <dimen name="financial_statistics_card_corner_radius">16dp</dimen>
     <dimen name="financial_statistics_card_elevation">4dp</dimen>
@@ -305,7 +304,7 @@
     <dimen name="financial_statistics_spacer_small">4dp</dimen>
     <dimen name="financial_statistics_metric_row_vertical">4dp</dimen>
 
-    <!-- New dimensions for BudgetTip -->
+    
     <dimen name="budget_tip_vertical_margin">4dp</dimen>
     <dimen name="budget_tip_corner_radius">8dp</dimen>
     <dimen name="budget_tip_elevation">1dp</dimen>
@@ -313,7 +312,7 @@
     <dimen name="budget_tip_icon_end_padding">8dp</dimen>
     <dimen name="budget_tip_spacer">1dp</dimen>
 
-    <!-- CommentField dimensions -->
+    
     <dimen name="comment_field_padding_horizontal">16dp</dimen>
     <dimen name="comment_field_padding_vertical">8dp</dimen>
     <dimen name="comment_field_corner_radius">12dp</dimen>
@@ -321,7 +320,7 @@
     <dimen name="comment_field_inner_padding_horizontal">16dp</dimen>
     <dimen name="comment_field_inner_padding_vertical">8dp</dimen>
 
-    <!-- CategorySection dimensions -->
+    
     <dimen name="category_section_padding_horizontal">16dp</dimen>
     <dimen name="category_section_padding_vertical">16dp</dimen>
     <dimen name="category_section_spacing">8dp</dimen>
@@ -340,7 +339,7 @@
     <dimen name="category_max_height">400dp</dimen>
     <dimen name="category_collapsed_height">120dp</dimen>
 
-    <!-- AddButton dimensions -->
+    
     <dimen name="add_button_padding_horizontal">16dp</dimen>
     <dimen name="add_button_padding_vertical">8dp</dimen>
     <dimen name="add_button_height">56dp</dimen>
@@ -348,16 +347,16 @@
     <dimen name="add_button_progress_size">24dp</dimen>
     <dimen name="add_button_progress_stroke_width">2dp</dimen>
 
-    <!-- DatePickerDialog dimensions -->
+    
     <dimen name="date_picker_snackbar_corner_radius">12dp</dimen>
 
-    <!-- SourceColorPickerDialog dimensions -->
+    
     <dimen name="source_color_picker_padding">8dp</dimen>
     <dimen name="source_color_picker_item_spacing">12dp</dimen>
     <dimen name="source_color_picker_item_size">40dp</dimen>
     <dimen name="source_color_picker_item_padding">4dp</dimen>
 
-    <!-- CategoryPickerDialog dimensions -->
+    
     <dimen name="category_dialog_item_spacing">8dp</dimen>
     <dimen name="category_dialog_item_border">1dp</dimen>
     <dimen name="category_dialog_item_padding">4dp</dimen>
@@ -368,7 +367,7 @@
     <dimen name="category_dialog_section_spacing">8dp</dimen>
     <dimen name="category_dialog_icon_grid_max_height">300dp</dimen>
 
-    <!-- TransactionItem specific -->
+    
     <dimen name="card_horizontal_padding">12dp</dimen>
     <dimen name="card_vertical_padding">6dp</dimen>
     <dimen name="card_elevation_default">2dp</dimen>
@@ -379,10 +378,10 @@
     <dimen name="source_indicator_size">8dp</dimen>
     <dimen name="amount_type_icon_size">16dp</dimen>
 
-    <!-- General Spacing -->
+    
     <dimen name="spacing_xsmall">4dp</dimen>
 
-    <!-- Import components dimensions -->
+    
     <dimen name="import_progress_indicator_height">8dp</dimen>
     <dimen name="import_icon_size">36dp</dimen>
     <dimen name="import_icon_size_large">64dp</dimen>
@@ -392,12 +391,12 @@
     <dimen name="import_dialog_width">90%</dimen>
     <dimen name="import_dialog_content_padding">24dp</dimen>
 
-    <!-- Quick action button dimensions -->
+    
     <dimen name="quick_action_button_size">52dp</dimen>
     <dimen name="quick_action_icon_size">28dp</dimen>
     <dimen name="quick_action_spacing">12dp</dimen>
 
-    <!-- Modern Wallet Summary Card dimensions -->
+    
     <dimen name="wallet_card_padding">20dp</dimen>
     <dimen name="wallet_card_corner_radius">20dp</dimen>
     <dimen name="wallet_card_elevation">8dp</dimen>

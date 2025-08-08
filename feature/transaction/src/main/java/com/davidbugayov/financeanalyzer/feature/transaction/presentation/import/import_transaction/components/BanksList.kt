@@ -43,7 +43,7 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(R.dimen.space_medium)),
+                .padding(vertical = dimensionResource(UiR.dimen.space_medium)),
     ) {
         // Сбербанк
         BankItem(
@@ -105,7 +105,7 @@ private fun BankItem(
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(width = 1.5.dp, color = color.copy(alpha = 0.6f)),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
     ) {
         Row(
             modifier =

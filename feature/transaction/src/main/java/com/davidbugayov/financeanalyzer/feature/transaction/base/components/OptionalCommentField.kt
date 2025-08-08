@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Опциональное поле для комментария с кнопкой показать/скрыть
@@ -101,16 +102,16 @@ fun OptionalCommentField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                shape = RoundedCornerShape(dimensionResource(R.dimen.comment_field_corner_radius)),
+                shape = RoundedCornerShape(dimensionResource(UiR.dimen.comment_field_corner_radius)),
                 color = MaterialTheme.colorScheme.surface,
-                tonalElevation = dimensionResource(R.dimen.comment_field_elevation),
+                tonalElevation = dimensionResource(UiR.dimen.comment_field_elevation),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            horizontal = dimensionResource(R.dimen.comment_field_inner_padding_horizontal),
-                            vertical = dimensionResource(R.dimen.comment_field_inner_padding_vertical),
+                            horizontal = dimensionResource(UiR.dimen.comment_field_inner_padding_horizontal),
+                            vertical = dimensionResource(UiR.dimen.comment_field_inner_padding_vertical),
                         ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
