@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
@@ -55,21 +57,21 @@ fun ParentWalletCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Общий баланс: ${wallet.balance.formatForDisplay()}",
+                text = "${stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance)}: ${wallet.balance.formatForDisplay()}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
 
             Text(
-                text = "В подкошельках: ${totalSubWalletAmount.formatForDisplay()}",
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.in_wallets, totalSubWalletAmount.formatForDisplay()),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
             )
 
             val availableAmount = wallet.balance - totalSubWalletAmount
             Text(
-                text = "Доступно: ${availableAmount.formatForDisplay()}",
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.available_colon_value, availableAmount.formatForDisplay()),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color =
@@ -115,7 +117,7 @@ fun SubWalletCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = "Баланс: ${wallet.balance.formatForDisplay()}",
+                        text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                     )
@@ -125,14 +127,14 @@ fun SubWalletCard(
                     IconButton(onClick = onEdit) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Редактировать",
+                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.edit),
                             tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Удалить",
+                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete),
                             tint = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -144,8 +146,8 @@ fun SubWalletCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Удалить подкошелек") },
-            text = { Text("Вы уверены, что хотите удалить подкошелек \"${wallet.name}\"?") },
+            title = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet)) },
+            text = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet_confirm, wallet.name)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -153,12 +155,12 @@ fun SubWalletCard(
                         showDeleteDialog = false
                     },
                 ) {
-                    Text("Удалить", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Отмена")
+                    Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.cancel))
                 }
             },
         )
@@ -194,18 +196,18 @@ fun EmptySubWalletsState(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Нет подкошельков",
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.no_subwallets),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
             )
 
             Text(
-                text = "Создайте подкошельки для организации ваших средств",
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.create_subwallets_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -219,8 +221,8 @@ fun EmptySubWalletsState(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Добавить подкошелек")
+                Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add_subwallet))
             }
         }
     }

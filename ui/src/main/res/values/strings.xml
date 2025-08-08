@@ -393,7 +393,7 @@
     <string name="rec_budget_category_desc">Разделите бюджет по категориям для лучшего контроля.</string>
     <string name="rec_budget_category_impact">Создайте лимиты по категориям</string>
     <string name="rec_budget_category_title">Категории бюджета</string>
-    <string name="rec_budget_rule_desc">Попробуйте правило 50% на нужды, 30% на желания, 20% на сбережения.</string>
+    <string name="rec_budget_rule_desc" formatted="false">Попробуйте правило 50% на нужды, 30% на желания, 20% на сбережения.</string>
     <string name="rec_budget_rule_impact">Создайте бюджет по этому принципу</string>
     <string name="rec_budget_rule_title">Правило 50/30/20</string>
     <string name="rec_budget_track_desc">Регулярно проверяйте соответствие трат бюджету.</string>
@@ -614,7 +614,7 @@
     <string name="tip_increase_income_title">Увеличьте доход на 5–10%</string>
     <string name="tip_increase_savings_desc">Вы откладываете %1$d%% доходов. Цель — минимум 10–20%%</string>
     <string name="tip_increase_savings_title">Увеличьте норму сбережений</string>
-    <string name="tip_rule_50_30_20_desc">50% на нужды, 30% на желания, 20% на сбережения и инвестиции</string>
+    <string name="tip_rule_50_30_20_desc" formatted="false">50% на нужды, 30% на желания, 20% на сбережения и инвестиции</string>
     <string name="tip_rule_50_30_20_title">Следуйте правилу 50/30/20</string>
     <string name="tip_set_goals_desc">Определите конкретные цели: отпуск, покупки, инвестиции</string>
     <string name="tip_set_goals_title">Ставьте финансовые цели</string>
@@ -700,4 +700,22 @@
     <string name="year">Год</string>
     <string name="yes">Да</string>
     <string name="yesterday">Вчера</string>
+    <!-- Added for hardcoded cleanup -->
+    <string name="validation_min_length_two">Название должно содержать минимум 2 символа</string>
+    <string name="dialog_new_subcategory">Новая подкатегория</string>
+    <string name="dialog_existing_subcategories">Существующие подкатегории:</string>
+    <string name="dialog_new_subcategory_name_label">Название новой подкатегории:</string>
+    <string name="input_hint_enter_name">Введите название</string>
+    <string name="input_placeholder_examples">Например: Кафе, Транспорт, Развлечения</string>
+    <string name="tip_use_short_names">💡 Совет: Используйте короткие и понятные названия</string>
+    <string name="create">Создать</string>
+    <string name="select">Выбрать</string>
+    <string name="select_currency_title">Выберите валюту</string>
+    <string name="menu_options">Опции</string>
+    <string name="no_subwallets">Нет подкошельков</string>
+    <string name="create_subwallets_hint">Создайте подкошельки для организации ваших средств</string>
+    <string name="in_wallets">В подкошельках: %1$s</string>
+    <string name="available_colon_value">Доступно: %1$s</string>
+    <string name="delete_subwallet">Удалить подкошелек</string>
+    <string name="delete_subwallet_confirm">Вы уверены, что хотите удалить подкошелек "%1$s"?</string>
 </resources>

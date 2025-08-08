@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
@@ -70,7 +71,7 @@ fun SourceSelectionDialog(
                                         sourceNames
                                     }
                             }
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -106,7 +107,7 @@ fun SourceSelectionDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
 
                 // Список источников
                 val isDarkTheme = isSystemInDarkTheme()
@@ -173,7 +174,7 @@ private fun SourceCheckboxItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 2.dp)
+                 .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny))
                 .clip(MaterialTheme.shapes.small)
                 .background(
                     if (isSelected) {
@@ -188,7 +189,7 @@ private fun SourceCheckboxItem(
                 Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { onToggle(!isSelected) })
-                    .padding(8.dp),
+                    .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
@@ -207,7 +208,7 @@ private fun SourceCheckboxItem(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .padding(start = 8.dp),
+                        .padding(start = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
             )
         }
     }

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -61,7 +62,7 @@ fun TransactionActionsDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(dimensionResource(R.dimen.spacing_large)),
             shape = RoundedCornerShape(24.dp),
             colors =
                 androidx.compose.material3.CardDefaults.cardColors(
@@ -69,7 +70,7 @@ fun TransactionActionsDialog(
                 ),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding)),
             ) {
                 // Заголовок с крестиком
                 Row(
@@ -86,30 +87,30 @@ fun TransactionActionsDialog(
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(28.dp),
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = stringResource(R.string.transaction_actions),
                             style =
                                 MaterialTheme.typography.titleLarge.copy(
-                                    fontSize = 22.sp,
+                                     fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
                                     fontWeight = FontWeight.Bold,
                                 ),
                         )
                     }
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_24dp)),
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)))
 
                 // Контент диалога
                 TransactionDetailContent(
@@ -117,7 +118,7 @@ fun TransactionActionsDialog(
                     subcategoryName = subcategoryName,
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
 
                 // Кнопки
                 Row(
@@ -126,36 +127,36 @@ fun TransactionActionsDialog(
                 ) {
                     TextButton(
                         onClick = { onDelete(transaction) },
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small), vertical = dimensionResource(R.dimen.spacing_small)),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_20dp)),
                             tint = MaterialTheme.colorScheme.error,
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = stringResource(R.string.delete),
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
                         )
                     }
                     TextButton(
                         onClick = { onEdit(transaction) },
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small), vertical = dimensionResource(R.dimen.spacing_small)),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = null,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_20dp)),
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = stringResource(R.string.edit),
                             fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
                         )
                     }
                 }

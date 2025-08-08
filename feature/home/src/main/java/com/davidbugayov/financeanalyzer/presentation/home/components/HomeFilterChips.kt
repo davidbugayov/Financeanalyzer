@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
@@ -42,8 +43,8 @@ fun PermissionUtilsHomeFilterChips(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(UiR.dimen.spacing_small)),
     ) {
         filters.forEach { filterData ->
             FilterChipItem(
@@ -78,7 +79,7 @@ private fun FilterChipItem(
         label = {
             Text(
                 filterData.label,
-                fontSize = 14.sp,
+                fontSize = dimensionResource(UiR.dimen.text_size_14sp).value.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             )
         },
@@ -89,7 +90,7 @@ private fun FilterChipItem(
                 containerColor = unselectedContainerColor,
                 labelColor = unselectedLabelColor,
             ),
-        border = BorderStroke(1.2.dp, borderColor),
+        border = BorderStroke(dimensionResource(UiR.dimen.border_width_1_2dp), borderColor),
     )
 }
 

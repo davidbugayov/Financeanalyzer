@@ -22,6 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Цифровая клавиатура для ввода PIN-кода
@@ -93,7 +95,7 @@ fun PinKeyboard(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Backspace,
-                    contentDescription = "Удалить",
+                    contentDescription = stringResource(UiR.string.delete),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

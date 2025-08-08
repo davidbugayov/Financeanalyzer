@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.EmptySubWalletsState
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.ParentWalletCard
@@ -49,7 +50,7 @@ fun SubWalletsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.back),
                         )
                     }
                 },
@@ -60,7 +61,7 @@ fun SubWalletsScreen(
                     }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Добавить подкошелек",
+                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add_subwallet),
                         )
                     }
                 },

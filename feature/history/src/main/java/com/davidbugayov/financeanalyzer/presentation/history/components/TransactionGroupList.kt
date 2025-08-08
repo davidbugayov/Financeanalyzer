@@ -203,7 +203,7 @@ fun TransactionGroupList(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(80.dp),
+                        .height(dimensionResource(id = UiR.dimen.height_empty_state)),
             )
         }
     }

@@ -30,9 +30,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
 fun CurrencySelectionDialog(
@@ -46,7 +50,7 @@ fun CurrencySelectionDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Выберите валюту",
+                text = stringResource(UiR.string.select_currency_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -54,7 +58,7 @@ fun CurrencySelectionDialog(
         },
         text = {
             Column(
-                modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                modifier = Modifier.padding(top = dimensionResource(UiR.dimen.spacing_small), bottom = 0.dp),
             ) {
                 Currency.entries
                     .filter { it in listOf(Currency.RUB, Currency.USD, Currency.EUR, Currency.CNY) }
@@ -82,16 +86,16 @@ fun CurrencySelectionDialog(
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
             ) {
-                Text("Выбрать")
+                Text(stringResource(UiR.string.select))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена")
+                Text(stringResource(UiR.string.cancel))
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_xlarge)),
         tonalElevation = 0.dp,
         properties =
             androidx.compose.ui.window.DialogProperties(
@@ -148,7 +152,7 @@ private fun CurrencyItem(
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = "Выбрано",
+                contentDescription = stringResource(UiR.string.select),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier =
                     Modifier

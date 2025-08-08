@@ -59,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -235,17 +236,17 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             OutlinedTextField(
                                 value = categoryName,
                                 onValueChange = { categoryName = it },
-                                label = { Text("Название кошелька") },
+                                label = { Text(stringResource(R.string.wallet_name_label)) },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
 
                             NumberTextField(
                                 value = categoryLimit,
                                 onValueChange = { categoryLimit = it },
-                                label = "Лимит расходов",
+                                label = stringResource(R.string.expense_limit),
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
                                 isError = false,
@@ -274,12 +275,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             },
                             enabled = categoryName.isNotBlank() && categoryLimit.isNotBlank(),
                         ) {
-                            Text("Добавить")
+                            Text(stringResource(R.string.add))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showAddCategoryDialog = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.cancel))
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -290,21 +291,21 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
             if (showDistributeIncomeDialog) {
                 AlertDialog(
                     onDismissRequest = { showDistributeIncomeDialog = false },
-                    title = { Text("Распределить доход") },
+                    title = { Text(stringResource(R.string.distribute_income)) },
                     text = {
                         Column {
                             Text(
-                                text = "Доход будет распределен между кошельками пропорционально лимитам категорий",
+                                text = stringResource(R.string.distribute_income_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
 
                             NumberTextField(
                                 value = incomeAmount,
                                 onValueChange = { incomeAmount = it },
-                                label = "Сумма дохода",
+                                label = stringResource(R.string.income_amount),
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
                                 isError = false,
@@ -323,12 +324,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             },
                             enabled = incomeAmount.toBigDecimalOrNull() != null && incomeAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO,
                         ) {
-                            Text("Распределить")
+                            Text(stringResource(R.string.distribute))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDistributeIncomeDialog = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.cancel))
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -339,29 +340,29 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
             if (showSpendFromWalletDialog && selectedWallet != null) {
                 AlertDialog(
                     onDismissRequest = { showSpendFromWalletDialog = false },
-                    title = { Text("Потратить из кошелька") },
+                    title = { Text(stringResource(R.string.spend_from_wallet)) },
                     text = {
                         Column {
                             Text(
-                                text = "Категория: ${selectedWallet!!.name}",
+                                text = stringResource(R.string.category_colon) + " ${selectedWallet!!.name}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
                             )
 
                             Text(
-                                text = "Баланс кошелька: ${selectedWallet!!.balance.formatForDisplay(
+                                text = stringResource(R.string.wallet_balance) + ": " + selectedWallet!!.balance.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
-                                )}",
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
 
                             NumberTextField(
                                 value = walletAmount,
                                 onValueChange = { walletAmount = it },
-                                label = "Сумма",
+                                label = stringResource(R.string.amount),
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
                                 isError = false,
@@ -391,12 +392,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                     walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } == true
                                 } == true,
                         ) {
-                            Text("Потратить")
+                            Text(stringResource(R.string.spend))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showSpendFromWalletDialog = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.cancel))
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -407,27 +408,27 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
             if (showTransferDialog && selectedFromWallet != null) {
                 AlertDialog(
                     onDismissRequest = { showTransferDialog = false },
-                    title = { Text("Перевод между кошельками") },
+                    title = { Text(stringResource(R.string.transfer_between_wallets)) },
                     text = {
                         Column {
                             Text(
-                                text = "Из категории: ${selectedFromWallet!!.name}",
+                                text = stringResource(R.string.from_category, selectedFromWallet!!.name),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium,
                             )
 
                             Text(
-                                text = "Баланс: ${selectedFromWallet!!.balance.formatForDisplay(
+                                text = stringResource(R.string.wallet_balance) + ": " + selectedFromWallet!!.balance.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
-                                )}",
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
 
                             Text(
-                                text = "В категорию:",
+                                text = stringResource(R.string.to_category),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
@@ -450,17 +451,17 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             // Отображаем поле ввода суммы только если выбрана категория-получатель
                             if (selectedToWallet != null) {
                                 Text(
-                                    text = "Выбрано: ${selectedToWallet!!.name}",
+                                    text = stringResource(R.string.selected_wallet, selectedToWallet!!.name),
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
                                 )
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
 
                                 NumberTextField(
                                     value = transferAmount,
                                     onValueChange = { transferAmount = it },
-                                    label = "Сумма перевода",
+                                    label = stringResource(R.string.transfer_amount),
                                     modifier = Modifier.fillMaxWidth(),
                                     allowDecimal = true,
                                     isError = false,
@@ -494,7 +495,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                         ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
                                 } == true,
                         ) {
-                            Text("Перевести")
+                            Text(stringResource(R.string.transfer))
                         }
                     },
                     dismissButton = {
@@ -504,7 +505,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 selectedToWallet = null
                             },
                         ) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.cancel))
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -908,7 +909,7 @@ fun WalletCard(
                 IconButton(onClick = { /* TODO: show menu */ }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Опции",
+                        contentDescription = stringResource(R.string.menu_options),
                         tint = contentColor,
                     )
                 }
@@ -1051,7 +1052,7 @@ fun EditWalletDialog(
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "Выбрать дату",
+                            contentDescription = stringResource(R.string.select_date_button),
                             modifier = Modifier.clickable(onClick = onShowDatePicker),
                         )
                     },

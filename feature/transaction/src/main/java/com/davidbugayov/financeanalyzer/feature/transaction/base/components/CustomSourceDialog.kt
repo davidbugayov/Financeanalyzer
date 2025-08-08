@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
@@ -66,7 +67,7 @@ fun CustomSourceDialog(
         title = { Text(stringResource(R.string.add_custom_source)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(dimensionResource(UiR.dimen.padding_small))) {
                 OutlinedTextField(
                     value = sourceName,
                     onValueChange = {
@@ -80,13 +81,13 @@ fun CustomSourceDialog(
 
                 if (sourceName.trim().length < 2) {
                     Text(
-                        text = "Название должно содержать минимум 2 символа",
+                        text = stringResource(UiR.string.validation_min_length_two),
                         color = Color.Red,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(top = dimensionResource(UiR.dimen.padding_small)),
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_large)))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -97,17 +98,17 @@ fun CustomSourceDialog(
                                 Timber.d("Color picker clicked, showing color picker dialog")
                                 showColorPicker = true
                             }
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                 ) {
                     Text(
-                        text = "Выберите цвет:",
+                        text = stringResource(UiR.string.select_color),
                         modifier = Modifier.weight(1f),
                     )
 
                     Box(
                         modifier =
                             Modifier
-                                .size(40.dp)
+                                .size(dimensionResource(UiR.dimen.icon_container_size_40dp))
                                 .clip(CircleShape)
                                 .background(Color(color))
                                 .clickable { showColorPicker = true },
@@ -123,7 +124,7 @@ fun CustomSourceDialog(
                 },
                 enabled = sourceName.trim().length >= 2,
             ) {
-                Text("Добавить")
+                Text(stringResource(UiR.string.add))
             }
         },
         dismissButton = {

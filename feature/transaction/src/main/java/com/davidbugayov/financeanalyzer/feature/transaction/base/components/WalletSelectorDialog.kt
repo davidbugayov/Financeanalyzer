@@ -25,6 +25,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -55,7 +57,7 @@ fun WalletSelectorDialog(
                 Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_xlarge)),
             colors =
                 CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -65,13 +67,13 @@ fun WalletSelectorDialog(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
             ) {
                 Text(
-                    text = "Выберите кошельки",
+                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.select_wallets),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier.padding(bottom = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
                 )
 
                 if (wallets.isEmpty()) {
@@ -79,11 +81,11 @@ fun WalletSelectorDialog(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .height(100.dp),
+                                .height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_empty_state)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "Нет доступных кошельков",
+                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.no_wallets_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -93,7 +95,7 @@ fun WalletSelectorDialog(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .heightIn(max = 300.dp),
+                                .heightIn(max = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_dialog)),
                     ) {
                         items(wallets) { wallet ->
                             WalletItem(
@@ -111,20 +113,20 @@ fun WalletSelectorDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp),
+                            .padding(top = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Отмена")
+                        Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.cancel))
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
 
                     Button(
                         onClick = onConfirm,
                         enabled = selectedWalletIds.isNotEmpty(),
                     ) {
-                        Text("Готово")
+                        Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.done))
                     }
                 }
             }
@@ -166,7 +168,7 @@ private fun WalletItem(
             )
 
             Text(
-                text = "Баланс: ${wallet.balance.formatForDisplay()}",
+                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

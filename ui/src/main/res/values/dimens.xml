@@ -3,6 +3,7 @@
         <dimen name="spacing_tiny">3dp</dimen>
     <dimen name="spacing_small">4dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_20dp">20dp</dimen>
     <dimen name="spacing_normal">16dp</dimen>
     <dimen name="spacing_large">24dp</dimen>
     <dimen name="spacing_xlarge">32dp</dimen>
@@ -28,6 +29,7 @@
     <dimen name="icon_size">24dp</dimen>
     <dimen name="icon_size_20dp">20dp</dimen>
     <dimen name="icon_size_24dp">24dp</dimen>
+    <dimen name="icon_size_22dp">22dp</dimen>
     <dimen name="icon_size_28dp">28dp</dimen>
     <dimen name="icon_container_size_40dp">40dp</dimen>
     <dimen name="nav_icon_size">18dp</dimen>
@@ -61,6 +63,7 @@
     <dimen name="text_size_micro">11sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_14sp">14sp</dimen>
     <dimen name="text_size_normal">20sp</dimen>
     <dimen name="text_size_large">22sp</dimen>
     <dimen name="text_size_xlarge">24sp</dimen>
@@ -94,6 +97,7 @@
 
     
     <dimen name="stroke_thin">1dp</dimen>
+    <dimen name="border_width_1_2dp">1.2dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="stroke_thick">3dp</dimen>
     <dimen name="border_width_none">0dp</dimen>

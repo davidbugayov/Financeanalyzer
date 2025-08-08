@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.statistics.R
@@ -261,7 +262,7 @@ fun EnhancedSummaryCard(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = "Выбрать период",
+                        contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.select_period),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         modifier = Modifier.padding(end = 6.dp),
                     )
