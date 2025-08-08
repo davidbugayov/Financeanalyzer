@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +35,7 @@ fun PinKeyboard(
     onBackspaceClick: () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(UiR.dimen.chart_spacing_medium)),
     ) {
         // Первый ряд: 1, 2, 3
         Row(
@@ -81,7 +82,7 @@ fun PinKeyboard(
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             // Пустое место
-            Spacer(modifier = Modifier.size(64.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(UiR.dimen.icon_size_xxlarge)))
 
             // Кнопка 0
             PinKeyboardButton(
@@ -115,10 +116,10 @@ private fun PinKeyboardButton(
     Box(
         modifier =
             Modifier
-                .size(64.dp)
+                .size(dimensionResource(UiR.dimen.icon_size_xxlarge))
                 .clip(CircleShape)
                 .border(
-                    width = 1.dp,
+                    width = dimensionResource(UiR.dimen.border_width_small),
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                     shape = CircleShape,
                 )
@@ -131,7 +132,7 @@ private fun PinKeyboardButton(
             Text(
                 text = text ?: "",
                 style = MaterialTheme.typography.headlineMedium,
-                fontSize = 24.sp,
+                fontSize = dimensionResource(UiR.dimen.text_size_xlarge).value.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
             )

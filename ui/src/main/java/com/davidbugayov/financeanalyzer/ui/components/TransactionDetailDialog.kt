@@ -22,6 +22,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,15 +57,15 @@ fun TransactionDetailDialog(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_xlarge)),
             colors =
                 androidx.compose.material3.CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                 ),
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding)),
             ) {
                 // Заголовок с крестиком
                 Row(
@@ -81,30 +82,30 @@ fun TransactionDetailDialog(
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(28.dp),
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                         Text(
                             text = stringResource(R.string.transaction_details),
                             style =
                                 MaterialTheme.typography.titleLarge.copy(
-                                    fontSize = 22.sp,
+                                    fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
                                     fontWeight = FontWeight.Bold,
                                 ),
                         )
                     }
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = stringResource(R.string.close),
                             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_24dp)),
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)))
 
                 // Контент диалога
                 TransactionDetailContent(
@@ -112,7 +113,7 @@ fun TransactionDetailDialog(
                     subcategoryName = subcategoryName,
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                 // Кнопка закрытия
                 Row(
@@ -121,12 +122,12 @@ fun TransactionDetailDialog(
                 ) {
                     TextButton(
                         onClick = onDismiss,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.card_horizontal_padding), vertical = dimensionResource(R.dimen.card_vertical_padding)),
                     ) {
                         Text(
                             text = stringResource(R.string.close),
                             fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
                         )
                     }
                 }

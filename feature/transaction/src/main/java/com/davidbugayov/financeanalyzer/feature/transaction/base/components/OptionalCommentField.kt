@@ -47,7 +47,7 @@ fun OptionalCommentField(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = dimensionResource(UiR.dimen.padding_horizontal_12dp) + dimensionResource(UiR.dimen.padding_8dp), vertical = dimensionResource(UiR.dimen.comment_field_padding_vertical)),
     ) {
         // Кнопка для показа/скрытия поля комментария
         TextButton(
@@ -63,7 +63,7 @@ fun OptionalCommentField(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.spacing_small)))
                 Text(
                     text = when {
                         note.isNotEmpty() -> stringResource(R.string.edit_note)
@@ -101,7 +101,7 @@ fun OptionalCommentField(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
+                    .padding(top = dimensionResource(UiR.dimen.spacing_xxsmall)),
                 shape = RoundedCornerShape(dimensionResource(UiR.dimen.comment_field_corner_radius)),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = dimensionResource(UiR.dimen.comment_field_elevation),
