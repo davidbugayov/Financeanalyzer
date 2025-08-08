@@ -37,7 +37,9 @@ import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -112,12 +114,14 @@ val appModule =
             )
         }
 
+        // App-level coroutine scope
+        single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+
         // Achievement system
-        @Suppress("DelicateCoroutinesApi")
         single<AchievementEngine> {
             AchievementEngine(
                 achievementsRepository = get(),
-                scope = GlobalScope,
+                scope = get(),
             )
         }
     }

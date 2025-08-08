@@ -27,7 +27,9 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
@@ -232,9 +234,7 @@ class TransactionHistoryViewModel(
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
-                    Timber.d(
-                        StringResourceProvider.errorUnknown, // TODO: Заменить на правильную строку
-                    )
+                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown))
 
                     // Логируем событие в аналитику
                     AnalyticsUtils.logTransactionDeleted(

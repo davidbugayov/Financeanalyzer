@@ -17,7 +17,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -441,16 +443,14 @@ class HomeViewModel(
                 if (!hasError) {
                     Timber.d("Test data generation completed successfully")
                 } else {
-                    _state.update {
-                        it.copy(
-                            error = HomeStringProvider.errorSavingTestTransactions,
-                        )
-                    }
+                        val rp: ResourceProvider = GlobalContext.get().get()
+                        _state.update { it.copy(error = rp.getString(R.string.error_saving_test_transactions)) }
                 }
                 loadTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error generating test data")
-                _state.update { it.copy(error = e.message ?: HomeStringProvider.errorGeneratingTestData) }
+                val rp: ResourceProvider = GlobalContext.get().get()
+                _state.update { it.copy(error = e.message ?: rp.getString(R.string.error_generating_test_data)) }
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

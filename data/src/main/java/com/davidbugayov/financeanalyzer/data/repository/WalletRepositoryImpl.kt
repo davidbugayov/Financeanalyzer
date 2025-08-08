@@ -7,7 +7,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.data.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
 
 /**
  * Реализация репозитория для работы с кошельками
@@ -16,6 +17,8 @@ class WalletRepositoryImpl(
     private val walletPreferences: WalletPreferences,
     private val transactionRepository: TransactionRepository? = null,
 ) : WalletRepository {
+    private val resourceProvider: ResourceProvider
+        get() = GlobalContext.get().get()
 
     override suspend fun getAllWallets(): List<Wallet> {
         return walletPreferences.getWallets()
@@ -87,7 +90,7 @@ class WalletRepositoryImpl(
             // Для расходных транзакций или если транзакция не найдена, возвращаем пустой список
             return emptyList()
         } catch (e: Exception) {
-            Timber.e(e, StringProvider.logErrorGettingWallets(transactionId))
+            Timber.e(e, resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_error_getting_wallets, transactionId))
             return emptyList()
         }
     }
@@ -95,7 +98,7 @@ class WalletRepositoryImpl(
     // Вспомогательный метод для получения транзакции из репозитория транзакций
     private suspend fun getTransactionForWallets(transactionId: String): Transaction? {
         if (transactionRepository == null) {
-            Timber.d(StringProvider.logTransactionRepositoryNotSet)
+            Timber.d(resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_transaction_repository_not_set))
             return null
         }
 
@@ -103,7 +106,7 @@ class WalletRepositoryImpl(
             // В реальной реализации здесь используем репозиторий для получения транзакции
             return transactionRepository.getTransactionById(transactionId)
         } catch (e: Exception) {
-            Timber.e(e, StringProvider.logErrorGettingTransaction(transactionId))
+            Timber.e(e, resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_error_getting_transaction, transactionId))
             return null
         }
     }

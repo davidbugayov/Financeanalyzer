@@ -9,7 +9,9 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 import kotlin.math.max
 import java.math.BigDecimal
 
@@ -86,23 +88,25 @@ class CalculateEnhancedFinancialMetricsUseCase(
         
         // Рекомендации по коэффициенту финансового здоровья
         if (healthScore < 50) {
-                            recommendations.add(
-                    FinancialRecommendation(
-                        title = StringProvider.recommendationImproveFinancialHealth,
-        description = StringProvider.recommendationImproveFinancialHealthDesc(healthScore.toInt()),
-                        priority = RecommendationPriority.HIGH,
-                        category = RecommendationCategory.SAVINGS,
-                        potentialImpact = 15.0
-                    )
+            val rp: ResourceProvider = GlobalContext.get().get()
+            recommendations.add(
+                FinancialRecommendation(
+                    title = rp.getString(R.string.recommendation_improve_financial_health),
+                    description = rp.getString(R.string.recommendation_improve_financial_health_desc, healthScore.toInt()),
+                    priority = RecommendationPriority.HIGH,
+                    category = RecommendationCategory.SAVINGS,
+                    potentialImpact = 15.0
                 )
+            )
         }
         
         // Рекомендации по дисциплине расходов
         if (expenseDisciplineIndex < 60) {
-                        recommendations.add(
+            val rp: ResourceProvider = GlobalContext.get().get()
+            recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationImproveExpenseControl,
-        description = StringProvider.recommendationImproveExpenseControlDesc(expenseDisciplineIndex.toInt()),
+                    title = rp.getString(R.string.recommendation_improve_expense_control),
+                    description = rp.getString(R.string.recommendation_improve_expense_control_desc, expenseDisciplineIndex.toInt()),
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 12.0
@@ -117,10 +121,11 @@ class CalculateEnhancedFinancialMetricsUseCase(
             )
             
             if (monthlyDeficit.toDouble() > 0) {
-                                recommendations.add(
+                val rp: ResourceProvider = GlobalContext.get().get()
+                recommendations.add(
                     FinancialRecommendation(
-                        title = StringProvider.recommendationIncreaseRetirementSavings,
-        description = StringProvider.recommendationIncreaseRetirementSavingsDesc(Money(monthlyDeficit).formatted, retirementForecast.retirementGoalProgress.toInt()),
+                        title = rp.getString(R.string.recommendation_increase_retirement_savings),
+                        description = rp.getString(R.string.recommendation_increase_retirement_savings_desc, Money(monthlyDeficit).formatted, retirementForecast.retirementGoalProgress.toInt()),
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.RETIREMENT,
                         potentialImpact = 8.0
@@ -131,10 +136,11 @@ class CalculateEnhancedFinancialMetricsUseCase(
         
         // Рекомендации на основе сравнения с пирами
         if (peerComparison.savingsRateVsPeers < -5) { // На 5% меньше среднего
-                        recommendations.add(
+            val rp: ResourceProvider = GlobalContext.get().get()
+            recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationIncreaseSavingsRate,
-        description = StringProvider.recommendationIncreaseSavingsRateDesc((-peerComparison.savingsRateVsPeers).toInt()),
+                    title = rp.getString(R.string.recommendation_increase_savings_rate),
+                    description = rp.getString(R.string.recommendation_increase_savings_rate_desc, (-peerComparison.savingsRateVsPeers).toInt()),
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.SAVINGS,
                     potentialImpact = 10.0
@@ -145,10 +151,11 @@ class CalculateEnhancedFinancialMetricsUseCase(
         // Рекомендации по разнообразию источников дохода
         val incomeSources = transactions.filter { !it.isExpense }.map { it.source }.distinct().size
         if (incomeSources < 2) {
-                        recommendations.add(
+            val rp: ResourceProvider = GlobalContext.get().get()
+            recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationDiversifyIncome,
-        description = StringProvider.recommendationDiversifyIncomeDesc(incomeSources),
+                    title = rp.getString(R.string.recommendation_diversify_income),
+                    description = rp.getString(R.string.recommendation_diversify_income_desc, incomeSources),
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.INCOME,
                     potentialImpact = 5.0
@@ -166,10 +173,11 @@ class CalculateEnhancedFinancialMetricsUseCase(
         }
         
         if (emergencyFundMonths < 3) {
-                        recommendations.add(
+            val rp: ResourceProvider = GlobalContext.get().get()
+            recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationCreateEmergencyFund,
-        description = StringProvider.recommendationCreateEmergencyFundDesc(max(0.0, emergencyFundMonths).toInt()),
+                    title = rp.getString(R.string.recommendation_create_emergency_fund),
+                    description = rp.getString(R.string.recommendation_create_emergency_fund_desc, max(0.0, emergencyFundMonths).toInt()),
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.EMERGENCY_FUND,
                     potentialImpact = 12.0
@@ -181,20 +189,22 @@ class CalculateEnhancedFinancialMetricsUseCase(
         val wallets = walletRepository.getAllWallets()
         wallets.forEach { wallet ->
             if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount) {
-                                recommendations.add(
+                val rp: ResourceProvider = GlobalContext.get().get()
+                recommendations.add(
                     FinancialRecommendation(
-                        title = StringProvider.recommendationBudgetExceeded(wallet.name),
-        description = StringProvider.recommendationBudgetExceededDesc(wallet.name),
+                        title = rp.getString(R.string.recommendation_budget_exceeded, wallet.name),
+                        description = rp.getString(R.string.recommendation_budget_exceeded_desc, wallet.name),
                         priority = RecommendationPriority.HIGH,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 15.0
                     )
                 )
             } else if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount.multiply(java.math.BigDecimal("0.8"))) {
-                                recommendations.add(
+                val rp: ResourceProvider = GlobalContext.get().get()
+                recommendations.add(
                     FinancialRecommendation(
-                        title = StringProvider.recommendationBudgetCloseToLimit(wallet.name),
-        description = StringProvider.recommendationBudgetCloseToLimitDesc(wallet.name),
+                        title = rp.getString(R.string.recommendation_budget_close_to_limit, wallet.name),
+                        description = rp.getString(R.string.recommendation_budget_close_to_limit_desc, wallet.name),
                         priority = RecommendationPriority.MEDIUM,
                         category = RecommendationCategory.EXPENSES,
                         potentialImpact = 8.0
@@ -203,7 +213,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
             }
         }
         // Анализ повторяющихся подписок и крупных трат (пример)
-        val subscriptionCategories = listOf(StringProvider.categorySubscription, "Subscription", StringProvider.categoryServices)
+        val rp: ResourceProvider = GlobalContext.get().get()
+        val subscriptionCategories = listOf(rp.getString(R.string.category_subscription), "Subscription", rp.getString(R.string.category_services))
         val unusedSubscriptions = transactions.filter { tx ->
             subscriptionCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
             // Здесь можно добавить анализ неиспользуемых подписок
@@ -211,8 +222,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         if (unusedSubscriptions.isNotEmpty()) {
                         recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationCheckSubscriptionsTitle,
-        description = StringProvider.recommendationCheckSubscriptionsDesc,
+                    title = rp.getString(R.string.recommendation_check_subscriptions_title),
+                    description = rp.getString(R.string.recommendation_check_subscriptions_desc),
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 6.0
@@ -220,15 +231,15 @@ class CalculateEnhancedFinancialMetricsUseCase(
             )
         }
         // Совет по экономии на кафе
-        val cafeCategories = listOf(StringProvider.categoryCafe, StringProvider.categoryRestaurant, "Coffee", "Restaurant")
+        val cafeCategories = listOf(rp.getString(R.string.category_cafe), rp.getString(R.string.category_restaurant), "Coffee", "Restaurant")
         val cafeExpenses = transactions.filter { tx ->
             tx.isExpense && cafeCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
         }
         if (cafeExpenses.size > 5) { // Порог можно скорректировать
                         recommendations.add(
                 FinancialRecommendation(
-                    title = StringProvider.recommendationSaveOnCafe,
-        description = StringProvider.recommendationSaveOnCafeDesc,
+                    title = rp.getString(R.string.recommendation_save_on_cafe),
+                    description = rp.getString(R.string.recommendation_save_on_cafe_desc),
                     priority = RecommendationPriority.LOW,
                     category = RecommendationCategory.EXPENSES,
                     potentialImpact = 4.0

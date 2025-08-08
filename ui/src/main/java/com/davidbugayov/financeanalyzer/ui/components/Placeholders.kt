@@ -17,7 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.ui.util.StringProvider
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Компонент для отображения индикатора загрузки по центру экрана
@@ -25,7 +26,7 @@ import com.davidbugayov.financeanalyzer.ui.util.StringProvider
  * @param message Текст сообщения (необязательно)
  */
 @Composable
-fun CenteredLoadingIndicator(message: String = StringProvider.loadingDataDefault) {
+fun CenteredLoadingIndicator(message: String = stringResource(id = R.string.loading_data_default)) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -59,10 +60,10 @@ fun CenteredLoadingIndicator(message: String = StringProvider.loadingDataDefault
  */
 @Composable
 fun EmptyContent(
-    message: String = StringProvider.noDataToDisplay,
-    description: String = StringProvider.addTransactionsToSeeAnalytics,
+    message: String = stringResource(id = R.string.no_data_to_display),
+    description: String = stringResource(id = R.string.add_transactions_to_see_analytics),
     onActionClick: (() -> Unit)? = null,
-    actionText: String = StringProvider.refresh,
+    actionText: String = stringResource(id = R.string.refresh),
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -121,7 +122,7 @@ fun ErrorContent(
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = StringProvider.loadingError,
+                text = stringResource(id = R.string.loading_error),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
@@ -142,7 +143,7 @@ fun ErrorContent(
                 onClick = onRetry,
                 modifier = Modifier.padding(bottom = 8.dp),
             ) {
-                Text(StringProvider.retry)
+                Text(stringResource(id = R.string.retry))
             }
         }
     }

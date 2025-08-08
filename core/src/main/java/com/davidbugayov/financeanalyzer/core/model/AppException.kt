@@ -1,8 +1,10 @@
 package com.davidbugayov.financeanalyzer.core.model
 
-import com.davidbugayov.financeanalyzer.core.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.R
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
 
-// Используется статический StringProvider для сообщений из core модуля
+// Строки берутся через ResourceProvider (Koin GlobalContext)
 
 
 /**
@@ -12,6 +14,14 @@ sealed class AppException(
     message: String? = null,
     cause: Throwable? = null,
 ) : Exception(message, cause) {
+    private object RStrings {
+        private val resourceProvider: ResourceProvider
+            get() = GlobalContext.get().get()
+        val errorNetworkConnection: String get() = resourceProvider.getString(R.string.error_network_connection)
+        val errorDataNotFound: String get() = resourceProvider.getString(R.string.error_data_not_found)
+        val errorFileRead: String get() = resourceProvider.getString(R.string.error_file_read)
+        val errorUnknown: String get() = resourceProvider.getString(R.string.error_unknown)
+    }
     /**
      * Ошибки сети
      */
@@ -19,7 +29,7 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class Connection(cause: Throwable? = null) : Network(StringProvider.errorNetworkConnection, cause)
+        class Connection(cause: Throwable? = null) : Network(RStrings.errorNetworkConnection, cause)
     }
 
     /**
@@ -30,7 +40,7 @@ sealed class AppException(
         cause: Throwable? = null,
     ) : AppException(message, cause) {
 
-        class NotFound(message: String? = null) : Data(message ?: StringProvider.errorDataNotFound)
+        class NotFound(message: String? = null) : Data(message ?: RStrings.errorDataNotFound)
     }
 
     /**
@@ -41,7 +51,7 @@ sealed class AppException(
         cause: Throwable? = null,
     ) : AppException(message, cause) {
         class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(
-            message ?: StringProvider.errorFileRead,
+            message ?: RStrings.errorFileRead,
             cause,
         )
     }
@@ -62,7 +72,7 @@ sealed class AppException(
     class Unknown(
         message: String? = null,
         cause: Throwable? = null,
-    ) : AppException(message ?: StringProvider.errorUnknown, cause)
+    ) : AppException(message ?: RStrings.errorUnknown, cause)
 
     companion object {
         /**

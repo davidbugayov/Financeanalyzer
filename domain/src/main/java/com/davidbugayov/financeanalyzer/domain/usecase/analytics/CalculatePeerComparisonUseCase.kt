@@ -3,7 +3,9 @@ package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.PeerComparison
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.max
@@ -60,7 +62,7 @@ class CalculatePeerComparisonUseCase {
      */
     private fun createDefaultComparison(): PeerComparison {
         return PeerComparison(
-            incomeRange = StringProvider.incomeRangeInsufficientData,
+            incomeRange = GlobalContext.get().get<ResourceProvider>().getString(R.string.income_range_insufficient_data),
             savingsRateVsPeers = 0.0,
             expenseCategoriesVsPeers = emptyMap(),
             healthScorePercentile = 50.0,
@@ -163,96 +165,96 @@ class CalculatePeerComparisonUseCase {
             "< 30k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.05, // 5%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.25,
-                    StringProvider.categoryTransport to 0.15,
-                    StringProvider.categoryUtilities to 0.20,
-                    StringProvider.categoryClothing to 0.08,
-                    StringProvider.categoryEntertainment to 0.07,
-                    StringProvider.categoryOther to 0.25
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.25,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.15,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.08,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.07,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.25
                 ),
                 sampleSize = 1000
             )
             "30-50k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.08, // 8%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.22,
-                    StringProvider.categoryTransport to 0.18,
-                    StringProvider.categoryUtilities to 0.18,
-                    StringProvider.categoryClothing to 0.10,
-                    StringProvider.categoryEntertainment to 0.10,
-                    StringProvider.categoryOther to 0.22
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.22,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.18,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.18,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.10,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.10,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.22
                 ),
                 sampleSize = 1500
             )
             "50-75k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.12, // 12%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.20,
-                    StringProvider.categoryTransport to 0.20,
-                    StringProvider.categoryUtilities to 0.15,
-                    StringProvider.categoryClothing to 0.12,
-                    StringProvider.categoryEntertainment to 0.13,
-                    StringProvider.categoryOther to 0.20
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.15,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.12,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.13,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.20
                 ),
                 sampleSize = 2000
             )
             "75-100k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.15, // 15%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.18,
-                    StringProvider.categoryTransport to 0.22,
-                    StringProvider.categoryUtilities to 0.12,
-                    StringProvider.categoryClothing to 0.13,
-                    StringProvider.categoryEntertainment to 0.15,
-                    StringProvider.categoryOther to 0.20
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.18,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.22,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.12,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.13,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.15,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.20
                 ),
                 sampleSize = 1200
             )
             "100-150k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.18, // 18%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.16,
-                    StringProvider.categoryTransport to 0.25,
-                    StringProvider.categoryUtilities to 0.10,
-                    StringProvider.categoryClothing to 0.15,
-                    StringProvider.categoryEntertainment to 0.18,
-                    StringProvider.categoryOther to 0.16
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.16,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.25,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.10,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.15,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.18,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.16
                 ),
                 sampleSize = 800
             )
             "150-200k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.22, // 22%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.15,
-                    StringProvider.categoryTransport to 0.28,
-                    StringProvider.categoryUtilities to 0.08,
-                    StringProvider.categoryClothing to 0.17,
-                    StringProvider.categoryEntertainment to 0.20,
-                    StringProvider.categoryOther to 0.12
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.15,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.28,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.08,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.17,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.12
                 ),
                 sampleSize = 500
             )
             "200-300k" -> IncomeBenchmarks(
                 averageSavingsRate = 0.25, // 25%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.12,
-                    StringProvider.categoryTransport to 0.30,
-                    StringProvider.categoryUtilities to 0.06,
-                    StringProvider.categoryClothing to 0.20,
-                    StringProvider.categoryEntertainment to 0.22,
-                    StringProvider.categoryOther to 0.10
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.12,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.30,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.06,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.22,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.10
                 ),
                 sampleSize = 300
             )
             else -> IncomeBenchmarks( // "300k+"
                 averageSavingsRate = 0.30, // 30%
                 averageExpenseBreakdown = mapOf(
-                    StringProvider.categoryProducts to 0.10,
-                    StringProvider.categoryTransport to 0.35,
-                    StringProvider.categoryUtilities to 0.05,
-                    StringProvider.categoryClothing to 0.25,
-                    StringProvider.categoryEntertainment to 0.20,
-                    StringProvider.categoryOther to 0.05
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_products) to 0.10,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_transport) to 0.35,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_utilities) to 0.05,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_clothing) to 0.25,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_entertainment) to 0.20,
+                    GlobalContext.get().get<ResourceProvider>().getString(R.string.category_other) to 0.05
                 ),
                 sampleSize = 150
             )
@@ -267,9 +269,15 @@ class CalculatePeerComparisonUseCase {
         benchmarkBreakdown: Map<String, Double>
     ): Map<String, Double> {
         val comparison = mutableMapOf<String, Double>()
-        
+        val rp: ResourceProvider = GlobalContext.get().get()
         // Сравниваем основные категории
-        val mainCategories = setOf(StringProvider.categoryProducts, StringProvider.categoryTransport, StringProvider.categoryUtilities, StringProvider.categoryClothing, StringProvider.categoryEntertainment)
+        val mainCategories = setOf(
+            rp.getString(R.string.category_products),
+            rp.getString(R.string.category_transport),
+            rp.getString(R.string.category_utilities),
+            rp.getString(R.string.category_clothing),
+            rp.getString(R.string.category_entertainment)
+        )
         
         for (category in mainCategories) {
             val userPercent = userBreakdown[category] ?: 0.0

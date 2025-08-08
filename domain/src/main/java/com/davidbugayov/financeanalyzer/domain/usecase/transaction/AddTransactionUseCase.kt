@@ -4,7 +4,9 @@ import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.core.model.AppException
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 import timber.log.Timber
 
 /**
@@ -19,10 +21,8 @@ class AddTransactionUseCase(
     suspend operator fun invoke(transaction: Transaction): Result<String> {
         return try {
             Timber.d(
-                StringProvider.logTransactionAdd(
-                    transaction.amount.toString(),
-                    transaction.category
-                )
+                GlobalContext.get().get<ResourceProvider>()
+                    .getString(R.string.log_transaction_add, transaction.amount.toString(), transaction.category)
             )
             val transactionId = transactionRepository.addTransaction(transaction)
             Result.success(transactionId)

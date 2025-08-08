@@ -4,7 +4,9 @@ import android.content.Context
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -74,11 +76,13 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     private val prefs = context.applicationContext.getSharedPreferences("achievements", android.content.Context.MODE_PRIVATE)
     
     // Предустановленные достижения
+    private val rp: ResourceProvider = GlobalContext.get().get()
+
     private val defaultAchievements = listOf(
         Achievement(
             id = "first_transaction",
-            title = StringProvider.achievementFirstSteps,
-            description = StringProvider.achievementFirstStepsDesc,
+            title = rp.getString(R.string.achievement_first_steps),
+            description = rp.getString(R.string.achievement_first_steps_desc),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -87,8 +91,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "transaction_master",
-            title = StringProvider.achievementTransactionMaster,
-            description = StringProvider.achievementTransactionMasterDesc,
+            title = rp.getString(R.string.achievement_transaction_master),
+            description = rp.getString(R.string.achievement_transaction_master_desc),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
@@ -97,8 +101,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "data_analyst",
-            title = StringProvider.achievementDataAnalyst,
-            description = StringProvider.achievementDataAnalystDesc,
+            title = rp.getString(R.string.achievement_data_analyst),
+            description = rp.getString(R.string.achievement_data_analyst_desc),
             iconRes = 0,
             category = AchievementCategory.STATISTICS,
             rarity = AchievementRarity.COMMON,
@@ -107,8 +111,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "first_budget",
-            title = StringProvider.achievementFirstBudget,
-            description = StringProvider.achievementFirstBudgetDesc,
+            title = rp.getString(R.string.achievement_first_budget),
+            description = rp.getString(R.string.achievement_first_budget_desc),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
@@ -117,8 +121,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "app_explorer",
-            title = StringProvider.achievementExplorer,
-            description = StringProvider.achievementExplorerDesc,
+            title = rp.getString(R.string.achievement_explorer),
+            description = rp.getString(R.string.achievement_explorer_desc),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
@@ -127,8 +131,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "category_organizer",
-            title = StringProvider.achievementCategoryOrganizer,
-            description = StringProvider.achievementCategoryOrganizerDesc,
+            title = rp.getString(R.string.achievement_category_organizer),
+            description = rp.getString(R.string.achievement_category_organizer_desc),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -137,8 +141,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "early_bird",
-            title = StringProvider.achievementEarlyBird,
-            description = StringProvider.achievementEarlyBirdDesc,
+            title = rp.getString(R.string.achievement_early_bird),
+            description = rp.getString(R.string.achievement_early_bird_desc),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -147,8 +151,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "night_owl",
-            title = StringProvider.achievementNightOwl,
-            description = StringProvider.achievementNightOwlDesc,
+            title = rp.getString(R.string.achievement_night_owl),
+            description = rp.getString(R.string.achievement_night_owl_desc),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
@@ -157,8 +161,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "first_savings",
-            title = StringProvider.achievementFirstSavings,
-            description = StringProvider.achievementFirstSavingsDesc,
+            title = rp.getString(R.string.achievement_first_savings),
+            description = rp.getString(R.string.achievement_first_savings_desc),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.COMMON,
@@ -167,8 +171,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "emergency_fund",
-            title = StringProvider.achievementEmergencyFund,
-            description = StringProvider.achievementEmergencyFundDesc,
+            title = rp.getString(R.string.achievement_emergency_fund),
+            description = rp.getString(R.string.achievement_emergency_fund_desc),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.RARE,
@@ -177,8 +181,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "economical",
-            title = StringProvider.achievementEconomical,
-            description = StringProvider.achievementEconomicalDesc,
+            title = rp.getString(R.string.achievement_economical),
+            description = rp.getString(R.string.achievement_economical_desc),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
@@ -187,8 +191,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "regular_user",
-            title = StringProvider.achievementRegularUser,
-            description = StringProvider.achievementRegularUserDesc,
+            title = rp.getString(R.string.achievement_regular_user),
+            description = rp.getString(R.string.achievement_regular_user_desc),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
@@ -197,8 +201,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "loyal_user",
-            title = StringProvider.achievementLoyalUser,
-            description = StringProvider.achievementLoyalUserDesc,
+            title = rp.getString(R.string.achievement_loyal_user),
+            description = rp.getString(R.string.achievement_loyal_user_desc),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.RARE,
@@ -207,8 +211,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "category_expert",
-            title = StringProvider.achievementCategoryExpert,
-            description = StringProvider.achievementCategoryExpertDesc,
+            title = rp.getString(R.string.achievement_category_expert),
+            description = rp.getString(R.string.achievement_category_expert_desc),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
@@ -217,8 +221,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "tinkoff_integrator",
-            title = StringProvider.achievementTinkoffIntegrator,
-            description = StringProvider.achievementTinkoffIntegratorDesc,
+            title = rp.getString(R.string.achievement_tinkoff_integrator),
+            description = rp.getString(R.string.achievement_tinkoff_integrator_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
@@ -227,8 +231,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "sber_collector",
-            title = StringProvider.achievementSberCollector,
-            description = StringProvider.achievementSberCollectorDesc,
+            title = rp.getString(R.string.achievement_sber_collector),
+            description = rp.getString(R.string.achievement_sber_collector_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
@@ -237,8 +241,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "alpha_analyst",
-            title = StringProvider.achievementAlphaAnalyst,
-            description = StringProvider.achievementAlphaAnalystDesc,
+            title = rp.getString(R.string.achievement_alpha_analyst),
+            description = rp.getString(R.string.achievement_alpha_analyst_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
@@ -247,8 +251,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "ozon_collector",
-            title = StringProvider.achievementOzonCollector,
-            description = StringProvider.achievementOzonCollectorDesc,
+            title = rp.getString(R.string.achievement_ozon_collector),
+            description = rp.getString(R.string.achievement_ozon_collector_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
@@ -257,8 +261,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "multi_bank_collector",
-            title = StringProvider.achievementMultiBankCollector,
-            description = StringProvider.achievementMultiBankCollectorDesc,
+            title = rp.getString(R.string.achievement_multi_bank_collector),
+            description = rp.getString(R.string.achievement_multi_bank_collector_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.EPIC,
@@ -267,8 +271,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "export_master",
-            title = StringProvider.achievementExportMaster,
-            description = StringProvider.achievementExportMasterDesc,
+            title = rp.getString(R.string.achievement_export_master),
+            description = rp.getString(R.string.achievement_export_master_desc),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
             rarity = AchievementRarity.COMMON,
@@ -277,8 +281,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "backup_enthusiast",
-            title = StringProvider.achievementBackupEnthusiast,
-            description = StringProvider.achievementBackupEnthusiastDesc,
+            title = rp.getString(R.string.achievement_backup_enthusiast),
+            description = rp.getString(R.string.achievement_backup_enthusiast_desc),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
             rarity = AchievementRarity.RARE,
@@ -287,8 +291,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "csv_importer",
-            title = StringProvider.achievementCsvImporter,
-            description = StringProvider.achievementCsvImporterDesc,
+            title = rp.getString(R.string.achievement_csv_importer),
+            description = rp.getString(R.string.achievement_csv_importer_desc),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
@@ -317,7 +321,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
                 )
             }
         } catch (e: Exception) {
-            Timber.e(e, StringProvider.logErrorLoadingAchievements)
+            Timber.e(e, rp.getString(R.string.log_error_loading_achievements))
             defaultAchievements
         }
     }
@@ -337,7 +341,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
             }
             editor.apply()
         } catch (e: Exception) {
-            Timber.e(e, StringProvider.logErrorSavingAchievements)
+            Timber.e(e, rp.getString(R.string.log_error_saving_achievements))
         }
     }
     

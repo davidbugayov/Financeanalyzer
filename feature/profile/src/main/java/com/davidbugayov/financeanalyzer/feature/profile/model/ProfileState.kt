@@ -3,7 +3,9 @@ package com.davidbugayov.financeanalyzer.feature.profile.model
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
-import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.utils.Time
 
 /**
@@ -39,7 +41,7 @@ data class ProfileState(
     val totalIncomeCategories: Int = 0,
     val averageExpense: String = "0 ₽",
     val totalSourcesUsed: Int = 0,
-    val dateRange: String = StringResourceProvider.periodAllTime,
+    val dateRange: String = GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time),
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,

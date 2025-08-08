@@ -4,7 +4,9 @@ import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.core.model.AppException
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * UseCase для получения транзакции по ID.
@@ -21,7 +23,11 @@ class GetTransactionByIdUseCase(
             if (transaction != null) {
                 Result.success(transaction)
             } else {
-                Result.error(AppException.Data.NotFound(StringProvider.logTransactionNotFound(id)))
+                Result.error(
+                    AppException.Data.NotFound(
+                        GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_not_found, id)
+                    )
+                )
             }
         } catch (e: Exception) {
             Result.error(AppException.mapException(e))

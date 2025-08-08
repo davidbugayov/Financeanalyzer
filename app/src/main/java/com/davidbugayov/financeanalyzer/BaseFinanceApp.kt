@@ -9,19 +9,15 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import com.davidbugayov.financeanalyzer.core.util.StringProvider
-import com.davidbugayov.financeanalyzer.data.util.StringProvider as DataStringProvider
+ 
 import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider as DomainStringProvider
-import com.davidbugayov.financeanalyzer.feature.budget.util.StringProvider as BudgetStringProvider
-import com.davidbugayov.financeanalyzer.feature.history.util.StringProvider as HistoryStringProvider
-import com.davidbugayov.financeanalyzer.feature.home.util.StringProvider as HomeStringProvider
+ 
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
+ 
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.util.StringProvider as UiStringProvider
+ 
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
 import io.appmetrica.analytics.AppMetrica
@@ -52,16 +48,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
 
         super<Application>.onCreate()
 
-        // Инициализация StringProvider для строковых ресурсов
-        StringProvider.init(this)
-        DataStringProvider.init(this)
-        DomainStringProvider.init(this)
-        TransactionStringProvider.init(this)
-        HomeStringProvider.init(this)
-        HistoryStringProvider.init(this)
-        BudgetStringProvider.init(this)
-        UiStringProvider.init(this)
-        TransactionStringProvider.init(this)
+        // Инициализация StringProvider удалена. Используется ResourceProvider через Koin и stringResource в UI.
 
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {

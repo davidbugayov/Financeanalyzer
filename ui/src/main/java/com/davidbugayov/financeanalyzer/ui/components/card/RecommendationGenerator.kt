@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
-import com.davidbugayov.financeanalyzer.ui.util.StringProvider
 
 /**
  * Генератор унифицированных рекомендаций на основе финансовых метрик
@@ -32,11 +31,11 @@ object RecommendationGenerator {
         if (savingsRate < 5f) {
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.criticalLowSavingsTitle,
-                    description = StringProvider.criticalLowSavingsDescription,
+                    title = stringResource(R.string.critical_low_savings_title),
+                    description = stringResource(R.string.critical_low_savings_description),
                     icon = Icons.Filled.Warning,
                     priority = UnifiedRecommendationPriority.CRITICAL,
-                    impact = StringProvider.criticalLowSavingsImpact,
+                    impact = stringResource(R.string.critical_low_savings_impact),
                     category = stringResource(R.string.recommendation_category_savings),
                 ),
             )
@@ -46,11 +45,11 @@ object RecommendationGenerator {
         if (savingsRate in 5f..10f) {
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.improveSavingsRateTitle,
-                    description = StringProvider.improveSavingsRateDescription,
+                    title = stringResource(R.string.improve_savings_rate_title),
+                    description = stringResource(R.string.improve_savings_rate_description),
                     icon = Icons.Filled.Savings,
                     priority = UnifiedRecommendationPriority.HIGH,
-                    impact = StringProvider.improveSavingsRateImpact,
+                    impact = stringResource(R.string.improve_savings_rate_impact),
                     category = stringResource(R.string.recommendation_category_savings),
                 ),
             )
@@ -60,11 +59,11 @@ object RecommendationGenerator {
         if (topExpenseCategory.isNotEmpty() && topCategoryPercentage > 35f) {
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.optimizeCategoryTitle(topExpenseCategory),
-                    description = StringProvider.optimizeCategoryDescription(topCategoryPercentage.toInt()),
+                    title = stringResource(R.string.optimize_category_title, topExpenseCategory),
+                    description = stringResource(R.string.optimize_category_description, topCategoryPercentage.toInt()),
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.MEDIUM,
-                    impact = StringProvider.optimizeCategoryImpact,
+                    impact = stringResource(R.string.optimize_category_impact),
                     category = stringResource(R.string.recommendation_category_expenses),
                 ),
             )
@@ -75,11 +74,11 @@ object RecommendationGenerator {
             val priority = if (monthsOfSavings < 1) UnifiedRecommendationPriority.HIGH else UnifiedRecommendationPriority.MEDIUM
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.createEmergencyFundTitleUi,
-                    description = StringProvider.createEmergencyFundDescriptionUi,
+                    title = stringResource(R.string.create_emergency_fund_title_ui),
+                    description = stringResource(R.string.create_emergency_fund_description_ui),
                     icon = Icons.Filled.PriorityHigh,
                     priority = priority,
-                    impact = StringProvider.createEmergencyFundImpact,
+                    impact = stringResource(R.string.create_emergency_fund_impact),
                     category = stringResource(R.string.recommendation_category_emergency_fund),
                 ),
             )
@@ -89,11 +88,11 @@ object RecommendationGenerator {
         if (savingsRate > 20f) {
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.considerInvestmentsTitle,
-                    description = StringProvider.considerInvestmentsDescription,
+                    title = stringResource(R.string.consider_investments_title),
+                    description = stringResource(R.string.consider_investments_description),
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.NORMAL,
-                    impact = StringProvider.considerInvestmentsImpact,
+                    impact = stringResource(R.string.consider_investments_impact),
                     category = stringResource(R.string.recommendation_category_investments),
                 ),
             )
@@ -103,11 +102,11 @@ object RecommendationGenerator {
         if (expenseTransactionsCount > 100) {
             recommendations.add(
                 UnifiedRecommendation(
-                    title = StringProvider.manySmallExpensesTitle,
-                    description = StringProvider.manySmallExpensesDescription(expenseTransactionsCount),
+                    title = stringResource(R.string.many_small_expenses_title),
+                    description = stringResource(R.string.many_small_expenses_description, expenseTransactionsCount),
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.MEDIUM,
-                    impact = StringProvider.manySmallExpensesImpact,
+                    impact = stringResource(R.string.many_small_expenses_impact),
                     category = stringResource(R.string.recommendation_category_expenses),
                 ),
             )

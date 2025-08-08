@@ -1,6 +1,8 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * Тип кошелька.
@@ -28,25 +30,31 @@ enum class WalletType {
     /**
      * Получить локализованное название типа кошелька
      */
-    fun getDisplayName(): String = when (this) {
-        CASH -> StringProvider.walletTypeCash
-        CARD -> StringProvider.walletTypeCard
-        SAVINGS -> StringProvider.walletTypeSavings
-        INVESTMENT -> StringProvider.walletTypeInvestment
-        GOAL -> StringProvider.walletTypeGoal
-        OTHER -> StringProvider.walletTypeOther
+    fun getDisplayName(): String {
+        val rp: ResourceProvider = GlobalContext.get().get()
+        return when (this) {
+            CASH -> rp.getString(R.string.wallet_type_cash)
+            CARD -> rp.getString(R.string.wallet_type_card)
+            SAVINGS -> rp.getString(R.string.wallet_type_savings)
+            INVESTMENT -> rp.getString(R.string.wallet_type_investment)
+            GOAL -> rp.getString(R.string.wallet_type_goal)
+            OTHER -> rp.getString(R.string.wallet_type_other)
+        }
     }
 
     /**
      * Получить описание назначения типа кошелька
      */
-    fun getDescription(): String = when (this) {
-        CASH -> StringProvider.walletTypeCashDescription
-        CARD -> StringProvider.walletTypeCardDescription
-        SAVINGS -> StringProvider.walletTypeSavingsDescription
-        INVESTMENT -> StringProvider.walletTypeInvestmentDescription
-        GOAL -> StringProvider.walletTypeGoalDescription
-        OTHER -> StringProvider.walletTypeOtherDescription
+    fun getDescription(): String {
+        val rp: ResourceProvider = GlobalContext.get().get()
+        return when (this) {
+            CASH -> rp.getString(R.string.wallet_type_cash_description)
+            CARD -> rp.getString(R.string.wallet_type_card_description)
+            SAVINGS -> rp.getString(R.string.wallet_type_savings_description)
+            INVESTMENT -> rp.getString(R.string.wallet_type_investment_description)
+            GOAL -> rp.getString(R.string.wallet_type_goal_description)
+            OTHER -> rp.getString(R.string.wallet_type_other_description)
+        }
     }
 
     /**

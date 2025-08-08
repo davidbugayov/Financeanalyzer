@@ -9,6 +9,8 @@ import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import com.davidbugayov.financeanalyzer.util.AndroidResourceProvider
 
 /**
  * Module with various utility singletons.
@@ -19,6 +21,9 @@ val utilsModule =
         single<INotificationScheduler> { get<NotificationScheduler>() }
 
         single { NavigationManager() }
+
+        // ResourceProvider for safe access to string resources via DI
+        single<ResourceProvider> { AndroidResourceProvider(androidContext()) }
 
         // Crash reporter (initialized immediately)
         single {

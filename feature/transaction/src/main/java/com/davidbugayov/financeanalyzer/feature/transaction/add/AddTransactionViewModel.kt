@@ -20,7 +20,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseC
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.feature.transaction.util.StringProvider as TransactionStringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -80,9 +82,9 @@ class AddTransactionViewModel(
             try {
                 val walletsList = walletRepository.getAllWallets()
                 _wallets.value = walletsList
-                Timber.d(TransactionStringProvider.logTransactionWalletsLoaded(walletsList.size))
+                Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_wallets_loaded, walletsList.size))
             } catch (e: Exception) {
-                Timber.e(e, TransactionStringProvider.logErrorLoadingWallets)
+                Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(R.string.log_error_loading_wallets))
                 _wallets.value = emptyList()
             }
         }
@@ -106,7 +108,7 @@ class AddTransactionViewModel(
         amount: String,
         categoryId: String,
     ): Boolean {
-        Timber.d(TransactionStringProvider.logTransactionValidateInput(amount))
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_validate_input, amount))
         val validationBuilder = ValidationBuilder()
 
         _state.update {
@@ -119,31 +121,27 @@ class AddTransactionViewModel(
 
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
-            Timber.d(TransactionStringProvider.logTransactionEmptyAmountError)
-            CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorEmptyAmount))
+            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_amount_error))
+            CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_amount)))
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
                 if (amountValue <= BigDecimal.ZERO) {
                     validationBuilder.addAmountError()
-                    Timber.d(
-                        TransactionStringProvider.logTransactionZeroAmountError(amountValue.toFloat()),
-                    )
-                    CrashLoggerProvider.crashLogger.logException(
-                        Exception(TransactionStringProvider.errorZeroAmount(amountValue.toString())),
-                    )
+                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_zero_amount_error, amountValue.toFloat()))
+                    CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_zero_amount, amountValue.toString())))
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
-                Timber.e(TransactionStringProvider.logTransactionParseAmountError(e.message ?: ""))
+                Timber.e(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_parse_amount_error, e.message ?: ""))
                 CrashLoggerProvider.crashLogger.logException(e)
             }
         }
 
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
-            Timber.d(TransactionStringProvider.logTransactionEmptyCategoryError)
-            CrashLoggerProvider.crashLogger.logException(Exception(TransactionStringProvider.errorEmptyCategory))
+            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_category_error))
+            CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_category)))
         }
 
         val validationResult = validationBuilder.build()
@@ -155,12 +153,7 @@ class AddTransactionViewModel(
             )
         }
 
-        Timber.d(
-            TransactionStringProvider.logTransactionValidationResult(
-                validationResult.isValid,
-                validationResult.hasAmountError,
-            ),
-        )
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_validation_result, validationResult.isValid, validationResult.hasAmountError))
         return validationResult.isValid
     }
 
@@ -438,9 +431,7 @@ class AddTransactionViewModel(
             )
         }
 
-        Timber.d(
-            TransactionStringProvider.logTransactionInitializeScreen(_state.value.forceExpense, _state.value.isExpense),
-        )
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_initialize_screen, _state.value.forceExpense, _state.value.isExpense))
     }
 
     override fun handleBaseEvent(

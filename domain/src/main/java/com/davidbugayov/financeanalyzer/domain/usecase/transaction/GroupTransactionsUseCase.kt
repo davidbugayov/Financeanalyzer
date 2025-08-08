@@ -2,7 +2,9 @@ package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType
-import com.davidbugayov.financeanalyzer.domain.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.domain.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -134,19 +136,20 @@ class GroupTransactionsUseCase {
      * Преобразует название месяца на русском языке в числовой формат (1-12)
      */
     private fun getMonthNumber(monthName: String): Int {
+        val rp: ResourceProvider = GlobalContext.get().get()
         return when (monthName.lowercase()) {
-            StringProvider.monthJanuary -> 1
-            StringProvider.monthFebruary -> 2
-            StringProvider.monthMarch -> 3
-            StringProvider.monthApril -> 4
-            StringProvider.monthMay -> 5
-            StringProvider.monthJune -> 6
-            StringProvider.monthJuly -> 7
-            StringProvider.monthAugust -> 8
-            StringProvider.monthSeptember -> 9
-            StringProvider.monthOctober -> 10
-            StringProvider.monthNovember -> 11
-            StringProvider.monthDecember -> 12
+            rp.getString(R.string.month_january) -> 1
+            rp.getString(R.string.month_february) -> 2
+            rp.getString(R.string.month_march) -> 3
+            rp.getString(R.string.month_april) -> 4
+            rp.getString(R.string.month_may) -> 5
+            rp.getString(R.string.month_june) -> 6
+            rp.getString(R.string.month_july) -> 7
+            rp.getString(R.string.month_august) -> 8
+            rp.getString(R.string.month_september) -> 9
+            rp.getString(R.string.month_october) -> 10
+            rp.getString(R.string.month_november) -> 11
+            rp.getString(R.string.month_december) -> 12
             else -> 0
         }
     }

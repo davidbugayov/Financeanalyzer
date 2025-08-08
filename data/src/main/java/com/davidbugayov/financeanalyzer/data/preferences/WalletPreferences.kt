@@ -8,7 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.data.util.StringProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
 
 /**
  * Класс для управления кошельками через SharedPreferences.
@@ -22,6 +23,8 @@ class WalletPreferences private constructor(context: Context) {
         Context.MODE_PRIVATE,
     )
     private val gson = Gson()
+    private val resourceProvider: ResourceProvider
+        get() = GlobalContext.get().get()
 
     companion object {
 
@@ -76,7 +79,12 @@ class WalletPreferences private constructor(context: Context) {
                 // Сохраняем обновлённые данные, если была выполнена миграция
                 if (migratedWallets != wallets) {
                     saveWallets(migratedWallets)
-                    Timber.i(StringProvider.logWalletMigrationCompleted(wallets.size - migratedWallets.count { it.type != null }))
+                    Timber.i(
+                        resourceProvider.getString(
+                            com.davidbugayov.financeanalyzer.data.R.string.log_wallet_migration_completed,
+                            wallets.size - migratedWallets.count { it.type != null },
+                        ),
+                    )
                 }
                 
                 migratedWallets

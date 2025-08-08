@@ -15,7 +15,9 @@ import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
-import com.davidbugayov.financeanalyzer.ui.util.StringResourceProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -348,11 +350,11 @@ class ProfileViewModel(
                                 val endStr = dateFormat.format(dateRange.second)
                                 "$startStr - $endStr"
                             } else {
-                                StringResourceProvider.periodAllTime
+                                GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time)
                             }
                         } catch (exception: Exception) {
                             Timber.e(exception, "Ошибка при форматировании dateRange")
-                            StringResourceProvider.periodAllTime
+                            GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time)
                         }
 
                     // Форматируем averageExpense в строку
@@ -389,15 +391,15 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = exception.message ?: StringResourceProvider.errorUnknown,
+                            error = exception.message ?: GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown),
                         )
                     }
                 } else {
                     Timber.w("[ProfileViewModel] Unexpected result type: $result")
-                    _state.update { currentState ->
+                        _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = StringResourceProvider.errorUnknownType,
+                                error = GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown_type),
                         )
                     }
                 }
@@ -406,7 +408,7 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        error = StringResourceProvider.errorUnknown,
+                        error = GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown),
                     )
                 }
             }

@@ -29,7 +29,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.ui.util.StringProvider
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * 🎯 Профессиональная система умных рекомендаций
@@ -38,8 +39,8 @@ import com.davidbugayov.financeanalyzer.ui.util.StringProvider
 @Composable
 fun SmartRecommendationCard(
     recommendations: List<SmartRecommendation>,
-    title: String = StringProvider.smartCardDefaultTitle,
-    subtitle: String = StringProvider.smartCardDefaultSubtitle,
+    title: String = stringResource(id = R.string.smart_card_default_title),
+    subtitle: String = stringResource(id = R.string.smart_card_default_subtitle),
     style: SmartCardStyle = SmartCardStyle.ENHANCED,
     showPriorityIndicator: Boolean = true,
     onRecommendationClick: ((SmartRecommendation) -> Unit)? = null,
@@ -157,7 +158,7 @@ private fun SmartCardHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = StringProvider.closeButton,
+                    contentDescription = stringResource(id = R.string.close_button),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(18.dp),
                 )
@@ -517,13 +518,16 @@ private fun RecommendationStats(recommendations: List<SmartRecommendation>) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text =
-                        buildString {
-                            if (criticalCount > 0) append(StringProvider.criticalCountRecommendations(criticalCount))
-                            if (criticalCount > 0 && highCount > 0) append(", ")
-                            if (highCount > 0) append(StringProvider.importantCountRecommendations(highCount))
-                            append(StringProvider.recommendationsRequireAttention)
-                        },
+                    text = buildString {
+                        if (criticalCount > 0) append(
+                            stringResource(id = R.string.critical_count_recommendations, criticalCount)
+                        )
+                        if (criticalCount > 0 && highCount > 0) append(", ")
+                        if (highCount > 0) append(
+                            stringResource(id = R.string.important_count_recommendations, highCount)
+                        )
+                        append(stringResource(id = R.string.recommendations_require_attention))
+                    },
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium,
