@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 /**
  * Диалог выбора категории
@@ -150,7 +150,7 @@ fun CustomCategoryDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.add_category)) },
+        title = { Text(stringResource(R.string.add_custom_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -159,7 +159,7 @@ fun CustomCategoryDialog(
                 OutlinedTextField(
                     value = categoryText,
                     onValueChange = onCategoryTextChange,
-                    label = { Text(stringResource(R.string.category_name)) },
+                    label = { Text(stringResource(R.string.select_category)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -254,7 +254,7 @@ fun CustomCategoryDialog(
                     onClick = onConfirm,
                     enabled = categoryText.isNotBlank() && selectedIcon != null,
                 ) {
-                    Text(stringResource(R.string.add_button))
+                    Text(stringResource(UiR.string.add))
                 }
             }
         },

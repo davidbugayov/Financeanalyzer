@@ -89,7 +89,7 @@ fun TimePickerDialog(
                     Button(onClick = {
                         onTimeSelected(timePickerState.hour, timePickerState.minute)
                     }) {
-                        Text(stringResource(R.string.ok))
+                        Text(stringResource(UiR.string.ok))
                     }
                 }
             }

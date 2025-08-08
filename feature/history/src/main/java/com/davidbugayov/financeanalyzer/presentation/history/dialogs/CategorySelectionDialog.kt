@@ -77,7 +77,7 @@ fun CategorySelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_category)) },
+        title = { Text(stringResource(UiR.string.select_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -150,7 +150,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Расходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = stringResource(R.string.expenses),
+                    title = stringResource(UiR.string.expenses),
                     isExpanded = isExpensesExpanded,
                     color = expenseColor,
                     onToggle = { isExpensesExpanded = !isExpensesExpanded },
@@ -197,7 +197,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Доходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = stringResource(R.string.incomes),
+                    title = stringResource(UiR.string.income),
                     isExpanded = isIncomeExpanded,
                     color = incomeColor,
                     onToggle = { isIncomeExpanded = !isIncomeExpanded },
@@ -238,12 +238,12 @@ fun CategorySelectionDialog(
                 onCategoriesSelected(localSelectedCategories)
                 onDismiss()
             }) {
-                Text(stringResource(R.string.apply))
+                Text(stringResource(UiR.string.apply))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
+                Text(stringResource(UiR.string.close))
             }
         },
     )

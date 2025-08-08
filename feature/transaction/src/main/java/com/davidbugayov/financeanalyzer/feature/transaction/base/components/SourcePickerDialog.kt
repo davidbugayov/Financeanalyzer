@@ -80,7 +80,7 @@ fun SourcePickerDialog(
 
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.delete_source),
+                                contentDescription = stringResource(UiR.string.delete),
                                 tint = Color.Gray.copy(alpha = 0.5f),
                                 modifier =
                                     Modifier

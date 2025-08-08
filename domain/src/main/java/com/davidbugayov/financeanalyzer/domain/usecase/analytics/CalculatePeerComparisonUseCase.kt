@@ -5,7 +5,7 @@ import com.davidbugayov.financeanalyzer.domain.model.PeerComparison
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.domain.R
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.max

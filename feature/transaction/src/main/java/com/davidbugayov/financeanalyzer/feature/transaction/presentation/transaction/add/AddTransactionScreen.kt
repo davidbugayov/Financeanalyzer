@@ -150,7 +150,7 @@ fun AddTransactionScreen(
             viewModel.onNavigateBack()
         },
         screenTitle = stringResource(R.string.new_transaction_title),
-        buttonText = stringResource(R.string.add_button_text),
+        buttonText = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add),
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
         submitEvent = BaseTransactionEvent.Submit,

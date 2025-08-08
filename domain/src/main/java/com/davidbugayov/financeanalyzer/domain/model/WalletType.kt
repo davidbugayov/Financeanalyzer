@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.model
 
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * Тип кошелька.

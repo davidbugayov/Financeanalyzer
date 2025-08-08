@@ -26,10 +26,10 @@ abstract class AbstractPdfImportUseCase(
     open val headerMarkers: List<String> by lazy {
         listOf(
             context.getString(R.string.header_date_operation),
-            context.getString(R.string.header_date),
+            context.getString(com.davidbugayov.financeanalyzer.ui.R.string.date),
             context.getString(R.string.header_operation),
             context.getString(R.string.header_document),
-            context.getString(R.string.header_amount),
+            context.getString(com.davidbugayov.financeanalyzer.ui.R.string.amount),
         )
     }
     open val dataStartRegex: Regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}")

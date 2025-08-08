@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="profile_title">Профиль</string>
+    <string name="profile_settings_title">Настройки</string>
+    <string name="settings_theme_title">Тема</string>
+    <string name="settings_language_title">Язык</string>
+    <string name="settings_language_current_value">Русский</string>
+    <string name="profile_currency_title">Валюта</string>
+    <string name="profile_transaction_reminders_title">Напоминания о транзакциях</string>
+    <string name="notification_disabled_description">Уведомления выключены</string>
+    <string name="settings_reminder_time_format">Время: %1$d:%2$02d</string>
+    <string name="off">Выкл.</string>
+    <string name="profile_theme_select">Выбор темы</string>
+    <string name="notification_permission_required">Для уведомлений необходимо разрешение</string>
+    <string name="enable_reminders">Включить напоминания</string>
+    <string name="reminder_description">Получайте ежедневное напоминание</string>
+    <string name="reminder_time">Время напоминания</string>
+    <string name="reminder_time_description">Текущее время: %1$s</string>
+    <string name="notification_settings">Настройки уведомлений</string>
+    <string name="edit_time">Изменить время</string>
+    <string name="profile_theme_light">Светлая</string>
+    <string name="profile_theme_dark">Тёмная</string>
+    <string name="profile_theme_system">Системная</string>
+    <string name="permission_required_title">Требуется разрешение</string>
+    <string name="request_permission">Запросить разрешение</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="profile_budget_subtitle">Планирование расходов</string>
+    <string name="export_import">Импорт/Экспорт</string>
+    <string name="profile_export_import_subtitle">Файлы CSV, PDF, Excel</string>
+    <string name="achievements">Достижения</string>
+    <string name="profile_achievements_subtitle">Статистика и цели</string>
+</resources>
+

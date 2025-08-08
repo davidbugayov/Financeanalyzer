@@ -303,7 +303,7 @@ class GenericCsvImportUseCase(
                     expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
                 } else {
                     columns.getOrNull(4)?.equals(
-                        context.getString(R.string.csv_expense_value),
+                        context.getString(com.davidbugayov.financeanalyzer.ui.R.string.csv_expense_value),
                         ignoreCase = true,
                     ) ?: (amountValue < 0)
                 }

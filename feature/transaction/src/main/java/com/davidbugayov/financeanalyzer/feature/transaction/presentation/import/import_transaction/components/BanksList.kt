@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения списка поддерживаемых банков
@@ -46,21 +47,21 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
     ) {
         // Сбербанк
         BankItem(
-            name = stringResource(R.string.bank_sberbank),
+            name = stringResource(UiR.string.bank_sberbank),
             color = colorResource(id = R.color.bank_sberbank),
             onClick = { onBankClick("Сбербанк") },
         )
 
         // Тинькофф
         BankItem(
-            name = stringResource(R.string.bank_tinkoff),
+            name = stringResource(UiR.string.bank_tinkoff),
             color = colorResource(id = R.color.bank_tinkoff),
             onClick = { onBankClick("Тинькофф") },
         )
 
         // Альфа-Банк
         BankItem(
-            name = stringResource(R.string.bank_alfabank),
+            name = stringResource(UiR.string.bank_alfabank),
             color = colorResource(id = R.color.bank_alfabank),
             onClick = { onBankClick("Альфа-Банк") },
         )

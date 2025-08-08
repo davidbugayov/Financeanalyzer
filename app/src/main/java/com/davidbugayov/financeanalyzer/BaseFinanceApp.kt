@@ -171,7 +171,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             // Инициализируем провайдер для доступа из UI
             AchievementEngineProvider.initialize(achievementEngine)
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.achievements_system_init_error))
+            Timber.e(e, getString(R.string.achievements_init_error))
         }
     }
 

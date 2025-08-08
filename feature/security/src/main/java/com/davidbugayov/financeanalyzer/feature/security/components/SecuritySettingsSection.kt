@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.security.R
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Компонент для отображения настроек безопасности в профиле пользователя.

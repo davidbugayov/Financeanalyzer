@@ -19,6 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Кнопка добавления транзакции
@@ -57,7 +58,7 @@ fun AddButton(
                 )
             } else {
                 Text(
-                    text = text ?: stringResource(R.string.add_button),
+                    text = text ?: stringResource(UiR.string.add),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,

@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="error_application">Ошибка приложения</string>
-    <string name="error_data_not_found">Данные не найдены</string>
-    <string name="error_file_read">Ошибка чтения файла</string>
-    <string name="error_network_connection">Ошибка подключения к сети</string>
-    <string name="error_validation">Ошибка валидации</string>
-    </resources>

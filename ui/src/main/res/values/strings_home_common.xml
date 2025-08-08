@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="profile">Профиль</string>
+    <string name="empty_state_icon">Иконка пустого состояния</string>
+    <string name="no_transactions">Нет транзакций</string>
+    <string name="add_first_transaction_description">Добавьте первую транзакцию, чтобы начать отслеживать свои финансы</string>
+    <string name="filter_today">Сегодня</string>
+    <string name="filter_week">Неделя</string>
+    <string name="filter_month">Месяц</string>
+    <string name="total_income">Общий доход</string>
+    <string name="total_expense">Общий расход</string>
+    <string name="show_incomes">Показать доходы</string>
+    <string name="show_expenses">Показать расходы</string>
+    <string name="no_expenses_period">Нет расходов за период</string>
+    <string name="no_incomes_period">Нет доходов за период</string>
+    <string name="and_more_categories">И еще %1$d категорий</string>
+    <string name="hide">Скрыть</string>
+</resources>
+
+

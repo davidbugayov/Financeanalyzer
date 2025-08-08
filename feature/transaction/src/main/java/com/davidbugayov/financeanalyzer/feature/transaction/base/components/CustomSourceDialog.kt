@@ -73,7 +73,7 @@ fun CustomSourceDialog(
                         Timber.d("Source name changed to: '$it'")
                         onSourceNameChange(it)
                     },
-                    label = { Text(stringResource(R.string.source_name)) },
+                    label = { Text(stringResource(UiR.string.source_name)) },
                     isError = sourceName.trim().length < 2,
                     modifier = Modifier.fillMaxWidth(),
                 )

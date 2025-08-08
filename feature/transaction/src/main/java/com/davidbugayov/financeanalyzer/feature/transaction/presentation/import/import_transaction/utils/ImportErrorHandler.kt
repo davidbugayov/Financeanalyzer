@@ -60,7 +60,7 @@ class ImportErrorHandler(context: Context) {
                 }
                 else -> {
                     Timber.d("Неизвестный тип ошибки, возвращаем общее сообщение")
-                    appContext.getString(R.string.import_error_unknown, "", originalMessage)
+                    appContext.getString(R.string.import_error_unknown)
                 }
             }
 

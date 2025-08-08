@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
 /**
@@ -274,7 +275,7 @@ fun AmountField(
                     },
                     supportingText = {
                         if (isError) Text(
-                            text = stringResource(R.string.error_enter_valid_amount),
+                            text = stringResource(UiR.string.error_enter_valid_amount),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium,

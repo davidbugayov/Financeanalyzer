@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="edit_transaction_title">Редактировать транзакцию</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="add_button_text">Добавить</string>
+    <string name="import_transactions_content_description">Импорт транзакций</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="delete_source_title">Удалить источник</string>
+    <string name="got_it">Понятно</string>
+    <!-- bank_* уже есть в strings.xml -->
+    <string name="header_date">Дата</string>
+    <string name="header_amount">Сумма</string>
+    <string name="transaction_source_alfa">Альфа-Банк</string>
+    <string name="transaction_source_tinkoff">Тинькофф</string>
+    <string name="csv_expense_value">Расход</string>
+    <string name="import_unknown_error">Неизвестная ошибка при импорте</string>
+    <string name="subcategory_selected">Выбрана подкатегория</string>
+    <string name="has_subcategories">Есть подкатегории</string>
+</resources>
+

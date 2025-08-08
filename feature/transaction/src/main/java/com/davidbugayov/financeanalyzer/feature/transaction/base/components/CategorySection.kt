@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateContentColor
@@ -104,7 +105,7 @@ fun CategorySection(
                 modifier = Modifier.wrapContentHeight(),
             ) {
                 Text(
-                    text = stringResource(R.string.category) + " *",
+                    text = stringResource(UiR.string.category) + " *",
                     style =
                         MaterialTheme.typography.titleLarge.copy(
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
@@ -137,7 +138,7 @@ fun CategorySection(
                                         if (selectedSubcategory.isNotBlank()) {
                                             selectedSubcategory
                                         } else {
-                                            stringResource(R.string.subcategory)
+                                             stringResource(UiR.string.subcategory)
                                         },
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary,
@@ -154,9 +155,9 @@ fun CategorySection(
                         // Индикатор наличия подкатегорий
                         Text(
                             text = when {
-                                selectedSubcategory.isNotBlank() -> stringResource(R.string.subcategory_selected)
-                                hasAvailableSubcategories -> stringResource(R.string.has_subcategories)
-                                else -> stringResource(R.string.no_subcategories)
+                                selectedSubcategory.isNotBlank() -> stringResource(UiR.string.subcategory_selected)
+                                hasAvailableSubcategories -> stringResource(UiR.string.has_subcategories)
+                                else -> stringResource(UiR.string.no_subcategories)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

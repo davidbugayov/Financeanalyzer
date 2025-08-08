@@ -81,7 +81,7 @@
     <string name="recommendation_improve_expense_control_desc">Ваш индекс расходной дисциплины (%1$d/100) указывает на необходимость лучшего планирования трат. Попробуйте вести бюджет и избегать импульсивных покупок.</string>
     <string name="recommendation_increase_retirement_savings">Увеличьте пенсионные накопления</string>
     <string name="recommendation_increase_retirement_savings_desc">Для достижения пенсионной цели увеличьте ежемесячные накопления на %1$s. Текущий прогресс: %2$d%%</string>
-    <string name="recommendation_increase_savings_rate_desc">Ваша норма сбережений на %1$d%% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10% от дохода.</string>
+    <string name="recommendation_increase_savings_rate_desc">Ваша норма сбережений на %1$d%% ниже среднего в вашей группе дохода. Попробуйте автоматически откладывать 10%% от дохода.</string>
     <string name="recommendation_diversify_income">Диверсифицируйте источники дохода</string>
     <string name="recommendation_diversify_income_desc">У вас только %1$d источник дохода. Рассмотрите возможность дополнительного заработка или пассивного дохода для повышения финансовой стабильности.</string>
     <string name="recommendation_create_emergency_fund_desc">Рекомендуется иметь резерв на 3-6 месяцев расходов. Сейчас у вас есть средства примерно на %1$d месяца.</string>
@@ -107,6 +107,39 @@
     <string name="tip_small_expenses">У вас много мелких трат. Попробуйте объединять покупки или отказаться от лишнего.</string>
     <string name="tip_expenses_equal_income">Ваши расходы равны или превышают доходы. Попробуйте откладывать хотя бы 10% от дохода.</string>
     <string name="income_range_insufficient_data">Недостаточно данных</string>
+    <!-- Wallet types (titles) -->
+    <string name="wallet_type_cash">Наличные</string>
+    <string name="wallet_type_card">Карта</string>
+    <string name="wallet_type_savings">Сбережения</string>
+    <string name="wallet_type_investment">Инвестиции</string>
+    <string name="wallet_type_other">Другое</string>
+
+    <!-- Categories used by analytics -->
+    <string name="category_services">Услуги</string>
+
+    <!-- Achievements (titles) + missing descs -->
+    <string name="achievement_first_steps">Первые шаги</string>
+    <string name="achievement_first_steps_desc">Создана первая транзакция</string>
+    <string name="achievement_transaction_master">Мастер транзакций</string>
+    <string name="achievement_data_analyst">Аналитик данных</string>
+    <string name="achievement_first_budget">Первый бюджет</string>
+    <string name="achievement_export_master">Мастер экспорта</string>
+    <string name="achievement_backup_enthusiast">Энтузиаст резервных копий</string>
+    <string name="achievement_category_organizer">Эксперт категорий</string>
+    <string name="achievement_early_bird">Ранняя пташка</string>
+    <string name="achievement_night_owl">Ночная сова</string>
+
+    <!-- Recommendations (titles) -->
+    <string name="recommendation_create_emergency_fund">Создайте резервный фонд</string>
+    <string name="category_products">Продукты</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_utilities">Коммунальные услуги</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_other">Другое</string>
+    <string name="export_transaction_type_expense">Расход</string>
+    <string name="export_transaction_type_income">Доход</string>
+    <string name="recommendation_increase_savings_rate">Увеличьте норму сбережений</string>
     <string name="wallet_type_goal">Накопительная цель</string>
     <string name="wallet_type_cash_description">Наличные деньги в кошельке или дома</string>
     <string name="wallet_type_card_description">Дебетовые карты, расчётные счета в банке</string>

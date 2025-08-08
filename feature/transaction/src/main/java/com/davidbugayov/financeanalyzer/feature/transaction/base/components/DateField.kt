@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,7 +30,7 @@ fun DateField(
         value = formattedDate,
         onValueChange = { },
         readOnly = true,
-        label = { Text(stringResource(R.string.date)) },
+        label = { Text(stringResource(UiR.string.date)) },
         trailingIcon = {
             IconButton(onClick = onClick) {
                 Icon(

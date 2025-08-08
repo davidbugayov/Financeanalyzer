@@ -6,6 +6,7 @@ import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.feature.budget.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
@@ -59,7 +60,7 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = resourceProvider.getString(R.string.wallet_not_found),
+                            error = resourceProvider.getString(UiR.string.wallet_not_found),
                             isLoading = false,
                         )
                     }
@@ -99,7 +100,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading wallet")
                 _state.update {
                     it.copy(
-                        error = e.message ?: resourceProvider.getString(R.string.error_loading_wallet),
+                        error = e.message ?: resourceProvider.getString(UiR.string.error_loading_wallet),
                         isLoading = false,
                     )
                 }
@@ -118,7 +119,7 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = resourceProvider.getString(R.string.wallet_not_found),
+                            error = resourceProvider.getString(UiR.string.wallet_not_found),
                             isLoading = false,
                         )
                     }
@@ -155,7 +156,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error loading transactions")
                 _state.update {
                     it.copy(
-                        error = e.message ?: resourceProvider.getString(R.string.error_loading_transactions),
+                        error = e.message ?: resourceProvider.getString(UiR.string.error_loading_transactions),
                         isLoading = false,
                     )
                 }
@@ -181,7 +182,7 @@ class WalletTransactionsViewModel(
                 if (currentWallet == null) {
                     _state.update {
                         it.copy(
-                            error = resourceProvider.getString(R.string.wallet_not_found),
+                            error = resourceProvider.getString(UiR.string.wallet_not_found),
                         )
                     }
                     return@launch
@@ -213,7 +214,7 @@ class WalletTransactionsViewModel(
                 Timber.e(e, "Error linking categories")
                 _state.update {
                     it.copy(
-                        error = e.message ?: resourceProvider.getString(R.string.error_linking_categories),
+                        error = e.message ?: resourceProvider.getString(UiR.string.error_linking_categories),
                     )
                 }
             }

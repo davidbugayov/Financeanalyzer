@@ -11,7 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.domain.R
 import kotlin.math.max
 import java.math.BigDecimal
 

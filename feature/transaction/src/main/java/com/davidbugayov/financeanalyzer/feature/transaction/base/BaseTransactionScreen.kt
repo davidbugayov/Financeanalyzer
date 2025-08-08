@@ -92,15 +92,15 @@ fun <E> BaseTransactionScreen(
 
     // Устанавливаем значения по умолчанию для строковых ресурсов
     val actualScreenTitle: String = if (isEditMode) {
-        stringResource(R.string.edit_transaction_title)
+        stringResource(UiR.string.edit)
     } else {
-        screenTitle ?: stringResource(R.string.add_transaction)
+        screenTitle ?: stringResource(UiR.string.add)
     }
 
     val actualButtonText: String = if (isEditMode) {
-        stringResource(R.string.save_button_text)
+        stringResource(UiR.string.save)
     } else {
-        buttonText ?: stringResource(R.string.add_button)
+        buttonText ?: stringResource(UiR.string.add)
     }
 
     // Сортируем категории по частоте использования при инициализации экрана
@@ -127,8 +127,8 @@ fun <E> BaseTransactionScreen(
         }
 
     // Строковые ресурсы для категорий
-    val categoryOther = stringResource(R.string.category_other)
-    val categoryTransfer = stringResource(R.string.category_transfer)
+    val categoryOther = stringResource(UiR.string.category_other)
+    val categoryTransfer = stringResource(UiR.string.category_transfer)
 
     // Устанавливаем первый источник из отсортированного списка при инициализации
     LaunchedEffect(sortedSources) {
@@ -234,7 +234,7 @@ fun <E> BaseTransactionScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = stringResource(R.string.error_title),
+                    text = stringResource(UiR.string.error_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },
@@ -326,7 +326,7 @@ fun <E> BaseTransactionScreen(
                             Icon(
                                 imageVector = Icons.Default.Upload,
                                 contentDescription =
-                                    stringResource(R.string.import_transactions_content_description),
+                                    stringResource(UiR.string.import_transactions_content_description),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -353,7 +353,7 @@ fun <E> BaseTransactionScreen(
                 if (!isEditMode && onNavigateToImport != null) {
                     ReminderBubble(
                         visible = showImportReminder,
-                        title = stringResource(R.string.import_transactions_title),
+                        title = stringResource(R.string.import_section_title),
                         description = stringResource(R.string.import_transactions_hint),
                         actionButtonText = stringResource(R.string.import_button),
                         dismissButtonText = stringResource(UiR.string.close),
@@ -649,7 +649,7 @@ fun <E> BaseTransactionScreen(
                         TextButton(
                             onClick = { showImportConfirmation = false },
                         ) {
-                            Text(stringResource(R.string.dialog_cancel))
+                            Text(stringResource(UiR.string.cancel))
                         }
                     },
                 )
@@ -810,7 +810,7 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                        title = { Text(stringResource(R.string.delete_category_title)) },
+                         title = { Text(stringResource(UiR.string.delete_category_title)) },
                         text = {
                             Text(
                                 stringResource(R.string.delete_category_confirmation, category),
@@ -825,7 +825,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(stringResource(R.string.dialog_delete))
+                                 Text(stringResource(UiR.string.delete))
                             }
                         },
                         dismissButton = {
@@ -839,7 +839,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(stringResource(R.string.dialog_cancel))
+                                 Text(stringResource(UiR.string.cancel))
                             }
                         },
                     )
@@ -856,7 +856,7 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                        title = { Text(stringResource(R.string.delete_source_title)) },
+                         title = { Text(stringResource(UiR.string.delete_source_title)) },
                         text = { Text(stringResource(R.string.delete_source_confirmation, source)) },
                         confirmButton = {
                             Button(
@@ -867,7 +867,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(stringResource(R.string.dialog_delete))
+                                 Text(stringResource(UiR.string.delete))
                             }
                         },
                         dismissButton = {
@@ -879,7 +879,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                Text(stringResource(R.string.dialog_cancel))
+                                 Text(stringResource(UiR.string.cancel))
                             }
                         },
                     )

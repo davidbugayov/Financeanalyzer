@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 
@@ -101,7 +102,7 @@ fun NotificationPermissionDialog(
 
                 // Заголовок
                 Text(
-                    text = stringResource(R.string.notification_permission_title),
+                    text = stringResource(UiR.string.notification_permission_title),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -111,7 +112,7 @@ fun NotificationPermissionDialog(
 
                 // Описание
                 Text(
-                    text = stringResource(R.string.notification_permission_description),
+                    text = stringResource(UiR.string.notification_permission_description),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -135,7 +136,7 @@ fun NotificationPermissionDialog(
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text(stringResource(R.string.notification_permission_later))
+                        Text(stringResource(UiR.string.notification_permission_later))
                     }
 
                     // Кнопка "Разрешить"
@@ -158,7 +159,7 @@ fun NotificationPermissionDialog(
                         },
                         modifier = Modifier.weight(1f),
                     ) {
-                        Text(stringResource(R.string.notification_permission_allow))
+                        Text(stringResource(UiR.string.notification_permission_allow))
                     }
                 }
             }

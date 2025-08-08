@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
@@ -142,12 +143,12 @@ fun SourceSelectionDialog(
                 onSourcesSelected(localSelectedSources)
                 onDismiss()
             }) {
-                Text(stringResource(R.string.apply))
+                Text(stringResource(UiR.string.apply))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
+                Text(stringResource(UiR.string.close))
             }
         },
     )

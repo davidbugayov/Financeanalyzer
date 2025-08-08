@@ -48,7 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
-import com.davidbugayov.financeanalyzer.feature.statistics.R
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel

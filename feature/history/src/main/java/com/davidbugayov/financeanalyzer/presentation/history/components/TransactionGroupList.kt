@@ -269,10 +269,10 @@ private fun ExpandableGroupHeader(
                 contentDescription =
                     if (isExpanded) {
                         stringResource(
-                            R.string.collapse,
+                            com.davidbugayov.financeanalyzer.ui.R.string.collapse,
                         )
                     } else {
-                        stringResource(R.string.expand)
+                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.expand)
                     },
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

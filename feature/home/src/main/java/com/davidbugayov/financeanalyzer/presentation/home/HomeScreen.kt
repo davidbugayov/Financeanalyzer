@@ -37,6 +37,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
@@ -111,7 +112,7 @@ private fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = stringResource(R.string.profile),
+                    contentDescription = stringResource(UiR.string.profile),
                 )
             }
         },

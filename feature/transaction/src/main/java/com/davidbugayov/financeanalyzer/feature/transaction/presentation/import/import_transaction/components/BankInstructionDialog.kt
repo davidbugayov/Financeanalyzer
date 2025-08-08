@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог с инструкциями по импорту для выбранного банка
@@ -78,7 +79,7 @@ fun BankInstructionDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(text = stringResource(R.string.got_it))
+                    Text(text = stringResource(UiR.string.got_it))
                 }
             }
         }

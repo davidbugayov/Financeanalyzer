@@ -6,7 +6,7 @@ import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.domain.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

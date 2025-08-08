@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.feature.statistics.R
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Карточка с метриками финансового здоровья.

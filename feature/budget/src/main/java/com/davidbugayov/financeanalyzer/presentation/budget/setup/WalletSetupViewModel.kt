@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.feature.budget.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,12 +79,12 @@ class WalletSetupViewModel(
 
         // Валидация данных
         if (s.name.isBlank()) {
-            _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_wallet_name))
+            _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_enter_wallet_name))
             return
         }
 
         if (s.isGoal && s.goalAmountText.isBlank()) {
-            _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_target_amount))
+            _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_enter_target_amount))
             return
         }
 
@@ -92,12 +93,12 @@ class WalletSetupViewModel(
                 try {
                     val amount = s.goalAmountText.toDouble()
                     if (amount <= 0) {
-                        _state.value = s.copy(error = resourceProvider.getString(R.string.error_target_amount_positive))
+                        _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_target_amount_positive))
                         return
                     }
                     Money(amount)
                 } catch (_: Exception) {
-                    _state.value = s.copy(error = resourceProvider.getString(R.string.error_enter_valid_amount))
+                    _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_enter_valid_amount))
                     return
                 }
             } else {
@@ -140,7 +141,7 @@ class WalletSetupViewModel(
                 _state.value =
                     _state.value.copy(
                         isLoading = false,
-                        error = resourceProvider.getString(R.string.error_creating_wallet, e.message ?: ""),
+                        error = resourceProvider.getString(UiR.string.error_creating_wallet, e.message ?: ""),
                     )
             }
         }

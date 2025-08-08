@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
 /**
@@ -69,9 +70,9 @@ fun WalletSelectionSection(
                 Text(
                     text =
                         if (isExpense) {
-                            stringResource(R.string.deduct_from_wallets)
+                            stringResource(UiR.string.deduct_from_wallets)
                         } else {
-                            stringResource(R.string.add_to_wallets)
+                            stringResource(UiR.string.add_to_wallets)
                         },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),

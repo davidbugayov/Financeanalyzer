@@ -35,6 +35,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
@@ -241,7 +242,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                     .heightIn(min = 44.dp),
         ) {
             Text(
-                text = stringResource(R.string.add_transaction),
+                text = stringResource(UiR.string.add_transaction),
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp,
                 maxLines = 1,

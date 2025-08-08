@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
 fun NoteField(
@@ -17,7 +18,7 @@ fun NoteField(
     OutlinedTextField(
         value = note,
         onValueChange = onNoteChange,
-        label = { Text(stringResource(R.string.note_optional)) },
+        label = { Text(stringResource(UiR.string.note_optional)) },
         modifier = modifier,
         singleLine = false,
         keyboardOptions = KeyboardOptions.Default,

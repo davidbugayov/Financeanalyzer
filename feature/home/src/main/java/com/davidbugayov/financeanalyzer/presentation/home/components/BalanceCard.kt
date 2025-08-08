@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
@@ -51,7 +52,7 @@ private fun BalanceCardTitle(balance: Money) {
             expenseColor.copy(alpha = 0.7f)
         }
     Text(
-        text = stringResource(R.string.current_balance),
+        text = stringResource(UiR.string.current_balance),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Medium,
         color = titleColor,

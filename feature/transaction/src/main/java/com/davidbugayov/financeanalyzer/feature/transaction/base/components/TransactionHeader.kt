@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -81,7 +82,7 @@ fun TransactionHeader(
                 },
                 label = {
                     Text(
-                        stringResource(R.string.income_type),
+                        stringResource(UiR.string.income_type),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = if (!isExpense) FontWeight.SemiBold else FontWeight.Normal,
                     )
@@ -108,7 +109,7 @@ fun TransactionHeader(
                 },
                 label = {
                     Text(
-                        stringResource(R.string.expense_type),
+                        stringResource(UiR.string.expense_type),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = if (isExpense) FontWeight.SemiBold else FontWeight.Normal,
                     )
