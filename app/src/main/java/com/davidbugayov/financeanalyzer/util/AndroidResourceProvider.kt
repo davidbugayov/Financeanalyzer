@@ -9,6 +9,6 @@ import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
  */
 class AndroidResourceProvider(private val context: Context) : ResourceProvider {
     override fun getString(@StringRes id: Int, vararg args: Any?): String {
-        return context.getString(id, *args)
+        return if (args.isNotEmpty()) context.getString(id, *args) else context.getString(id)
     }
 }
