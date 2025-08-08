@@ -10,9 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
@@ -57,21 +57,31 @@ fun ParentWalletCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance)}: ${wallet.balance.formatForDisplay()}",
+                text = "${stringResource(
+                    com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance,
+                )}: ${wallet.balance.formatForDisplay()}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
 
             Text(
-                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.in_wallets, totalSubWalletAmount.formatForDisplay()),
+                text =
+                    stringResource(
+                        com.davidbugayov.financeanalyzer.ui.R.string.in_wallets,
+                        totalSubWalletAmount.formatForDisplay(),
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
             )
 
             val availableAmount = wallet.balance - totalSubWalletAmount
             Text(
-                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.available_colon_value, availableAmount.formatForDisplay()),
+                text =
+                    stringResource(
+                        com.davidbugayov.financeanalyzer.ui.R.string.available_colon_value,
+                        availableAmount.formatForDisplay(),
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
                 color =
@@ -147,7 +157,11 @@ fun SubWalletCard(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet)) },
-            text = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet_confirm, wallet.name)) },
+            text = {
+                Text(
+                    stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet_confirm, wallet.name),
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -155,7 +169,10 @@ fun SubWalletCard(
                         showDeleteDialog = false
                     },
                 ) {
-                    Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete), color = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete),
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
             },
             dismissButton = {
@@ -207,7 +224,10 @@ fun EmptySubWalletsState(
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
+                modifier =
+                    Modifier.padding(
+                        horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                    ),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -221,7 +241,12 @@ fun EmptySubWalletsState(
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                 )
-                Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                Spacer(
+                    modifier =
+                        Modifier.width(
+                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                        ),
+                )
                 Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add_subwallet))
             }
         }

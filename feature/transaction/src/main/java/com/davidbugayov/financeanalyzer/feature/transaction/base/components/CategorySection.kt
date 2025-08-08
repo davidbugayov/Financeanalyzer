@@ -41,8 +41,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateContentColor
 
@@ -93,9 +93,10 @@ fun CategorySection(
             Arrangement.spacedBy(1.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -138,7 +139,7 @@ fun CategorySection(
                                         if (selectedSubcategory.isNotBlank()) {
                                             selectedSubcategory
                                         } else {
-                                             stringResource(UiR.string.subcategory)
+                                            stringResource(UiR.string.subcategory)
                                         },
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary,
@@ -154,11 +155,12 @@ fun CategorySection(
                         }
                         // Индикатор наличия подкатегорий
                         Text(
-                            text = when {
-                                selectedSubcategory.isNotBlank() -> stringResource(UiR.string.subcategory_selected)
-                                hasAvailableSubcategories -> stringResource(UiR.string.has_subcategories)
-                                else -> stringResource(UiR.string.no_subcategories)
-                            },
+                            text =
+                                when {
+                                    selectedSubcategory.isNotBlank() -> stringResource(UiR.string.subcategory_selected)
+                                    hasAvailableSubcategories -> stringResource(UiR.string.has_subcategories)
+                                    else -> stringResource(UiR.string.no_subcategories)
+                                },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -250,7 +252,7 @@ fun CategorySection(
                                 },
                             modifier =
                                 Modifier.size(
-                                     dimensionResource(UiR.dimen.category_item_icon_size),
+                                    dimensionResource(UiR.dimen.category_item_icon_size),
                                 ),
                         )
                     }
@@ -281,7 +283,7 @@ fun CategorySection(
                         Modifier
                             .width(dimensionResource(UiR.dimen.category_item_width))
                             .padding(
-                                 vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
+                                vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
                             ),
                 )
             }
@@ -290,14 +292,18 @@ fun CategorySection(
         if (showExpand) {
             Spacer(modifier = Modifier.height(4.dp))
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 TextButton(onClick = { setExpanded(!expanded) }) {
                     Text(
-                        text = stringResource(if (expanded) R.string.hide_categories else R.string.show_more_categories),
+                        text =
+                            stringResource(
+                                if (expanded) R.string.hide_categories else R.string.show_more_categories,
+                            ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )

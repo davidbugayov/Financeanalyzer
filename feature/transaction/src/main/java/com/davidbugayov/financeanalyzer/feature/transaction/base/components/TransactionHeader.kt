@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,9 +55,10 @@ fun TransactionHeader(
         val formattedDate = dateFormat.format(date)
 
         Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
-                .clickable(onClick = onDateClick),
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = onDateClick),
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
             shape = RoundedCornerShape(12.dp),
         ) {
@@ -93,13 +93,21 @@ fun TransactionHeader(
                         selectedLabelColor = incomeColor,
                         containerColor = MaterialTheme.colorScheme.surface,
                     ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    selected = !isExpense,
-                    borderColor = if (!isExpense) incomeColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                    selectedBorderColor = incomeColor,
-                    borderWidth = if (!isExpense) 2.dp else 1.dp,
-                ),
+                border =
+                    FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = !isExpense,
+                        borderColor =
+                            if (!isExpense) {
+                                incomeColor
+                            } else {
+                                MaterialTheme.colorScheme.outline.copy(
+                                    alpha = 0.3f,
+                                )
+                            },
+                        selectedBorderColor = incomeColor,
+                        borderWidth = if (!isExpense) 2.dp else 1.dp,
+                    ),
             )
 
             FilterChip(
@@ -120,13 +128,21 @@ fun TransactionHeader(
                         selectedLabelColor = expenseColor,
                         containerColor = MaterialTheme.colorScheme.surface,
                     ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = true,
-                    selected = isExpense,
-                    borderColor = if (isExpense) expenseColor else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                    selectedBorderColor = expenseColor,
-                    borderWidth = if (isExpense) 2.dp else 1.dp,
-                ),
+                border =
+                    FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = isExpense,
+                        borderColor =
+                            if (isExpense) {
+                                expenseColor
+                            } else {
+                                MaterialTheme.colorScheme.outline.copy(
+                                    alpha = 0.3f,
+                                )
+                            },
+                        selectedBorderColor = expenseColor,
+                        borderWidth = if (isExpense) 2.dp else 1.dp,
+                    ),
             )
         }
     }

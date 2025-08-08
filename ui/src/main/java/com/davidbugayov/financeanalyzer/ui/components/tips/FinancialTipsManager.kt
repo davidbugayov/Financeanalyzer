@@ -18,12 +18,11 @@ enum class TipCategory(
     val icon: ImageVector,
     val priority: Int,
 ) {
-
     CRITICAL("Критично", Icons.AutoMirrored.Filled.TrendingDown, 1),
     SAVINGS("Накопления", Icons.Default.Savings, 2),
     ANALYTICS("Анализ", Icons.Default.Analytics, 3),
     OPTIMIZATION("Оптимизация", Icons.AutoMirrored.Filled.TrendingUp, 4),
-    PLANNING("Планирование", Icons.Default.PieChart, 5)
+    PLANNING("Планирование", Icons.Default.PieChart, 5),
 }
 
 /**
@@ -43,7 +42,6 @@ data class FinancialTip(
  * Менеджер финансовых советов
  */
 object FinancialTipsManager {
-
     /**
      * Получает персонализированные советы на основе финансовых данных
      *

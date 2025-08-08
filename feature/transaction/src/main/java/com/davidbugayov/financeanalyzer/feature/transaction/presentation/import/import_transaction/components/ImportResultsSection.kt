@@ -166,8 +166,8 @@ fun ImportResultsSection(
                         Column(
                             modifier =
                                 Modifier
-                                     .fillMaxWidth()
-                                 .padding(dimensionResource(UiR.dimen.space_small)),
+                                    .fillMaxWidth()
+                                    .padding(dimensionResource(UiR.dimen.space_small)),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(

@@ -26,10 +26,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 
 /**
@@ -518,16 +518,21 @@ private fun RecommendationStats(recommendations: List<SmartRecommendation>) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = buildString {
-                        if (criticalCount > 0) append(
-                            stringResource(id = R.string.critical_count_recommendations, criticalCount)
-                        )
-                        if (criticalCount > 0 && highCount > 0) append(", ")
-                        if (highCount > 0) append(
-                            stringResource(id = R.string.important_count_recommendations, highCount)
-                        )
-                        append(stringResource(id = R.string.recommendations_require_attention))
-                    },
+                    text =
+                        buildString {
+                            if (criticalCount > 0) {
+                                append(
+                                    stringResource(id = R.string.critical_count_recommendations, criticalCount),
+                                )
+                            }
+                            if (criticalCount > 0 && highCount > 0) append(", ")
+                            if (highCount > 0) {
+                                append(
+                                    stringResource(id = R.string.important_count_recommendations, highCount),
+                                )
+                            }
+                            append(stringResource(id = R.string.recommendations_require_attention))
+                        },
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Medium,

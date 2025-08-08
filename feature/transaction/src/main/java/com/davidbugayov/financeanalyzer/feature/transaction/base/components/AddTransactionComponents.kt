@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора категории
@@ -210,8 +210,8 @@ fun CustomCategoryDialog(
                                     },
                                 border =
                                     if (icon == selectedIcon) {
-                                         BorderStroke(
-                                             dimensionResource(UiR.dimen.category_dialog_icon_border),
+                                        BorderStroke(
+                                            dimensionResource(UiR.dimen.category_dialog_icon_border),
                                             MaterialTheme.colorScheme.primary,
                                         )
                                     } else {
@@ -227,9 +227,9 @@ fun CustomCategoryDialog(
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier =
-                                         Modifier.padding(
-                                             dimensionResource(UiR.dimen.padding_small),
-                                         ),
+                                        Modifier.padding(
+                                            dimensionResource(UiR.dimen.padding_small),
+                                        ),
                                 )
                             }
                         }

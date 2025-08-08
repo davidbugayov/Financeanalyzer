@@ -7,6 +7,7 @@ import org.koin.dsl.module
 /**
  * Модуль DI для feature statistics
  */
-val statisticsModule = module {
-    viewModel { EnhancedFinanceChartViewModel() }
-}
+val statisticsModule =
+    module {
+        viewModel { EnhancedFinanceChartViewModel() }
+    }

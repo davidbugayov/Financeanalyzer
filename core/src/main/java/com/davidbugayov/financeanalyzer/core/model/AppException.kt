@@ -6,7 +6,6 @@ import org.koin.core.context.GlobalContext
 
 // Строки берутся через ResourceProvider (Koin GlobalContext)
 
-
 /**
  * Базовый класс для всех исключений в приложении
  */
@@ -22,6 +21,7 @@ sealed class AppException(
         val errorFileRead: String get() = resourceProvider.getString(R.string.error_file_read)
         val errorUnknown: String get() = resourceProvider.getString(R.string.error_unknown)
     }
+
     /**
      * Ошибки сети
      */
@@ -39,7 +39,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-
         class NotFound(message: String? = null) : Data(message ?: RStrings.errorDataNotFound)
     }
 

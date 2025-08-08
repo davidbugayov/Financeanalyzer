@@ -36,11 +36,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.statistics.R
@@ -220,7 +220,10 @@ fun EnhancedSummaryCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_corner_radius)),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_corner_radius),
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors =
             CardDefaults.cardColors(
@@ -236,10 +239,16 @@ fun EnhancedSummaryCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                        .padding(
-                            horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal),
-                            vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical),
-                        ),
+                    .padding(
+                        horizontal =
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal,
+                            ),
+                        vertical =
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical,
+                            ),
+                    ),
         ) {
             // Используем Column с анимацией alpha
             Column(
@@ -283,8 +292,8 @@ fun EnhancedSummaryCard(
                     style =
                         MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
-                             fontSize =
-                                 dimensionResource(
+                            fontSize =
+                                dimensionResource(
                                     com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_font_size,
                                 ).value.sp * balanceScale,
                             letterSpacing =
@@ -324,10 +333,14 @@ fun EnhancedSummaryCard(
                                     Modifier
                                         .padding(end = 4.dp)
                                         .height(
-                                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size),
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                            ),
                                         )
                                         .width(
-                                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size),
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                            ),
                                         ),
                             )
                             Text(
@@ -336,7 +349,7 @@ fun EnhancedSummaryCard(
                                     MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold,
                                         fontSize =
-                                             dimensionResource(
+                                            dimensionResource(
                                                 com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
                                             ).value.sp,
                                     ),
@@ -349,7 +362,7 @@ fun EnhancedSummaryCard(
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
-                                         dimensionResource(
+                                        dimensionResource(
                                             com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
                                         ).value.sp,
                                 ),
@@ -373,10 +386,14 @@ fun EnhancedSummaryCard(
                                     Modifier
                                         .padding(end = 4.dp)
                                         .height(
-                                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size),
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                            ),
                                         )
                                         .width(
-                                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size),
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                            ),
                                         ),
                             )
                             Text(
@@ -385,7 +402,7 @@ fun EnhancedSummaryCard(
                                     MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Bold,
                                         fontSize =
-                                             dimensionResource(
+                                            dimensionResource(
                                                 com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
                                             ).value.sp,
                                     ),
@@ -398,7 +415,7 @@ fun EnhancedSummaryCard(
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
-                                         dimensionResource(
+                                        dimensionResource(
                                             com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
                                         ).value.sp,
                                 ),

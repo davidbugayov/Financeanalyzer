@@ -16,9 +16,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.setScale
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import timber.log.Timber
 
@@ -60,7 +60,11 @@ fun SavingsOptimizationCard(
 
             MetricRow(
                 title = stringResource(UiR.string.savings_rate_title),
-                value = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health_metric, metrics.savingsRate.setScale(1).toInt()),
+                value =
+                    stringResource(
+                        com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health_metric,
+                        metrics.savingsRate.setScale(1).toInt(),
+                    ),
             )
 
             MetricRow(

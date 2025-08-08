@@ -241,7 +241,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 modifier = Modifier.fillMaxWidth(),
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                    ),
+                            )
 
                             NumberTextField(
                                 value = categoryLimit,
@@ -300,7 +305,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                                    ),
+                            )
 
                             NumberTextField(
                                 value = incomeAmount,
@@ -350,14 +360,21 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             )
 
                             Text(
-                                text = stringResource(R.string.wallet_balance) + ": " + selectedWallet!!.balance.formatForDisplay(
-                                    showCurrency = true,
-                                    useMinimalDecimals = true,
-                                ),
+                                text =
+                                    stringResource(R.string.wallet_balance) + ": " +
+                                        selectedWallet!!.balance.formatForDisplay(
+                                            showCurrency = true,
+                                            useMinimalDecimals = true,
+                                        ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                                    ),
+                            )
 
                             NumberTextField(
                                 value = walletAmount,
@@ -418,14 +435,21 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             )
 
                             Text(
-                                text = stringResource(R.string.wallet_balance) + ": " + selectedFromWallet!!.balance.formatForDisplay(
-                                    showCurrency = true,
-                                    useMinimalDecimals = true,
-                                ),
+                                text =
+                                    stringResource(R.string.wallet_balance) + ": " +
+                                        selectedFromWallet!!.balance.formatForDisplay(
+                                            showCurrency = true,
+                                            useMinimalDecimals = true,
+                                        ),
                                 style = MaterialTheme.typography.bodySmall,
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                                    ),
+                            )
 
                             Text(
                                 text = stringResource(R.string.to_category),
@@ -456,7 +480,14 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                     fontWeight = FontWeight.Medium,
                                 )
 
-                                Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                                Spacer(
+                                    modifier =
+                                        Modifier.height(
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small,
+                                            ),
+                                        ),
+                                )
 
                                 NumberTextField(
                                     value = transferAmount,
@@ -520,11 +551,19 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                     text = {
                         Column {
                             Text(
-                                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.period_duration_description),
+                                text =
+                                    stringResource(
+                                        com.davidbugayov.financeanalyzer.ui.R.string.period_duration_description,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_medium)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_medium),
+                                    ),
+                            )
 
                             OutlinedTextField(
                                 value = periodDuration,
@@ -537,7 +576,11 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                     KeyboardOptions(
                                         keyboardType = KeyboardType.Number,
                                     ),
-                                label = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.days_count)) },
+                                label = {
+                                    Text(
+                                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.days_count),
+                                    )
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                             )
                         }
@@ -590,7 +633,10 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             Modifier
                                 .fillMaxWidth()
                                 .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_medium)),
-                        shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_large)),
+                        shape =
+                            RoundedCornerShape(
+                                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_large),
+                            ),
                         colors =
                             CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface,
@@ -600,7 +646,11 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.wallet_card_padding)),
+                                    .padding(
+                                        dimensionResource(
+                                            com.davidbugayov.financeanalyzer.ui.R.dimen.wallet_card_padding,
+                                        ),
+                                    ),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             // Заголовок с иконкой
@@ -613,29 +663,63 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                     imageVector = Icons.Default.AccountBalanceWallet,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.icon_size_28dp)),
+                                    modifier =
+                                        Modifier.size(
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.icon_size_28dp,
+                                            ),
+                                        ),
                                 )
-                                Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.chart_spacing_medium)))
+                                Spacer(
+                                    modifier =
+                                        Modifier.width(
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.chart_spacing_medium,
+                                            ),
+                                        ),
+                                )
                                 Text(
-                                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.distribute_income),
+                                    text =
+                                        stringResource(
+                                            com.davidbugayov.financeanalyzer.ui.R.string.distribute_income,
+                                        ),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_medium)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_medium),
+                                    ),
+                            )
 
                             // Пояснительный текст
                             Text(
-                                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.distribute_income_description),
+                                text =
+                                    stringResource(
+                                        com.davidbugayov.financeanalyzer.ui.R.string.distribute_income_description,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.padding_horizontal_8dp)),
+                                modifier =
+                                    Modifier.padding(
+                                        horizontal =
+                                            dimensionResource(
+                                                com.davidbugayov.financeanalyzer.ui.R.dimen.padding_horizontal_8dp,
+                                            ),
+                                    ),
                             )
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                                    ),
+                            )
 
                             // Кнопки действий
                             Button(
@@ -657,7 +741,10 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                     viewModel.onNavigateToTransactions(state.categories.first().id)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_12dp)),
+                                shape =
+                                    RoundedCornerShape(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_12dp),
+                                    ),
                             ) {
                                 Text(
                                     text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.distribute),
@@ -665,7 +752,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                            Spacer(
+                                modifier =
+                                    Modifier.height(
+                                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                    ),
+                            )
 
                             TextButton(
                                 onClick = {
@@ -676,7 +768,10 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
-                                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add_without_distribution),
+                                    text =
+                                        stringResource(
+                                            com.davidbugayov.financeanalyzer.ui.R.string.add_without_distribution,
+                                        ),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )

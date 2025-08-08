@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
@@ -14,10 +15,8 @@ import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
-import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -33,6 +32,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 class ProfileViewModel(
@@ -396,10 +396,13 @@ class ProfileViewModel(
                     }
                 } else {
                     Timber.w("[ProfileViewModel] Unexpected result type: $result")
-                        _state.update { currentState ->
+                    _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                                error = GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown_type),
+                            error =
+                                GlobalContext.get().get<ResourceProvider>().getString(
+                                    R.string.error_unknown_type,
+                                ),
                         )
                     }
                 }

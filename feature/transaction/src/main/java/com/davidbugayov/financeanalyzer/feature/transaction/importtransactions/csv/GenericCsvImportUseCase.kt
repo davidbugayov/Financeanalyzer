@@ -3,17 +3,17 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.csv
 import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 /**
@@ -70,7 +70,11 @@ class GenericCsvImportUseCase(
         reader.reset()
         if (firstLine == null) {
             val rp: ResourceProvider = GlobalContext.get().get()
-            Timber.w("[$bankName] ${rp.getString(com.davidbugayov.financeanalyzer.feature.transaction.R.string.csv_file_empty)}")
+            Timber.w(
+                "[$bankName] ${rp.getString(
+                    com.davidbugayov.financeanalyzer.feature.transaction.R.string.csv_file_empty,
+                )}",
+            )
             return false
         }
         val columns = firstLine.split(config.delimiter)

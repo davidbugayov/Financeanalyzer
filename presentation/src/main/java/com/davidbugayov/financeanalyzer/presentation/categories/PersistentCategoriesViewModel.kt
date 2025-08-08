@@ -128,4 +128,4 @@ class PersistentCategoriesViewModel(
         categoryPreferences.removeIncomeCategory(name)
         Timber.d("Удалена категория доходов: $name")
     }
-} 
+}

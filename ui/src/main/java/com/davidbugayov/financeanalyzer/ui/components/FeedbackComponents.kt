@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 import kotlinx.coroutines.delay
 
@@ -146,7 +145,11 @@ fun FeedbackMessage(
                                         )?.setPrimaryClip(
                                             clip,
                                         )
-                                        Toast.makeText(context, context.getString(R.string.path_copied), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.path_copied),
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
                                         isCopied = true
                                     }
                                     .padding(horizontal = 8.dp, vertical = 4.dp),

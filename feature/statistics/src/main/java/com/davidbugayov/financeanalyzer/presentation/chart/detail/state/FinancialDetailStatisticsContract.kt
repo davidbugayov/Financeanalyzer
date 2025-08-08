@@ -18,7 +18,9 @@ object FinancialDetailStatisticsContract {
     // Интенты (события)
     sealed class Intent {
         object LoadData : Intent()
+
         data class ToggleIncludeTransfers(val include: Boolean) : Intent()
+
         data class ToggleIncludeRefunds(val include: Boolean) : Intent()
     }
 

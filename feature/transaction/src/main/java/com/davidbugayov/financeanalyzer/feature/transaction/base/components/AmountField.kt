@@ -241,10 +241,11 @@ fun AmountField(
                             textFieldValueForDisplay =
                                 TextFieldValue(
                                     text = validatedText,
-                                    selection = TextRange(
-                                        start = newSelectionStart.coerceIn(0, validatedText.length),
-                                        end = newSelectionEnd.coerceIn(0, validatedText.length),
-                                    ),
+                                    selection =
+                                        TextRange(
+                                            start = newSelectionStart.coerceIn(0, validatedText.length),
+                                            end = newSelectionEnd.coerceIn(0, validatedText.length),
+                                        ),
                                 )
                         }
                         // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
@@ -252,48 +253,54 @@ fun AmountField(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    textStyle = MaterialTheme.typography.headlineMedium.copy(
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        color = accentColor,
-                        fontSize = 32.sp,
-                    ),
+                    textStyle =
+                        MaterialTheme.typography.headlineMedium.copy(
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            color = accentColor,
+                            fontSize = 32.sp,
+                        ),
                     singleLine = true,
                     minLines = 1,
                     isError = isError,
                     placeholder = {
                         Text(
                             text = stringResource(R.string.amount_placeholder),
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                textAlign = TextAlign.Center,
-                                fontSize = 32.sp,
-                            ),
+                            style =
+                                MaterialTheme.typography.headlineMedium.copy(
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 32.sp,
+                                ),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         )
                     },
                     supportingText = {
-                        if (isError) Text(
-                            text = stringResource(UiR.string.error_enter_valid_amount),
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
+                        if (isError) {
+                            Text(
+                                text = stringResource(UiR.string.error_enter_valid_amount),
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = accentColor,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentColor,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                        ),
                     shape = RoundedCornerShape(16.dp),
                     trailingIcon = {
                         Text(
                             text = currentCurrency.symbol,
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                            ),
+                            style =
+                                MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
                             color = accentColor,
                         )
                     },
@@ -302,10 +309,11 @@ fun AmountField(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        space = 3.dp,
-                        alignment = Alignment.CenterHorizontally,
-                    ),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(
+                            space = 3.dp,
+                            alignment = Alignment.CenterHorizontally,
+                        ),
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -342,10 +350,11 @@ fun AmountField(
                             modifier = Modifier.size(28.dp),
                             shape = CircleShape,
                             contentPadding = PaddingValues(0.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = accentColor,
-                                containerColor = Color.Transparent,
-                            ),
+                            colors =
+                                ButtonDefaults.outlinedButtonColors(
+                                    contentColor = accentColor,
+                                    containerColor = Color.Transparent,
+                                ),
                             border = null,
                         ) {
                             Text(

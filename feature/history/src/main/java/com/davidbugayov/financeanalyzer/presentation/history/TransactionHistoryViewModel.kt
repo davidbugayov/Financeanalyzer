@@ -8,6 +8,7 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
@@ -26,10 +27,8 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
@@ -50,6 +49,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi

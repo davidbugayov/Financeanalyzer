@@ -26,9 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -71,7 +70,9 @@ fun SourceSelectionDialog(
                                         sourceNames
                                     }
                             }
-                            .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
+                            .padding(
+                                vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -107,7 +108,12 @@ fun SourceSelectionDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)))
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                        ),
+                )
 
                 // Список источников
                 val isDarkTheme = isSystemInDarkTheme()
@@ -174,7 +180,7 @@ private fun SourceCheckboxItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                 .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny))
+                .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny))
                 .clip(MaterialTheme.shapes.small)
                 .background(
                     if (isSelected) {

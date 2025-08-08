@@ -105,7 +105,9 @@ fun TransactionDetailDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)),
+                )
 
                 // Контент диалога
                 TransactionDetailContent(
@@ -122,12 +124,19 @@ fun TransactionDetailDialog(
                 ) {
                     TextButton(
                         onClick = onDismiss,
-                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.card_horizontal_padding), vertical = dimensionResource(R.dimen.card_vertical_padding)),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.card_horizontal_padding),
+                                vertical = dimensionResource(R.dimen.card_vertical_padding),
+                            ),
                     ) {
                         Text(
                             text = stringResource(R.string.close),
                             fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                                ),
                         )
                     }
                 }

@@ -105,9 +105,9 @@ fun ExportImportScreen(
                 title = { Text(stringResource(R.string.export_import_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                            Icon(
+                        Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.back),
+                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.back),
                         )
                     }
                 },
@@ -205,7 +205,10 @@ fun ExportImportScreen(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.import_transactions_title),
+                                text =
+                                    stringResource(
+                                        com.davidbugayov.financeanalyzer.ui.R.string.import_transactions_title,
+                                    ),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
                                 color = MaterialTheme.colorScheme.onSurface,

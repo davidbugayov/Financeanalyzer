@@ -52,9 +52,9 @@ class EditTransactionViewModel(
         walletRepository,
         updateWalletBalancesUseCase,
         application.resources,
-    addSubcategoryUseCase,
-    getSubcategoriesByCategoryIdUseCase,
-    getSubcategoryByIdUseCase,
+        addSubcategoryUseCase,
+        getSubcategoriesByCategoryIdUseCase,
+        getSubcategoryByIdUseCase,
     ) {
     override val _state =
         MutableStateFlow(

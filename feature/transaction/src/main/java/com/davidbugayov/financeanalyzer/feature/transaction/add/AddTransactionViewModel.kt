@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -17,12 +18,10 @@ import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategor
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -33,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 class AddTransactionViewModel(
@@ -53,9 +53,9 @@ class AddTransactionViewModel(
         walletRepository,
         updateWalletBalancesUseCase,
         application.resources,
-    addSubcategoryUseCase,
-    getSubcategoriesByCategoryIdUseCase,
-    getSubcategoryByIdUseCase,
+        addSubcategoryUseCase,
+        getSubcategoriesByCategoryIdUseCase,
+        getSubcategoryByIdUseCase,
     ) {
     override val _state = MutableStateFlow(AddTransactionState())
 
@@ -82,7 +82,12 @@ class AddTransactionViewModel(
             try {
                 val walletsList = walletRepository.getAllWallets()
                 _wallets.value = walletsList
-                Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_wallets_loaded, walletsList.size))
+                Timber.d(
+                    GlobalContext.get().get<ResourceProvider>().getString(
+                        R.string.log_transaction_wallets_loaded,
+                        walletsList.size,
+                    ),
+                )
             } catch (e: Exception) {
                 Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(R.string.log_error_loading_wallets))
                 _wallets.value = emptyList()
@@ -122,26 +127,49 @@ class AddTransactionViewModel(
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
             Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_amount_error))
-            CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_amount)))
+            CrashLoggerProvider.crashLogger.logException(
+                Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_amount)),
+            )
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
                 if (amountValue <= BigDecimal.ZERO) {
                     validationBuilder.addAmountError()
-                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_zero_amount_error, amountValue.toFloat()))
-                    CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_zero_amount, amountValue.toString())))
+                    Timber.d(
+                        GlobalContext.get().get<ResourceProvider>().getString(
+                            R.string.log_transaction_zero_amount_error,
+                            amountValue.toFloat(),
+                        ),
+                    )
+                    CrashLoggerProvider.crashLogger.logException(
+                        Exception(
+                            GlobalContext.get().get<ResourceProvider>().getString(
+                                R.string.error_zero_amount,
+                                amountValue.toString(),
+                            ),
+                        ),
+                    )
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
-                Timber.e(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_parse_amount_error, e.message ?: ""))
+                Timber.e(
+                    GlobalContext.get().get<ResourceProvider>().getString(
+                        R.string.log_transaction_parse_amount_error,
+                        e.message ?: "",
+                    ),
+                )
                 CrashLoggerProvider.crashLogger.logException(e)
             }
         }
 
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
-            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_category_error))
-            CrashLoggerProvider.crashLogger.logException(Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_category)))
+            Timber.d(
+                GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_category_error),
+            )
+            CrashLoggerProvider.crashLogger.logException(
+                Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_category)),
+            )
         }
 
         val validationResult = validationBuilder.build()
@@ -153,7 +181,13 @@ class AddTransactionViewModel(
             )
         }
 
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_validation_result, validationResult.isValid, validationResult.hasAmountError))
+        Timber.d(
+            GlobalContext.get().get<ResourceProvider>().getString(
+                R.string.log_transaction_validation_result,
+                validationResult.isValid,
+                validationResult.hasAmountError,
+            ),
+        )
         return validationResult.isValid
     }
 
@@ -431,7 +465,13 @@ class AddTransactionViewModel(
             )
         }
 
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_initialize_screen, _state.value.forceExpense, _state.value.isExpense))
+        Timber.d(
+            GlobalContext.get().get<ResourceProvider>().getString(
+                R.string.log_transaction_initialize_screen,
+                _state.value.forceExpense,
+                _state.value.isExpense,
+            ),
+        )
     }
 
     override fun handleBaseEvent(

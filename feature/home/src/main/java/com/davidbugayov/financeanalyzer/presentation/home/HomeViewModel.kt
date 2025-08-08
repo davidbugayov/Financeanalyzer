@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -17,8 +18,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -45,6 +44,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 /**
@@ -443,8 +443,8 @@ class HomeViewModel(
                 if (!hasError) {
                     Timber.d("Test data generation completed successfully")
                 } else {
-                        val rp: ResourceProvider = GlobalContext.get().get()
-                        _state.update { it.copy(error = rp.getString(R.string.error_saving_test_transactions)) }
+                    val rp: ResourceProvider = GlobalContext.get().get()
+                    _state.update { it.copy(error = rp.getString(R.string.error_saving_test_transactions)) }
                 }
                 loadTransactions()
             } catch (e: Exception) {

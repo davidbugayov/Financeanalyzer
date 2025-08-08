@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
-import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.utils.PermissionManager

@@ -48,21 +48,31 @@ fun FinancialHealthScoreCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_corner_radius)),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_corner_radius),
+            ),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
             ),
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_elevation),
+                defaultElevation =
+                    dimensionResource(
+                        com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_elevation,
+                    ),
             ),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_padding)),
+                    .padding(
+                        dimensionResource(
+                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_padding,
+                        ),
+                    ),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -82,7 +92,11 @@ fun FinancialHealthScoreCard(
                 )
             }
 
-            Spacer(Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large)))
+            Spacer(
+                Modifier.height(
+                    dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large),
+                ),
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -133,7 +147,14 @@ fun FinancialHealthScoreCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_medium)))
+            Spacer(
+                modifier =
+                    Modifier.height(
+                        dimensionResource(
+                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_medium,
+                        ),
+                    ),
+            )
 
             // Интерпретация скора
             HealthScoreInterpretation(healthScore)

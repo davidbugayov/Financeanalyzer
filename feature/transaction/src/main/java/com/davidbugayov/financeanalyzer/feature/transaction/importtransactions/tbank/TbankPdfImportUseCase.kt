@@ -22,7 +22,10 @@ class TbankPdfImportUseCase(
     transactionRepository: TransactionRepository,
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
     override val bankName: String = "Тинькофф Банк (PDF)"
-    private val transactionSource: String = context.getString(com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_tinkoff)
+    private val transactionSource: String =
+        context.getString(
+            com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_tinkoff,
+        )
 
     private data class PartialTransaction(
         var date: Date? = null,

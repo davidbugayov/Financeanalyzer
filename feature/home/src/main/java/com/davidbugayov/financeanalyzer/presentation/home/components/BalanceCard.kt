@@ -66,7 +66,10 @@ private fun BalanceCardAmount(balance: Money) {
     Text(
         text = balance.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
         style = MaterialTheme.typography.headlineMedium,
-        fontSize = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_font_size).value.sp,
+        fontSize =
+            dimensionResource(
+                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_font_size,
+            ).value.sp,
         fontWeight = FontWeight.Bold,
         color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
     )
@@ -94,16 +97,32 @@ fun BalanceCard(
                 Modifier
                     .fillMaxWidth()
                     .padding(
-                        vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical),
-                        horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal),
+                        vertical =
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical,
+                            ),
+                        horizontal =
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal,
+                            ),
                     ),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BalanceCardTitle(balance)
-            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing)))
+            Spacer(
+                modifier =
+                    Modifier.height(
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing),
+                    ),
+            )
             // Баланс в центре, снизу две цветные плашки доходов/расходов
             BalanceCardAmount(balance)
-            Spacer(modifier = Modifier.height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing)))
+            Spacer(
+                modifier =
+                    Modifier.height(
+                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing),
+                    ),
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -115,7 +134,14 @@ fun BalanceCard(
                     color = incomeColor,
                     modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing)))
+                Spacer(
+                    modifier =
+                        Modifier.width(
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing,
+                            ),
+                        ),
+                )
                 AmountPill(
                     labelRes = com.davidbugayov.financeanalyzer.ui.R.string.expenses,
                     amountText = expense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
@@ -146,10 +172,14 @@ private fun AmountPill(
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             Text(
                 text = stringResource(id = labelRes),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size).value.sp,
-                ),
+                style =
+                    MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize =
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
+                            ).value.sp,
+                    ),
                 color = color,
             )
             Spacer(modifier = Modifier.height(2.dp))
@@ -158,15 +188,31 @@ private fun AmountPill(
                     imageVector = icon,
                     contentDescription = null,
                     tint = color,
-                    modifier = Modifier.size(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size)),
+                    modifier =
+                        Modifier.size(
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                            ),
+                        ),
                 )
-                Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing)))
+                Spacer(
+                    modifier =
+                        Modifier.width(
+                            dimensionResource(
+                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing,
+                            ),
+                        ),
+                )
                 Text(
                     text = amountText,
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size).value.sp,
-                    ),
+                    style =
+                        MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize =
+                                dimensionResource(
+                                    com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
+                                ).value.sp,
+                        ),
                     color = color,
                 )
             }

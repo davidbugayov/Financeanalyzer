@@ -72,17 +72,20 @@ fun EnhancedTipCard(
     val hasMultipleTips = tips.size > 1
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.card_corner_radius)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
@@ -99,12 +102,13 @@ fun EnhancedTipCard(
                 ) {
                     // Иконка категории с мягким фоном
                     Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                            ),
+                        modifier =
+                            Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -155,9 +159,14 @@ fun EnhancedTipCard(
                         ) {
                             Icon(
                                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                contentDescription = if (isExpanded) stringResource(R.string.tips_collapse) else stringResource(
-                                    R.string.tips_expand,
-                                ),
+                                contentDescription =
+                                    if (isExpanded) {
+                                        stringResource(R.string.tips_collapse)
+                                    } else {
+                                        stringResource(
+                                            R.string.tips_expand,
+                                        )
+                                    },
                             )
                         }
                     }
@@ -179,15 +188,21 @@ fun EnhancedTipCard(
 
             // Описание текущего совета
             Text(
-                text = if (currentTip.descriptionArgs.isEmpty()) stringResource(id = currentTip.descriptionResId) else stringResource(
-                    id = currentTip.descriptionResId,
-                    *currentTip.descriptionArgs.toTypedArray(),
-                ),
+                text =
+                    if (currentTip.descriptionArgs.isEmpty()) {
+                        stringResource(id = currentTip.descriptionResId)
+                    } else {
+                        stringResource(
+                            id = currentTip.descriptionResId,
+                            *currentTip.descriptionArgs.toTypedArray(),
+                        )
+                    },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp),
                 maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -273,10 +288,11 @@ private fun CategoryChip(
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier.height(32.dp),
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-        ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+            ),
     ) {
         Icon(
             imageVector = category.icon,
@@ -301,12 +317,14 @@ private fun TipItem(
     onActionClick: (FinancialTip) -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-        ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+            ),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

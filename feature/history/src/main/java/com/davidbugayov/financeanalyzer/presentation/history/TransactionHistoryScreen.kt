@@ -41,7 +41,6 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -56,6 +55,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelec
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
@@ -509,7 +509,9 @@ fun TransactionHistoryScreen(
                         onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) },
                     )
                 } else if (state.isLoading && !state.isLoadingMore) {
-                    CenteredLoadingIndicator(message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data))
+                    CenteredLoadingIndicator(
+                        message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data),
+                    )
                 } else if (state.filteredTransactions.isEmpty()) {
                     EmptyContent()
                 } else {
@@ -518,7 +520,9 @@ fun TransactionHistoryScreen(
 
                     when {
                         pagingItems.loadState.refresh is LoadState.Loading -> {
-                            CenteredLoadingIndicator(message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data))
+                            CenteredLoadingIndicator(
+                                message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data),
+                            )
                         }
                         pagingItems.loadState.refresh is LoadState.Error -> {
                             val e = (pagingItems.loadState.refresh as LoadState.Error).error

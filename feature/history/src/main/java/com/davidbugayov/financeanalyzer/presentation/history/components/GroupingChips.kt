@@ -12,9 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент с чипами для выбора типа группировки транзакций.

@@ -8,9 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.feature.budget.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +33,6 @@ class WalletSetupViewModel(
     private val walletRepository: WalletRepository,
     private val navigationManager: NavigationManager,
 ) : ViewModel(), KoinComponent {
-
     private val resourceProvider: ResourceProvider by inject()
     private val _state = MutableStateFlow(WalletSetupState())
     val state: StateFlow<WalletSetupState> = _state

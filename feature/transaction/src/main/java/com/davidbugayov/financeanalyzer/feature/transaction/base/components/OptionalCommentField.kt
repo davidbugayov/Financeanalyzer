@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
@@ -45,9 +44,13 @@ fun OptionalCommentField(
     var isExpanded by remember { mutableStateOf(note.isNotEmpty()) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(UiR.dimen.padding_horizontal_12dp) + dimensionResource(UiR.dimen.padding_8dp), vertical = dimensionResource(UiR.dimen.comment_field_padding_vertical)),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(UiR.dimen.padding_horizontal_12dp) + dimensionResource(UiR.dimen.padding_8dp),
+                    vertical = dimensionResource(UiR.dimen.comment_field_padding_vertical),
+                ),
     ) {
         // Кнопка для показа/скрытия поля комментария
         TextButton(
@@ -65,14 +68,16 @@ fun OptionalCommentField(
                 )
                 Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.spacing_small)))
                 Text(
-                    text = when {
-                        note.isNotEmpty() -> stringResource(R.string.edit_note)
-                        isExpanded -> stringResource(R.string.hide_note)
-                        else -> stringResource(R.string.add_note)
-                    },
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Medium,
-                    ),
+                    text =
+                        when {
+                            note.isNotEmpty() -> stringResource(R.string.edit_note)
+                            isExpanded -> stringResource(R.string.hide_note)
+                            else -> stringResource(R.string.add_note)
+                        },
+                    style =
+                        MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
                     color = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -99,20 +104,22 @@ fun OptionalCommentField(
             exit = shrinkVertically(),
         ) {
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = dimensionResource(UiR.dimen.spacing_xxsmall)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = dimensionResource(UiR.dimen.spacing_xxsmall)),
                 shape = RoundedCornerShape(dimensionResource(UiR.dimen.comment_field_corner_radius)),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = dimensionResource(UiR.dimen.comment_field_elevation),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = dimensionResource(UiR.dimen.comment_field_inner_padding_horizontal),
-                            vertical = dimensionResource(UiR.dimen.comment_field_inner_padding_vertical),
-                        ),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = dimensionResource(UiR.dimen.comment_field_inner_padding_horizontal),
+                                vertical = dimensionResource(UiR.dimen.comment_field_inner_padding_vertical),
+                            ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     NoteField(

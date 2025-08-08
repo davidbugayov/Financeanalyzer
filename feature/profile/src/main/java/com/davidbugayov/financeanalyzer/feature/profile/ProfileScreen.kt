@@ -60,9 +60,9 @@ import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSecti
 import com.davidbugayov.financeanalyzer.feature.profile.components.ThemeSelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils

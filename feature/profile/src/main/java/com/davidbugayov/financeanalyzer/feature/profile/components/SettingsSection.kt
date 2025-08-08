@@ -30,10 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Currency
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
@@ -119,7 +119,11 @@ fun SettingsSection(
                     if (!hasNotificationPermission) {
                         stringResource(R.string.notification_disabled_description)
                     } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
-                        stringResource(R.string.settings_reminder_time_format, transactionReminderTime.hour, transactionReminderTime.minute)
+                        stringResource(
+                            R.string.settings_reminder_time_format,
+                            transactionReminderTime.hour,
+                            transactionReminderTime.minute,
+                        )
                     } else {
                         stringResource(R.string.off)
                     },

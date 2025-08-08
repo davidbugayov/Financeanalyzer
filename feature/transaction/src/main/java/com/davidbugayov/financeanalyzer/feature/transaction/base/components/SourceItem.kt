@@ -92,16 +92,18 @@ fun SourceItem(
 
         Text(
             text = source.name,
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            ),
+            style =
+                MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                ),
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = when {
-                isError -> MaterialTheme.colorScheme.error
-                isSelected -> MaterialTheme.colorScheme.primary
-                else -> MaterialTheme.colorScheme.onSurface
-            },
+            color =
+                when {
+                    isError -> MaterialTheme.colorScheme.error
+                    isSelected -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.onSurface
+                },
         )
     }
 }

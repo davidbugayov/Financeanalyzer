@@ -39,20 +39,22 @@ object FinancialDataMapper {
             StatisticItem(
                 label = stringResource(id = R.string.stat_income_transactions),
                 value = incomeTransactionsCount.toString(),
-                description = stringResource(
-                    id = R.string.stat_income_transactions_desc,
-                    (incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
-                ),
+                description =
+                    stringResource(
+                        id = R.string.stat_income_transactions_desc,
+                        (incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
+                    ),
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
                 type = StatisticType.POSITIVE,
             ),
             StatisticItem(
                 label = stringResource(id = R.string.stat_expense_transactions),
                 value = expenseTransactionsCount.toString(),
-                description = stringResource(
-                    id = R.string.stat_expense_transactions_desc,
-                    (expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
-                ),
+                description =
+                    stringResource(
+                        id = R.string.stat_expense_transactions_desc,
+                        (expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt(),
+                    ),
                 icon = Icons.AutoMirrored.Filled.TrendingDown,
                 type = StatisticType.NEGATIVE,
             ),
@@ -346,7 +348,11 @@ object FinancialDataMapper {
                     InsightItem(
                         title = stringResource(id = R.string.insight_small_expenses),
                         description = stringResource(id = R.string.insight_small_expenses_desc),
-                        metric = stringResource(id = R.string.insight_small_expenses_metric, averageExpensePerTransaction.toInt()),
+                        metric =
+                            stringResource(
+                                id = R.string.insight_small_expenses_metric,
+                                averageExpensePerTransaction.toInt(),
+                            ),
                         icon = Icons.Default.LocalGroceryStore,
                         importance = InsightImportance.LOW,
                     ),
@@ -357,7 +363,11 @@ object FinancialDataMapper {
                     InsightItem(
                         title = stringResource(id = R.string.insight_large_expenses),
                         description = stringResource(id = R.string.insight_large_expenses_desc),
-                        metric = stringResource(id = R.string.insight_large_expenses_metric, averageExpensePerTransaction.toInt()),
+                        metric =
+                            stringResource(
+                                id = R.string.insight_large_expenses_metric,
+                                averageExpensePerTransaction.toInt(),
+                            ),
                         icon = Icons.Default.ShoppingBag,
                         importance = InsightImportance.MEDIUM,
                     ),

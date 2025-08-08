@@ -40,9 +40,9 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.text.SimpleDateFormat
@@ -245,10 +245,10 @@ private fun ExpandableGroupHeader(
         modifier =
             Modifier
                 .fillMaxWidth()
-                    .padding(
-                        horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
-                        vertical = dimensionResource(id = UiR.dimen.spacing_small),
-                    )
+                .padding(
+                    horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
+                    vertical = dimensionResource(id = UiR.dimen.spacing_small),
+                )
                 .clickable { onToggle(!isExpanded) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         border =

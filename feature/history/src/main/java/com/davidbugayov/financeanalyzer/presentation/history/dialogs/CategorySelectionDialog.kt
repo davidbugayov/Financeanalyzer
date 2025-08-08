@@ -142,7 +142,7 @@ fun CategorySelectionDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                             .height(dimensionResource(UiR.dimen.divider_height)),
+                            .height(dimensionResource(UiR.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
@@ -189,7 +189,7 @@ fun CategorySelectionDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                             .height(dimensionResource(UiR.dimen.divider_height)),
+                            .height(dimensionResource(UiR.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 

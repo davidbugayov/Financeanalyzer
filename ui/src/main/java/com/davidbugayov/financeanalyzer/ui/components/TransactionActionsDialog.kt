@@ -24,9 +24,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -92,7 +92,7 @@ fun TransactionActionsDialog(
                             text = stringResource(R.string.transaction_actions),
                             style =
                                 MaterialTheme.typography.titleLarge.copy(
-                                     fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
+                                    fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
                                     fontWeight = FontWeight.Bold,
                                 ),
                         )
@@ -110,7 +110,9 @@ fun TransactionActionsDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)),
+                )
 
                 // Контент диалога
                 TransactionDetailContent(
@@ -127,7 +129,11 @@ fun TransactionActionsDialog(
                 ) {
                     TextButton(
                         onClick = { onDelete(transaction) },
-                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small), vertical = dimensionResource(R.dimen.spacing_small)),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.spacing_small),
+                                vertical = dimensionResource(R.dimen.spacing_small),
+                            ),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -140,12 +146,19 @@ fun TransactionActionsDialog(
                             text = stringResource(R.string.delete),
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.error,
-                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                                ),
                         )
                     }
                     TextButton(
                         onClick = { onEdit(transaction) },
-                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_small), vertical = dimensionResource(R.dimen.spacing_small)),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = dimensionResource(R.dimen.spacing_small),
+                                vertical = dimensionResource(R.dimen.spacing_small),
+                            ),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -156,7 +169,10 @@ fun TransactionActionsDialog(
                         Text(
                             text = stringResource(R.string.edit),
                             fontWeight = FontWeight.Medium,
-                             style = MaterialTheme.typography.bodyLarge.copy(fontSize = dimensionResource(R.dimen.text_size_medium).value.sp),
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                                ),
                         )
                     }
                 }

@@ -134,7 +134,10 @@ class AlfaBankExcelHandler(
      */
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            val transactionSource = context.getString(com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_alfa)
+            val transactionSource =
+                context.getString(
+                    com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_alfa,
+                )
 
             // Конфигурация для Альфа-Банка
             val alfaBankConfig =

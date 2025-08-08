@@ -62,5 +62,5 @@ data class EditTransactionState(
     override val showCustomSubcategoryDialog: Boolean = false,
     override val customSubcategory: String = "",
     override val availableSubcategories:
-    List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory> = emptyList(),
+        List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory> = emptyList(),
 ) : BaseTransactionState

@@ -73,7 +73,10 @@ fun WalletSelectorDialog(
                     text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.select_wallets),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
+                    modifier =
+                        Modifier.padding(
+                            bottom = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                        ),
                 )
 
                 if (wallets.isEmpty()) {
@@ -81,7 +84,9 @@ fun WalletSelectorDialog(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .height(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_empty_state)),
+                                .height(
+                                    dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_empty_state),
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -95,7 +100,9 @@ fun WalletSelectorDialog(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .heightIn(max = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_dialog)),
+                                .heightIn(
+                                    max = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_dialog),
+                                ),
                     ) {
                         items(wallets) { wallet ->
                             WalletItem(
@@ -113,14 +120,21 @@ fun WalletSelectorDialog(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(top = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
+                            .padding(
+                                top = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                            ),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.cancel))
                     }
 
-                    Spacer(modifier = Modifier.width(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)))
+                    Spacer(
+                        modifier =
+                            Modifier.width(
+                                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                            ),
+                    )
 
                     Button(
                         onClick = onConfirm,

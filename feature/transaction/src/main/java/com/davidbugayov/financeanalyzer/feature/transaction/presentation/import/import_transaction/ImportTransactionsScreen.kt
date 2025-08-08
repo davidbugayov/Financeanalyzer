@@ -62,13 +62,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BanksList
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportProgressSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResults
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme

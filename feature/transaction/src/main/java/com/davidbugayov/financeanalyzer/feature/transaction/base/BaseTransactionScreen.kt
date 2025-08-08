@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
@@ -52,7 +53,6 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Tran
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
-import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
@@ -91,17 +91,19 @@ fun <E> BaseTransactionScreen(
     }
 
     // Устанавливаем значения по умолчанию для строковых ресурсов
-    val actualScreenTitle: String = if (isEditMode) {
-        stringResource(UiR.string.edit)
-    } else {
-        screenTitle ?: stringResource(UiR.string.add)
-    }
+    val actualScreenTitle: String =
+        if (isEditMode) {
+            stringResource(UiR.string.edit)
+        } else {
+            screenTitle ?: stringResource(UiR.string.add)
+        }
 
-    val actualButtonText: String = if (isEditMode) {
-        stringResource(UiR.string.save)
-    } else {
-        buttonText ?: stringResource(UiR.string.add)
-    }
+    val actualButtonText: String =
+        if (isEditMode) {
+            stringResource(UiR.string.save)
+        } else {
+            buttonText ?: stringResource(UiR.string.add)
+        }
 
     // Сортируем категории по частоте использования при инициализации экрана
     val sortedExpenseCategories =
@@ -810,7 +812,7 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                         title = { Text(stringResource(UiR.string.delete_category_title)) },
+                        title = { Text(stringResource(UiR.string.delete_category_title)) },
                         text = {
                             Text(
                                 stringResource(R.string.delete_category_confirmation, category),
@@ -825,7 +827,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                 Text(stringResource(UiR.string.delete))
+                                Text(stringResource(UiR.string.delete))
                             }
                         },
                         dismissButton = {
@@ -839,7 +841,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                 Text(stringResource(UiR.string.cancel))
+                                Text(stringResource(UiR.string.cancel))
                             }
                         },
                     )
@@ -856,7 +858,7 @@ fun <E> BaseTransactionScreen(
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
-                         title = { Text(stringResource(UiR.string.delete_source_title)) },
+                        title = { Text(stringResource(UiR.string.delete_source_title)) },
                         text = { Text(stringResource(R.string.delete_source_confirmation, source)) },
                         confirmButton = {
                             Button(
@@ -867,7 +869,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                 Text(stringResource(UiR.string.delete))
+                                Text(stringResource(UiR.string.delete))
                             }
                         },
                         dismissButton = {
@@ -879,7 +881,7 @@ fun <E> BaseTransactionScreen(
                                     )
                                 },
                             ) {
-                                 Text(stringResource(UiR.string.cancel))
+                                Text(stringResource(UiR.string.cancel))
                             }
                         },
                     )

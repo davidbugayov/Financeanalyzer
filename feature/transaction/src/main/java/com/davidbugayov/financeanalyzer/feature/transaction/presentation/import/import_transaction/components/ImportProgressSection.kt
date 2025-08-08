@@ -141,13 +141,13 @@ fun ImportProgressSection(
                         CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                         ),
-                         shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
+                    shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_card)),
                 ) {
                     Column(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                 .padding(dimensionResource(UiR.dimen.space_small)),
+                                .padding(dimensionResource(UiR.dimen.space_small)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator(
@@ -195,7 +195,7 @@ fun ImportProgressSection(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                             modifier = Modifier.padding(top = dimensionResource(UiR.dimen.space_small)),
+                    modifier = Modifier.padding(top = dimensionResource(UiR.dimen.space_small)),
                     textAlign = TextAlign.Center,
                 )
             }
