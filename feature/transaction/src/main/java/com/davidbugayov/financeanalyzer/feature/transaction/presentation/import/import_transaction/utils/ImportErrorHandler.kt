@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.import_transaction.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
 /**
@@ -60,7 +61,7 @@ class ImportErrorHandler(context: Context) {
                 }
                 else -> {
                     Timber.d("Неизвестный тип ошибки, возвращаем общее сообщение")
-                    appContext.getString(R.string.import_error_unknown)
+                    appContext.getString(UiR.string.import_error_unknown)
                 }
             }
 

@@ -46,10 +46,6 @@
     <string name="achievement_csv_importer_desc">Импортируйте транзакции из CSV-файла</string>
     <string name="log_error_loading_achievements">Ошибка при загрузке достижений</string>
     <string name="log_error_saving_achievements">Ошибка при сохранении достижений</string>
-    <string name="log_error_loading_achievement_progress">Ошибка при загрузке прогресса достижений</string>
-    <string name="log_error_updating_achievement_progress">Ошибка при обновлении прогресса достижения %1$s</string>
-    <string name="log_error_checking_achievement">Ошибка при проверке достижения %1$s</string>
-    <string name="log_error_profile_analytics">Ошибка при получении аналитики профиля</string>
     <string name="log_transaction_update">Обновление транзакции: %1$s</string>
     <string name="log_transaction_add">Добавление транзакции: сумма=%1$s, категория=%2$s</string>
     <string name="log_transaction_not_found">Транзакция с id=%1$s не найдена</string>
@@ -107,39 +103,14 @@
     <string name="tip_small_expenses">У вас много мелких трат. Попробуйте объединять покупки или отказаться от лишнего.</string>
     <string name="tip_expenses_equal_income">Ваши расходы равны или превышают доходы. Попробуйте откладывать хотя бы 10% от дохода.</string>
     <string name="income_range_insufficient_data">Недостаточно данных</string>
-    <!-- Wallet types (titles) -->
+    
+    <string name="achievement_category_organizer">Эксперт категорий</string>
+    <!-- Wallet type display names used in domain -->
     <string name="wallet_type_cash">Наличные</string>
     <string name="wallet_type_card">Карта</string>
     <string name="wallet_type_savings">Сбережения</string>
     <string name="wallet_type_investment">Инвестиции</string>
     <string name="wallet_type_other">Другое</string>
-
-    <!-- Categories used by analytics -->
-    <string name="category_services">Услуги</string>
-
-    <!-- Achievements (titles) + missing descs -->
-    <string name="achievement_first_steps">Первые шаги</string>
-    <string name="achievement_first_steps_desc">Создана первая транзакция</string>
-    <string name="achievement_transaction_master">Мастер транзакций</string>
-    <string name="achievement_data_analyst">Аналитик данных</string>
-    <string name="achievement_first_budget">Первый бюджет</string>
-    <string name="achievement_export_master">Мастер экспорта</string>
-    <string name="achievement_backup_enthusiast">Энтузиаст резервных копий</string>
-    <string name="achievement_category_organizer">Эксперт категорий</string>
-    <string name="achievement_early_bird">Ранняя пташка</string>
-    <string name="achievement_night_owl">Ночная сова</string>
-
-    <!-- Recommendations (titles) -->
-    <string name="recommendation_create_emergency_fund">Создайте резервный фонд</string>
-    <string name="category_products">Продукты</string>
-    <string name="category_transport">Транспорт</string>
-    <string name="category_utilities">Коммунальные услуги</string>
-    <string name="category_clothing">Одежда</string>
-    <string name="category_entertainment">Развлечения</string>
-    <string name="category_other">Другое</string>
-    <string name="export_transaction_type_expense">Расход</string>
-    <string name="export_transaction_type_income">Доход</string>
-    <string name="recommendation_increase_savings_rate">Увеличьте норму сбережений</string>
     <string name="wallet_type_goal">Накопительная цель</string>
     <string name="wallet_type_cash_description">Наличные деньги в кошельке или дома</string>
     <string name="wallet_type_card_description">Дебетовые карты, расчётные счета в банке</string>
@@ -147,6 +118,34 @@
     <string name="wallet_type_investment_description">Брокерские счета, ИИС, инвестиционные портфели</string>
     <string name="wallet_type_goal_description">Специальные счета для достижения целей</string>
     <string name="wallet_type_other_description">Кредиты, долги, займы и другие финансовые инструменты</string>
+    
+    <!-- Categories used in analytics calculations (domain) -->
+    <string name="category_products">Продукты</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_utilities">Коммунальные услуги</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_other">Другое</string>
+    <string name="category_services">Услуги</string>
+
+    <!-- Achievement titles used in domain repository -->
+    <string name="achievement_first_steps">Первые шаги</string>
+    <string name="achievement_first_steps_desc">Создайте первую транзакцию</string>
+    <string name="achievement_transaction_master">Мастер транзакций</string>
+    <string name="achievement_data_analyst">Аналитик данных</string>
+    <string name="achievement_first_budget">Первый бюджет</string>
+    <string name="achievement_early_bird">Ранняя пташка</string>
+    <string name="achievement_night_owl">Ночная сова</string>
+    <string name="achievement_export_master">Мастер экспорта</string>
+    <string name="achievement_backup_enthusiast">Энтузиаст резервных копий</string>
+
+    <!-- Recommendations titles used in domain -->
+    <string name="recommendation_increase_savings_rate">Увеличьте норму сбережений</string>
+    <string name="recommendation_create_emergency_fund">Создайте резервный фонд</string>
+
+    <!-- Export CSV headers/types -->
+    <string name="export_transaction_type_expense">Расход</string>
+    <string name="export_transaction_type_income">Доход</string>
     
     
     </resources>

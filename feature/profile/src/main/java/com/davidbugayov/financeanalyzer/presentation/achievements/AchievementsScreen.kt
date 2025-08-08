@@ -183,7 +183,7 @@ private fun AchievementsScreenContent(
                 .verticalScroll(scrollState),
     ) {
         AppTopBar(
-            title = stringResource(R.string.achievements),
+            title = stringResource(UiR.string.achievements),
             showBackButton = true,
             onBackClick = onBack,
         )

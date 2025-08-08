@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.BufferedReader
@@ -46,7 +47,7 @@ abstract class AbstractPdfImportUseCase(
             // Список ресурсов строк, которые принимают два параметра
             val twoParamResources =
                 listOf(
-                    R.string.import_error_unknown,
+                    UiR.string.import_error_unknown,
                     R.string.import_error_io_exception,
                     R.string.import_error_pdf_extraction_exception,
                 )
@@ -263,7 +264,7 @@ abstract class AbstractPdfImportUseCase(
                         exception = e,
                         message =
                             formatErrorMessage(
-                                R.string.import_error_unknown,
+                                UiR.string.import_error_unknown,
                                 currentBankName,
                                 e.localizedMessage,
                             ),

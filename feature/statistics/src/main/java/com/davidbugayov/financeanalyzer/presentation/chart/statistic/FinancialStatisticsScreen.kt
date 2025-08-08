@@ -545,7 +545,7 @@ fun FinancialStatisticsScreen(
                                         ) {
                                             Column {
                                                 Text(
-                                                    text = stringResource(R.string.detailed_financial_statistics),
+                                                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.detailed_financial_statistics),
                                                     style = MaterialTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
                                                     color = MaterialTheme.colorScheme.onPrimaryContainer,

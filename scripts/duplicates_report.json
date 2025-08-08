@@ -1,0 +1,4941 @@
+{
+  "timestamp": "Fri Aug  8 15:17:11 MSK 2025",
+  "total_duplicates": 183,
+  "consolidation_plan": {
+    "target_modules": {
+      "ui": [
+        {
+          "value": "Неизвестная ошибка",
+          "target_file": [
+            "ui/src/main/res/values/strings.xml",
+            "error_unknown"
+          ],
+          "other_files": [
+            [
+              "core/src/main/res/values/strings.xml",
+              "error_unknown"
+            ]
+          ]
+        },
+        {
+          "value": "Средние расходы рассчитываются на основе ваших трат за выбранный период. Анализ помогает выявить тренды и возможности для оптимизации бюджета.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "average_expenses_explanation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "average_expenses_explanation"
+            ]
+          ]
+        },
+        {
+          "value": "Произвольный",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "custom_period"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "custom_period"
+            ]
+          ]
+        },
+        {
+          "value": "Ежедневные расходы",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "daily_expenses_title"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "daily_expenses_title"
+            ]
+          ]
+        },
+        {
+          "value": "Детальная финансовая статистика",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "detailed_financial_statistics"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "detailed_financial_statistics"
+            ]
+          ]
+        },
+        {
+          "value": "Анализ расходов",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "expense_analysis"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "expense_analysis"
+            ]
+          ]
+        },
+        {
+          "value": "Отлично (6+ мес.)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_excellent_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_excellent_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Отличная финансовая подушка! У вас есть резерв на 6+ месяцев. Рассмотрите возможность инвестирования части средств для получения дополнительного дохода.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_excellent_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_excellent_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "Финансовая подушка — это сумма, которая позволит вам прожить без дохода. Рассчитывается как среднемесячные расходы × количество месяцев. Рекомендуется иметь резерв на 3-6 месяцев.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_explanation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_explanation"
+            ]
+          ]
+        },
+        {
+          "value": "Хорошо (3-6 мес.)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_good_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_good_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Хорошая финансовая подушка 3-6 месяцев. Продолжайте пополнять резервный фонд и стремитесь к 6 месяцам для максимальной безопасности.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_good_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_good_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "Недостаточно (<3 мес.)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_insufficient_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_insufficient_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Недостаточная финансовая подушка менее 3 месяцев. Приоритетно создайте резервный фонд на 3-6 месяцев для защиты от непредвиденных ситуаций.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_insufficient_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_insufficient_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "%1$s мес.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_months"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_cushion_months"
+            ]
+          ]
+        },
+        {
+          "value": "Средние расходы помогают понять ваши траты в динамике. Анализируются ежедневные, ежемесячные и годовые показатели. Контроль расходов позволяет выявить возможности для экономии и оптимизации бюджета.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_average_expenses_content"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_average_expenses_content"
+            ]
+          ]
+        },
+        {
+          "value": "Финансовое здоровье — это комплексный показатель, который оценивает ваше текущее финансовое состояние и устойчивость. Он учитывает норму сбережений, контроль расходов и наличие финансовой подушки безопасности.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_explanation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_explanation"
+            ]
+          ]
+        },
+        {
+          "value": "Финансовая подушка — это сумма, которая позволит вам прожить 3-6 месяцев без дохода. Рассчитывается как среднемесячные расходы × количество месяцев. Это ваш запас прочности на случай непредвиденных ситуаций.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_financial_cushion_content"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_financial_cushion_content"
+            ]
+          ]
+        },
+        {
+          "value": "Подробная информация о вашем финансовом состоянии и рекомендации по улучшению",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_info_description"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_info_description"
+            ]
+          ]
+        },
+        {
+          "value": "Рекомендуемые значения",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_recommended_values_title"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_recommended_values_title"
+            ]
+          ]
+        },
+        {
+          "value": "Норма сбережений показывает, какой процент вашего дохода вы откладываете. Рассчитывается как (Доходы - Расходы) / Доходы × 100%. Рекомендуется откладывать 10-20% от дохода для достижения финансовых целей.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_savings_rate_content"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_savings_rate_content"
+            ]
+          ]
+        },
+        {
+          "value": "Советы по финансовому здоровью",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_tips_title"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_tips_title"
+            ]
+          ]
+        },
+        {
+          "value": "Нажмите для получения подробной информации о показателе и рекомендаций по улучшению",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_tooltip_description"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_health_tooltip_description"
+            ]
+          ]
+        },
+        {
+          "value": "Период финансовой статистики",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_statistics_period"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "financial_statistics_period"
+            ]
+          ]
+        },
+        {
+          "value": "Ключевые показатели",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "key_metrics"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "key_metrics"
+            ]
+          ]
+        },
+        {
+          "value": "Ежемесячные расходы",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "monthly_expenses_title"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "monthly_expenses_title"
+            ]
+          ]
+        },
+        {
+          "value": "Обзор",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "overview"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "overview"
+            ]
+          ]
+        },
+        {
+          "value": "0%",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_0_percent"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_0_percent"
+            ]
+          ]
+        },
+        {
+          "value": "15%",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_15_percent"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_15_percent"
+            ]
+          ]
+        },
+        {
+          "value": "30%",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_30_percent"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_30_percent"
+            ]
+          ]
+        },
+        {
+          "value": "50%",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_50_percent"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_50_percent"
+            ]
+          ]
+        },
+        {
+          "value": "Отлично (30%+)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_excellent_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_excellent_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Отличная работа! Ваша норма сбережений выше 30%. Продолжайте в том же духе и рассмотрите возможность инвестирования части сбережений для получения дополнительного дохода.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_excellent_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_excellent_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "Норма сбережений показывает процент дохода, который вы откладываете. Рассчитывается как (Доходы - Расходы) / Доходы × 100%. Это ключевой показатель финансового здоровья.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_explanation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_explanation"
+            ]
+          ]
+        },
+        {
+          "value": "Хорошо (15-30%)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_good_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_good_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Хорошая норма сбережений 15-30%. Вы на правильном пути. Попробуйте увеличить сбережения до 20-25% для достижения финансовой независимости.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_good_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_good_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "Требует внимания (<5%)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_needs_attention_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_needs_attention_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Норма сбережений ниже 5% требует внимания. Проанализируйте расходы, найдите возможности для экономии и начните откладывать хотя бы 10% от дохода.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_needs_attention_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_needs_attention_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "%1$s%%",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_percent"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_percent"
+            ]
+          ]
+        },
+        {
+          "value": "Удовлетворительно (5-15%)",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_satisfactory_qualification"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_satisfactory_qualification"
+            ]
+          ]
+        },
+        {
+          "value": "Удовлетворительная норма сбережений 5-15%. Есть возможности для улучшения. Начните с увеличения сбережений на 1-2% каждый месяц.",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_satisfactory_recommendation"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "savings_rate_satisfactory_recommendation"
+            ]
+          ]
+        },
+        {
+          "value": "Паттерны расходов",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "spending_patterns"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "spending_patterns"
+            ]
+          ]
+        },
+        {
+          "value": "Статистика транзакций",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "transaction_statistics"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "transaction_statistics"
+            ]
+          ]
+        },
+        {
+          "value": "Отрицательный тренд",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_negative_description"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "trend_negative_description"
+            ]
+          ]
+        },
+        {
+          "value": "Нейтральный тренд",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_neutral_description"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "trend_neutral_description"
+            ]
+          ]
+        },
+        {
+          "value": "Положительный тренд",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_positive_description"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "trend_positive_description"
+            ]
+          ]
+        },
+        {
+          "value": "Ежегодные расходы",
+          "target_file": [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "yearly_expenses_title"
+          ],
+          "other_files": [
+            [
+              "feature/statistics/src/main/res/values/strings.xml",
+              "yearly_expenses_title"
+            ]
+          ]
+        },
+        {
+          "value": "Не удалось выполнить действие: %1$s",
+          "target_file": [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_action_failed"
+          ],
+          "other_files": [
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "export_action_error"
+            ]
+          ]
+        },
+        {
+          "value": "Есть подкатегории",
+          "target_file": [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "has_subcategories"
+          ],
+          "other_files": [
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "has_subcategories"
+            ]
+          ]
+        },
+        {
+          "value": "Импорт",
+          "target_file": [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_import"
+          ],
+          "other_files": [
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "import_button"
+            ],
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "import_section_title"
+            ]
+          ]
+        },
+        {
+          "value": "Неизвестная ошибка при импорте",
+          "target_file": [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "import_unknown_error"
+          ],
+          "other_files": [
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "import_error_unknown"
+            ]
+          ]
+        },
+        {
+          "value": "Выбрана подкатегория",
+          "target_file": [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "subcategory_selected"
+          ],
+          "other_files": [
+            [
+              "feature/transaction/src/main/res/values/strings.xml",
+              "subcategory_selected"
+            ]
+          ]
+        },
+        {
+          "value": "Добавьте первую транзакцию, чтобы начать отслеживать свои финансы",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "add_first_transaction_description"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "add_first_transaction_description"
+            ]
+          ]
+        },
+        {
+          "value": "И еще %1$d категорий",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "and_more_categories"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "and_more_categories"
+            ]
+          ]
+        },
+        {
+          "value": "Иконка пустого состояния",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "empty_state_icon"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "empty_state_icon"
+            ]
+          ]
+        },
+        {
+          "value": "Все",
+          "target_file": [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_filter_all"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "filter_all"
+            ]
+          ]
+        },
+        {
+          "value": "Нет расходов за период",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_expenses_period"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "no_expenses_period"
+            ]
+          ]
+        },
+        {
+          "value": "Нет доходов за период",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_incomes_period"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "no_incomes_period"
+            ]
+          ]
+        },
+        {
+          "value": "Нет транзакций",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_transactions"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "no_transactions"
+            ]
+          ]
+        },
+        {
+          "value": "Показать расходы",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "show_expenses"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "show_expenses"
+            ]
+          ]
+        },
+        {
+          "value": "Показать доходы",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "show_incomes"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "show_incomes"
+            ]
+          ]
+        },
+        {
+          "value": "Общий расход",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "total_expense"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "total_expense"
+            ]
+          ]
+        },
+        {
+          "value": "Общий доход",
+          "target_file": [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "total_income"
+          ],
+          "other_files": [
+            [
+              "feature/home/src/main/res/values/strings.xml",
+              "total_income"
+            ]
+          ]
+        },
+        {
+          "value": "Безопасность",
+          "target_file": [
+            "ui/src/main/res/values/strings_security.xml",
+            "security_title"
+          ],
+          "other_files": [
+            [
+              "feature/security/src/main/res/values/strings.xml",
+              "security_title"
+            ]
+          ]
+        },
+        {
+          "value": "Блокировка приложения",
+          "target_file": [
+            "ui/src/main/res/values/strings_security.xml",
+            "security_app_lock_title"
+          ],
+          "other_files": [
+            [
+              "feature/security/src/main/res/values/strings.xml",
+              "security_app_lock_title"
+            ]
+          ]
+        },
+        {
+          "value": "Неверный PIN-код",
+          "target_file": [
+            "ui/src/main/res/values/strings_security.xml",
+            "auth_wrong_pin"
+          ],
+          "other_files": [
+            [
+              "feature/security/src/main/res/values/strings.xml",
+              "auth_wrong_pin"
+            ]
+          ]
+        },
+        {
+          "value": "Планирование расходов",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_budget_subtitle"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_budget_subtitle"
+            ]
+          ]
+        },
+        {
+          "value": "Импорт/Экспорт",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "export_import"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "export_import"
+            ]
+          ]
+        },
+        {
+          "value": "Файлы CSV, PDF, Excel",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_export_import_subtitle"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_export_import_subtitle"
+            ]
+          ]
+        },
+        {
+          "value": "Достижения",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "achievements"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "achievements"
+            ]
+          ]
+        },
+        {
+          "value": "Статистика и цели",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_achievements_subtitle"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_achievements_subtitle"
+            ]
+          ]
+        },
+        {
+          "value": "Настройки",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_settings_title"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_settings_title"
+            ]
+          ]
+        },
+        {
+          "value": "Тема",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_theme_title"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "settings_theme_title"
+            ]
+          ]
+        },
+        {
+          "value": "Язык",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_language_title"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "settings_language_title"
+            ]
+          ]
+        },
+        {
+          "value": "Русский",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_language_current_value"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "settings_language_current_value"
+            ]
+          ]
+        },
+        {
+          "value": "Валюта",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_currency_title"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_currency_title"
+            ]
+          ]
+        },
+        {
+          "value": "Уведомления выключены",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_disabled_description"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "notification_disabled_description"
+            ]
+          ]
+        },
+        {
+          "value": "Время: %1$d:%2$02d",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_reminder_time_format"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "settings_reminder_time_format"
+            ]
+          ]
+        },
+        {
+          "value": "Выкл.",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "off"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "off"
+            ]
+          ]
+        },
+        {
+          "value": "Выбор темы",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_theme_select"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "profile_theme_select"
+            ]
+          ]
+        },
+        {
+          "value": "Для уведомлений необходимо разрешение",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_permission_required"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "notification_permission_required"
+            ]
+          ]
+        },
+        {
+          "value": "Включить напоминания",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "enable_reminders"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "enable_reminders"
+            ]
+          ]
+        },
+        {
+          "value": "Получайте ежедневное напоминание",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_description"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "reminder_description"
+            ]
+          ]
+        },
+        {
+          "value": "Время напоминания",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_time"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "reminder_time"
+            ]
+          ]
+        },
+        {
+          "value": "Текущее время: %1$s",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_time_description"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "reminder_time_description"
+            ]
+          ]
+        },
+        {
+          "value": "Неизвестно",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "unknown"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "unknown"
+            ]
+          ]
+        },
+        {
+          "value": "Настройки уведомлений",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_settings"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "notification_settings"
+            ]
+          ]
+        },
+        {
+          "value": "Изменить время",
+          "target_file": [
+            "ui/src/main/res/values/strings_profile.xml",
+            "edit_time"
+          ],
+          "other_files": [
+            [
+              "feature/profile/src/main/res/values/strings.xml",
+              "edit_time"
+            ]
+          ]
+        },
+        {
+          "value": "Выбрать все",
+          "target_file": [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_select_all"
+          ],
+          "other_files": [
+            [
+              "feature/history/src/main/res/values/strings.xml",
+              "select_all"
+            ]
+          ]
+        },
+        {
+          "value": "Ошибка при загрузке прогресса достижений",
+          "target_file": [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievements_loading"
+          ],
+          "other_files": [
+            [
+              "domain/src/main/res/values/strings.xml",
+              "log_error_loading_achievement_progress"
+            ]
+          ]
+        },
+        {
+          "value": "Ошибка при обновлении прогресса достижения %1$s",
+          "target_file": [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievement_progress_update"
+          ],
+          "other_files": [
+            [
+              "domain/src/main/res/values/strings.xml",
+              "log_error_updating_achievement_progress"
+            ]
+          ]
+        },
+        {
+          "value": "Ошибка при проверке достижения %1$s",
+          "target_file": [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievement_check"
+          ],
+          "other_files": [
+            [
+              "domain/src/main/res/values/strings.xml",
+              "log_error_checking_achievement"
+            ]
+          ]
+        },
+        {
+          "value": "Ошибка при получении аналитики профиля",
+          "target_file": [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_profile_analytics"
+          ],
+          "other_files": [
+            [
+              "domain/src/main/res/values/strings.xml",
+              "log_error_profile_analytics"
+            ]
+          ]
+        }
+      ],
+      "transaction": [],
+      "profile": [],
+      "domain": []
+    },
+    "duplicates": {},
+    "summary": {
+      "total_duplicates": 183,
+      "files_to_modify": [
+        "feature/statistics/src/main/res/values/strings.xml",
+        "feature/transaction/src/main/res/values/strings.xml",
+        "feature/security/src/main/res/values/strings.xml",
+        "feature/profile/src/main/res/values/strings.xml",
+        "core/src/main/res/values/strings.xml",
+        "feature/history/src/main/res/values/strings.xml",
+        "feature/home/src/main/res/values/strings.xml",
+        "domain/src/main/res/values/strings.xml"
+      ],
+      "strings_to_move": 93
+    }
+  },
+  "duplicates_by_module": {
+    "ui": [
+      {
+        "value": "Резервный фонд",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "achievement_emergency_fund_title"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "emergency_fund_category"
+          ]
+        ]
+      },
+      {
+        "value": "Создана первая транзакция",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "achievement_first_steps_description"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "achievement_first_transaction_desc"
+          ]
+        ]
+      },
+      {
+        "value": "Добавить транзакцию",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "action_add_transaction"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "add_transaction"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "add_transaction_long"
+          ]
+        ]
+      },
+      {
+        "value": "Добавить",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "add"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "add_button"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "add_button_text"
+          ]
+        ]
+      },
+      {
+        "value": "Транзакция",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "add_transaction_short"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction"
+          ]
+        ]
+      },
+      {
+        "value": "За все время",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "all_time"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_all_time"
+          ]
+        ]
+      },
+      {
+        "value": "Сумма",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "amount"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_amount"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "header_amount"
+          ]
+        ]
+      },
+      {
+        "value": "Применить",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "apply"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_apply"
+          ]
+        ]
+      },
+      {
+        "value": "Средний расход",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "average_expense"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_avg_expense"
+          ]
+        ]
+      },
+      {
+        "value": "Средние расходы",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "average_expenses_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_average_expenses_title"
+          ]
+        ]
+      },
+      {
+        "value": "Баланс",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "balance"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_balance"
+          ]
+        ]
+      },
+      {
+        "value": "Альфа-Банк",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "bank_alfabank"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "transaction_source_alfa"
+          ]
+        ]
+      },
+      {
+        "value": "Тинькофф",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "bank_tinkoff"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "transaction_source_tinkoff"
+          ]
+        ]
+      },
+      {
+        "value": "Бюджет",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "budget"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "nav_budget"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_budget"
+          ]
+        ]
+      },
+      {
+        "value": "Лимит бюджета",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "budget_limit"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_budget_limit"
+          ]
+        ]
+      },
+      {
+        "value": "Осталось",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "budget_remaining"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_remaining_amount"
+          ]
+        ]
+      },
+      {
+        "value": "Потрачено",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "budget_spent"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_spent_amount"
+          ]
+        ]
+      },
+      {
+        "value": "Отмена",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "cancel"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "dialog_cancel"
+          ]
+        ]
+      },
+      {
+        "value": "Категория",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_category"
+          ]
+        ]
+      },
+      {
+        "value": "Развлечения",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_entertainment"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "subcategory_demo_entertainment"
+          ]
+        ]
+      },
+      {
+        "value": "Продукты",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_food"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "subcategory_demo_food"
+          ]
+        ]
+      },
+      {
+        "value": "Другое",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_other"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_type_other"
+          ]
+        ]
+      },
+      {
+        "value": "Рестораны",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_restaurant"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "subcategory_demo_restaurant"
+          ]
+        ]
+      },
+      {
+        "value": "Перевод",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_transfer"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_transfer"
+          ]
+        ]
+      },
+      {
+        "value": "Транспорт",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "category_transport"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "subcategory_demo_transport"
+          ]
+        ]
+      },
+      {
+        "value": "Закрыть",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "close"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_close"
+          ]
+        ]
+      },
+      {
+        "value": "Свернуть",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "collapse"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_collapse"
+          ]
+        ]
+      },
+      {
+        "value": "Подтвердить",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "confirm"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_confirm"
+          ]
+        ]
+      },
+      {
+        "value": "Рассмотрите инвестиции",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "consider_investments_title"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_normal_invest_title"
+          ]
+        ]
+      },
+      {
+        "value": "У вас нет резервного фонда. Это критически важно для финансовой безопасности.",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "create_emergency_fund_description_ui"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_critical_emergency_desc"
+          ]
+        ]
+      },
+      {
+        "value": "Создайте фонд на 3-6 месяцев расходов",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "create_emergency_fund_impact"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_critical_emergency_impact"
+          ]
+        ]
+      },
+      {
+        "value": "Создайте резервный фонд",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "create_emergency_fund_title_ui"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_critical_emergency_title"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "tip_create_emergency_fund_title"
+          ]
+        ]
+      },
+      {
+        "value": "Дата",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "date"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_date"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "header_date"
+          ]
+        ]
+      },
+      {
+        "value": "Удалить",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "delete"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "dialog_delete"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_delete_title"
+          ]
+        ]
+      },
+      {
+        "value": "Удалить источник",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "delete_source"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "delete_source_title"
+          ]
+        ]
+      },
+      {
+        "value": "ОК",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "dialog_ok"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "ok"
+          ]
+        ]
+      },
+      {
+        "value": "Редактировать транзакцию",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "edit_transaction"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "edit_transaction_title"
+          ]
+        ]
+      },
+      {
+        "value": "Конечная дата",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "end_date"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "period_end_date"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_title"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка привязки категорий",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_binding_categories"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_linking_categories"
+          ]
+        ]
+      },
+      {
+        "value": "Введите название кошелька",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_enter_wallet_name"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_name_hint"
+          ]
+        ]
+      },
+      {
+        "value": "Кошелек не найден",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_wallet_not_found"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_not_found"
+          ]
+        ]
+      },
+      {
+        "value": "Развернуть",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expand"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_expand"
+          ]
+        ]
+      },
+      {
+        "value": "Расход",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expense"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expense_type"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_type_expense"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "csv_expense_value"
+          ]
+        ]
+      },
+      {
+        "value": "Расходы",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expense_category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expenses"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "expenses_category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_expense_transactions"
+          ]
+        ]
+      },
+      {
+        "value": "Понятно",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "financial_health_ok_button"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "got_it"
+          ]
+        ]
+      },
+      {
+        "value": "Привычки",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "habits_category"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_habits"
+          ]
+        ]
+      },
+      {
+        "value": "Скрыть",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "hide_categories"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "hide"
+          ]
+        ]
+      },
+      {
+        "value": "История",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "history"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "nav_history"
+          ]
+        ]
+      },
+      {
+        "value": "Импорт транзакций",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "import_transactions_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "import_transactions_content_description"
+          ]
+        ]
+      },
+      {
+        "value": "Цель: 15-20% от доходов",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "improve_savings_rate_impact"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_high_savings_impact"
+          ]
+        ]
+      },
+      {
+        "value": "Доходы",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "income"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "income_category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_income_transactions"
+          ]
+        ]
+      },
+      {
+        "value": "Доход",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "income_type"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_type_income"
+          ]
+        ]
+      },
+      {
+        "value": "Увеличьте норму сбережений",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "increase_savings_rate_title_ui"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "tip_increase_savings_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_recommendations.xml",
+            "recommendation_increase_savings_title"
+          ]
+        ]
+      },
+      {
+        "value": "Наиболее активный день: %s",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_active_weekday_desc"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_expense_pattern_desc"
+          ]
+        ]
+      },
+      {
+        "value": "%s",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_active_weekday_metric"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_expense_pattern_metric"
+          ]
+        ]
+      },
+      {
+        "value": "%d транзакций за период",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_expense_frequency_desc"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_high_activity_desc"
+          ]
+        ]
+      },
+      {
+        "value": "%d транзакций",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_expense_frequency_metric"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_high_activity_metric"
+          ]
+        ]
+      },
+      {
+        "value": "Финансовое здоровье",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "insight_financial_health"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_title"
+          ]
+        ]
+      },
+      {
+        "value": "Инвестиции",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "investments_category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_type_investment"
+          ]
+        ]
+      },
+      {
+        "value": "Месяц",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "month"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "filter_month"
+          ]
+        ]
+      },
+      {
+        "value": "Профиль",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "nav_profile"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "profile"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_title"
+          ]
+        ]
+      },
+      {
+        "value": "Статистика",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "nav_statistics"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_onboarding_stats_title"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "statistics"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_statistics"
+          ]
+        ]
+      },
+      {
+        "value": "Заметка",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "note"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transaction_note"
+          ]
+        ]
+      },
+      {
+        "value": "Напоминания о транзакциях",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "notification_channel_name"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_transaction_reminders_title"
+          ]
+        ]
+      },
+      {
+        "value": "%1$s - %2$s",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_custom"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_month"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_quarter"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_week"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_year"
+          ]
+        ]
+      },
+      {
+        "value": "%1$s",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_day"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_expenses"
+          ]
+        ]
+      },
+      {
+        "value": "Настройки периода",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_settings"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "period_settings_title"
+          ]
+        ]
+      },
+      {
+        "value": "Требуется разрешение",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "permission_required"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "permission_required_title"
+          ]
+        ]
+      },
+      {
+        "value": "Изучите достижения",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_onboarding_achievements_title"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "study_achievements_title"
+          ]
+        ]
+      },
+      {
+        "value": "Советы",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "rec_onboarding_tips_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "tips"
+          ]
+        ]
+      },
+      {
+        "value": "Сохранить",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "save"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "save_button_text"
+          ]
+        ]
+      },
+      {
+        "value": "Сбережения",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "savings_category"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_type_savings"
+          ]
+        ]
+      },
+      {
+        "value": "Норма сбережений",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "savings_rate"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_savings_rate"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_savings_rate_title"
+          ]
+        ]
+      },
+      {
+        "value": "Сбербанк",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "sberbank_name"
+          ],
+          [
+            "ui/src/main/res/values/strings_banks.xml",
+            "bank_sberbank"
+          ]
+        ]
+      },
+      {
+        "value": "Выбрать период",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "select_period"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_select_period_title"
+          ]
+        ]
+      },
+      {
+        "value": "Тёмная",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "settings_theme_dark"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_theme_dark"
+          ]
+        ]
+      },
+      {
+        "value": "Светлая",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "settings_theme_light"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_theme_light"
+          ]
+        ]
+      },
+      {
+        "value": "Системная",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "settings_theme_system"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_theme_system"
+          ]
+        ]
+      },
+      {
+        "value": "Начальная дата",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "start_date"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "period_start_date"
+          ]
+        ]
+      },
+      {
+        "value": "Финансовая подушка",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_financial_cushion"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_title"
+          ]
+        ]
+      },
+      {
+        "value": "Всего транзакций",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "stat_total_transactions"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "total_transactions"
+          ]
+        ]
+      },
+      {
+        "value": "Сегодня",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "today"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "filter_today"
+          ]
+        ]
+      },
+      {
+        "value": "Транзакции",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "transactions"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_transactions"
+          ]
+        ]
+      },
+      {
+        "value": "Название кошелька",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_name"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_name_label"
+          ]
+        ]
+      },
+      {
+        "value": "Тип кошелька",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_type"
+          ],
+          [
+            "ui/src/main/res/values/strings.xml",
+            "wallet_type_label"
+          ]
+        ]
+      },
+      {
+        "value": "Неделя",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "week"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "filter_week"
+          ]
+        ]
+      }
+    ],
+    "core,ui": [
+      {
+        "value": "Неизвестная ошибка",
+        "files": [
+          [
+            "ui/src/main/res/values/strings.xml",
+            "error_unknown"
+          ],
+          [
+            "core/src/main/res/values/strings.xml",
+            "error_unknown"
+          ]
+        ]
+      }
+    ],
+    "statistics,ui": [
+      {
+        "value": "Средние расходы рассчитываются на основе ваших трат за выбранный период. Анализ помогает выявить тре...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "average_expenses_explanation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "average_expenses_explanation"
+          ]
+        ]
+      },
+      {
+        "value": "Произвольный",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "custom_period"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "custom_period"
+          ]
+        ]
+      },
+      {
+        "value": "Ежедневные расходы",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "daily_expenses_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "daily_expenses_title"
+          ]
+        ]
+      },
+      {
+        "value": "Детальная финансовая статистика",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "detailed_financial_statistics"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "detailed_financial_statistics"
+          ]
+        ]
+      },
+      {
+        "value": "Анализ расходов",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "expense_analysis"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "expense_analysis"
+          ]
+        ]
+      },
+      {
+        "value": "Отлично (6+ мес.)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_excellent_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_excellent_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Отличная финансовая подушка! У вас есть резерв на 6+ месяцев. Рассмотрите возможность инвестирования...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_excellent_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_excellent_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "Финансовая подушка — это сумма, которая позволит вам прожить без дохода. Рассчитывается как среднеме...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_explanation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_explanation"
+          ]
+        ]
+      },
+      {
+        "value": "Хорошо (3-6 мес.)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_good_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_good_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Хорошая финансовая подушка 3-6 месяцев. Продолжайте пополнять резервный фонд и стремитесь к 6 месяца...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_good_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_good_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "Недостаточно (<3 мес.)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_insufficient_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_insufficient_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Недостаточная финансовая подушка менее 3 месяцев. Приоритетно создайте резервный фонд на 3-6 месяцев...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_insufficient_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_insufficient_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "%1$s мес.",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_cushion_months"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_cushion_months"
+          ]
+        ]
+      },
+      {
+        "value": "Средние расходы помогают понять ваши траты в динамике. Анализируются ежедневные, ежемесячные и годов...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_average_expenses_content"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_average_expenses_content"
+          ]
+        ]
+      },
+      {
+        "value": "Финансовое здоровье — это комплексный показатель, который оценивает ваше текущее финансовое состояни...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_explanation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_explanation"
+          ]
+        ]
+      },
+      {
+        "value": "Финансовая подушка — это сумма, которая позволит вам прожить 3-6 месяцев без дохода. Рассчитывается ...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_financial_cushion_content"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_financial_cushion_content"
+          ]
+        ]
+      },
+      {
+        "value": "Подробная информация о вашем финансовом состоянии и рекомендации по улучшению",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_info_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_info_description"
+          ]
+        ]
+      },
+      {
+        "value": "Рекомендуемые значения",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_recommended_values_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_recommended_values_title"
+          ]
+        ]
+      },
+      {
+        "value": "Норма сбережений показывает, какой процент вашего дохода вы откладываете. Рассчитывается как (Доходы...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_savings_rate_content"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_savings_rate_content"
+          ]
+        ]
+      },
+      {
+        "value": "Советы по финансовому здоровью",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_tips_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_tips_title"
+          ]
+        ]
+      },
+      {
+        "value": "Нажмите для получения подробной информации о показателе и рекомендаций по улучшению",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_health_tooltip_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_health_tooltip_description"
+          ]
+        ]
+      },
+      {
+        "value": "Период финансовой статистики",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "financial_statistics_period"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "financial_statistics_period"
+          ]
+        ]
+      },
+      {
+        "value": "Ключевые показатели",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "key_metrics"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "key_metrics"
+          ]
+        ]
+      },
+      {
+        "value": "Ежемесячные расходы",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "monthly_expenses_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "monthly_expenses_title"
+          ]
+        ]
+      },
+      {
+        "value": "Обзор",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "overview"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "overview"
+          ]
+        ]
+      },
+      {
+        "value": "0%",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_0_percent"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_0_percent"
+          ]
+        ]
+      },
+      {
+        "value": "15%",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_15_percent"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_15_percent"
+          ]
+        ]
+      },
+      {
+        "value": "30%",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_30_percent"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_30_percent"
+          ]
+        ]
+      },
+      {
+        "value": "50%",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_50_percent"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_50_percent"
+          ]
+        ]
+      },
+      {
+        "value": "Отлично (30%+)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_excellent_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_excellent_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Отличная работа! Ваша норма сбережений выше 30%. Продолжайте в том же духе и рассмотрите возможность...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_excellent_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_excellent_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "Норма сбережений показывает процент дохода, который вы откладываете. Рассчитывается как (Доходы - Ра...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_explanation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_explanation"
+          ]
+        ]
+      },
+      {
+        "value": "Хорошо (15-30%)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_good_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_good_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Хорошая норма сбережений 15-30%. Вы на правильном пути. Попробуйте увеличить сбережения до 20-25% дл...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_good_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_good_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "Требует внимания (<5%)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_needs_attention_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_needs_attention_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Норма сбережений ниже 5% требует внимания. Проанализируйте расходы, найдите возможности для экономии...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_needs_attention_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_needs_attention_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "%1$s%%",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_percent"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_percent"
+          ]
+        ]
+      },
+      {
+        "value": "Удовлетворительно (5-15%)",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_satisfactory_qualification"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_satisfactory_qualification"
+          ]
+        ]
+      },
+      {
+        "value": "Удовлетворительная норма сбережений 5-15%. Есть возможности для улучшения. Начните с увеличения сбер...",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "savings_rate_satisfactory_recommendation"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "savings_rate_satisfactory_recommendation"
+          ]
+        ]
+      },
+      {
+        "value": "Паттерны расходов",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "spending_patterns"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "spending_patterns"
+          ]
+        ]
+      },
+      {
+        "value": "Статистика транзакций",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "transaction_statistics"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "transaction_statistics"
+          ]
+        ]
+      },
+      {
+        "value": "Отрицательный тренд",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "trend_negative_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_negative_description"
+          ]
+        ]
+      },
+      {
+        "value": "Нейтральный тренд",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "trend_neutral_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_neutral_description"
+          ]
+        ]
+      },
+      {
+        "value": "Положительный тренд",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "trend_positive_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "trend_positive_description"
+          ]
+        ]
+      },
+      {
+        "value": "Ежегодные расходы",
+        "files": [
+          [
+            "feature/statistics/src/main/res/values/strings.xml",
+            "yearly_expenses_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_statistics.xml",
+            "yearly_expenses_title"
+          ]
+        ]
+      }
+    ],
+    "transaction": [
+      {
+        "value": "Ozon",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "bank_ozon"
+          ],
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "transaction_source_ozon"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка загрузки кошельков",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "log_error_loading_wallets"
+          ],
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "log_error_loading_wallets_base"
+          ]
+        ]
+      }
+    ],
+    "transaction,ui": [
+      {
+        "value": "Не удалось выполнить действие: %1$s",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "export_action_error"
+          ],
+          [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_action_failed"
+          ]
+        ]
+      },
+      {
+        "value": "Есть подкатегории",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "has_subcategories"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "has_subcategories"
+          ]
+        ]
+      },
+      {
+        "value": "Импорт",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "import_button"
+          ],
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "import_section_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_category_import"
+          ]
+        ]
+      },
+      {
+        "value": "Неизвестная ошибка при импорте",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "import_error_unknown"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "import_unknown_error"
+          ]
+        ]
+      },
+      {
+        "value": "Выбрана подкатегория",
+        "files": [
+          [
+            "feature/transaction/src/main/res/values/strings.xml",
+            "subcategory_selected"
+          ],
+          [
+            "ui/src/main/res/values/strings_transaction.xml",
+            "subcategory_selected"
+          ]
+        ]
+      }
+    ],
+    "home,ui": [
+      {
+        "value": "Добавьте первую транзакцию, чтобы начать отслеживать свои финансы",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "add_first_transaction_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "add_first_transaction_description"
+          ]
+        ]
+      },
+      {
+        "value": "И еще %1$d категорий",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "and_more_categories"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "and_more_categories"
+          ]
+        ]
+      },
+      {
+        "value": "Иконка пустого состояния",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "empty_state_icon"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "empty_state_icon"
+          ]
+        ]
+      },
+      {
+        "value": "Все",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "filter_all"
+          ],
+          [
+            "ui/src/main/res/values/strings_achievements.xml",
+            "achievements_filter_all"
+          ]
+        ]
+      },
+      {
+        "value": "Нет расходов за период",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "no_expenses_period"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_expenses_period"
+          ]
+        ]
+      },
+      {
+        "value": "Нет доходов за период",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "no_incomes_period"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_incomes_period"
+          ]
+        ]
+      },
+      {
+        "value": "Нет транзакций",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "no_transactions"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "no_transactions"
+          ]
+        ]
+      },
+      {
+        "value": "Показать расходы",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "show_expenses"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "show_expenses"
+          ]
+        ]
+      },
+      {
+        "value": "Показать доходы",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "show_incomes"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "show_incomes"
+          ]
+        ]
+      },
+      {
+        "value": "Общий расход",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "total_expense"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "total_expense"
+          ]
+        ]
+      },
+      {
+        "value": "Общий доход",
+        "files": [
+          [
+            "feature/home/src/main/res/values/strings.xml",
+            "total_income"
+          ],
+          [
+            "ui/src/main/res/values/strings_home_common.xml",
+            "total_income"
+          ]
+        ]
+      }
+    ],
+    "security,ui": [
+      {
+        "value": "Безопасность",
+        "files": [
+          [
+            "feature/security/src/main/res/values/strings.xml",
+            "security_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_security.xml",
+            "security_title"
+          ]
+        ]
+      },
+      {
+        "value": "Блокировка приложения",
+        "files": [
+          [
+            "feature/security/src/main/res/values/strings.xml",
+            "security_app_lock_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_security.xml",
+            "security_app_lock_title"
+          ]
+        ]
+      },
+      {
+        "value": "Неверный PIN-код",
+        "files": [
+          [
+            "feature/security/src/main/res/values/strings.xml",
+            "auth_wrong_pin"
+          ],
+          [
+            "ui/src/main/res/values/strings_security.xml",
+            "auth_wrong_pin"
+          ]
+        ]
+      }
+    ],
+    "profile,ui": [
+      {
+        "value": "Планирование расходов",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_budget_subtitle"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_budget_subtitle"
+          ]
+        ]
+      },
+      {
+        "value": "Импорт/Экспорт",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "export_import"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "export_import"
+          ]
+        ]
+      },
+      {
+        "value": "Файлы CSV, PDF, Excel",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_export_import_subtitle"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_export_import_subtitle"
+          ]
+        ]
+      },
+      {
+        "value": "Достижения",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "achievements"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "achievements"
+          ]
+        ]
+      },
+      {
+        "value": "Статистика и цели",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_achievements_subtitle"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_achievements_subtitle"
+          ]
+        ]
+      },
+      {
+        "value": "Настройки",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_settings_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_settings_title"
+          ]
+        ]
+      },
+      {
+        "value": "Тема",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "settings_theme_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_theme_title"
+          ]
+        ]
+      },
+      {
+        "value": "Язык",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "settings_language_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_language_title"
+          ]
+        ]
+      },
+      {
+        "value": "Русский",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "settings_language_current_value"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_language_current_value"
+          ]
+        ]
+      },
+      {
+        "value": "Валюта",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_currency_title"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_currency_title"
+          ]
+        ]
+      },
+      {
+        "value": "Уведомления выключены",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "notification_disabled_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_disabled_description"
+          ]
+        ]
+      },
+      {
+        "value": "Время: %1$d:%2$02d",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "settings_reminder_time_format"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "settings_reminder_time_format"
+          ]
+        ]
+      },
+      {
+        "value": "Выкл.",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "off"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "off"
+          ]
+        ]
+      },
+      {
+        "value": "Выбор темы",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_theme_select"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "profile_theme_select"
+          ]
+        ]
+      },
+      {
+        "value": "Для уведомлений необходимо разрешение",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "notification_permission_required"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_permission_required"
+          ]
+        ]
+      },
+      {
+        "value": "Включить напоминания",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "enable_reminders"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "enable_reminders"
+          ]
+        ]
+      },
+      {
+        "value": "Получайте ежедневное напоминание",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "reminder_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_description"
+          ]
+        ]
+      },
+      {
+        "value": "Время напоминания",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "reminder_time"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_time"
+          ]
+        ]
+      },
+      {
+        "value": "Текущее время: %1$s",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "reminder_time_description"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "reminder_time_description"
+          ]
+        ]
+      },
+      {
+        "value": "Неизвестно",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "unknown"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "unknown"
+          ]
+        ]
+      },
+      {
+        "value": "Настройки уведомлений",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "notification_settings"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "notification_settings"
+          ]
+        ]
+      },
+      {
+        "value": "Изменить время",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "edit_time"
+          ],
+          [
+            "ui/src/main/res/values/strings_profile.xml",
+            "edit_time"
+          ]
+        ]
+      }
+    ],
+    "profile": [
+      {
+        "value": "Темная",
+        "files": [
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "profile_theme_dark"
+          ],
+          [
+            "feature/profile/src/main/res/values/strings.xml",
+            "settings_theme_dark"
+          ]
+        ]
+      }
+    ],
+    "history,ui": [
+      {
+        "value": "Выбрать все",
+        "files": [
+          [
+            "feature/history/src/main/res/values/strings.xml",
+            "select_all"
+          ],
+          [
+            "ui/src/main/res/values/strings_dialogs.xml",
+            "dialog_select_all"
+          ]
+        ]
+      }
+    ],
+    "domain": [
+      {
+        "value": "Эксперт категорий",
+        "files": [
+          [
+            "domain/src/main/res/values/strings.xml",
+            "achievement_category_expert"
+          ],
+          [
+            "domain/src/main/res/values/strings.xml",
+            "achievement_category_organizer"
+          ]
+        ]
+      }
+    ],
+    "domain,ui": [
+      {
+        "value": "Ошибка при загрузке прогресса достижений",
+        "files": [
+          [
+            "domain/src/main/res/values/strings.xml",
+            "log_error_loading_achievement_progress"
+          ],
+          [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievements_loading"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка при обновлении прогресса достижения %1$s",
+        "files": [
+          [
+            "domain/src/main/res/values/strings.xml",
+            "log_error_updating_achievement_progress"
+          ],
+          [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievement_progress_update"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка при проверке достижения %1$s",
+        "files": [
+          [
+            "domain/src/main/res/values/strings.xml",
+            "log_error_checking_achievement"
+          ],
+          [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_achievement_check"
+          ]
+        ]
+      },
+      {
+        "value": "Ошибка при получении аналитики профиля",
+        "files": [
+          [
+            "domain/src/main/res/values/strings.xml",
+            "log_error_profile_analytics"
+          ],
+          [
+            "ui/src/main/res/values/strings_errors.xml",
+            "error_profile_analytics"
+          ]
+        ]
+      }
+    ]
+  },
+  "unused_by_module": {
+    "ui": [
+      "worth_considering",
+      "achievement_first_transaction_desc",
+      "edit_transaction",
+      "subcategory_kfc",
+      "stat_smallest_transaction_desc",
+      "financial_cushion_explanation",
+      "achievement_healthy_spender_title",
+      "achievement_multi_bank_importer_title",
+      "for_note",
+      "category_health",
+      "error_distributing_income",
+      "error_insufficient_funds",
+      "stat_average_transaction",
+      "wallets",
+      "wallet_not_found",
+      "error_setting_period_duration",
+      "trend_positive_description",
+      "no_transactions_found",
+      "error_profile_analytics",
+      "increase_savings_rate_title_ui",
+      "subcategory_optics",
+      "reminder_time_description",
+      "overview",
+      "savings_rate_15_percent",
+      "subcategory_demo_entertainment",
+      "expense_categories",
+      "savings_rate_title",
+      "security_title",
+      "recommendation_savings_rate_low_impact",
+      "period_custom",
+      "financial_health_ok_button",
+      "tips",
+      "error_spending_funds",
+      "export_import",
+      "error_unknown_type",
+      "enable_reminders",
+      "average",
+      "profile_theme_dark",
+      "link_categories_subtitle",
+      "savings_rate_critical_title",
+      "savings_rate_good_qualification",
+      "savings_category",
+      "stat_by_account",
+      "error_wallet_not_found",
+      "achievements_init_error",
+      "library_timber_description",
+      "show_expenses",
+      "loading_data",
+      "financial_statistics_period",
+      "collapse",
+      "subwallets",
+      "library_apache_poi_name",
+      "bank_ozon",
+      "achievements_category_export",
+      "income",
+      "to_category",
+      "settings_theme_system",
+      "subcategories_main_title",
+      "no_transactions",
+      "recommendation_emergency_fund_impact",
+      "achievements_filter_unlocked",
+      "savings_rate_critical_impact",
+      "notification_permission_text_hardcoded",
+      "low_level",
+      "period_week",
+      "add",
+      "category_name",
+      "subcategory_massimo_dutti",
+      "analysis_tip_forecast",
+      "onboarding_skip_button",
+      "has_subcategories",
+      "wallet_available_balance",
+      "achievements_category_transactions",
+      "category_restaurant",
+      "sberbank_name",
+      "recommendation_investments_title",
+      "budget_over_limit_message",
+      "include_refunds",
+      "savings_rate_needs_attention_qualification",
+      "subcategory_yandex_taxi",
+      "budget",
+      "spending_patterns",
+      "subcategory_medical_tests",
+      "achievement_budget_keeper_desc",
+      "add_transaction_short",
+      "category_communication",
+      "subcategory_h_m",
+      "error_enter_valid_amount",
+      "subcategory_subway",
+      "wallet_type_investment_description",
+      "recommendation_increase_savings_impact",
+      "achievement_daily_tracker_desc",
+      "custom",
+      "insight_expense_concentration_high",
+      "financial_health_average_expenses_title",
+      "selected_wallet",
+      "transactions_section",
+      "achievement_month_user_desc",
+      "expand",
+      "financial_cushion_title",
+      "delete_source_confirmation_message",
+      "category_shopping",
+      "library_room_name",
+      "expense_analysis",
+      "distribute",
+      "subcategory_stradivarius",
+      "delete_source_title",
+      "error_validation_transaction",
+      "achievement_emergency_fund_desc",
+      "think_about_investments_impact",
+      "from_category",
+      "subcategory_hospital",
+      "wallet_setup_title",
+      "total_expense",
+      "daily_expenses_title",
+      "select_category",
+      "add_subcategory",
+      "delete_source",
+      "off",
+      "spend_from_wallet",
+      "analysis_tip_sync",
+      "select_source",
+      "category_other",
+      "notification_permission_description",
+      "achievement_alfabank_importer_desc",
+      "edit_time",
+      "notification_permission_later",
+      "category_education",
+      "category_colon",
+      "period_duration_description",
+      "total_transactions",
+      "transaction_amount",
+      "subcategory_billa",
+      "library_room_description",
+      "library_license_format",
+      "subcategory_demo_food",
+      "insight_expense_concentration_critical",
+      "investment_tip_bonds",
+      "subcategory_taxi",
+      "achievement_emergency_fund_title",
+      "create_emergency_fund_urgent_impact",
+      "wallet",
+      "study_achievements_description",
+      "budget_limit",
+      "wallet_goal_amount_hint",
+      "achievements_rarity_rare",
+      "library_koin_name",
+      "achievements_category_special",
+      "import_unknown_error",
+      "show_incomes",
+      "achievement_transaction_master_title",
+      "error_enter_target_amount",
+      "achievement_category_organizer_title",
+      "library_core_ktx_name",
+      "subcategory_magnit",
+      "category_food",
+      "security_app_lock_title",
+      "initializing_subcategories",
+      "empty_state_icon",
+      "no_categories",
+      "error_action_failed",
+      "financial_cushion_expenses",
+      "category_label",
+      "got_it",
+      "save",
+      "select_icon",
+      "budget_over_limit_title",
+      "expense_limit",
+      "import_categories_confirm",
+      "note_colon",
+      "smallest",
+      "wallet_setup_tip",
+      "category_gifts",
+      "subcategory_trolleybus",
+      "no_data",
+      "wallet_creating",
+      "wallet_type_other",
+      "profile_theme_select",
+      "wallet_spend_action",
+      "general_category",
+      "subcategories_demo_title",
+      "wallet_name_description",
+      "stat_trends",
+      "dialog_expand",
+      "wallet_type_label",
+      "period_settings",
+      "financial_health_average_expenses_content",
+      "add_first_transaction_description",
+      "financial_health_recommended_values_content",
+      "unknown_error_message",
+      "error_loading_wallet",
+      "transaction_source_alfa",
+      "error_memory_tracking",
+      "library_apache_poi_description",
+      "all_time",
+      "recommendation_enhanced_title",
+      "think_about_investments_title",
+      "category_other_expense",
+      "transaction",
+      "error_adding_funds",
+      "transactions",
+      "library_kotlin_coroutines_name",
+      "profile_theme_system",
+      "auth_title",
+      "wallet_goal_amount_label",
+      "subcategory_carrefour",
+      "recommendation_investments_description",
+      "wallet_name_label",
+      "expense",
+      "category_rental",
+      "category_salary",
+      "critical_level_alt",
+      "add_without_distribution",
+      "wallet_type_cash",
+      "notification_permission_allow",
+      "achievement_early_bird_title",
+      "select_wallets",
+      "financial_health_tips_title",
+      "period_quarter",
+      "transaction_type_income",
+      "subcategory_uber",
+      "habits_category",
+      "prediction_title",
+      "subcategory_pharmacy",
+      "achievement_first_budget_title",
+      "notification_settings",
+      "request_permission",
+      "investment_tip_stocks",
+      "subcategory_dixy",
+      "finish",
+      "wallet_type_savings_description",
+      "yesterday",
+      "achievement_backup_enthusiast_title",
+      "savings_rate_percent",
+      "date_colon",
+      "savings_rate_satisfactory_qualification",
+      "stat_calendar",
+      "financial_health_tooltip_description",
+      "dialog_select_all",
+      "subcategory_vkusvill",
+      "subcategory_dodo_pizza",
+      "error_insufficient_source_funds",
+      "error_validation_result",
+      "bank_tinkoff",
+      "achievement_daily_tracker_title",
+      "week",
+      "add_button_text",
+      "error_resetting_period",
+      "auth_wrong_pin",
+      "achievement_alfabank_importer_title",
+      "subcategory_museum",
+      "achievement_sberbank_importer_desc",
+      "error_achievement_progress_update",
+      "sources_used",
+      "achievement_data_analyst_desc",
+      "financial_health_title",
+      "dialog_delete_title",
+      "income_amount",
+      "subcategory_mcdonalds",
+      "prediction_next_month",
+      "period_all_time",
+      "subcategory_demo_transport",
+      "subcategory_pyaterochka",
+      "hide",
+      "settings_reminder_time_format",
+      "this_month",
+      "period_start_date",
+      "dialog_ok",
+      "important_level",
+      "investment_tip_business",
+      "subcategory_lenta",
+      "year",
+      "critical_level",
+      "this_year",
+      "wallet_budget_limit",
+      "prediction_savings",
+      "achievement_export_master_title",
+      "notification_permission_title",
+      "delete_wallet",
+      "achievement_backup_enthusiast_desc",
+      "wallet_type_card_description",
+      "financial_health_tips_content",
+      "for_financial_health",
+      "subcategory_yandex_eda",
+      "continue_to_app",
+      "financial_health_recommended_values_title",
+      "financial_cushion_months",
+      "wallet_manage_action",
+      "fab_spacer",
+      "error_enter_wallet_name",
+      "subcategory_dominos",
+      "transaction_type",
+      "financial_cushion_insufficient_qualification",
+      "period_end_date",
+      "subcategory_karaoke",
+      "custom_period",
+      "transaction_history",
+      "financial_health_info_description",
+      "achievements",
+      "trend_negative_description",
+      "largest",
+      "view_subcategories",
+      "wallet_budget_progress",
+      "library_jetpack_compose_description",
+      "wallet_type_card",
+      "subcategory_tram",
+      "budgeting_category",
+      "wallet_type_goal_description",
+      "error_wallet_balance_update_failed",
+      "import_transactions_content_description",
+      "profile",
+      "distribute_income",
+      "library_version_format",
+      "nav_history",
+      "savings_rate_0_percent",
+      "idea_emoji",
+      "edit_transaction_title",
+      "achievements_rarity_common",
+      "dialog_cancel",
+      "dialog_select_period_title",
+      "apply",
+      "subcategory_okey",
+      "achievement_week_no_coffee_title",
+      "financial_cushion_excellent_qualification",
+      "select_period",
+      "achievement_transaction_master_desc",
+      "notification_disabled_description",
+      "investment_tip_diversification",
+      "subcategory_mango",
+      "recommendation_achievements_description",
+      "select_date_button",
+      "achievement_tinkoff_importer_desc",
+      "days_count",
+      "bank_sberbank",
+      "spend",
+      "auth_use_biometric",
+      "import_error_unknown",
+      "subcategories_demo_description",
+      "financial_health_explanation",
+      "filter_today",
+      "subcategory_name",
+      "nav_budget",
+      "wallet_overview",
+      "library_lifecycle_name",
+      "profile_settings_title",
+      "usage_count",
+      "subcategory_doctor",
+      "library_navigation_compose_description",
+      "savings_rate_good_recommendation",
+      "achievement_healthy_spender_desc",
+      "add_custom_source",
+      "investment_tip_gold",
+      "achievements_rarity_legendary",
+      "expenses_category",
+      "financial_cushion_good_recommendation",
+      "unknown",
+      "error_binding_categories",
+      "group_by_months",
+      "edit_wallet",
+      "stat_average_transaction_desc",
+      "create_emergency_fund_urgent_title",
+      "period_settings_title",
+      "transaction_transfers",
+      "add_transaction_long",
+      "library_material3_description",
+      "achievement_first_budget_desc",
+      "library_jetpack_compose_name",
+      "wallet_type",
+      "error_achievements_loading",
+      "add_transaction",
+      "achievement_csv_importer_desc",
+      "recommendation_enhanced_subtitle",
+      "library_timber_name",
+      "permission_required_title",
+      "income_type",
+      "include_transfers",
+      "security_biometric_title",
+      "category_interest",
+      "transfer_between_wallets",
+      "bank_alfabank",
+      "achievement_app_explorer_title",
+      "achievements_progress",
+      "achievement_night_owl_title",
+      "category_transport",
+      "budget_spent",
+      "high_level",
+      "recommendation_emergency_fund_description",
+      "ok",
+      "key_metrics",
+      "achievement_budget_saver_desc",
+      "source_colon",
+      "profile_theme_light",
+      "investments_category",
+      "library_core_ktx_description",
+      "category_transfer",
+      "nav_statistics",
+      "amount_colon",
+      "savings_rate",
+      "wallet_type_savings",
+      "add_wallet",
+      "achievement_perfectionist_desc",
+      "achievements_filter_all",
+      "profile_achievements_subtitle",
+      "reminder_description",
+      "error_title",
+      "insight_expense_concentration_good",
+      "distribute_income_description",
+      "wallet_type_cash_description",
+      "period_month",
+      "investment_tips",
+      "check_emoji",
+      "subcategory_uniqlo",
+      "profile_currency_title",
+      "subcategory_gasoline",
+      "filter_week",
+      "and_more_categories",
+      "import_categories_title",
+      "recommendation_increase_savings_description",
+      "achievement_category_organizer_desc",
+      "period_day",
+      "yearly_expenses_title",
+      "expense_category",
+      "subcategory_demo_restaurant",
+      "notification_transaction_reminder_title",
+      "achievement_csv_importer_title",
+      "achievement_data_analyst_title",
+      "expense_type",
+      "import_transactions_title",
+      "show_more_categories",
+      "achievement_week_no_coffee_desc",
+      "delete_category_title",
+      "nav_home",
+      "wallet_type_other_description",
+      "average_expense",
+      "profile_budget_subtitle",
+      "transaction_type_expense",
+      "error_achievement_check",
+      "wallet_spent_amount",
+      "monthly_expenses_title",
+      "average_expenses_title",
+      "error_creating_wallet",
+      "error_transferring_funds",
+      "achievement_early_bird_desc",
+      "analysis_tip_budget",
+      "transaction_transfer",
+      "wallet_type_goal",
+      "header_amount",
+      "category_clothing",
+      "source_name",
+      "error_resetting_all_periods",
+      "analytics_title",
+      "financial_health_financial_cushion_title",
+      "budget_remaining",
+      "subcategory_bus",
+      "dialog_apply",
+      "error_rustore_rating",
+      "savings_rate_explanation",
+      "achievements_rarity_epic",
+      "savings_rate_satisfactory_recommendation",
+      "header_date",
+      "last_year",
+      "start_date",
+      "profile_title",
+      "linked_categories",
+      "error_loading_transactions",
+      "subcategory_massage",
+      "savings_rate_critical_description",
+      "dialog_delete",
+      "transaction_date",
+      "add_new_wallet",
+      "category_entertainment",
+      "subcategory_bershka",
+      "library_navigation_compose_name",
+      "achievements_category_savings",
+      "subcategory_theater",
+      "total",
+      "category_pet",
+      "categories_with_subcategories",
+      "subcategory_delivery_club",
+      "notification_permission_title_hardcoded",
+      "library_accompanist_name",
+      "no_expenses_period",
+      "achievements_category_import",
+      "wallet_created_success",
+      "detailed_financial_statistics",
+      "notification_transaction_reminder_text",
+      "wallet_setup_description",
+      "transaction_note",
+      "budget_exceeded",
+      "dialog_delete_category_message_default",
+      "emergency_fund_category",
+      "balance",
+      "link_button",
+      "transaction_category",
+      "subcategory_pull_bear",
+      "library_accompanist_description",
+      "financial_health_savings_rate_title",
+      "add_income",
+      "reset_filters",
+      "wallet_type_hint",
+      "last_month",
+      "subcategories_nav_init",
+      "subcategories_for_category",
+      "header_content",
+      "subcategory_reserved",
+      "category_freelance",
+      "wallet_goal_amount_example",
+      "category_credit",
+      "achievement_night_owl_desc",
+      "save_button_text",
+      "recommendation_achievements_title",
+      "savings_rate_excellent_recommendation",
+      "security_biometric_description",
+      "dialog_delete_category_message_irreversible",
+      "settings_language_current_value",
+      "settings_language_title",
+      "my_wallets",
+      "normal_level",
+      "quarter",
+      "add_category",
+      "no_wallets_available",
+      "dialog_collapse",
+      "critical_emoji",
+      "category_charity",
+      "achievement_perfectionist_title",
+      "note_optional",
+      "category_other_income",
+      "stat_smallest_transaction",
+      "achievements_overall_progress",
+      "achievement_first_savings_title",
+      "link_categories",
+      "subcategory_zara",
+      "financial_cushion_good_qualification",
+      "subcategory_car_service",
+      "transaction_source_tinkoff",
+      "group_by_days",
+      "achievement_month_user_title",
+      "app_name",
+      "wallet_name",
+      "wallet_balance",
+      "financial_cushion_excellent_recommendation",
+      "error_loading_additional_data",
+      "achievement_tinkoff_importer_title",
+      "subcategories_ready",
+      "day",
+      "subcategory_clinic",
+      "loading",
+      "csv_expense_value",
+      "achievements_category_budget",
+      "auth_enter_pin",
+      "wallet_goal_description",
+      "stat_by_merchant",
+      "achievements_category_milestones",
+      "transfer_amount",
+      "filter_month",
+      "stat_largest_transaction_desc",
+      "wallet_add_funds_action",
+      "error_linking_categories",
+      "subcategories_nav_demo",
+      "stat_by_category",
+      "all_time_filter",
+      "notification_permission_required",
+      "notification_channel_name",
+      "settings_theme_dark",
+      "average_expenses_explanation",
+      "wallet_budget_exceeded",
+      "error_target_amount_positive",
+      "achievement_first_transaction_title",
+      "transfer",
+      "achievement_ozon_importer_desc",
+      "recommendation_compact_title",
+      "study_achievements_title",
+      "ok_button",
+      "dialog_confirm",
+      "profile_export_import_subtitle",
+      "add_to_wallets",
+      "subcategory_auchan",
+      "wallet_name_hint",
+      "dialog_close",
+      "nav_profile",
+      "income_category",
+      "create_emergency_fund_urgent_description",
+      "wallet_type_investment",
+      "error_wallet_allocation_no_limit",
+      "link_categories_title",
+      "category_services",
+      "reminder_time",
+      "important_emoji",
+      "transaction_statistics",
+      "achievement_first_savings_desc",
+      "category_housing",
+      "library_pdfbox_android_name",
+      "achievement_app_explorer_desc",
+      "expenses",
+      "subcategory_selected",
+      "recommendation_investments_impact",
+      "achievement_multi_bank_importer_desc",
+      "settings_theme_title",
+      "select_color",
+      "category_utilities",
+      "wallet_create_button",
+      "hide_categories",
+      "library_material3_name",
+      "savings_rate_30_percent",
+      "append_loading",
+      "subcategory_cinema",
+      "month",
+      "trend_neutral_description",
+      "achievements_category_habits",
+      "increase_savings_rate_impact_ui",
+      "thought_emoji",
+      "medium_level",
+      "recommendation_savings_rate_low_title",
+      "financial_health_financial_cushion_content",
+      "notification_channel_description",
+      "subcategory_bowling",
+      "subcategory_starbucks",
+      "library_koin_description",
+      "achievement_budget_saver_title",
+      "group_by_weeks",
+      "add_subwallet",
+      "stat_largest_transaction",
+      "key_recommendations",
+      "achievements_unlocked",
+      "achievement_ozon_importer_title",
+      "settings_theme_light",
+      "last_week",
+      "achievements_category_statistics",
+      "no_incomes_period",
+      "next",
+      "wallet_remaining_amount",
+      "financial_cushion_insufficient_recommendation",
+      "error",
+      "financial_health_savings_rate_content",
+      "deduct_from_wallets",
+      "error_unknown",
+      "savings_rate_needs_attention_recommendation",
+      "security_app_lock_description",
+      "import_categories_subtitle",
+      "subcategory_burger_king",
+      "subcategory_dentist",
+      "subcategory_exhibition",
+      "subcategory_amusement_park",
+      "subcategory_parking",
+      "think_about_investments_description",
+      "library_lifecycle_description",
+      "error_wallet_allocation_failed",
+      "error_wallet_balance_rollback",
+      "achievement_sberbank_importer_title",
+      "subcategory_physiotherapy",
+      "total_income",
+      "today",
+      "achievements_filter_locked",
+      "income_categories",
+      "library_pdfbox_android_description",
+      "achievement_budget_keeper_title",
+      "library_kotlin_coroutines_description",
+      "error_wallet_allocation_no_wallets",
+      "increase_savings_rate_description_ui",
+      "period_year",
+      "recommended",
+      "savings_rate_50_percent",
+      "profile_transaction_reminders_title",
+      "wallet_goal_checkbox",
+      "log_error_loading_wallets",
+      "subcategory_billiards",
+      "error_widgets_updated",
+      "end_date",
+      "subcategory_metro",
+      "recommendation_savings_rate_low_description",
+      "savings_rate_excellent_qualification",
+      "subcategory_concert",
+      "this_week",
+      "achievement_export_master_desc",
+      "no_subcategories"
+    ],
+    "core": [
+      "error_application",
+      "error_validation"
+    ],
+    "app": [
+      "string",
+      "app_name",
+      "crash_report_error"
+    ],
+    "statistics": [
+      "financial_health_explanation",
+      "poor",
+      "financial_cushion_explanation",
+      "add_first_transaction",
+      "financial_health_average_expenses_content",
+      "personal_advice_title",
+      "financial_health_recommended_values_content",
+      "friday",
+      "financial_cushion_good_qualification",
+      "diversification",
+      "savings_rate_good_recommendation",
+      "insights",
+      "trend_positive_description",
+      "financial_cushion_good_recommendation",
+      "overview",
+      "savings_rate_15_percent",
+      "sunday",
+      "financial_cushion_excellent_recommendation",
+      "average",
+      "income_stability",
+      "track_savings_description",
+      "savings_rate_good_qualification",
+      "good",
+      "savings_optimization",
+      "expense_control",
+      "see_analytics_magic",
+      "financial_statistics_period",
+      "tuesday",
+      "golden_budget_rules_title",
+      "key_metrics",
+      "average_expenses_explanation",
+      "financial_health_tips_title",
+      "wednesday",
+      "error_loading_data_with_message",
+      "critical_recommendations_for_your_budget",
+      "charts",
+      "savings_rate_percent",
+      "category_list",
+      "savings_rate_satisfactory_qualification",
+      "financial_health_tooltip_description",
+      "categories_control_description",
+      "yearly_expenses_title",
+      "study_financial_indicators",
+      "dynamics",
+      "both",
+      "plan_budget_description",
+      "savings_rate_needs_attention_qualification",
+      "transaction_statistics",
+      "spending_patterns",
+      "professional_budgeting_principles",
+      "compare_periods_description",
+      "requires_attention",
+      "financial_health_score",
+      "monthly_expenses_title",
+      "saturday",
+      "chart_title_both",
+      "plan_budget_title",
+      "trend_neutral_description",
+      "savings_rate_30_percent",
+      "expense_analysis",
+      "daily_expenses_title",
+      "financial_health_tips_content",
+      "categories_control_title",
+      "compare_periods_title",
+      "error_loading_data",
+      "financial_health_financial_cushion_content",
+      "savings_rate_explanation",
+      "statistics_tip_description",
+      "savings_rate_satisfactory_recommendation",
+      "financial_health_recommended_values_title",
+      "start_date",
+      "no_category",
+      "financial_cushion_months",
+      "financial_health_analysis_title",
+      "months_format",
+      "monday",
+      "financial_cushion_insufficient_qualification",
+      "track_savings_title",
+      "custom_period",
+      "financial_health_info_description",
+      "personal_financial_analysis",
+      "financial_cushion_insufficient_recommendation",
+      "financial_health_savings_rate_content",
+      "trend_negative_description",
+      "analysis",
+      "savings_rate_needs_attention_recommendation",
+      "detailed_financial_statistics",
+      "golden_budget_rules_subtitle",
+      "statistics_tip_title",
+      "savings_rate_0_percent",
+      "categories",
+      "golden_budgeting_rules",
+      "show_tip",
+      "excellent",
+      "months_of_savings",
+      "completed",
+      "financial_cushion_excellent_qualification",
+      "select_period",
+      "financial_health_evaluation_description",
+      "savings_rate_50_percent",
+      "personal_advice_subtitle",
+      "savings_rate_excellent_recommendation",
+      "thursday",
+      "end_date",
+      "savings_rate_excellent_qualification"
+    ],
+    "transaction": [
+      "import_error_csv_format",
+      "csv_amount_parse_error",
+      "import_success_message",
+      "log_wallets_loaded",
+      "add_custom_subcategory",
+      "log_source_positions_updated",
+      "error_empty_category",
+      "log_csv_date_found",
+      "log_csv_date_not_found",
+      "csv_amount_parse_exception",
+      "log_source_usage_increased",
+      "log_not_saving_wallets",
+      "log_category_usage_count",
+      "import_total_amount",
+      "error_date_parse_failed",
+      "bank_generic_csv",
+      "add_custom_source",
+      "no_subcategories_available",
+      "csv_parse_line_error",
+      "import_error_date_format",
+      "select_wallet_for_expense",
+      "import_completed",
+      "log_category_income_usage_increased",
+      "new_transaction_title",
+      "csv_requirements",
+      "transaction_saved_success",
+      "log_enabling_income_wallets",
+      "show_less",
+      "import_transactions_hint",
+      "select_wallets_content_description",
+      "import_error_io_exception",
+      "log_ozon_import_created",
+      "sberbank_statement_alt",
+      "import_section_description_friendly",
+      "export_import",
+      "log_sberbank_import_created",
+      "sberbank_instructions",
+      "log_parse_money_remove_operator",
+      "log_parse_money_simple_number",
+      "selected_wallets_count",
+      "add_transaction",
+      "csv_date_format",
+      "alfabank_instructions_title_mobile",
+      "import_error_no_transactions_found",
+      "log_parse_money_empty_after_clean",
+      "log_transaction_after_switch",
+      "select_wallets_for_income",
+      "log_select_wallet_event",
+      "csv_no_description",
+      "unsaved_data_warning",
+      "attention_title",
+      "log_parse_money_unrecognized",
+      "log_transaction_wallets_loaded",
+      "select_wallets",
+      "bank_ozon",
+      "sberbank_instructions_title",
+      "log_parse_money_empty",
+      "import_error",
+      "import_error_pdf_extraction_exception",
+      "log_parse_money_expression_error",
+      "log_expense_categories_sorted",
+      "hide_note",
+      "import_instructions",
+      "log_parse_money_number_error",
+      "log_transaction_empty_category_error",
+      "add_custom_category",
+      "log_source_usage_count",
+      "bank_csv",
+      "import_error_invalid_format",
+      "export_action_error",
+      "csv_file_empty",
+      "import_error_no_transactions",
+      "import_section_title_emoji",
+      "log_category_positions_updated",
+      "log_csv_amount_processed",
+      "profile_export_import_subtitle",
+      "log_transaction_initialize_screen",
+      "wallet_income_explanation",
+      "header_document",
+      "comment",
+      "import_results",
+      "log_csv_delimiter_used",
+      "import_error_unsupported_format",
+      "log_category_expense_usage_increased",
+      "has_subcategories",
+      "log_enabling_expense_wallet",
+      "wallet_selected_for_expense",
+      "csv_skip_invalid_status",
+      "log_transaction_parse_amount_error",
+      "export_section_description_friendly",
+      "import_section_title",
+      "sberbank_category",
+      "sberbank_date_operation",
+      "transaction_source_ozon",
+      "log_transaction_type_switch",
+      "edit_note",
+      "error_empty_amount",
+      "export_section_description",
+      "log_income_categories_sorted",
+      "show_more_categories",
+      "import_error_unknown_format",
+      "error_unsupported_file_type",
+      "log_parse_money_expression_success",
+      "log_transaction_validate_input",
+      "transaction_note_auth_code",
+      "subcategory_selected",
+      "transaction_title_unknown",
+      "header_operation",
+      "csv_parsing_line",
+      "import_progress_text_extracted_validating",
+      "csv_example",
+      "delete_source_confirmation",
+      "transaction_source_sber",
+      "tinkoff_instructions",
+      "sberbank_headers",
+      "sberbank_operations_decoding",
+      "select_color",
+      "import_error_file_read",
+      "alfabank_note_important",
+      "hide_categories",
+      "import_progress_saving_transactions",
+      "sberbank_card_pattern",
+      "csv_skip_line_not_enough_columns",
+      "import_progress_completed",
+      "csv_not_enough_columns",
+      "select_subcategory",
+      "delete_category_confirmation",
+      "tinkoff_instructions_title",
+      "log_error_loading_wallets_base",
+      "export_section_title",
+      "log_error_updating_wallet_balance",
+      "sberbank_statement",
+      "log_sberbank_indicator_found",
+      "choose_file_button",
+      "log_saving_expense_wallets",
+      "select_category",
+      "alfabank_note",
+      "header_date_operation",
+      "csv_note_title",
+      "csv_no_header",
+      "select_source",
+      "log_sberbank_read_error",
+      "transaction_note_time",
+      "amount_placeholder",
+      "sberbank_note",
+      "alfabank_instructions_web",
+      "transaction_note_balance",
+      "supported_banks_title",
+      "unavailable_instructions",
+      "log_disabling_wallets",
+      "import_progress_processing_transactions",
+      "log_saving_income_wallets",
+      "log_transaction_validation_result",
+      "import_progress_format_validated_skipping_headers",
+      "bank_instructions_title",
+      "csv_header_skipped",
+      "csv_requirements_title",
+      "import_error_pdf_extraction_failed",
+      "csv_format_check",
+      "export_import_screen_title",
+      "proceed_to_import",
+      "selected_wallet_count",
+      "import_button_friendly",
+      "alfabank_instructions_mobile",
+      "ozon_instructions",
+      "import_progress_count",
+      "log_error_loading_sources",
+      "csv_date_parse_error",
+      "csv_note",
+      "wallet_expense_explanation",
+      "csv_instructions_title",
+      "export_button_friendly",
+      "csv_example_title",
+      "export_section_title_emoji",
+      "error_zero_amount",
+      "error_no_csv_app",
+      "export_import_section",
+      "add_note",
+      "log_parse_money_expression",
+      "wallets_selected_for_income",
+      "csv_imported_note",
+      "bank_sberbank_pdf",
+      "log_updating_selected_wallets",
+      "csv_date_not_found",
+      "log_transaction_empty_amount_error",
+      "log_parse_money_invalid_chars",
+      "wallets_selected_for_expense",
+      "log_transaction_zero_amount_error",
+      "csv_format_instructions",
+      "log_no_wallets_for_expense",
+      "import_button",
+      "alfabank_instructions_title_web",
+      "import_in_progress",
+      "log_transaction_reset_fields",
+      "progress_percentage",
+      "select_date_button",
+      "import_progress_starting",
+      "transaction_note_details",
+      "import_section_description",
+      "select_icon",
+      "importing_file",
+      "import_error_statistics_file",
+      "log_error_loading_wallets",
+      "ozon_instructions_title",
+      "csv_amount_not_found",
+      "wallet_selected_for_income",
+      "import_summary",
+      "how_to_import",
+      "log_csv_date_parsed",
+      "import_error_unknown"
+    ],
+    "home": [
+      "show_expenses",
+      "no_incomes_period",
+      "transactions_today",
+      "loading_data",
+      "feedback_success",
+      "transaction_deleted",
+      "error_saving_test_transactions",
+      "error_generating_test_data",
+      "no_expenses_period",
+      "add_first_transaction",
+      "show_summary",
+      "no_transactions",
+      "add_first_transaction_description",
+      "generate_test_data",
+      "transactions_week",
+      "financial_analyzer",
+      "feedback_info",
+      "show_incomes",
+      "feedback_warning",
+      "total_expense",
+      "empty_transaction_id_error",
+      "test_data_generated",
+      "transactions_all",
+      "feedback_error",
+      "total_income",
+      "transactions_month",
+      "empty_state_icon",
+      "and_more_categories",
+      "filter_all",
+      "hide_summary",
+      "welcome_title",
+      "welcome_subtitle"
+    ],
+    "widget": [
+      "balance_widget_description",
+      "small_balance_widget_description",
+      "default_small_amount",
+      "default_amount"
+    ],
+    "security": [
+      "pin_remove_success",
+      "change",
+      "pin_set_success",
+      "enable",
+      "security_change_pin_title",
+      "pin_mismatch",
+      "pin_change_success",
+      "security_app_lock_description",
+      "biometric_auth_failed",
+      "pin_too_short",
+      "pin_current",
+      "security_disable_lock_message",
+      "security_setup_pin_title",
+      "security_pin_setup_title",
+      "biometric_not_supported",
+      "biometric_feature_unavailable",
+      "pin_enter_new",
+      "security_disable_lock_title",
+      "pin_confirm_new",
+      "biometric_enabled",
+      "biometric_disabled",
+      "setup",
+      "security_app_lock_title",
+      "security_title",
+      "auth_biometric_negative",
+      "security_pin_confirm_title",
+      "biometric_hardware_unavailable",
+      "error_try_again",
+      "disable",
+      "security_biometric_description",
+      "auth_biometric_subtitle",
+      "auth_use_biometric",
+      "auth_wrong_pin",
+      "biometric_not_enrolled"
+    ],
+    "profile": [
+      "achievements",
+      "settings_reminder_time_format",
+      "sources_used",
+      "select_reminder_time",
+      "profile_budget_subtitle",
+      "profile_theme_select",
+      "notification_permission_required",
+      "settings_theme_title",
+      "app_version",
+      "settings_theme_dark",
+      "licenses_note",
+      "profile_settings_title",
+      "notification_settings",
+      "libraries_description",
+      "settings_currency_current_value",
+      "app_info",
+      "profile_achievements_subtitle",
+      "build_version",
+      "license_colon",
+      "reminder_description",
+      "profile_export_import_subtitle",
+      "libraries_title",
+      "all_time",
+      "unknown",
+      "reminder_time_description",
+      "off",
+      "expense_categories",
+      "profile_currency_title",
+      "income_categories",
+      "minutes",
+      "export_import",
+      "notification_disabled_description",
+      "enable_reminders",
+      "profile_theme_dark",
+      "edit_time",
+      "hours",
+      "reminder_time",
+      "settings_language_current_value",
+      "settings_language_title"
+    ],
+    "history": [
+      "custom_period",
+      "deleteSourceConfirmationMessage",
+      "select_all",
+      "no_changes",
+      "week_format",
+      "increase_by_percent",
+      "sources_selected",
+      "all_sources",
+      "categories_selected",
+      "source_filter",
+      "delete_category_confirm_irreversible",
+      "delete_category_confirm_move",
+      "previous_period",
+      "error_loading_transactions",
+      "all_categories",
+      "category_filter",
+      "filter",
+      "current_period",
+      "decrease_by_percent",
+      "select_sources",
+      "clear_selection"
+    ],
+    "onboarding": [
+      "onboarding_feature_analytics_description",
+      "onboarding_feature_widgets_description",
+      "onboarding_feature_security_description",
+      "onboarding_feature_budget_description",
+      "onboarding_feature_widgets_title",
+      "onboarding_page_4_description",
+      "onboarding_feature_budget_title",
+      "onboarding_page_2_title",
+      "onboarding_page_2_description",
+      "onboarding_welcome_subtitle",
+      "onboarding_benefits_title",
+      "onboarding_page_1_title",
+      "onboarding_feature_tracking_description",
+      "onboarding_button_start",
+      "onboarding_benefit_offline",
+      "onboarding_start_button",
+      "onboarding_feature_analytics_title",
+      "onboarding_benefit_free",
+      "onboarding_page_1_description",
+      "onboarding_welcome_title",
+      "onboarding_benefit_privacy",
+      "onboarding_feature_tracking_title",
+      "onboarding_feature_security_title",
+      "onboarding_page_3_description",
+      "onboarding_benefit_simple",
+      "onboarding_page_3_title",
+      "onboarding_features_title"
+    ],
+    "budget": [
+      "error_target_amount_positive"
+    ],
+    "data": [
+      "log_migration_15_14_completed",
+      "error_migration_13_14",
+      "error_migration_1_2",
+      "error_migration_7_8",
+      "error_migration_10_11",
+      "log_migration_16_15_completed",
+      "default_source",
+      "error_migration_9_10",
+      "log_error_string_conversion",
+      "error_migration_12_13",
+      "error_migration_6_7",
+      "error_migration_8_9",
+      "error_migration_4_5",
+      "error_migration_5_6",
+      "error_migration_15_16",
+      "error_migration_3_4",
+      "default_destination",
+      "error_migration_14_15",
+      "error_migration_2_3",
+      "log_migration_15_16_completed",
+      "log_migration_14_15_completed",
+      "error_migration_11_12"
+    ],
+    "domain": [
+      "category_other_income",
+      "log_achievement_section_visited",
+      "category_other_expense",
+      "log_achievement_statistics_viewed",
+      "log_achievement_category_used",
+      "log_achievement_budget_progress",
+      "log_achievement_savings_changed",
+      "log_error_checking_achievement",
+      "log_error_updating_achievement_progress",
+      "log_achievement_milestone_reached",
+      "log_error_profile_analytics",
+      "log_error_loading_achievement_progress",
+      "log_achievement_trigger_initialized",
+      "log_achievement_transaction_added",
+      "log_achievement_budget_created"
+    ]
+  }
+}

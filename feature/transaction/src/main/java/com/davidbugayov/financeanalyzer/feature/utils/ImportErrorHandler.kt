@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.feature.utils
 import android.content.Context
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
 /**
@@ -25,7 +26,7 @@ object ImportErrorHandler {
         CrashLoggerProvider.crashLogger.logException(error ?: Exception("Unknown import error"))
 
         return when {
-            error == null -> context.getString(R.string.import_error_unknown)
+            error == null -> context.getString(UiR.string.import_error_unknown)
             error.message?.contains("unsupported format", ignoreCase = true) == true ->
                 context.getString(R.string.import_error_unsupported_format)
             error.message?.contains("unknown format", ignoreCase = true) == true ->
@@ -40,7 +41,7 @@ object ImportErrorHandler {
                 context.getString(R.string.import_error_csv_format)
             error.message?.contains("statistics file", ignoreCase = true) == true ->
                 context.getString(R.string.import_error_statistics_file)
-            else -> error.message ?: context.getString(R.string.import_error_unknown)
+            else -> error.message ?: context.getString(UiR.string.import_error_unknown)
         }
     }
 }

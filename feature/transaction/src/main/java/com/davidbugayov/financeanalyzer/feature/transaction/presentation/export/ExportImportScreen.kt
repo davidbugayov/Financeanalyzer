@@ -205,7 +205,7 @@ fun ExportImportScreen(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                text = stringResource(R.string.import_section_title),
+                                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.import_transactions_title),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
                                 color = MaterialTheme.colorScheme.onSurface,

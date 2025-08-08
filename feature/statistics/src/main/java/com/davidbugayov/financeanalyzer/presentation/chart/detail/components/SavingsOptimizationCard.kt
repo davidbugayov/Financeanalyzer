@@ -60,7 +60,7 @@ fun SavingsOptimizationCard(
 
             MetricRow(
                 title = stringResource(UiR.string.savings_rate_title),
-                value = stringResource(R.string.savings_rate_percent, metrics.savingsRate.setScale(1).toString()),
+                value = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health_metric, metrics.savingsRate.setScale(1).toInt()),
             )
 
             MetricRow(

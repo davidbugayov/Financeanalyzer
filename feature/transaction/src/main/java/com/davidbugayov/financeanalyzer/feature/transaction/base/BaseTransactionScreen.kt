@@ -353,9 +353,9 @@ fun <E> BaseTransactionScreen(
                 if (!isEditMode && onNavigateToImport != null) {
                     ReminderBubble(
                         visible = showImportReminder,
-                        title = stringResource(R.string.import_section_title),
+                        title = stringResource(UiR.string.import_transactions_title),
                         description = stringResource(R.string.import_transactions_hint),
-                        actionButtonText = stringResource(R.string.import_button),
+                        actionButtonText = stringResource(R.string.import_button_friendly),
                         dismissButtonText = stringResource(UiR.string.close),
                         onDismiss = { handleImportReminderDismiss() },
                         onAction = {
