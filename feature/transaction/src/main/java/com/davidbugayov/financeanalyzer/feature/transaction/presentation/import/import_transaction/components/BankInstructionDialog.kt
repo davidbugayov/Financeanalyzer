@@ -50,11 +50,11 @@ fun BankInstructionDialog(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.import_dialog_content_padding)),
+                        .padding(dimensionResource(UiR.dimen.import_dialog_content_padding)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(R.string.bank_instructions_title, bankName),
+                    text = stringResource(UiR.string.bank_instructions_title, bankName),
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -97,6 +97,6 @@ fun BankInstructionsContent(bankName: String) {
         "Альфа-Банк" -> AlfaBankInstructions()
         "Озон" -> OzonInstructions()
         "CSV" -> CSVInstructions()
-        else -> Text(text = stringResource(R.string.unavailable_instructions))
+        else -> Text(text = stringResource(UiR.string.unavailable_instructions))
     }
 }

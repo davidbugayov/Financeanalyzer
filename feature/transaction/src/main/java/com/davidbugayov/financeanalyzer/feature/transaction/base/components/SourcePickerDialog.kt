@@ -45,7 +45,7 @@ fun SourcePickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_source)) },
+        title = { Text(stringResource(UiR.string.select_source)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column {
@@ -101,13 +101,13 @@ fun SourcePickerDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.add_custom_source),
+                                contentDescription = stringResource(UiR.string.add_custom_source),
                                 modifier =
                                     Modifier
                                         .padding(end = dimensionResource(UiR.dimen.spacing_medium))
                                         .size(dimensionResource(UiR.dimen.icon_size_small)),
                             )
-                            Text(stringResource(R.string.add_custom_source))
+                            Text(stringResource(UiR.string.add_custom_source))
                         }
                     }
                 }

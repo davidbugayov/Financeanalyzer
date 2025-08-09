@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог для выбора категорий (импорта или связывания)
@@ -42,9 +43,9 @@ fun ImportCategoriesDialog(
     onDismiss: () -> Unit,
     onImport: (List<String>) -> Unit,
     availableCategories: List<UiCategory>,
-    title: String = stringResource(R.string.import_categories_title),
-    subtitle: String = stringResource(R.string.import_categories_subtitle),
-    confirmButtonText: String = stringResource(R.string.import_categories_confirm),
+    title: String = stringResource(UiR.string.import_categories_title),
+    subtitle: String = stringResource(UiR.string.import_categories_subtitle),
+    confirmButtonText: String = stringResource(UiR.string.import_categories_confirm),
     preselectedCategories: List<String> = emptyList(),
 ) {
     // Список выбранных категорий
@@ -110,7 +111,7 @@ fun ImportCategoriesDialog(
             TextButton(
                 onClick = onDismiss,
             ) {
-                Text(text = stringResource(R.string.cancel))
+                Text(text = stringResource(UiR.string.cancel))
             }
         },
     )

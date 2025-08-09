@@ -48,35 +48,35 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
         // Сбербанк
         BankItem(
             name = stringResource(UiR.string.bank_sberbank),
-            color = colorResource(id = R.color.bank_sberbank),
+            color = colorResource(id = UiR.color.bank_sberbank),
             onClick = { onBankClick("Сбербанк") },
         )
 
         // Тинькофф
         BankItem(
             name = stringResource(UiR.string.bank_tinkoff),
-            color = colorResource(id = R.color.bank_tinkoff),
+            color = colorResource(id = UiR.color.bank_tinkoff),
             onClick = { onBankClick("Тинькофф") },
         )
 
         // Альфа-Банк
         BankItem(
             name = stringResource(UiR.string.bank_alfabank),
-            color = colorResource(id = R.color.bank_alfabank),
+            color = colorResource(id = UiR.color.bank_alfabank),
             onClick = { onBankClick("Альфа-Банк") },
         )
 
         // Озон
         BankItem(
-            name = stringResource(R.string.bank_ozon),
-            color = colorResource(id = R.color.bank_ozon),
+            name = stringResource(UiR.string.bank_ozon),
+            color = colorResource(id = UiR.color.bank_ozon),
             onClick = { onBankClick("Озон") },
         )
 
         // CSV
         BankItem(
-            name = stringResource(R.string.bank_csv),
-            color = colorResource(id = R.color.bank_csv),
+            name = stringResource(UiR.string.bank_csv),
+            color = colorResource(id = UiR.color.bank_csv),
             isCSV = true,
             onClick = { onBankClick("CSV") },
         )

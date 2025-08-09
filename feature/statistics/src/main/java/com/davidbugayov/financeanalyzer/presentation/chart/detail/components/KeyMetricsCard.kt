@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
 fun KeyMetricsCard(
@@ -40,13 +41,13 @@ fun KeyMetricsCard(
         modifier = modifier,
         shape =
             RoundedCornerShape(
-                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_corner_radius),
+                dimensionResource(UiR.dimen.financial_statistics_card_corner_radius),
             ),
         elevation =
             CardDefaults.cardElevation(
                 defaultElevation =
                     dimensionResource(
-                        com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_elevation,
+                        UiR.dimen.financial_statistics_card_elevation,
                     ),
             ),
         colors =
@@ -65,12 +66,12 @@ fun KeyMetricsCard(
                     .fillMaxWidth()
                     .padding(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_padding,
+                            UiR.dimen.financial_statistics_card_padding,
                         ),
                     ),
         ) {
             Text(
-                text = stringResource(R.string.key_metrics),
+                text = stringResource(UiR.string.key_metrics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -80,7 +81,7 @@ fun KeyMetricsCard(
                 modifier =
                     Modifier.height(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large,
+                            UiR.dimen.financial_statistics_spacer_large,
                         ),
                     ),
             )
@@ -91,20 +92,20 @@ fun KeyMetricsCard(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.income),
+                        text = stringResource(UiR.string.income),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = income.format(true),
                         style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(R.color.financial_statistics_progress_good),
+                        color = colorResource(UiR.color.financial_statistics_progress_good),
                         fontWeight = FontWeight.Bold,
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = stringResource(R.string.expense),
+                        text = stringResource(UiR.string.expense),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -121,7 +122,7 @@ fun KeyMetricsCard(
                 modifier =
                     Modifier.height(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large,
+                            UiR.dimen.financial_statistics_spacer_large,
                         ),
                     ),
             )
@@ -146,10 +147,10 @@ fun KeyMetricsCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color =
                         if (savingsRate >= 20) {
-                            colorResource(R.color.savings_rate_good)
+                            colorResource(UiR.color.savings_rate_good)
                         } else {
                             colorResource(
-                                R.color.savings_rate_needs_attention,
+                                UiR.color.savings_rate_needs_attention,
                             )
                         },
                 )
@@ -158,7 +159,7 @@ fun KeyMetricsCard(
                 modifier =
                     Modifier.height(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_medium,
+                            UiR.dimen.financial_statistics_spacer_medium,
                         ),
                     ),
             )
@@ -171,7 +172,7 @@ fun KeyMetricsCard(
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
                                 .background(
-                                    colorResource(R.color.savings_rate_needs_attention).copy(
+                                    colorResource(UiR.color.savings_rate_needs_attention).copy(
                                         alpha = 0.2f,
                                     ),
                                 ),
@@ -182,7 +183,7 @@ fun KeyMetricsCard(
                                 .weight(0.1f)
                                 .height(8.dp)
                                 .background(
-                                    colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f),
+                                    colorResource(UiR.color.savings_rate_satisfactory).copy(alpha = 0.2f),
                                 ),
                     )
                     Box(
@@ -190,7 +191,7 @@ fun KeyMetricsCard(
                             Modifier
                                 .weight(0.15f)
                                 .height(8.dp)
-                                .background(colorResource(R.color.savings_rate_good).copy(alpha = 0.2f)),
+                                .background(colorResource(UiR.color.savings_rate_good).copy(alpha = 0.2f)),
                     )
                     Box(
                         modifier =
@@ -199,17 +200,17 @@ fun KeyMetricsCard(
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
                                 .background(
-                                    colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f),
+                                    colorResource(UiR.color.savings_rate_excellent).copy(alpha = 0.2f),
                                 ),
                     )
                 }
                 val normalizedRate = (savingsRate / 100f).coerceIn(0f, 1f)
                 val progressColor =
                     when {
-                        savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
-                        savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
-                        savingsRate >= 5 -> colorResource(R.color.savings_rate_satisfactory)
-                        else -> colorResource(R.color.savings_rate_needs_attention)
+                        savingsRate >= 30 -> colorResource(UiR.color.savings_rate_excellent)
+                        savingsRate >= 15 -> colorResource(UiR.color.savings_rate_good)
+                        savingsRate >= 5 -> colorResource(UiR.color.savings_rate_satisfactory)
+                        else -> colorResource(UiR.color.savings_rate_needs_attention)
                     }
                 LinearProgressIndicator(
                     progress = { normalizedRate },
@@ -230,22 +231,22 @@ fun KeyMetricsCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = stringResource(R.string.savings_rate_0_percent),
+                    text = stringResource(UiR.string.savings_rate_0_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_15_percent),
+                    text = stringResource(UiR.string.savings_rate_15_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_30_percent),
+                    text = stringResource(UiR.string.savings_rate_30_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = stringResource(R.string.savings_rate_50_percent),
+                    text = stringResource(UiR.string.savings_rate_50_percent),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -254,7 +255,7 @@ fun KeyMetricsCard(
                 modifier =
                     Modifier.height(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_small,
+                            UiR.dimen.financial_statistics_spacer_small,
                         ),
                     ),
             )

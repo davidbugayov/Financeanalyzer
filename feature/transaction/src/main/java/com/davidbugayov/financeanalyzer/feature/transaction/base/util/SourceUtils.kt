@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.theme.CashColor
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 // import com.davidbugayov.financeanalyzer.utils.ColorUtils // ColorUtils может быть еще нужен для getSourceColorByName, если используется где-то еще
 
@@ -15,7 +16,7 @@ fun getInitialSources(
     resources: Resources,
 ): List<Source> {
     val deletedDefaultSources = sourcePreferences.getDeletedDefaultSources()
-    val defaultSourceNames = resources.getStringArray(R.array.default_source_names).toList()
+    val defaultSourceNames = resources.getStringArray(UiR.array.default_source_names).toList()
     val defaultSources =
         defaultSourceNames
             .filter { it !in deletedDefaultSources }

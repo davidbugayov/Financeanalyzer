@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 class TransactionHistoryViewModel(
@@ -234,7 +235,7 @@ class TransactionHistoryViewModel(
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
-                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown))
+                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown))
 
                     // Логируем событие в аналитику
                     AnalyticsUtils.logTransactionDeleted(

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="custom_period">Произвольный</string>
+    <!-- custom_period дублируется в ui/values/strings.xml и удалён здесь -->
     <string name="detailed_financial_statistics">Детальная финансовая статистика</string>
     <string name="overview">Обзор</string>
     <string name="financial_statistics_period">Период финансовой статистики</string>
@@ -51,17 +51,8 @@
     <string name="financial_health_financial_cushion_title">Финансовая подушка безопасности</string>
     <string name="financial_health_financial_cushion_content">Финансовая подушка — это сумма, которая позволит вам прожить 3-6 месяцев без дохода. Рассчитывается как среднемесячные расходы × количество месяцев. Это ваш запас прочности на случай непредвиденных ситуаций.</string>
     <string name="financial_health_tips_title">Советы по финансовому здоровью</string>
-    <string name="financial_health_tips_content">• Откладывайте 10-20% от каждого дохода
-• Ведите учёт всех трат
-• Создайте резервный фонд на 3-6 месяцев
-• Диверсифицируйте источники дохода
-• Регулярно анализируйте свои финансы</string>
+    <!-- financial_health_tips_content и financial_health_recommended_values_content вынесены в strings.xml -->
     <string name="financial_health_recommended_values_title">Рекомендуемые значения</string>
-    <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: 10-20%
-• Финансовая подушка: 3-6 месяцев расходов
-• Контроль расходов: не более 90% от дохода
-• Диверсификация доходов: минимум 2 источника
-• Регулярный анализ: еженедельно</string>
     <string name="financial_health_tooltip_description">Нажмите для получения подробной информации о показателе и рекомендаций по улучшению</string>
 </resources>
 

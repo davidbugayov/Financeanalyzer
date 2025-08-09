@@ -60,6 +60,7 @@ import androidx.compose.ui.window.Dialog
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран экспорта/импорта транзакций.
@@ -102,12 +103,12 @@ fun ExportImportScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.export_import_screen_title)) },
+                title = { Text(stringResource(UiR.string.export_import_screen_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.back),
+                            contentDescription = stringResource(UiR.string.back),
                         )
                     }
                 },
@@ -150,14 +151,14 @@ fun ExportImportScreen(
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                text = stringResource(R.string.export_section_title),
+                                text = stringResource(UiR.string.export_section_title),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                         Text(
-                            text = stringResource(R.string.export_section_description_friendly),
+                            text = stringResource(UiR.string.export_section_description_friendly),
                             fontSize = 15.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -174,7 +175,7 @@ fun ExportImportScreen(
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 8.dp),
                             )
-                            Text(stringResource(R.string.export_button_friendly))
+                            Text(stringResource(UiR.string.export_button_friendly))
                         }
                     }
                 }
@@ -207,7 +208,7 @@ fun ExportImportScreen(
                             Text(
                                 text =
                                     stringResource(
-                                        com.davidbugayov.financeanalyzer.ui.R.string.import_transactions_title,
+                                        UiR.string.import_transactions_title,
                                     ),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
@@ -215,7 +216,7 @@ fun ExportImportScreen(
                             )
                         }
                         Text(
-                            text = stringResource(R.string.import_section_description_friendly),
+                            text = stringResource(UiR.string.import_section_description_friendly),
                             fontSize = 15.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -232,7 +233,7 @@ fun ExportImportScreen(
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 8.dp),
                             )
-                            Text(stringResource(R.string.import_button_friendly))
+                            Text(stringResource(UiR.string.import_button_friendly))
                         }
                     }
                 }

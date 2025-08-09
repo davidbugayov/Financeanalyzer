@@ -23,6 +23,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTrans
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран добавления новой транзакции
@@ -149,8 +150,8 @@ fun AddTransactionScreen(
             )
             viewModel.onNavigateBack()
         },
-        screenTitle = stringResource(R.string.new_transaction_title),
-        buttonText = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add),
+        screenTitle = stringResource(UiR.string.new_transaction_title),
+        buttonText = stringResource(UiR.string.add),
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
         submitEvent = BaseTransactionEvent.Submit,

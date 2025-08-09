@@ -262,7 +262,7 @@ private fun ExpandableGroupHeader(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(id = R.dimen.spacing_normal)),
+                    .padding(dimensionResource(id = UiR.dimen.spacing_normal)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -270,10 +270,10 @@ private fun ExpandableGroupHeader(
                 contentDescription =
                     if (isExpanded) {
                         stringResource(
-                            com.davidbugayov.financeanalyzer.ui.R.string.collapse,
+                            UiR.string.collapse,
                         )
                     } else {
-                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.expand)
+                        stringResource(UiR.string.expand)
                     },
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

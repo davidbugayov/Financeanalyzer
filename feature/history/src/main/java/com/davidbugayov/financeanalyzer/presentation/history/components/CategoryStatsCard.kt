@@ -60,7 +60,7 @@ fun CategoryStatsCard(
             ) {
                 Column {
                     Text(
-                        text = stringResource(R.string.current_period),
+                        text = stringResource(UiR.string.current_period),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -71,7 +71,7 @@ fun CategoryStatsCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = stringResource(R.string.previous_period),
+                        text = stringResource(UiR.string.previous_period),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -87,10 +87,10 @@ fun CategoryStatsCard(
                 val changeText =
                     when {
                         percentChangeInt > 0 ->
-                            stringResource(R.string.increase_by_percent, percentChangeInt)
+                            stringResource(UiR.string.increase_by_percent, percentChangeInt)
                         percentChangeInt < 0 ->
-                            stringResource(R.string.decrease_by_percent, kotlin.math.abs(percentChangeInt))
-                        else -> stringResource(R.string.no_changes)
+                            stringResource(UiR.string.decrease_by_percent, kotlin.math.abs(percentChangeInt))
+                        else -> stringResource(UiR.string.no_changes)
                     }
                 val percentChangeColor =
                     when {

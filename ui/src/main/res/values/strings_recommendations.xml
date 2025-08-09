@@ -26,6 +26,9 @@
     <string name="recommendation_enhanced_title">Улучшенные рекомендации</string>
     <string name="recommendation_enhanced_subtitle">Детальный анализ с приоритетами</string>
     <string name="recommendation_compact_title">Компактные рекомендации</string>
+    <string name="best_recommendations_title">Рекомендации</string>
+    <string name="best_recommendations_subtitle">На основе ваших данных</string>
+    <!-- show_more/show_less уже есть в strings.xml -->
     
     <!-- Категории рекомендаций -->
     <string name="recommendation_category_savings">savings</string>

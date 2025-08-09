@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
 import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Состояние экрана профиля.
@@ -41,7 +42,7 @@ data class ProfileState(
     val totalIncomeCategories: Int = 0,
     val averageExpense: String = "0 ₽",
     val totalSourcesUsed: Int = 0,
-    val dateRange: String = GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time),
+    val dateRange: String = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time),
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,

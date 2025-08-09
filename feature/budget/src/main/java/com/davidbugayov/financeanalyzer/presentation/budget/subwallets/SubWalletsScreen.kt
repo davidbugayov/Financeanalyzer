@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.component
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.SubWalletCard
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +51,7 @@ fun SubWalletsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.back),
+                            contentDescription = stringResource(UiR.string.back),
                         )
                     }
                 },
@@ -63,7 +64,7 @@ fun SubWalletsScreen(
                             imageVector = Icons.Default.Add,
                             contentDescription =
                                 stringResource(
-                                    com.davidbugayov.financeanalyzer.ui.R.string.add_subwallet,
+                                    UiR.string.add_subwallet,
                                 ),
                         )
                     }

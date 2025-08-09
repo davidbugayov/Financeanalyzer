@@ -25,6 +25,7 @@ import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Базовый абстрактный класс приложения.
@@ -65,7 +66,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
                 Timber.d("AppMetrica успешно инициализирована (release build)")
                 CrashReporter.isAppMetricaInitialized = true
             } catch (e: Exception) {
-                Timber.e(e, getString(R.string.appmetrica_init_error))
+                Timber.e(e, getString(UiR.string.appmetrica_init_error))
                 CrashReporter.isAppMetricaInitialized = false
             }
         } else {
@@ -80,26 +81,26 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             // Инициализация Koin
             initKoin()
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.koin_init_error))
-            CrashReporter.trackError("KoinInit", getString(R.string.koin_init_error_detail, e.message ?: ""))
+            Timber.e(e, getString(UiR.string.koin_init_error))
+            CrashReporter.trackError("KoinInit", getString(UiR.string.koin_init_error_detail, e.message ?: ""))
         }
 
         try {
             // Инициализация модулей
             initModules()
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.modules_init_error))
-            CrashReporter.trackError("ModuleInit", getString(R.string.modules_init_error_detail, e.message ?: ""))
+            Timber.e(e, getString(UiR.string.modules_init_error))
+            CrashReporter.trackError("ModuleInit", getString(UiR.string.modules_init_error_detail, e.message ?: ""))
         }
 
         try {
             // Инициализация системы достижений
             initAchievements()
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.achievements_init_error))
+            Timber.e(e, getString(UiR.string.achievements_init_error))
             CrashReporter.trackError(
                 "AchievementsInit",
-                getString(R.string.achievements_init_error_detail, e.message ?: ""),
+                getString(UiR.string.achievements_init_error_detail, e.message ?: ""),
             )
         }
 
@@ -107,16 +108,16 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             // Логируем основные данные устройства для диагностики
             logDeviceInfo()
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.device_info_log_error))
-            CrashReporter.trackError("DeviceInfoLog", getString(R.string.device_info_log_error_detail, e.message ?: ""))
+            Timber.e(e, getString(UiR.string.device_info_log_error))
+            CrashReporter.trackError("DeviceInfoLog", getString(UiR.string.device_info_log_error_detail, e.message ?: ""))
         }
 
         try {
             // Инициализируем специфичные для флейвора компоненты
             initFlavor()
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.flavor_init_error))
-            CrashReporter.trackError("FlavorInit", getString(R.string.flavor_init_error_detail, e.message ?: ""))
+            Timber.e(e, getString(UiR.string.flavor_init_error))
+            CrashReporter.trackError("FlavorInit", getString(UiR.string.flavor_init_error_detail, e.message ?: ""))
         }
 
         // Регистрируем наблюдатель за жизненным циклом приложения
@@ -153,7 +154,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
     private fun initModules() {
         // Инициализация модуля транзакций
         TransactionModuleInitializer.initialize()
-        Timber.d(getString(R.string.modules_initialized_success))
+        Timber.d(getString(UiR.string.modules_initialized_success))
     }
 
     /**
@@ -167,7 +168,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             // Инициализируем провайдер для доступа из UI
             AchievementEngineProvider.initialize(achievementEngine)
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.achievements_init_error))
+            Timber.e(e, getString(UiR.string.achievements_init_error))
         }
     }
 
@@ -250,7 +251,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
                 AchievementTrigger.onMilestoneReached("month_active")
             }
         } catch (e: Exception) {
-            Timber.e(e, getString(R.string.user_activity_check_error))
+            Timber.e(e, getString(UiR.string.user_activity_check_error))
         }
     }
 

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для экрана достижений
@@ -33,8 +34,8 @@ class AchievementsViewModel(
             // Транзакции
             Achievement(
                 id = "first_transaction",
-                title = appContext.getString(R.string.achievement_first_transaction_title),
-                description = appContext.getString(R.string.achievement_first_transaction_desc),
+                title = appContext.getString(UiR.string.achievement_first_transaction_title),
+                description = appContext.getString(UiR.string.achievement_first_transaction_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -43,8 +44,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "transaction_master",
-                title = appContext.getString(R.string.achievement_transaction_master_title),
-                description = appContext.getString(R.string.achievement_transaction_master_desc),
+                title = appContext.getString(UiR.string.achievement_transaction_master_title),
+                description = appContext.getString(UiR.string.achievement_transaction_master_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.RARE,
@@ -53,8 +54,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "daily_tracker",
-                title = appContext.getString(R.string.achievement_daily_tracker_title),
-                description = appContext.getString(R.string.achievement_daily_tracker_desc),
+                title = appContext.getString(UiR.string.achievement_daily_tracker_title),
+                description = appContext.getString(UiR.string.achievement_daily_tracker_desc),
                 iconRes = 0,
                 category = AchievementCategory.HABITS,
                 rarity = AchievementRarity.RARE,
@@ -63,8 +64,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "category_organizer",
-                title = appContext.getString(R.string.achievement_category_organizer_title),
-                description = appContext.getString(R.string.achievement_category_organizer_desc),
+                title = appContext.getString(UiR.string.achievement_category_organizer_title),
+                description = appContext.getString(UiR.string.achievement_category_organizer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -74,8 +75,8 @@ class AchievementsViewModel(
             // Бюджет
             Achievement(
                 id = "first_budget",
-                title = appContext.getString(R.string.achievement_first_budget_title),
-                description = appContext.getString(R.string.achievement_first_budget_desc),
+                title = appContext.getString(UiR.string.achievement_first_budget_title),
+                description = appContext.getString(UiR.string.achievement_first_budget_desc),
                 iconRes = 0,
                 category = AchievementCategory.BUDGET,
                 rarity = AchievementRarity.COMMON,
@@ -84,8 +85,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "budget_keeper",
-                title = appContext.getString(R.string.achievement_budget_keeper_title),
-                description = appContext.getString(R.string.achievement_budget_keeper_desc),
+                title = appContext.getString(UiR.string.achievement_budget_keeper_title),
+                description = appContext.getString(UiR.string.achievement_budget_keeper_desc),
                 iconRes = 0,
                 category = AchievementCategory.BUDGET,
                 rarity = AchievementRarity.EPIC,
@@ -94,8 +95,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "budget_saver",
-                title = appContext.getString(R.string.achievement_budget_saver_title),
-                description = appContext.getString(R.string.achievement_budget_saver_desc),
+                title = appContext.getString(UiR.string.achievement_budget_saver_title),
+                description = appContext.getString(UiR.string.achievement_budget_saver_desc),
                 iconRes = 0,
                 category = AchievementCategory.BUDGET,
                 rarity = AchievementRarity.RARE,
@@ -105,8 +106,8 @@ class AchievementsViewModel(
             // Накопления
             Achievement(
                 id = "first_savings",
-                title = appContext.getString(R.string.achievement_first_savings_title),
-                description = appContext.getString(R.string.achievement_first_savings_desc),
+                title = appContext.getString(UiR.string.achievement_first_savings_title),
+                description = appContext.getString(UiR.string.achievement_first_savings_desc),
                 iconRes = 0,
                 category = AchievementCategory.SAVINGS,
                 rarity = AchievementRarity.COMMON,
@@ -115,8 +116,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "emergency_fund",
-                title = appContext.getString(R.string.achievement_emergency_fund_title),
-                description = appContext.getString(R.string.achievement_emergency_fund_desc),
+                title = appContext.getString(UiR.string.achievement_emergency_fund_title),
+                description = appContext.getString(UiR.string.achievement_emergency_fund_desc),
                 iconRes = 0,
                 category = AchievementCategory.SAVINGS,
                 rarity = AchievementRarity.LEGENDARY,
@@ -126,8 +127,8 @@ class AchievementsViewModel(
             // Привычки
             Achievement(
                 id = "week_no_coffee",
-                title = appContext.getString(R.string.achievement_week_no_coffee_title),
-                description = appContext.getString(R.string.achievement_week_no_coffee_desc),
+                title = appContext.getString(UiR.string.achievement_week_no_coffee_title),
+                description = appContext.getString(UiR.string.achievement_week_no_coffee_desc),
                 iconRes = 0,
                 category = AchievementCategory.HABITS,
                 rarity = AchievementRarity.RARE,
@@ -136,8 +137,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "healthy_spender",
-                title = appContext.getString(R.string.achievement_healthy_spender_title),
-                description = appContext.getString(R.string.achievement_healthy_spender_desc),
+                title = appContext.getString(UiR.string.achievement_healthy_spender_title),
+                description = appContext.getString(UiR.string.achievement_healthy_spender_desc),
                 iconRes = 0,
                 category = AchievementCategory.HABITS,
                 rarity = AchievementRarity.COMMON,
@@ -147,8 +148,8 @@ class AchievementsViewModel(
             // Статистика
             Achievement(
                 id = "data_analyst",
-                title = appContext.getString(R.string.achievement_data_analyst_title),
-                description = appContext.getString(R.string.achievement_data_analyst_desc),
+                title = appContext.getString(UiR.string.achievement_data_analyst_title),
+                description = appContext.getString(UiR.string.achievement_data_analyst_desc),
                 iconRes = 0,
                 category = AchievementCategory.STATISTICS,
                 rarity = AchievementRarity.COMMON,
@@ -158,8 +159,8 @@ class AchievementsViewModel(
             // Вехи
             Achievement(
                 id = "app_explorer",
-                title = appContext.getString(R.string.achievement_app_explorer_title),
-                description = appContext.getString(R.string.achievement_app_explorer_desc),
+                title = appContext.getString(UiR.string.achievement_app_explorer_title),
+                description = appContext.getString(UiR.string.achievement_app_explorer_desc),
                 iconRes = 0,
                 category = AchievementCategory.MILESTONES,
                 rarity = AchievementRarity.COMMON,
@@ -168,8 +169,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "month_user",
-                title = appContext.getString(R.string.achievement_month_user_title),
-                description = appContext.getString(R.string.achievement_month_user_desc),
+                title = appContext.getString(UiR.string.achievement_month_user_title),
+                description = appContext.getString(UiR.string.achievement_month_user_desc),
                 iconRes = 0,
                 category = AchievementCategory.MILESTONES,
                 rarity = AchievementRarity.RARE,
@@ -179,8 +180,8 @@ class AchievementsViewModel(
             // Специальные
             Achievement(
                 id = "early_bird",
-                title = appContext.getString(R.string.achievement_early_bird_title),
-                description = appContext.getString(R.string.achievement_early_bird_desc),
+                title = appContext.getString(UiR.string.achievement_early_bird_title),
+                description = appContext.getString(UiR.string.achievement_early_bird_desc),
                 iconRes = 0,
                 category = AchievementCategory.SPECIAL,
                 rarity = AchievementRarity.COMMON,
@@ -189,8 +190,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "night_owl",
-                title = appContext.getString(R.string.achievement_night_owl_title),
-                description = appContext.getString(R.string.achievement_night_owl_desc),
+                title = appContext.getString(UiR.string.achievement_night_owl_title),
+                description = appContext.getString(UiR.string.achievement_night_owl_desc),
                 iconRes = 0,
                 category = AchievementCategory.SPECIAL,
                 rarity = AchievementRarity.COMMON,
@@ -199,8 +200,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "perfectionist",
-                title = appContext.getString(R.string.achievement_perfectionist_title),
-                description = appContext.getString(R.string.achievement_perfectionist_desc),
+                title = appContext.getString(UiR.string.achievement_perfectionist_title),
+                description = appContext.getString(UiR.string.achievement_perfectionist_desc),
                 iconRes = 0,
                 category = AchievementCategory.SPECIAL,
                 rarity = AchievementRarity.EPIC,
@@ -211,8 +212,8 @@ class AchievementsViewModel(
             // Достижения для импорта из банков
             Achievement(
                 id = "tinkoff_importer",
-                title = appContext.getString(R.string.achievement_tinkoff_importer_title),
-                description = appContext.getString(R.string.achievement_tinkoff_importer_desc),
+                title = appContext.getString(UiR.string.achievement_tinkoff_importer_title),
+                description = appContext.getString(UiR.string.achievement_tinkoff_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -221,8 +222,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "sberbank_importer",
-                title = appContext.getString(R.string.achievement_sberbank_importer_title),
-                description = appContext.getString(R.string.achievement_sberbank_importer_desc),
+                title = appContext.getString(UiR.string.achievement_sberbank_importer_title),
+                description = appContext.getString(UiR.string.achievement_sberbank_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -231,8 +232,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "alfabank_importer",
-                title = appContext.getString(R.string.achievement_alfabank_importer_title),
-                description = appContext.getString(R.string.achievement_alfabank_importer_desc),
+                title = appContext.getString(UiR.string.achievement_alfabank_importer_title),
+                description = appContext.getString(UiR.string.achievement_alfabank_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -241,8 +242,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "ozon_importer",
-                title = appContext.getString(R.string.achievement_ozon_importer_title),
-                description = appContext.getString(R.string.achievement_ozon_importer_desc),
+                title = appContext.getString(UiR.string.achievement_ozon_importer_title),
+                description = appContext.getString(UiR.string.achievement_ozon_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -251,8 +252,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "multi_bank_importer",
-                title = appContext.getString(R.string.achievement_multi_bank_importer_title),
-                description = appContext.getString(R.string.achievement_multi_bank_importer_desc),
+                title = appContext.getString(UiR.string.achievement_multi_bank_importer_title),
+                description = appContext.getString(UiR.string.achievement_multi_bank_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.EPIC,
@@ -262,8 +263,8 @@ class AchievementsViewModel(
             // Достижения для экспорта
             Achievement(
                 id = "export_master",
-                title = appContext.getString(R.string.achievement_export_master_title),
-                description = appContext.getString(R.string.achievement_export_master_desc),
+                title = appContext.getString(UiR.string.achievement_export_master_title),
+                description = appContext.getString(UiR.string.achievement_export_master_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,
@@ -272,8 +273,8 @@ class AchievementsViewModel(
             ),
             Achievement(
                 id = "backup_enthusiast",
-                title = appContext.getString(R.string.achievement_backup_enthusiast_title),
-                description = appContext.getString(R.string.achievement_backup_enthusiast_desc),
+                title = appContext.getString(UiR.string.achievement_backup_enthusiast_title),
+                description = appContext.getString(UiR.string.achievement_backup_enthusiast_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.RARE,
@@ -283,8 +284,8 @@ class AchievementsViewModel(
             // Достижение для импорта CSV
             Achievement(
                 id = "csv_importer",
-                title = appContext.getString(R.string.achievement_csv_importer_title),
-                description = appContext.getString(R.string.achievement_csv_importer_desc),
+                title = appContext.getString(UiR.string.achievement_csv_importer_title),
+                description = appContext.getString(UiR.string.achievement_csv_importer_desc),
                 iconRes = 0,
                 category = AchievementCategory.TRANSACTIONS,
                 rarity = AchievementRarity.COMMON,

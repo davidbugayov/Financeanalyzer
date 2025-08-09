@@ -56,6 +56,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.min
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Современная карточка сводной информации о кошельке с улучшенным дизайном
@@ -129,10 +130,10 @@ fun WalletSummaryCard(
 
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.wallet_card_corner_radius)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.wallet_card_corner_radius)),
         elevation =
             CardDefaults.elevatedCardElevation(
-                defaultElevation = dimensionResource(R.dimen.wallet_card_elevation),
+                defaultElevation = dimensionResource(UiR.dimen.wallet_card_elevation),
             ),
         colors =
             CardDefaults.elevatedCardColors(
@@ -145,7 +146,7 @@ fun WalletSummaryCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.wallet_gradient_height))
+                        .height(dimensionResource(UiR.dimen.wallet_gradient_height))
                         .background(
                             brush =
                                 Brush.verticalGradient(
@@ -162,7 +163,7 @@ fun WalletSummaryCard(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.wallet_card_padding)),
+                        .padding(dimensionResource(UiR.dimen.wallet_card_padding)),
             ) {
                 // Заголовок с иконкой кошелька
                 WalletHeader(
@@ -170,7 +171,7 @@ fun WalletSummaryCard(
                     onManageClick = onManageClick,
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.wallet_section_spacing)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.wallet_section_spacing)))
 
                 // Основная секция с прогрессом и метриками
                 Row(
@@ -186,22 +187,22 @@ fun WalletSummaryCard(
                         isOverBudget = isOverBudget,
                     )
 
-                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.wallet_header_spacing)))
+                    Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.wallet_header_spacing)))
 
                     // Метрики бюджета
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.wallet_metric_spacing)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(UiR.dimen.wallet_metric_spacing)),
                     ) {
                         WalletMetric(
-                            label = stringResource(R.string.wallet_spent_amount),
+                            label = stringResource(UiR.string.wallet_spent_amount),
                             amount = wallet.spent,
                             color = MaterialTheme.colorScheme.onSurface,
                             trend = TrendType.NEUTRAL,
                         )
 
                         WalletMetric(
-                            label = stringResource(R.string.wallet_remaining_amount),
+                            label = stringResource(UiR.string.wallet_remaining_amount),
                             amount = remaining,
                             color =
                                 if (remaining.isNegative()) {
@@ -213,19 +214,19 @@ fun WalletSummaryCard(
                         )
 
                         WalletMetric(
-                            label = stringResource(R.string.wallet_budget_limit),
+                            label = stringResource(UiR.string.wallet_budget_limit),
                             amount = wallet.limit,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.wallet_section_spacing)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.wallet_section_spacing)))
 
                 // Баланс кошелька в отдельной карточке
                 BalanceCard(balance = wallet.balance)
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.wallet_header_spacing)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.wallet_header_spacing)))
 
                 // Быстрые действия
                 QuickActionsRow(
@@ -258,7 +259,7 @@ private fun WalletHeader(
                 imageVector = Icons.Outlined.AccountBalanceWallet,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(R.dimen.wallet_stats_icon_size)),
+                modifier = Modifier.size(dimensionResource(UiR.dimen.wallet_stats_icon_size)),
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -274,10 +275,10 @@ private fun WalletHeader(
                 )
 
                 Text(
-                    text = stringResource(R.string.wallet_overview),
+                    text = stringResource(UiR.string.wallet_overview),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.wallet_subtitle_margin_top)),
+                    modifier = Modifier.padding(top = dimensionResource(UiR.dimen.wallet_subtitle_margin_top)),
                 )
             }
         }
@@ -292,7 +293,7 @@ private fun WalletHeader(
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Timeline,
-                    contentDescription = stringResource(R.string.wallet_manage_action),
+                    contentDescription = stringResource(UiR.string.wallet_manage_action),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
@@ -312,11 +313,11 @@ private fun ModernProgressIndicator(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(dimensionResource(R.dimen.wallet_progress_size)),
+        modifier = Modifier.size(dimensionResource(UiR.dimen.wallet_progress_size)),
     ) {
         // Фоновый круг
         Canvas(
-            modifier = Modifier.size(dimensionResource(R.dimen.wallet_progress_size)),
+            modifier = Modifier.size(dimensionResource(UiR.dimen.wallet_progress_size)),
         ) {
             drawCircle(
                 color = progressColor.copy(alpha = 0.1f),
@@ -328,10 +329,10 @@ private fun ModernProgressIndicator(
         // Прогресс индикатор
         CircularProgressIndicator(
             progress = { progress },
-            modifier = Modifier.size(dimensionResource(R.dimen.wallet_progress_size)),
+            modifier = Modifier.size(dimensionResource(UiR.dimen.wallet_progress_size)),
             color = progressColor,
             trackColor = Color.Transparent,
-            strokeWidth = dimensionResource(R.dimen.wallet_progress_stroke_width),
+            strokeWidth = dimensionResource(UiR.dimen.wallet_progress_stroke_width),
         )
 
         // Центральный текст
@@ -343,26 +344,26 @@ private fun ModernProgressIndicator(
                 style =
                     MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = dimensionResource(R.dimen.wallet_progress_text_size).value.sp,
+                        fontSize = dimensionResource(UiR.dimen.wallet_progress_text_size).value.sp,
                     ),
                 color = progressColor,
             )
 
             if (isOverBudget) {
                 Text(
-                    text = stringResource(R.string.wallet_budget_exceeded),
+                    text = stringResource(UiR.string.wallet_budget_exceeded),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
-                    fontSize = dimensionResource(R.dimen.wallet_percentage_text_size).value.sp,
+                    fontSize = dimensionResource(UiR.dimen.wallet_percentage_text_size).value.sp,
                 )
             } else {
                 Text(
-                    text = stringResource(R.string.wallet_budget_progress),
+                    text = stringResource(UiR.string.wallet_budget_progress),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    fontSize = dimensionResource(R.dimen.wallet_percentage_text_size).value.sp,
+                    fontSize = dimensionResource(UiR.dimen.wallet_percentage_text_size).value.sp,
                 )
             }
         }
@@ -392,7 +393,7 @@ private fun WalletMetric(
                 text = label,
                 style =
                     MaterialTheme.typography.bodySmall.copy(
-                        fontSize = dimensionResource(R.dimen.wallet_metric_label_text_size).value.sp,
+                        fontSize = dimensionResource(UiR.dimen.wallet_metric_label_text_size).value.sp,
                     ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -423,7 +424,7 @@ private fun WalletMetric(
             style =
                 MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = dimensionResource(R.dimen.wallet_metric_value_text_size).value.sp,
+                    fontSize = dimensionResource(UiR.dimen.wallet_metric_value_text_size).value.sp,
                 ),
             color = color,
         )
@@ -437,7 +438,7 @@ private fun WalletMetric(
 private fun BalanceCard(balance: Money) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.wallet_stats_card_corner_radius)),
+        shape = RoundedCornerShape(dimensionResource(UiR.dimen.wallet_stats_card_corner_radius)),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
@@ -447,13 +448,13 @@ private fun BalanceCard(balance: Money) {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.wallet_stats_card_padding)),
+                    .padding(dimensionResource(UiR.dimen.wallet_stats_card_padding)),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
                 Text(
-                    text = stringResource(R.string.wallet_available_balance),
+                    text = stringResource(UiR.string.wallet_available_balance),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -471,7 +472,7 @@ private fun BalanceCard(balance: Money) {
             Icon(
                 imageVector = Icons.Outlined.AccountBalanceWallet,
                 contentDescription = null,
-                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
+                modifier = Modifier.size(dimensionResource(UiR.dimen.icon_size_medium)),
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
             )
         }
@@ -497,8 +498,8 @@ private fun QuickActionsRow(
             modifier =
                 Modifier
                     .weight(1f)
-                    .height(dimensionResource(R.dimen.wallet_action_button_height)),
-            shape = RoundedCornerShape(dimensionResource(R.dimen.wallet_action_button_corner_radius)),
+                    .height(dimensionResource(UiR.dimen.wallet_action_button_height)),
+            shape = RoundedCornerShape(dimensionResource(UiR.dimen.wallet_action_button_corner_radius)),
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = progressColor,
@@ -511,7 +512,7 @@ private fun QuickActionsRow(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = stringResource(R.string.wallet_spend_action),
+                text = stringResource(UiR.string.wallet_spend_action),
                 style =
                     MaterialTheme.typography.labelLarge.copy(
                         fontWeight = FontWeight.SemiBold,
@@ -526,8 +527,8 @@ private fun QuickActionsRow(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .height(dimensionResource(R.dimen.wallet_action_button_height)),
-                shape = RoundedCornerShape(dimensionResource(R.dimen.wallet_action_button_corner_radius)),
+                        .height(dimensionResource(UiR.dimen.wallet_action_button_height)),
+                shape = RoundedCornerShape(dimensionResource(UiR.dimen.wallet_action_button_corner_radius)),
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -536,7 +537,7 @@ private fun QuickActionsRow(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.wallet_add_funds_action),
+                    text = stringResource(UiR.string.wallet_add_funds_action),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }

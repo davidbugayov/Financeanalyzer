@@ -37,6 +37,7 @@ import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -69,7 +70,7 @@ fun SettingsSection(
                 .fillMaxWidth(),
     ) {
         Text(
-            text = stringResource(R.string.profile_settings_title),
+            text = stringResource(UiR.string.profile_settings_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
         )
@@ -82,12 +83,12 @@ fun SettingsSection(
                         ThemeMode.SYSTEM -> Icons.Default.Brightness6
                     },
                 iconBackground = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.settings_theme_title),
+                title = stringResource(UiR.string.settings_theme_title),
                 subtitle =
                     when (themeMode) {
-                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
-                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
-                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                        ThemeMode.LIGHT -> stringResource(UiR.string.settings_theme_light)
+                        ThemeMode.DARK -> stringResource(UiR.string.settings_theme_dark)
+                        ThemeMode.SYSTEM -> stringResource(UiR.string.settings_theme_system)
                     },
                 onClick = onThemeClick,
             )
@@ -96,8 +97,8 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Language,
                 iconBackground = MaterialTheme.colorScheme.secondary,
-                title = stringResource(R.string.settings_language_title),
-                subtitle = stringResource(R.string.settings_language_current_value),
+                title = stringResource(UiR.string.settings_language_title),
+                subtitle = stringResource(UiR.string.settings_language_current_value),
                 onClick = onLanguageClick,
             )
         }
@@ -105,7 +106,7 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Payments,
                 iconBackground = MaterialTheme.colorScheme.tertiary,
-                title = stringResource(R.string.profile_currency_title),
+                title = stringResource(UiR.string.profile_currency_title),
                 subtitle = getCurrencyDisplayName(selectedCurrency),
                 onClick = onCurrencyClick,
             )
@@ -114,18 +115,18 @@ fun SettingsSection(
             SettingsActionCard(
                 icon = Icons.Default.Timer,
                 iconBackground = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.profile_transaction_reminders_title),
+                title = stringResource(UiR.string.profile_transaction_reminders_title),
                 subtitle =
                     if (!hasNotificationPermission) {
-                        stringResource(R.string.notification_disabled_description)
+                        stringResource(UiR.string.notification_disabled_description)
                     } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
                         stringResource(
-                            R.string.settings_reminder_time_format,
+                            UiR.string.settings_reminder_time_format,
                             transactionReminderTime.hour,
                             transactionReminderTime.minute,
                         )
                     } else {
-                        stringResource(R.string.off)
+                        stringResource(UiR.string.off)
                     },
                 subtitleColor = if (!hasNotificationPermission) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 onClick = onTransactionReminderClick,

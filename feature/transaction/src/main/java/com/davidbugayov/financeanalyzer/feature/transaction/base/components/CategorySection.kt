@@ -302,7 +302,7 @@ fun CategorySection(
                     Text(
                         text =
                             stringResource(
-                                if (expanded) R.string.hide_categories else R.string.show_more_categories,
+                                if (expanded) UiR.string.hide_categories else UiR.string.show_more_categories,
                             ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
@@ -344,7 +344,7 @@ fun AddCategoryItem(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_custom_category),
+                contentDescription = stringResource(UiR.string.add_custom_category),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(dimensionResource(UiR.dimen.category_item_icon_size)),
             )
@@ -353,7 +353,7 @@ fun AddCategoryItem(
         Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.category_item_spacer_height)))
 
         Text(
-            text = stringResource(R.string.add_custom_category),
+            text = stringResource(UiR.string.add_custom_category),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             maxLines = 1,

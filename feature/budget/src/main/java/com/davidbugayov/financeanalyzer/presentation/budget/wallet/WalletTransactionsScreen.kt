@@ -40,6 +40,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalTypeInference::class)
 @Composable
@@ -75,7 +76,7 @@ fun WalletTransactionsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = state.wallet?.name ?: stringResource(R.string.wallet_not_found),
+                title = state.wallet?.name ?: stringResource(UiR.string.wallet_not_found),
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
@@ -84,7 +85,7 @@ fun WalletTransactionsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.link_categories),
+                            contentDescription = stringResource(UiR.string.link_categories),
                         )
                     }
                 },
@@ -103,7 +104,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(stringResource(R.string.loading_data))
+                    Text(stringResource(UiR.string.loading_data))
                 }
             } else if (state.wallet == null) {
                 // Показываем сообщение, если кошелек не найден
@@ -111,7 +112,7 @@ fun WalletTransactionsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(stringResource(R.string.wallet_not_found))
+                    Text(stringResource(UiR.string.wallet_not_found))
                 }
             } else {
                 // Сохраняем кошелек в локальную переменную для умного приведения типов
@@ -135,7 +136,7 @@ fun WalletTransactionsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Text(
-                            text = stringResource(R.string.linked_categories),
+                            text = stringResource(UiR.string.linked_categories),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium,
                         )
@@ -158,7 +159,7 @@ fun WalletTransactionsScreen(
 
                 // Заголовок списка транзакций
                 Text(
-                    text = stringResource(R.string.transactions_section),
+                    text = stringResource(UiR.string.transactions_section),
                     style = MaterialTheme.typography.titleMedium,
                     modifier =
                         Modifier.padding(
@@ -179,7 +180,7 @@ fun WalletTransactionsScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = stringResource(R.string.no_transactions_found),
+                            text = stringResource(UiR.string.no_transactions_found),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -210,9 +211,9 @@ fun WalletTransactionsScreen(
                 onImport = { selectedCategories ->
                     // Связываем выбранные категории
                 },
-                title = stringResource(R.string.import_categories_title),
-                subtitle = stringResource(R.string.import_categories_subtitle),
-                confirmButtonText = stringResource(R.string.import_categories_confirm),
+                title = stringResource(UiR.string.import_categories_title),
+                subtitle = stringResource(UiR.string.import_categories_subtitle),
+                confirmButtonText = stringResource(UiR.string.import_categories_confirm),
                 preselectedCategories = state.wallet?.linkedCategories ?: emptyList(),
             )
         }
@@ -221,11 +222,11 @@ fun WalletTransactionsScreen(
         state.error?.let { error ->
             AlertDialog(
                 onDismissRequest = { viewModel.onEvent(WalletTransactionsEvent.ClearError) },
-                title = { Text(stringResource(R.string.error_title)) },
+                title = { Text(stringResource(UiR.string.error_title)) },
                 text = { Text(error) },
                 confirmButton = {
                     TextButton(onClick = { viewModel.onEvent(WalletTransactionsEvent.ClearError) }) {
-                        Text(stringResource(R.string.ok_button))
+                        Text(stringResource(UiR.string.ok_button))
                     }
                 },
             )

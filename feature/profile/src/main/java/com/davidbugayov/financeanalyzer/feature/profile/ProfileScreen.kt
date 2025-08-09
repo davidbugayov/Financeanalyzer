@@ -72,6 +72,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран профиля пользователя.
@@ -100,7 +101,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         }
 
     val versionName = packageInfo?.versionName
-    val appVersion = versionName ?: stringResource(R.string.unknown)
+    val appVersion = versionName ?: stringResource(UiR.string.unknown)
 
     @SuppressLint("NewApi")
     val buildVersion =
@@ -274,7 +275,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     },
                     modifier =
                         Modifier
-                            .padding(horizontal = dimensionResource(R.dimen.profile_section_padding)),
+                            .padding(horizontal = dimensionResource(UiR.dimen.profile_section_padding)),
                     onSectionClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -290,13 +291,13 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.budget),
-                    subtitle = stringResource(R.string.profile_budget_subtitle),
+                    title = stringResource(UiR.string.budget),
+                    subtitle = stringResource(UiR.string.profile_budget_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -311,18 +312,18 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     },
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                             vertical = 4.dp,
                         ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.export_import),
-                    subtitle = stringResource(R.string.profile_export_import_subtitle),
+                    title = stringResource(UiR.string.export_import),
+                    subtitle = stringResource(UiR.string.profile_export_import_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -337,19 +338,19 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     },
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                             vertical = 4.dp,
                         ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 ProfileActionCard(
                     icon = Icons.Default.Star,
                     iconBackground = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.achievements),
-                    subtitle = stringResource(R.string.profile_achievements_subtitle),
+                    title = stringResource(UiR.string.achievements),
+                    subtitle = stringResource(UiR.string.profile_achievements_subtitle),
                     onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
@@ -364,12 +365,12 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     },
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                             vertical = 4.dp,
                         ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 SettingsSection(
@@ -388,12 +389,12 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     hasNotificationPermission = state.hasNotificationPermission,
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                         ),
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 // Секция безопасности
@@ -413,12 +414,12 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     onBiometricClick = { viewModel.onEvent(ProfileEvent.ChangeBiometric(!state.isBiometricEnabled)) },
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                         ),
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 AppInfoSection(
@@ -427,12 +428,12 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     onNavigateToLibraries = { viewModel.onEvent(ProfileEvent.NavigateToLibraries) },
                     modifier =
                         Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                         ),
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 ShowDialogs(state, viewModel)
@@ -440,7 +441,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 Spacer(
                     modifier =
                         Modifier.height(
-                            dimensionResource(R.dimen.profile_section_spacing) * 2,
+                            dimensionResource(UiR.dimen.profile_section_spacing) * 2,
                         ),
                 )
             }

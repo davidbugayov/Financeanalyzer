@@ -254,7 +254,7 @@ fun ImportTransactionsScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.choose_file_button),
+                        contentDescription = stringResource(UiR.string.choose_file_button),
                         modifier = Modifier.size(32.dp),
                     )
                 }
@@ -303,7 +303,7 @@ fun ImportTransactionsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Text(
-                                    text = stringResource(R.string.how_to_import),
+                                    text = stringResource(UiR.string.how_to_import),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -330,7 +330,7 @@ fun ImportTransactionsScreen(
                                             .padding(horizontal = 16.dp, vertical = 8.dp),
                                 ) {
                                     Text(
-                                        text = stringResource(R.string.import_instructions),
+                                        text = stringResource(UiR.string.import_instructions),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -352,7 +352,7 @@ fun ImportTransactionsScreen(
                                             contentDescription = null,
                                             modifier = Modifier.padding(end = 8.dp),
                                         )
-                                        Text(text = stringResource(R.string.choose_file_button))
+                                        Text(text = stringResource(UiR.string.choose_file_button))
                                     }
                                 }
                             }
@@ -393,7 +393,7 @@ fun ImportTransactionsScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
-                                        text = stringResource(R.string.import_results),
+                                        text = stringResource(UiR.string.import_results),
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -477,7 +477,7 @@ fun ImportTransactionsScreen(
                                     .padding(16.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.supported_banks_title),
+                                text = stringResource(UiR.string.supported_banks_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(bottom = 12.dp),

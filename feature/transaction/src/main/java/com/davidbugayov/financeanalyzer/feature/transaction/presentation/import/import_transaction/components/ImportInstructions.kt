@@ -40,7 +40,7 @@ fun ImportInstructions() {
                     .padding(dimensionResource(UiR.dimen.space_medium)),
         ) {
             Text(
-                text = stringResource(R.string.how_to_import),
+                text = stringResource(UiR.string.how_to_import),
                 style =
                     MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
@@ -49,7 +49,7 @@ fun ImportInstructions() {
             )
 
             Text(
-                text = stringResource(R.string.import_instructions),
+                text = stringResource(UiR.string.import_instructions),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 modifier = Modifier.padding(top = dimensionResource(UiR.dimen.space_small)),

@@ -37,7 +37,7 @@ fun SourceColorPickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_color)) },
+        title = { Text(stringResource(UiR.string.select_color)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(

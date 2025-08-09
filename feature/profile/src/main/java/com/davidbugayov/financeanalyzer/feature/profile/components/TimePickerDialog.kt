@@ -64,7 +64,7 @@ fun TimePickerDialog(
                 modifier = Modifier.padding(16.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.select_reminder_time),
+                    text = stringResource(UiR.string.select_reminder_time),
                     style = MaterialTheme.typography.titleLarge,
                 )
 

@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -350,11 +351,11 @@ class ProfileViewModel(
                                 val endStr = dateFormat.format(dateRange.second)
                                 "$startStr - $endStr"
                             } else {
-                                GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time)
+                                GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
                             }
                         } catch (exception: Exception) {
                             Timber.e(exception, "Ошибка при форматировании dateRange")
-                            GlobalContext.get().get<ResourceProvider>().getString(R.string.period_all_time)
+                            GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
                         }
 
                     // Форматируем averageExpense в строку
@@ -391,7 +392,7 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = exception.message ?: GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown),
+                            error = exception.message ?: GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
                         )
                     }
                 } else {
@@ -401,7 +402,7 @@ class ProfileViewModel(
                             isLoading = false,
                             error =
                                 GlobalContext.get().get<ResourceProvider>().getString(
-                                    R.string.error_unknown_type,
+                                    UiR.string.error_unknown_type,
                                 ),
                         )
                     }
@@ -411,7 +412,7 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        error = GlobalContext.get().get<ResourceProvider>().getString(R.string.error_unknown),
+                        error = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
                     )
                 }
             }

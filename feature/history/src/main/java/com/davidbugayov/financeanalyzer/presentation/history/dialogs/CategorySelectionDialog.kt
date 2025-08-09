@@ -107,9 +107,9 @@ fun CategorySelectionDialog(
                     Text(
                         text =
                             if (localSelectedCategories.isEmpty()) {
-                                stringResource(R.string.all_categories)
+                                stringResource(UiR.string.all_categories)
                             } else if (localSelectedCategories.size == allCategories.size) {
-                                stringResource(R.string.clear_selection)
+                                stringResource(UiR.string.clear_selection)
                             } else {
                                 stringResource(UiR.string.dialog_select_all)
                             },

@@ -28,7 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения информации о приложении.
@@ -66,9 +66,9 @@ fun AppInfoSection(
                     Icon(
                         painter =
                             painterResource(
-                                com.davidbugayov.financeanalyzer.ui.R.drawable.ic_notification_wallet,
+                                UiR.drawable.ic_notification_wallet,
                             ),
-                        contentDescription = stringResource(R.string.app_info),
+                        contentDescription = stringResource(UiR.string.app_info),
                         tint = Color.White,
                         modifier = Modifier.size(28.dp),
                     )
@@ -79,7 +79,7 @@ fun AppInfoSection(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = stringResource(R.string.app_info),
+                        text = stringResource(UiR.string.app_info),
                         style =
                             MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
@@ -89,13 +89,13 @@ fun AppInfoSection(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = stringResource(R.string.app_version) + ": " + appVersion,
+                        text = stringResource(UiR.string.app_version) + ": " + appVersion,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                     )
                     Text(
-                        text = stringResource(R.string.build_version) + ": " + buildVersion,
+                        text = stringResource(UiR.string.build_version) + ": " + buildVersion,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,

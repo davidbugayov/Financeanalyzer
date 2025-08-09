@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Верхняя панель для экрана профиля.
@@ -13,7 +14,7 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 @Composable
 fun ProfileTopBar(onNavigateBack: () -> Unit) {
     AppTopBar(
-        title = stringResource(R.string.profile_title),
+        title = stringResource(UiR.string.profile_title),
         showBackButton = true,
         onBackClick = onNavigateBack,
     )

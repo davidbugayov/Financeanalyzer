@@ -368,7 +368,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Category,
-                            contentDescription = stringResource(R.string.category_filter),
+                            contentDescription = stringResource(UiR.string.category_filter),
                         )
                     }
                     IconButton(
@@ -376,7 +376,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.AccountBalance,
-                            contentDescription = stringResource(R.string.source_filter),
+                            contentDescription = stringResource(UiR.string.source_filter),
                         )
                     }
                     IconButton(
@@ -384,7 +384,7 @@ fun TransactionHistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
-                            contentDescription = stringResource(R.string.filter),
+                            contentDescription = stringResource(UiR.string.filter),
                         )
                     }
                 },
@@ -465,7 +465,7 @@ fun TransactionHistoryScreen(
                             Text(
                                 text =
                                     stringResource(
-                                        R.string.categories_selected,
+                                        UiR.string.categories_selected,
                                         state.selectedCategories.joinToString(", "),
                                     ),
                                 fontSize = dimensionResource(UiR.dimen.text_size_small).value.sp,
@@ -480,7 +480,7 @@ fun TransactionHistoryScreen(
                             Text(
                                 text =
                                     stringResource(
-                                        R.string.sources_selected,
+                                        UiR.string.sources_selected,
                                         state.selectedSources.joinToString(", "),
                                     ),
                                 fontSize = dimensionResource(UiR.dimen.text_size_small).value.sp,
@@ -510,7 +510,7 @@ fun TransactionHistoryScreen(
                     )
                 } else if (state.isLoading && !state.isLoadingMore) {
                     CenteredLoadingIndicator(
-                        message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data),
+                        message = stringResource(UiR.string.loading_data),
                     )
                 } else if (state.filteredTransactions.isEmpty()) {
                     EmptyContent()
@@ -521,7 +521,7 @@ fun TransactionHistoryScreen(
                     when {
                         pagingItems.loadState.refresh is LoadState.Loading -> {
                             CenteredLoadingIndicator(
-                                message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data),
+                                message = stringResource(UiR.string.loading_data),
                             )
                         }
                         pagingItems.loadState.refresh is LoadState.Error -> {

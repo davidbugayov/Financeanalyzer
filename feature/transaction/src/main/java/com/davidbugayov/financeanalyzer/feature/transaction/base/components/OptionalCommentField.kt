@@ -70,9 +70,9 @@ fun OptionalCommentField(
                 Text(
                     text =
                         when {
-                            note.isNotEmpty() -> stringResource(R.string.edit_note)
-                            isExpanded -> stringResource(R.string.hide_note)
-                            else -> stringResource(R.string.add_note)
+                            note.isNotEmpty() -> stringResource(UiR.string.edit_note)
+                            isExpanded -> stringResource(UiR.string.hide_note)
+                            else -> stringResource(UiR.string.add_note)
                         },
                     style =
                         MaterialTheme.typography.bodyMedium.copy(

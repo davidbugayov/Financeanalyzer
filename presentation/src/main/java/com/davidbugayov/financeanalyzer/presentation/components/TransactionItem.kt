@@ -67,6 +67,7 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 object Formatters {
     fun formatAmount(
@@ -130,7 +131,7 @@ fun TransactionItem(
         }
     }
 
-    val transferCategoryString = context.getString(R.string.transaction_transfers).lowercase(Locale.getDefault())
+    val transferCategoryString = context.getString(UiR.string.transaction_transfers).lowercase(Locale.getDefault())
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
@@ -147,7 +148,7 @@ fun TransactionItem(
         ) {
             when {
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                    transaction.category.equals(context.getString(R.string.transaction_transfer), ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
+                    transaction.category.equals(context.getString(UiR.string.transaction_transfer), ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
                 transaction.isExpense -> expenseColor
                 else -> incomeColor
             }
@@ -206,7 +207,7 @@ fun TransactionItem(
 
             val isTransfer =
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                    transaction.category.equals(context.getString(R.string.transaction_transfer), ignoreCase = true)
+                    transaction.category.equals(context.getString(UiR.string.transaction_transfer), ignoreCase = true)
 
             val prefix =
                 when {
@@ -248,7 +249,7 @@ fun TransactionItem(
     )
 
     // Corrected Dp to Float conversion for targetValue
-    val targetTranslationYDp = dimensionResource(id = R.dimen.spacing_medium)
+    val targetTranslationYDp = dimensionResource(id = UiR.dimen.spacing_medium)
     val targetTranslationYPx = with(LocalDensity.current) { targetTranslationYDp.toPx() }
 
     val animatedTranslationY by animateFloatAsState(
@@ -266,8 +267,8 @@ fun TransactionItem(
             Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = dimensionResource(id = R.dimen.card_horizontal_padding),
-                    vertical = dimensionResource(id = R.dimen.card_vertical_padding),
+                    horizontal = dimensionResource(id = UiR.dimen.card_horizontal_padding),
+                    vertical = dimensionResource(id = UiR.dimen.card_vertical_padding),
                 )
                 .graphicsLayer {
                     alpha = animatedAlpha
@@ -275,9 +276,9 @@ fun TransactionItem(
                 },
         elevation =
             CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
+                defaultElevation = dimensionResource(id = UiR.dimen.card_elevation_default),
             ),
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)),
+        shape = RoundedCornerShape(dimensionResource(id = UiR.dimen.card_corner_radius_medium)),
         colors =
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -293,31 +294,31 @@ fun TransactionItem(
                         onClick = { onClick(transaction) },
                         onLongClick = { onTransactionLongClick(transaction) },
                     )
-                    .padding(dimensionResource(id = R.dimen.card_content_padding_medium)),
+                    .padding(dimensionResource(id = UiR.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar
             Box(
                 modifier =
                     Modifier
-                        .width(dimensionResource(id = R.dimen.transaction_type_indicator_width))
-                        .height(dimensionResource(id = R.dimen.icon_container_size_large))
+                        .width(dimensionResource(id = UiR.dimen.transaction_type_indicator_width))
+                        .height(dimensionResource(id = UiR.dimen.icon_container_size_large))
                         .background(
                             color = transactionTypeColor,
                             shape =
                                 RoundedCornerShape(
-                                    topStart = dimensionResource(id = R.dimen.radius_small),
-                                    bottomStart = dimensionResource(id = R.dimen.radius_small),
+                                    topStart = dimensionResource(id = UiR.dimen.radius_small),
+                                    bottomStart = dimensionResource(id = UiR.dimen.radius_small),
                                 ),
                         ),
             )
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
+            Spacer(modifier = Modifier.width(dimensionResource(id = UiR.dimen.spacing_medium)))
 
             // Category Icon
             Box(
                 modifier =
                     Modifier
-                        .size(dimensionResource(id = R.dimen.icon_container_size_large))
+                        .size(dimensionResource(id = UiR.dimen.icon_container_size_large))
                         .clip(CircleShape)
                         .background(categoryActualColor.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center,
@@ -326,11 +327,11 @@ fun TransactionItem(
                     imageVector = categoryIcon,
                     contentDescription = transaction.category,
                     tint = categoryActualColor,
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
+                    modifier = Modifier.size(dimensionResource(id = UiR.dimen.icon_size_medium)),
                 )
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
+            Spacer(modifier = Modifier.width(dimensionResource(id = UiR.dimen.spacing_medium)))
 
             // Transaction Details
             Column(
@@ -356,7 +357,7 @@ fun TransactionItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_tiny)),
+                        modifier = Modifier.padding(top = dimensionResource(id = UiR.dimen.spacing_tiny)),
                     )
                 }
 
@@ -367,7 +368,7 @@ fun TransactionItem(
                         color = sourceActualColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.line_chart_stroke_width)),
+                        modifier = Modifier.padding(top = dimensionResource(id = UiR.dimen.line_chart_stroke_width)),
                     )
                 }
 
@@ -378,12 +379,12 @@ fun TransactionItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_small)),
+                        modifier = Modifier.padding(top = dimensionResource(id = UiR.dimen.spacing_small)),
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
+            Spacer(modifier = Modifier.width(dimensionResource(id = UiR.dimen.spacing_small)))
 
             Column(
                 horizontalAlignment = Alignment.End,

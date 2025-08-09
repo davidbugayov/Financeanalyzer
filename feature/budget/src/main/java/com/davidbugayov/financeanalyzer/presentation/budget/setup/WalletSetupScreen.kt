@@ -20,6 +20,7 @@ import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +33,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.wallet_setup_title),
+                        text = stringResource(UiR.string.wallet_setup_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Medium,
                     )
@@ -41,7 +42,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                     IconButton(onClick = viewModel::navigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
+                            contentDescription = stringResource(UiR.string.back),
                         )
                     }
                 },
@@ -49,7 +50,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                     if (state.isSuccess) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(R.string.success),
+                            contentDescription = stringResource(UiR.string.success),
                             tint = MaterialTheme.colorScheme.primary,
                         )
                     }
@@ -91,13 +92,13 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                     )
                     Column {
                         Text(
-                            text = stringResource(R.string.wallet_setup_title),
+                            text = stringResource(UiR.string.wallet_setup_title),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Text(
-                            text = stringResource(R.string.wallet_setup_description),
+                            text = stringResource(UiR.string.wallet_setup_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -108,7 +109,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
             // Поле названия
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = stringResource(R.string.wallet_name_label),
+                    text = stringResource(UiR.string.wallet_name_label),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -116,7 +117,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                 OutlinedTextField(
                     value = state.name,
                     onValueChange = viewModel::updateName,
-                    label = { Text(stringResource(R.string.wallet_name_hint)) },
+                    label = { Text(stringResource(UiR.string.wallet_name_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = state.error?.contains("название") == true,
@@ -127,7 +128,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                         ),
                 )
                 Text(
-                    text = stringResource(R.string.wallet_name_description),
+                    text = stringResource(UiR.string.wallet_name_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -136,7 +137,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
             // Выбор типа кошелька
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = stringResource(R.string.wallet_type_label),
+                    text = stringResource(UiR.string.wallet_type_label),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -150,7 +151,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                     OutlinedTextField(
                         value = "${state.type.getIcon()} ${state.type.getDisplayName()}",
                         onValueChange = {},
-                        label = { Text(stringResource(R.string.wallet_type_hint)) },
+                        label = { Text(stringResource(UiR.string.wallet_type_hint)) },
                         readOnly = true,
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                         modifier =
@@ -224,12 +225,12 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                         )
                         Column(modifier = Modifier.padding(start = 8.dp)) {
                             Text(
-                                text = stringResource(R.string.wallet_goal_checkbox),
+                                text = stringResource(UiR.string.wallet_goal_checkbox),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
                             )
                             Text(
-                                text = stringResource(R.string.wallet_goal_description),
+                                text = stringResource(UiR.string.wallet_goal_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -239,20 +240,20 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                     if (state.isGoal) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = stringResource(R.string.wallet_goal_amount_label),
+                                text = stringResource(UiR.string.wallet_goal_amount_label),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Medium,
                             )
                             NumberTextField(
                                 value = state.goalAmountText,
                                 onValueChange = viewModel::updateGoalAmountText,
-                                label = stringResource(R.string.wallet_goal_amount_hint),
+                                label = stringResource(UiR.string.wallet_goal_amount_hint),
                                 allowDecimal = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 isError = state.error?.contains("сумм") == true,
                             )
                             Text(
-                                text = stringResource(R.string.wallet_goal_amount_example),
+                                text = stringResource(UiR.string.wallet_goal_amount_example),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -290,7 +291,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                             ),
                     ) {
                         Text(
-                            text = stringResource(R.string.wallet_created_success),
+                            text = stringResource(UiR.string.wallet_created_success),
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
@@ -323,7 +324,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                                 strokeWidth = 2.dp,
                             )
                             Text(
-                                text = stringResource(R.string.wallet_creating),
+                                text = stringResource(UiR.string.wallet_creating),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                         }
@@ -337,13 +338,13 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                                 contentDescription = null,
                             )
                             Text(
-                                text = stringResource(R.string.done),
+                                text = stringResource(UiR.string.done),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                         }
                     } else {
                         Text(
-                            text = stringResource(R.string.wallet_create_button),
+                            text = stringResource(UiR.string.wallet_create_button),
                             style = MaterialTheme.typography.titleMedium,
                         )
                     }
@@ -351,7 +352,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
 
                 // Подсказка
                 Text(
-                    text = stringResource(R.string.wallet_setup_tip),
+                    text = stringResource(UiR.string.wallet_setup_tip),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

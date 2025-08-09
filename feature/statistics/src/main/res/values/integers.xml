@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Animation durations -->
-    <integer name="enhanced_pie_chart_animation_duration">800</integer>
-    <integer name="standard_animation_duration">300</integer>
-    <integer name="long_animation_duration">500</integer>
-</resources> 

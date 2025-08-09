@@ -129,8 +129,8 @@ fun NotificationSettingsDialog(
 
     if (showPermissionDialog) {
         PermissionDialogs.RationalePermissionDialog(
-            titleResId = R.string.permission_required_title,
-            messageResId = R.string.notification_permission_required,
+            titleResId = UiR.string.permission_required_title,
+            messageResId = UiR.string.notification_permission_required,
             onConfirm = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -177,7 +177,7 @@ fun NotificationSettingsDialog(
                         .fillMaxWidth(),
             ) {
                 Text(
-                    text = stringResource(R.string.notification_settings),
+                    text = stringResource(UiR.string.notification_settings),
                     style = MaterialTheme.typography.titleLarge,
                 )
 
@@ -185,7 +185,7 @@ fun NotificationSettingsDialog(
 
                 if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     Text(
-                        text = stringResource(R.string.notification_permission_required),
+                        text = stringResource(UiR.string.notification_permission_required),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error,
                     )
@@ -198,7 +198,7 @@ fun NotificationSettingsDialog(
                         },
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
-                        Text(stringResource(R.string.request_permission))
+                        Text(stringResource(UiR.string.request_permission))
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -209,11 +209,11 @@ fun NotificationSettingsDialog(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.enable_reminders),
+                            text = stringResource(UiR.string.enable_reminders),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                         Text(
-                            text = stringResource(R.string.reminder_description),
+                            text = stringResource(UiR.string.reminder_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -243,13 +243,13 @@ fun NotificationSettingsDialog(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = stringResource(R.string.reminder_time),
+                                text = stringResource(UiR.string.reminder_time),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             Text(
                                 text =
                                     stringResource(
-                                        R.string.reminder_time_description,
+                                        UiR.string.reminder_time_description,
                                         String.format(
                                             Locale.getDefault(),
                                             "%02d:%02d",
@@ -264,7 +264,7 @@ fun NotificationSettingsDialog(
                         IconButton(onClick = { showTimePicker = true }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.edit_time),
+                                contentDescription = stringResource(UiR.string.edit_time),
                             )
                         }
                     }

@@ -53,7 +53,7 @@ fun PeriodSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_period)) },
+        title = { Text(stringResource(UiR.string.select_period)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -66,7 +66,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.ALL,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.all_time),
+                    title = stringResource(UiR.string.all_time),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -74,7 +74,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.DAY,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.day),
+                    title = stringResource(UiR.string.day),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -82,7 +82,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.WEEK,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.week),
+                    title = stringResource(UiR.string.week),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -90,7 +90,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.MONTH,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.month),
+                    title = stringResource(UiR.string.month),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -98,7 +98,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.QUARTER,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.period_quarter),
+                    title = stringResource(UiR.string.period_quarter),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -106,7 +106,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.YEAR,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.year),
+                    title = stringResource(UiR.string.year),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -114,7 +114,7 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.CUSTOM,
                     selectedPeriod = selectedPeriod,
-                    title = stringResource(R.string.custom_period),
+                    title = stringResource(UiR.string.custom_period),
                     onPeriodSelected = onPeriodSelected,
                 )
 
@@ -124,7 +124,7 @@ fun PeriodSelectionDialog(
 
                     // Поле начальной даты
                     DateField(
-                        label = stringResource(R.string.start_date),
+                        label = stringResource(UiR.string.start_date),
                         date = startDate,
                         dateFormat = dateFormat,
                         onClick = onStartDateClick,
@@ -134,7 +134,7 @@ fun PeriodSelectionDialog(
 
                     // Поле конечной даты
                     DateField(
-                        label = stringResource(R.string.end_date),
+                        label = stringResource(UiR.string.end_date),
                         date = endDate,
                         dateFormat = dateFormat,
                         onClick = onEndDateClick,
@@ -145,7 +145,7 @@ fun PeriodSelectionDialog(
         confirmButton = {
             if (selectedPeriod == PeriodType.CUSTOM) {
                 TextButton(onClick = onConfirm) {
-                    Text(stringResource(R.string.apply))
+                    Text(stringResource(UiR.string.apply))
                 }
             } else {
                 TextButton(onClick = onDismiss) {
@@ -178,7 +178,7 @@ private fun PeriodOption(
             Modifier
                 .fillMaxWidth()
                 .clickable { onPeriodSelected(periodType) }
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
@@ -188,7 +188,7 @@ private fun PeriodOption(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
+            modifier = Modifier.padding(start = dimensionResource(UiR.dimen.spacing_small)),
         )
     }
 }

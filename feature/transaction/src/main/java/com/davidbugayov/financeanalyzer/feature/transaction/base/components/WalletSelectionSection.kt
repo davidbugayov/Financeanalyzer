@@ -101,16 +101,16 @@ fun WalletSelectionSection(
                         if (isExpense) {
                             // Для расходов обычно выбирается один кошелёк
                             if (selectedWallets.size == 1) {
-                                stringResource(R.string.wallet_selected_for_expense)
+                                stringResource(UiR.string.wallet_selected_for_expense)
                             } else {
-                                stringResource(R.string.wallets_selected_for_expense, selectedWallets.size)
+                                stringResource(UiR.string.wallets_selected_for_expense, selectedWallets.size)
                             }
                         } else {
                             // Для доходов можно выбрать несколько кошельков
                             if (selectedWallets.size == 1) {
-                                stringResource(R.string.wallet_selected_for_income)
+                                stringResource(UiR.string.wallet_selected_for_income)
                             } else {
-                                stringResource(R.string.wallets_selected_for_income, selectedWallets.size)
+                                stringResource(UiR.string.wallets_selected_for_income, selectedWallets.size)
                             }
                         }
 
@@ -126,9 +126,9 @@ fun WalletSelectionSection(
                 Text(
                     text =
                         if (isExpense) {
-                            stringResource(R.string.wallet_expense_explanation)
+                            stringResource(UiR.string.wallet_expense_explanation)
                         } else {
-                            stringResource(R.string.wallet_income_explanation)
+                            stringResource(UiR.string.wallet_income_explanation)
                         },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -154,9 +154,9 @@ private fun SelectWalletsButton(
         when {
             selectedWallets.isEmpty() -> {
                 if (isExpense) {
-                    stringResource(R.string.select_wallet_for_expense)
+                    stringResource(UiR.string.select_wallet_for_expense)
                 } else {
-                    stringResource(R.string.select_wallets_for_income)
+                    stringResource(UiR.string.select_wallets_for_income)
                 }
             }
             selectedWallets.size == 1 && targetWalletName != null -> {
@@ -164,10 +164,10 @@ private fun SelectWalletsButton(
             }
             isExpense && selectedWallets.size == 1 -> {
                 // Для расходов показываем название единственного выбранного кошелька
-                targetWalletName ?: stringResource(R.string.selected_wallet_count, selectedWallets.size)
+                targetWalletName ?: stringResource(UiR.string.selected_wallet_count, selectedWallets.size)
             }
             else -> {
-                stringResource(R.string.selected_wallets_count, selectedWallets.size)
+                stringResource(UiR.string.selected_wallets_count, selectedWallets.size)
             }
         }
 
@@ -237,7 +237,7 @@ private fun WalletSelectorButton(
 
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = stringResource(R.string.select_wallets_content_description),
+            contentDescription = stringResource(UiR.string.select_wallets_content_description),
             tint = contentColor,
         )
     }

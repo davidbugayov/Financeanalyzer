@@ -62,6 +62,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран подробной финансовой статистики
@@ -121,7 +122,7 @@ fun FinancialDetailStatisticsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.detailed_financial_statistics),
+                title = stringResource(UiR.string.detailed_financial_statistics),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
             )
@@ -139,7 +140,7 @@ fun FinancialDetailStatisticsScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+                        .padding(dimensionResource(UiR.dimen.financial_statistics_card_padding)),
             ) {
                 // Панель фильтров
                 item {
@@ -148,13 +149,13 @@ fun FinancialDetailStatisticsScreen(
                             Icon(Icons.Default.Info, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = stringResource(R.string.overview),
+                                text = stringResource(UiR.string.overview),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
-                        Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_small)))
+                        Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_small)))
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors =
@@ -167,7 +168,7 @@ fun FinancialDetailStatisticsScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = stringResource(R.string.financial_statistics_period),
+                                    text = stringResource(UiR.string.financial_statistics_period),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -180,11 +181,11 @@ fun FinancialDetailStatisticsScreen(
                                 Row {
                                     val chips =
                                         listOf(
-                                            com.davidbugayov.financeanalyzer.ui.R.string.all_time,
-                                            com.davidbugayov.financeanalyzer.ui.R.string.year,
-                                            com.davidbugayov.financeanalyzer.ui.R.string.month,
-                                            com.davidbugayov.financeanalyzer.ui.R.string.week,
-                                            com.davidbugayov.financeanalyzer.ui.R.string.day,
+                                            UiR.string.all_time,
+                                            UiR.string.year,
+                                            UiR.string.month,
+                                            UiR.string.week,
+                                            UiR.string.day,
                                         )
                                     chips.forEachIndexed { index, resId ->
                                         AssistChip(
@@ -203,14 +204,14 @@ fun FinancialDetailStatisticsScreen(
                                     Checkbox(checked = includeTransfers, onCheckedChange = { includeTransfers = it })
                                     Text(
                                         stringResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.string.include_transfers,
+                                            id = UiR.string.include_transfers,
                                         ),
                                     )
                                     Spacer(Modifier.width(12.dp))
                                     Checkbox(checked = includeRefunds, onCheckedChange = { includeRefunds = it })
                                     Text(
                                         stringResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.string.include_refunds,
+                                            id = UiR.string.include_refunds,
                                         ),
                                     )
                                     Spacer(Modifier.weight(1f))
@@ -222,7 +223,7 @@ fun FinancialDetailStatisticsScreen(
                                     ) {
                                         Text(
                                             stringResource(
-                                                id = com.davidbugayov.financeanalyzer.ui.R.string.reset_filters,
+                                                id = UiR.string.reset_filters,
                                             ),
                                         )
                                     }
@@ -234,14 +235,14 @@ fun FinancialDetailStatisticsScreen(
 
                 // Табы
                 item {
-                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
                     TabRow(selectedTabIndex = selectedTabIndex) {
                         Tab(
                             selected = selectedTabIndex == 0,
                             onClick = { selectedTabIndex = 0 },
                             text = {
                                 Text(
-                                    stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_category),
+                                    stringResource(id = UiR.string.stat_by_category),
                                 )
                             },
                         )
@@ -250,7 +251,7 @@ fun FinancialDetailStatisticsScreen(
                             onClick = { selectedTabIndex = 1 },
                             text = {
                                 Text(
-                                    stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_merchant),
+                                    stringResource(id = UiR.string.stat_by_merchant),
                                 )
                             },
                         )
@@ -259,7 +260,7 @@ fun FinancialDetailStatisticsScreen(
                             onClick = { selectedTabIndex = 2 },
                             text = {
                                 Text(
-                                    stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_by_account),
+                                    stringResource(id = UiR.string.stat_by_account),
                                 )
                             },
                         )
@@ -268,7 +269,7 @@ fun FinancialDetailStatisticsScreen(
                             onClick = { selectedTabIndex = 3 },
                             text = {
                                 Text(
-                                    stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_calendar),
+                                    stringResource(id = UiR.string.stat_calendar),
                                 )
                             },
                         )
@@ -277,7 +278,7 @@ fun FinancialDetailStatisticsScreen(
                             onClick = { selectedTabIndex = 4 },
                             text = {
                                 Text(
-                                    stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.stat_trends),
+                                    stringResource(id = UiR.string.stat_trends),
                                 )
                             },
                         )
@@ -296,7 +297,7 @@ fun FinancialDetailStatisticsScreen(
                                     savingsRate = metrics.savingsRate,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
-                                Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                                Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
                                 val expenseAnalysis =
                                     FinancialDataMapper.createExpenseAnalysis(
                                         averageDailyExpense = metrics.averageDailyExpense.format(true),
@@ -313,7 +314,7 @@ fun FinancialDetailStatisticsScreen(
                                         mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                                     )
                                 PremiumStatisticsCard(
-                                    title = stringResource(R.string.expense_analysis),
+                                    title = stringResource(UiR.string.expense_analysis),
                                     icon = Icons.Default.Analytics,
                                     statistics = expenseAnalysis,
                                     accentColor = MaterialTheme.colorScheme.tertiary,
@@ -331,7 +332,7 @@ fun FinancialDetailStatisticsScreen(
                                         averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
                                     )
                                 PremiumInsightsCard(
-                                    title = stringResource(R.string.spending_patterns),
+                                    title = stringResource(UiR.string.spending_patterns),
                                     insights = spendingPatterns,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
@@ -342,7 +343,7 @@ fun FinancialDetailStatisticsScreen(
                             Text(
                                 text =
                                     stringResource(
-                                        id = com.davidbugayov.financeanalyzer.ui.R.string.no_data_to_display,
+                                        id = UiR.string.no_data_to_display,
                                     ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -352,7 +353,7 @@ fun FinancialDetailStatisticsScreen(
                             Text(
                                 text =
                                     stringResource(
-                                        id = com.davidbugayov.financeanalyzer.ui.R.string.no_data_to_display,
+                                        id = UiR.string.no_data_to_display,
                                     ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -376,13 +377,13 @@ fun FinancialDetailStatisticsScreen(
                                         monthsOfSavings = metrics.monthsOfSavings,
                                     )
                                 PremiumStatisticsCard(
-                                    title = stringResource(R.string.transaction_statistics),
+                                    title = stringResource(UiR.string.transaction_statistics),
                                     icon = Icons.Default.Receipt,
                                     statistics = transactionStats,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
 
-                                Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                                Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
                                 val predictExpensesUseCase =
                                     remember {
                                         org.koin.core.context.GlobalContext.get()
@@ -398,12 +399,12 @@ fun FinancialDetailStatisticsScreen(
                                 ) {
                                     Text(
                                         stringResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title,
+                                            id = UiR.string.prediction_title,
                                         ),
                                     )
                                     Text(
                                         stringResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                            id = UiR.string.prediction_next_month,
                                             predictedExpenses.amount.toString(),
                                         ),
                                     )
@@ -415,7 +416,7 @@ fun FinancialDetailStatisticsScreen(
 
                 // Советы (общая секция в конце)
                 item {
-                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_large)))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -423,7 +424,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.ThumbUp, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = stringResource(R.string.tips),
+                            text = stringResource(UiR.string.tips),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -436,17 +437,17 @@ fun FinancialDetailStatisticsScreen(
                         )
                     SmartRecommendationCard(
                         recommendations = healthRecommendations,
-                        title = stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.key_recommendations),
+                        title = stringResource(id = UiR.string.key_recommendations),
                         subtitle =
                             stringResource(
-                                id = com.davidbugayov.financeanalyzer.ui.R.string.for_financial_health,
+                                id = UiR.string.for_financial_health,
                             ),
                     )
                 }
 
                 // Инвестиционные советы
                 item {
-                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -454,7 +455,7 @@ fun FinancialDetailStatisticsScreen(
                         Icon(Icons.Default.Lightbulb, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.investment_tips),
+                            text = stringResource(UiR.string.investment_tips),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -462,20 +463,20 @@ fun FinancialDetailStatisticsScreen(
                     }
                     val keyInvestmentTips =
                         listOf(
-                            stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_bonds),
+                            stringResource(id = UiR.string.investment_tip_bonds),
                             stringResource(
-                                id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_diversification,
+                                id = UiR.string.investment_tip_diversification,
                             ),
-                            stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks),
+                            stringResource(id = UiR.string.investment_tip_stocks),
                         )
                     Column {
                         Text(
-                            stringResource(id = com.davidbugayov.financeanalyzer.ui.R.string.investment_tips),
+                            stringResource(id = UiR.string.investment_tips),
                             style = MaterialTheme.typography.titleMedium,
                         )
                         keyInvestmentTips.forEach { tip -> Text(tip) }
                     }
-                    Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_large)))
                 }
             }
         }

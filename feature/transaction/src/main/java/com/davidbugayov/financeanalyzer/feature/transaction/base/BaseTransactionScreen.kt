@@ -356,8 +356,8 @@ fun <E> BaseTransactionScreen(
                     ReminderBubble(
                         visible = showImportReminder,
                         title = stringResource(UiR.string.import_transactions_title),
-                        description = stringResource(R.string.import_transactions_hint),
-                        actionButtonText = stringResource(R.string.import_button_friendly),
+                        description = stringResource(UiR.string.import_transactions_hint),
+                        actionButtonText = stringResource(UiR.string.import_button_friendly),
                         dismissButtonText = stringResource(UiR.string.close),
                         onDismiss = { handleImportReminderDismiss() },
                         onAction = {
@@ -631,8 +631,8 @@ fun <E> BaseTransactionScreen(
                 AlertDialog(
                     onDismissRequest = { showImportConfirmation = false },
                     containerColor = MaterialTheme.colorScheme.surface,
-                    title = { Text(stringResource(R.string.attention_title)) },
-                    text = { Text(stringResource(R.string.unsaved_data_warning)) },
+                    title = { Text(stringResource(UiR.string.attention_title)) },
+                    text = { Text(stringResource(UiR.string.unsaved_data_warning)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -644,7 +644,7 @@ fun <E> BaseTransactionScreen(
                                 }
                             },
                         ) {
-                            Text(stringResource(R.string.proceed_to_import))
+                            Text(stringResource(UiR.string.proceed_to_import))
                         }
                     },
                     dismissButton = {
@@ -664,7 +664,7 @@ fun <E> BaseTransactionScreen(
                     exit = scaleOut(animationSpec = tween(400)),
                 ) {
                     SuccessDialog(
-                        message = stringResource(R.string.transaction_saved_success),
+                        message = stringResource(UiR.string.transaction_saved_success),
                         onDismiss = {
                             Timber.d("UI: Нажато 'OK' в диалоге успеха, вызываем handleExit()")
                             viewModel.onEvent(
@@ -815,7 +815,7 @@ fun <E> BaseTransactionScreen(
                         title = { Text(stringResource(UiR.string.delete_category_title)) },
                         text = {
                             Text(
-                                stringResource(R.string.delete_category_confirmation, category),
+                                stringResource(UiR.string.delete_category_confirmation, category),
                             )
                         },
                         confirmButton = {
@@ -859,7 +859,7 @@ fun <E> BaseTransactionScreen(
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
                         title = { Text(stringResource(UiR.string.delete_source_title)) },
-                        text = { Text(stringResource(R.string.delete_source_confirmation, source)) },
+                        text = { Text(stringResource(UiR.string.delete_source_confirmation, source)) },
                         confirmButton = {
                             Button(
                                 onClick = {

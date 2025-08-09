@@ -5,6 +5,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитарный класс для работы с UI компонентами
@@ -27,35 +28,35 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> context.getString(R.string.period_all_time)
-            PeriodType.DAY -> context.getString(R.string.period_day, dateFormat.format(startDate))
+            PeriodType.ALL -> context.getString(UiR.string.period_all_time)
+            PeriodType.DAY -> context.getString(UiR.string.period_day, dateFormat.format(startDate))
             PeriodType.WEEK ->
                 context.getString(
-                    R.string.period_week,
+                    UiR.string.period_week,
                     dateFormat.format(startDate),
                     dateFormat.format(endDate),
                 )
             PeriodType.MONTH ->
                 context.getString(
-                    R.string.period_month,
+                    UiR.string.period_month,
                     dateFormat.format(startDate),
                     dateFormat.format(endDate),
                 )
             PeriodType.QUARTER ->
                 context.getString(
-                    R.string.period_quarter,
+                    UiR.string.period_quarter,
                     dateFormat.format(startDate),
                     dateFormat.format(endDate),
                 )
             PeriodType.YEAR ->
                 context.getString(
-                    R.string.period_year,
+                    UiR.string.period_year,
                     dateFormat.format(startDate),
                     dateFormat.format(endDate),
                 )
             PeriodType.CUSTOM ->
                 context.getString(
-                    R.string.period_custom,
+                    UiR.string.period_custom,
                     dateFormat.format(startDate),
                     dateFormat.format(endDate),
                 )
@@ -79,7 +80,7 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
-            PeriodType.ALL -> context.getString(R.string.period_all_time)
+            PeriodType.ALL -> context.getString(UiR.string.period_all_time)
             PeriodType.DAY -> dateFormat.format(startDate)
             PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
                 dateFormat.format(startDate) + " - " + dateFormat.format(endDate)

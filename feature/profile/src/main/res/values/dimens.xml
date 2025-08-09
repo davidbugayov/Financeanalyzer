@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="radius_large">24dp</dimen>
-    <dimen name="radius_medium">16dp</dimen>
-    <dimen name="spacing_normal">8dp</dimen>
-    </resources>

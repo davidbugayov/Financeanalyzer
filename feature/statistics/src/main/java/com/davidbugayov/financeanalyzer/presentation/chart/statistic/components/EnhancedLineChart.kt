@@ -56,6 +56,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.hypot
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 // --- Constants for Dimensions ---
 private val DefaultSelectionThreshold: Dp = 30.dp
@@ -241,11 +242,11 @@ fun EnhancedLineChart(
         }
 
     // Получаем стандартные размеры из ресурсов
-    val cardCornerRadius = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_card_corner_radius)
-    val cardElevation = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_card_elevation)
-    val chartCornerRadius = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_corner_radius)
-    val spacingNormal = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_spacing_normal)
-    val spacingMedium = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_spacing_medium)
+    val cardCornerRadius = dimensionResource(id = UiR.dimen.chart_card_corner_radius)
+    val cardElevation = dimensionResource(id = UiR.dimen.chart_card_elevation)
+    val chartCornerRadius = dimensionResource(id = UiR.dimen.chart_corner_radius)
+    val spacingNormal = dimensionResource(id = UiR.dimen.chart_spacing_normal)
+    val spacingMedium = dimensionResource(id = UiR.dimen.chart_spacing_medium)
 
     Card(
         modifier =

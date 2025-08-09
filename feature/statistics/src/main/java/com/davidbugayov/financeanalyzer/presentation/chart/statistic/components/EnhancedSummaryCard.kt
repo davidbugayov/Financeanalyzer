@@ -57,6 +57,7 @@ import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.delay
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенная карточка с информацией о балансе, доходах и расходах.
@@ -222,7 +223,7 @@ fun EnhancedSummaryCard(
         modifier = modifier,
         shape =
             RoundedCornerShape(
-                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_corner_radius),
+                dimensionResource(UiR.dimen.enhanced_summary_card_corner_radius),
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors =
@@ -242,11 +243,11 @@ fun EnhancedSummaryCard(
                     .padding(
                         horizontal =
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal,
+                                UiR.dimen.enhanced_summary_card_padding_horizontal,
                             ),
                         vertical =
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical,
+                                UiR.dimen.enhanced_summary_card_padding_vertical,
                             ),
                     ),
         ) {
@@ -258,7 +259,7 @@ fun EnhancedSummaryCard(
                         .alpha(contentAlpha),
                 verticalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing),
+                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
                     ),
             ) {
                 // Период с возможностью клика для открытия диалога выбора периода
@@ -271,7 +272,7 @@ fun EnhancedSummaryCard(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.DateRange,
-                        contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.select_period),
+                        contentDescription = stringResource(UiR.string.select_period),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         modifier = Modifier.padding(end = 6.dp),
                     )
@@ -294,11 +295,11 @@ fun EnhancedSummaryCard(
                             fontWeight = FontWeight.Bold,
                             fontSize =
                                 dimensionResource(
-                                    com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_font_size,
+                                    UiR.dimen.enhanced_summary_card_balance_font_size,
                                 ).value.sp * balanceScale,
                             letterSpacing =
                                 dimensionResource(
-                                    com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_letter_spacing,
+                                    UiR.dimen.enhanced_summary_card_balance_letter_spacing,
                                 ).value.sp,
                         ),
                     color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
@@ -334,12 +335,12 @@ fun EnhancedSummaryCard(
                                         .padding(end = 4.dp)
                                         .height(
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                                UiR.dimen.enhanced_summary_card_icon_size,
                                             ),
                                         )
                                         .width(
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                                UiR.dimen.enhanced_summary_card_icon_size,
                                             ),
                                         ),
                             )
@@ -350,7 +351,7 @@ fun EnhancedSummaryCard(
                                         fontWeight = FontWeight.Bold,
                                         fontSize =
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
+                                                UiR.dimen.enhanced_summary_card_income_expense_font_size,
                                             ).value.sp,
                                     ),
                                 color = incomeColor,
@@ -363,7 +364,7 @@ fun EnhancedSummaryCard(
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
                                         dimensionResource(
-                                            com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
+                                            UiR.dimen.enhanced_summary_card_label_font_size,
                                         ).value.sp,
                                 ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -387,12 +388,12 @@ fun EnhancedSummaryCard(
                                         .padding(end = 4.dp)
                                         .height(
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                                UiR.dimen.enhanced_summary_card_icon_size,
                                             ),
                                         )
                                         .width(
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                                UiR.dimen.enhanced_summary_card_icon_size,
                                             ),
                                         ),
                             )
@@ -403,7 +404,7 @@ fun EnhancedSummaryCard(
                                         fontWeight = FontWeight.Bold,
                                         fontSize =
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
+                                                UiR.dimen.enhanced_summary_card_income_expense_font_size,
                                             ).value.sp,
                                     ),
                                 color = expenseColor,
@@ -416,7 +417,7 @@ fun EnhancedSummaryCard(
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
                                         dimensionResource(
-                                            com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
+                                            UiR.dimen.enhanced_summary_card_label_font_size,
                                         ).value.sp,
                                 ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

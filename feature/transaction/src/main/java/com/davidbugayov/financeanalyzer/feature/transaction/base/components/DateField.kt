@@ -35,7 +35,7 @@ fun DateField(
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = Icons.Default.DateRange,
-                    contentDescription = stringResource(R.string.select_date_button),
+                    contentDescription = stringResource(UiR.string.select_date_button),
                 )
             }
         },

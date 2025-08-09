@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения настроек безопасности в профиле пользователя.
@@ -54,7 +55,7 @@ fun SecuritySettingsSection(
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = stringResource(R.string.security_title),
+            text = stringResource(UiR.string.security_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
         )
@@ -63,8 +64,8 @@ fun SecuritySettingsSection(
             SecurityActionCard(
                 icon = Icons.Default.Lock,
                 iconBackground = MaterialTheme.colorScheme.primary,
-                title = stringResource(R.string.security_app_lock_title),
-                subtitle = stringResource(R.string.security_app_lock_description),
+                title = stringResource(UiR.string.security_app_lock_title),
+                subtitle = stringResource(UiR.string.security_app_lock_description),
                 isEnabled = isAppLockEnabled,
                 onClick = onAppLockClick,
             )
@@ -75,8 +76,8 @@ fun SecuritySettingsSection(
                 SecurityActionCard(
                     icon = Icons.Default.Fingerprint,
                     iconBackground = MaterialTheme.colorScheme.secondary,
-                    title = stringResource(R.string.security_biometric_title),
-                    subtitle = stringResource(R.string.security_biometric_description),
+                    title = stringResource(UiR.string.security_biometric_title),
+                    subtitle = stringResource(UiR.string.security_biometric_description),
                     isEnabled = isBiometricEnabled,
                     onClick = onBiometricClick,
                     enabled = isAppLockEnabled, // Биометрия доступна только при включенной блокировке

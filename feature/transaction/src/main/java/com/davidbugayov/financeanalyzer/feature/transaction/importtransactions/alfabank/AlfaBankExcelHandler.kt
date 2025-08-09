@@ -15,6 +15,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import java.io.BufferedInputStream
 import java.util.Locale
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Обработчик Excel-выписок Альфа-Банка
@@ -136,7 +137,7 @@ class AlfaBankExcelHandler(
         if (supportsFileType(fileType)) {
             val transactionSource =
                 context.getString(
-                    com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_alfa,
+                    UiR.string.transaction_source_alfa,
                 )
 
             // Конфигурация для Альфа-Банка

@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компактный виджет для отображения текущего баланса.
@@ -85,11 +86,9 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                         )
                         val color =
                             if (balance.isPositive()) {
-                                context.getColor(
-                                    R.color.income,
-                                )
+                                context.getColor(UiR.color.income)
                             } else {
-                                context.getColor(R.color.expense)
+                                context.getColor(UiR.color.expense)
                             }
                         views.setTextColor(R.id.small_widget_balance, color)
                         appWidgetManager.updateAppWidget(appWidgetId, views)

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Bank colors copied locally so that the feature module can compile independently -->
-    <color name="bank_sberbank">#1AB239</color>
-    <color name="bank_tinkoff">#FFDD2D</color>
-    <color name="bank_alfabank">#EF3124</color>
-    <color name="bank_ozon">#1A6DFF</color>
-    <color name="bank_csv">#455A64</color>
-</resources> 

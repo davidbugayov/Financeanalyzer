@@ -18,15 +18,12 @@
     <string name="reminder_time_description">Текущее время: %1$s</string>
     <string name="notification_settings">Настройки уведомлений</string>
     <string name="edit_time">Изменить время</string>
-    <string name="profile_theme_light">Светлая</string>
-    <string name="profile_theme_dark">Тёмная</string>
-    <string name="profile_theme_system">Системная</string>
+    <!-- варианты тем определены в strings.xml -->
     <string name="permission_required_title">Требуется разрешение</string>
     <string name="request_permission">Запросить разрешение</string>
     <string name="unknown">Неизвестно</string>
     <string name="profile_budget_subtitle">Планирование расходов</string>
-    <string name="export_import">Импорт/Экспорт</string>
-    <string name="profile_export_import_subtitle">Файлы CSV, PDF, Excel</string>
+    <!-- export_import и profile_export_import_subtitle определены в strings.xml -->
     <string name="achievements">Достижения</string>
     <string name="profile_achievements_subtitle">Статистика и цели</string>
 </resources>

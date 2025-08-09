@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.feature.statistics.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент элемента легенды для графиков
@@ -27,10 +28,10 @@ fun ChartLegendItem(
     color: Color,
     text: String,
 ) {
-    val legendItemWidth = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_legend_item_width)
-    val legendItemHeight = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_legend_item_height)
-    val legendSpacing = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_legend_spacing)
-    val cornerRadius = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.chart_corner_radius)
+    val legendItemWidth = dimensionResource(id = UiR.dimen.chart_legend_item_width)
+    val legendItemHeight = dimensionResource(id = UiR.dimen.chart_legend_item_height)
+    val legendSpacing = dimensionResource(id = UiR.dimen.chart_legend_spacing)
+    val cornerRadius = dimensionResource(id = UiR.dimen.chart_corner_radius)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -26,11 +26,11 @@ abstract class AbstractPdfImportUseCase(
 ) : BankImportUseCase(transactionRepository, context) {
     open val headerMarkers: List<String> by lazy {
         listOf(
-            context.getString(R.string.header_date_operation),
-            context.getString(com.davidbugayov.financeanalyzer.ui.R.string.date),
-            context.getString(R.string.header_operation),
-            context.getString(R.string.header_document),
-            context.getString(com.davidbugayov.financeanalyzer.ui.R.string.amount),
+            context.getString(UiR.string.header_date_operation),
+            context.getString(UiR.string.date),
+            context.getString(UiR.string.header_operation),
+            context.getString(UiR.string.header_document),
+            context.getString(UiR.string.amount),
         )
     }
     open val dataStartRegex: Regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}")
@@ -48,8 +48,8 @@ abstract class AbstractPdfImportUseCase(
             val twoParamResources =
                 listOf(
                     UiR.string.import_error_unknown,
-                    R.string.import_error_io_exception,
-                    R.string.import_error_pdf_extraction_exception,
+                    UiR.string.import_error_io_exception,
+                    UiR.string.import_error_pdf_extraction_exception,
                 )
 
             if (resourceId in twoParamResources) {
@@ -96,7 +96,7 @@ abstract class AbstractPdfImportUseCase(
                 Timber.e(e, "$bankName extractTextFromPdf: Ошибка при извлечении текста из PDF.")
                 throw IOException(
                     formatErrorMessage(
-                        R.string.import_error_pdf_extraction_exception,
+                        UiR.string.import_error_pdf_extraction_exception,
                         bankName,
                         e.localizedMessage,
                     ),
@@ -118,7 +118,7 @@ abstract class AbstractPdfImportUseCase(
                 ImportResult.Progress(
                     0,
                     100,
-                    context.getString(R.string.import_progress_starting, currentBankName),
+                    context.getString(UiR.string.import_progress_starting, currentBankName),
                 ),
             )
             Timber.i("$currentBankName importTransactions: Начало импорта из URI: $uri")
@@ -130,7 +130,7 @@ abstract class AbstractPdfImportUseCase(
                         ImportResult.Error(
                             message =
                                 formatErrorMessage(
-                                    R.string.import_error_pdf_extraction_failed,
+                                    UiR.string.import_error_pdf_extraction_failed,
                                     currentBankName,
                                     null,
                                 ),
@@ -142,7 +142,7 @@ abstract class AbstractPdfImportUseCase(
                     ImportResult.Progress(
                         5,
                         100,
-                        context.getString(R.string.import_progress_text_extracted_validating, currentBankName),
+                        context.getString(UiR.string.import_progress_text_extracted_validating, currentBankName),
                     ),
                 )
                 Timber.d(
@@ -160,7 +160,7 @@ abstract class AbstractPdfImportUseCase(
                             ImportResult.Error(
                                 message =
                                     formatErrorMessage(
-                                        R.string.import_error_invalid_format,
+                                        UiR.string.import_error_invalid_format,
                                         currentBankName,
                                         null,
                                     ),
@@ -174,7 +174,7 @@ abstract class AbstractPdfImportUseCase(
                     ImportResult.Progress(
                         10,
                         100,
-                        context.getString(R.string.import_progress_format_validated_skipping_headers, currentBankName),
+                        context.getString(UiR.string.import_progress_format_validated_skipping_headers, currentBankName),
                     ),
                 )
 
@@ -187,7 +187,7 @@ abstract class AbstractPdfImportUseCase(
                         ImportResult.Progress(
                             15,
                             100,
-                            context.getString(R.string.import_progress_processing_transactions, currentBankName),
+                            context.getString(UiR.string.import_progress_processing_transactions, currentBankName),
                         ),
                     )
 
@@ -200,7 +200,7 @@ abstract class AbstractPdfImportUseCase(
                             ImportResult.Error(
                                 message =
                                     formatErrorMessage(
-                                        R.string.import_error_no_transactions_found,
+                                        UiR.string.import_error_no_transactions_found,
                                         currentBankName,
                                         null,
                                     ),
@@ -213,7 +213,7 @@ abstract class AbstractPdfImportUseCase(
                             85,
                             100,
                             context.getString(
-                                R.string.import_progress_saving_transactions,
+                                UiR.string.import_progress_saving_transactions,
                                 transactions.size,
                                 currentBankName,
                             ),
@@ -251,7 +251,7 @@ abstract class AbstractPdfImportUseCase(
                         exception = e,
                         message =
                             formatErrorMessage(
-                                R.string.import_error_io_exception,
+                                UiR.string.import_error_io_exception,
                                 currentBankName,
                                 e.localizedMessage,
                             ),

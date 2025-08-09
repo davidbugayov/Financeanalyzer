@@ -127,7 +127,7 @@ fun AddSourceItem(onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_custom_source),
+                contentDescription = stringResource(UiR.string.add_custom_source),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp),
             )
@@ -136,7 +136,7 @@ fun AddSourceItem(onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(2.dp))
 
         Text(
-            text = stringResource(R.string.add_custom_source),
+            text = stringResource(UiR.string.add_custom_source),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             maxLines = 1,

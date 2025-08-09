@@ -128,7 +128,7 @@ fun ImportProgressSection(
                 }
 
                 Text(
-                    text = stringResource(R.string.importing_file),
+                    text = stringResource(UiR.string.importing_file),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = dimensionResource(UiR.dimen.space_small)),
@@ -155,7 +155,7 @@ fun ImportProgressSection(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
-                                    .height(dimensionResource(R.dimen.import_progress_indicator_height)),
+                                    .height(dimensionResource(UiR.dimen.import_progress_indicator_height)),
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
                         )
@@ -183,7 +183,7 @@ fun ImportProgressSection(
                             Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.space_small)))
 
                             Text(
-                                text = stringResource(R.string.progress_percentage, progress),
+                                text = stringResource(UiR.string.progress_percentage, progress),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )

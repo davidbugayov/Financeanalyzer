@@ -95,9 +95,9 @@ fun ImportResultsSection(
                 Text(
                     text =
                         if (importResults.errorMessage != null) {
-                            stringResource(R.string.import_error)
+                            stringResource(UiR.string.import_error)
                         } else {
-                            stringResource(R.string.import_completed)
+                            stringResource(UiR.string.import_completed)
                         },
                     style = MaterialTheme.typography.titleLarge,
                     color =
@@ -173,7 +173,7 @@ fun ImportResultsSection(
                             Text(
                                 text =
                                     stringResource(
-                                        R.string.import_summary,
+                                        UiR.string.import_summary,
                                         importResults.importedCount,
                                         importResults.skippedCount,
                                     ),

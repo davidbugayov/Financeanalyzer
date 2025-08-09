@@ -49,7 +49,7 @@ fun CategoryPickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_category)) },
+        title = { Text(stringResource(UiR.string.select_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             LazyVerticalGrid(
@@ -150,7 +150,7 @@ fun CustomCategoryDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.add_custom_category)) },
+        title = { Text(stringResource(UiR.string.add_custom_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -159,14 +159,14 @@ fun CustomCategoryDialog(
                 OutlinedTextField(
                     value = categoryText,
                     onValueChange = onCategoryTextChange,
-                    label = { Text(stringResource(R.string.select_category)) },
+                    label = { Text(stringResource(UiR.string.select_category)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
                 if (availableIcons.isNotEmpty()) {
                     Text(
-                        text = stringResource(R.string.select_icon),
+                        text = stringResource(UiR.string.select_icon),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     LazyVerticalGrid(

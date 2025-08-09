@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для экрана импорта транзакций.
@@ -101,7 +102,7 @@ class ImportTransactionsViewModel(
             }
 
         val bankInfo = actualBankName ?: _state.value.fileName
-        val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount, bankInfo)
+        val successMessage = context.getString(UiR.string.import_success_message, importedCount, skippedCount, bankInfo)
 
         Timber.i("Импорт завершен: импортировано=$importedCount, пропущено=$skippedCount, банк=$actualBankName")
 
@@ -110,7 +111,7 @@ class ImportTransactionsViewModel(
             ImportState(
                 isLoading = false,
                 progress = 100,
-                progressMessage = context.getString(R.string.import_progress_completed, bankInfo),
+                progressMessage = context.getString(UiR.string.import_progress_completed, bankInfo),
                 successCount = importedCount,
                 skippedCount = skippedCount,
                 successMessage = successMessage,
@@ -256,7 +257,7 @@ class ImportTransactionsViewModel(
 
         // Обновляем состояние, показывая процесс загрузки
         val context = getApplication<Application>().applicationContext
-        val startMessage = context.getString(R.string.import_progress_starting, bankName ?: fileName)
+        val startMessage = context.getString(UiR.string.import_progress_starting, bankName ?: fileName)
         _state.value =
             _state.value.copy(
                 isLoading = true,

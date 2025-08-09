@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
@@ -84,12 +85,12 @@ class AddTransactionViewModel(
                 _wallets.value = walletsList
                 Timber.d(
                     GlobalContext.get().get<ResourceProvider>().getString(
-                        R.string.log_transaction_wallets_loaded,
+                        UiR.string.log_transaction_wallets_loaded,
                         walletsList.size,
                     ),
                 )
             } catch (e: Exception) {
-                Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(R.string.log_error_loading_wallets))
+                Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_error_loading_wallets))
                 _wallets.value = emptyList()
             }
         }
@@ -113,7 +114,7 @@ class AddTransactionViewModel(
         amount: String,
         categoryId: String,
     ): Boolean {
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_validate_input, amount))
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_validate_input, amount))
         val validationBuilder = ValidationBuilder()
 
         _state.update {
@@ -126,9 +127,9 @@ class AddTransactionViewModel(
 
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
-            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_amount_error))
+            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_empty_amount_error))
             CrashLoggerProvider.crashLogger.logException(
-                Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_amount)),
+                Exception(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_empty_amount)),
             )
         } else {
             try {
@@ -137,14 +138,14 @@ class AddTransactionViewModel(
                     validationBuilder.addAmountError()
                     Timber.d(
                         GlobalContext.get().get<ResourceProvider>().getString(
-                            R.string.log_transaction_zero_amount_error,
+                            UiR.string.log_transaction_zero_amount_error,
                             amountValue.toFloat(),
                         ),
                     )
                     CrashLoggerProvider.crashLogger.logException(
                         Exception(
                             GlobalContext.get().get<ResourceProvider>().getString(
-                                R.string.error_zero_amount,
+                                UiR.string.error_zero_amount,
                                 amountValue.toString(),
                             ),
                         ),
@@ -154,7 +155,7 @@ class AddTransactionViewModel(
                 validationBuilder.addAmountError()
                 Timber.e(
                     GlobalContext.get().get<ResourceProvider>().getString(
-                        R.string.log_transaction_parse_amount_error,
+                        UiR.string.log_transaction_parse_amount_error,
                         e.message ?: "",
                     ),
                 )
@@ -165,10 +166,10 @@ class AddTransactionViewModel(
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
             Timber.d(
-                GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_empty_category_error),
+                GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_empty_category_error),
             )
             CrashLoggerProvider.crashLogger.logException(
-                Exception(GlobalContext.get().get<ResourceProvider>().getString(R.string.error_empty_category)),
+                Exception(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_empty_category)),
             )
         }
 
@@ -183,7 +184,7 @@ class AddTransactionViewModel(
 
         Timber.d(
             GlobalContext.get().get<ResourceProvider>().getString(
-                R.string.log_transaction_validation_result,
+                UiR.string.log_transaction_validation_result,
                 validationResult.isValid,
                 validationResult.hasAmountError,
             ),
@@ -467,7 +468,7 @@ class AddTransactionViewModel(
 
         Timber.d(
             GlobalContext.get().get<ResourceProvider>().getString(
-                R.string.log_transaction_initialize_screen,
+                UiR.string.log_transaction_initialize_screen,
                 _state.value.forceExpense,
                 _state.value.isExpense,
             ),

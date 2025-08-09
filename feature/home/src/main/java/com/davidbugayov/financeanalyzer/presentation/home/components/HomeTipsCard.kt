@@ -19,6 +19,7 @@ import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * 🏠 Современная карточка советов для главного экрана
@@ -58,8 +59,8 @@ fun HomeTipsCard(
 
             SmartRecommendationCard(
                 recommendations = onboardingRecommendations,
-                title = stringResource(R.string.welcome_title),
-                subtitle = stringResource(R.string.welcome_subtitle),
+                title = stringResource(UiR.string.welcome_title),
+                subtitle = stringResource(UiR.string.welcome_subtitle),
                 style = SmartCardStyle.MINIMAL,
                 showPriorityIndicator = false,
                 onDismiss = {

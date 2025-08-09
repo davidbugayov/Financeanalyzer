@@ -51,7 +51,7 @@ fun SubcategoryPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.select_subcategory),
+                text = stringResource(UiR.string.select_subcategory),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )

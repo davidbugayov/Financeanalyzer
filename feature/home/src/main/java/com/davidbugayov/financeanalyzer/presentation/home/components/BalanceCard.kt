@@ -68,7 +68,7 @@ private fun BalanceCardAmount(balance: Money) {
         style = MaterialTheme.typography.headlineMedium,
         fontSize =
             dimensionResource(
-                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_balance_font_size,
+                UiR.dimen.enhanced_summary_card_balance_font_size,
             ).value.sp,
         fontWeight = FontWeight.Bold,
         color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
@@ -99,11 +99,11 @@ fun BalanceCard(
                     .padding(
                         vertical =
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_vertical,
+                                UiR.dimen.enhanced_summary_card_padding_vertical,
                             ),
                         horizontal =
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_padding_horizontal,
+                                UiR.dimen.enhanced_summary_card_padding_horizontal,
                             ),
                     ),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -112,7 +112,7 @@ fun BalanceCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing),
+                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
                     ),
             )
             // Баланс в центре, снизу две цветные плашки доходов/расходов
@@ -120,7 +120,7 @@ fun BalanceCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing),
+                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
                     ),
             )
             Row(
@@ -128,7 +128,7 @@ fun BalanceCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AmountPill(
-                    labelRes = com.davidbugayov.financeanalyzer.ui.R.string.income,
+                    labelRes = UiR.string.income,
                     amountText = income.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                     icon = Icons.Filled.ArrowUpward,
                     color = incomeColor,
@@ -138,12 +138,12 @@ fun BalanceCard(
                     modifier =
                         Modifier.width(
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing,
+                                UiR.dimen.enhanced_summary_card_spacing,
                             ),
                         ),
                 )
                 AmountPill(
-                    labelRes = com.davidbugayov.financeanalyzer.ui.R.string.expenses,
+                    labelRes = UiR.string.expenses,
                     amountText = expense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                     icon = Icons.Filled.ArrowDownward,
                     color = expenseColor,
@@ -177,7 +177,7 @@ private fun AmountPill(
                         fontWeight = FontWeight.Medium,
                         fontSize =
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_label_font_size,
+                                UiR.dimen.enhanced_summary_card_label_font_size,
                             ).value.sp,
                     ),
                 color = color,
@@ -191,7 +191,7 @@ private fun AmountPill(
                     modifier =
                         Modifier.size(
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_icon_size,
+                                UiR.dimen.enhanced_summary_card_icon_size,
                             ),
                         ),
                 )
@@ -199,7 +199,7 @@ private fun AmountPill(
                     modifier =
                         Modifier.width(
                             dimensionResource(
-                                com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_spacing,
+                                UiR.dimen.enhanced_summary_card_spacing,
                             ),
                         ),
                 )
@@ -210,7 +210,7 @@ private fun AmountPill(
                             fontWeight = FontWeight.SemiBold,
                             fontSize =
                                 dimensionResource(
-                                    com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_summary_card_income_expense_font_size,
+                                    UiR.dimen.enhanced_summary_card_income_expense_font_size,
                                 ).value.sp,
                         ),
                     color = color,

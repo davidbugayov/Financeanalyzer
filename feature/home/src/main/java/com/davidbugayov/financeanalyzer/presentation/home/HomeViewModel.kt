@@ -46,6 +46,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для главного экрана.
@@ -444,13 +445,13 @@ class HomeViewModel(
                     Timber.d("Test data generation completed successfully")
                 } else {
                     val rp: ResourceProvider = GlobalContext.get().get()
-                    _state.update { it.copy(error = rp.getString(R.string.error_saving_test_transactions)) }
+                    _state.update { it.copy(error = rp.getString(UiR.string.error_saving_test_transactions)) }
                 }
                 loadTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error generating test data")
                 val rp: ResourceProvider = GlobalContext.get().get()
-                _state.update { it.copy(error = e.message ?: rp.getString(R.string.error_generating_test_data)) }
+                _state.update { it.copy(error = e.message ?: rp.getString(UiR.string.error_generating_test_data)) }
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }

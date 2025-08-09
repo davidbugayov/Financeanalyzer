@@ -63,6 +63,7 @@ import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий * с интерактивной легендой и компактным размером для лучшей наглядности
@@ -149,13 +150,13 @@ fun EnhancedCategoryPieChart(
             CardDefaults.cardElevation(
                 defaultElevation =
                     dimensionResource(
-                        id = com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_pie_chart_card_elevation,
+                        id = UiR.dimen.enhanced_pie_chart_card_elevation,
                     ),
             ),
         shape =
             RoundedCornerShape(
                 dimensionResource(
-                    id = com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_pie_chart_card_corner_radius,
+                    id = UiR.dimen.enhanced_pie_chart_card_corner_radius,
                 ),
             ),
     ) {
@@ -166,7 +167,7 @@ fun EnhancedCategoryPieChart(
                     .padding(
                         all =
                             dimensionResource(
-                                id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_medium,
+                                id = UiR.dimen.padding_medium,
                             ),
                         // Use standard padding
                     )
@@ -187,7 +188,7 @@ fun EnhancedCategoryPieChart(
                     Modifier
                         .fillMaxWidth()
                         .padding(
-                            bottom = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_medium),
+                            bottom = dimensionResource(id = UiR.dimen.padding_medium),
                         ),
                 // Use standard padding
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -220,7 +221,7 @@ fun EnhancedCategoryPieChart(
                     Modifier
                         .fillMaxWidth()
                         .height(
-                            dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_pie_chart_size),
+                            dimensionResource(id = UiR.dimen.enhanced_pie_chart_size),
                         ),
                 // Keep specific size
                 contentAlignment = Alignment.Center,
@@ -228,7 +229,7 @@ fun EnhancedCategoryPieChart(
                 DrawPieChart(
                     modifier =
                         Modifier.size(
-                            dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.enhanced_pie_chart_size),
+                            dimensionResource(id = UiR.dimen.enhanced_pie_chart_size),
                         ),
                     // Keep specific size
                     data = filteredData,
@@ -271,7 +272,7 @@ fun EnhancedCategoryPieChart(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_medium),
+                        dimensionResource(id = UiR.dimen.padding_medium),
                     ),
             ) // Use standard padding
 
@@ -282,10 +283,10 @@ fun EnhancedCategoryPieChart(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
                     Modifier.padding(
-                        start = dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_small),
+                        start = dimensionResource(id = UiR.dimen.padding_small),
                         bottom =
                             dimensionResource(
-                                id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_small,
+                                id = UiR.dimen.padding_small,
                             ),
                         // Use standard padding
                     ),
@@ -297,15 +298,15 @@ fun EnhancedCategoryPieChart(
             // Use constants for legend height calculation
             val legendItemHeight =
                 dimensionResource(
-                    id = com.davidbugayov.financeanalyzer.ui.R.dimen.legend_item_height_approx,
+                    id = UiR.dimen.legend_item_height_approx,
                 ) // New dimen needed
             val minLegendHeight =
                 dimensionResource(
-                    id = com.davidbugayov.financeanalyzer.ui.R.dimen.min_legend_height,
+                    id = UiR.dimen.min_legend_height,
                 ) // New dimen needed
             val maxLegendHeight =
                 dimensionResource(
-                    id = com.davidbugayov.financeanalyzer.ui.R.dimen.max_legend_height,
+                    id = UiR.dimen.max_legend_height,
                 ) // New dimen needed
 
             val calculatedHeight = minLegendHeight + (sortedItems.size * legendItemHeight.value).dp // Multiply Int by Dp's value, convert back to Dp
@@ -319,7 +320,7 @@ fun EnhancedCategoryPieChart(
                         .padding(
                             horizontal =
                                 dimensionResource(
-                                    id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_extra_small,
+                                    id = UiR.dimen.padding_extra_small,
                                 ),
                         ) // Use standard padding
                         .height(legendHeight) // Calculated height with constraints
@@ -368,11 +369,11 @@ fun EnhancedCategoryPieChart(
                                 .padding(
                                     vertical =
                                         dimensionResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_extra_small,
+                                            id = UiR.dimen.padding_extra_small,
                                         ),
                                     horizontal =
                                         dimensionResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_tiny,
+                                            id = UiR.dimen.padding_tiny,
                                         ),
                                 ),
                         verticalAlignment = Alignment.CenterVertically,
@@ -383,7 +384,7 @@ fun EnhancedCategoryPieChart(
                                 Modifier
                                     .size(
                                         dimensionResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.dimen.legend_indicator_size,
+                                            id = UiR.dimen.legend_indicator_size,
                                         ),
                                     ) // Use standard padding
                                     .background(
@@ -392,7 +393,7 @@ fun EnhancedCategoryPieChart(
                                             if (isSelected) {
                                                 RoundedCornerShape(
                                                     dimensionResource(
-                                                        id = com.davidbugayov.financeanalyzer.ui.R.dimen.radius_small,
+                                                        id = UiR.dimen.radius_small,
                                                     ),
                                                 )
                                             } else {
@@ -414,7 +415,7 @@ fun EnhancedCategoryPieChart(
                                     .padding(
                                         start =
                                             dimensionResource(
-                                                id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_small,
+                                                id = UiR.dimen.padding_small,
                                             ),
                                     )
                                     .weight(1f),
@@ -435,7 +436,7 @@ fun EnhancedCategoryPieChart(
                                 Modifier.padding(
                                     horizontal =
                                         dimensionResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_tiny,
+                                            id = UiR.dimen.padding_tiny,
                                         ),
                                 ),
                         )
@@ -459,7 +460,7 @@ fun EnhancedCategoryPieChart(
                                     .fillMaxWidth()
                                     .height(
                                         dimensionResource(
-                                            id = com.davidbugayov.financeanalyzer.ui.R.dimen.divider_height,
+                                            id = UiR.dimen.divider_height,
                                         ),
                                     )
                                     .background(
@@ -750,7 +751,7 @@ private fun DrawPieChart(
                 tween(
                     durationMillis =
                         context.resources.getInteger(
-                            R.integer.enhanced_pie_chart_animation_duration,
+                            UiR.integer.enhanced_pie_chart_animation_duration,
                         ),
                     easing = FastOutSlowInEasing,
                 ),
@@ -797,7 +798,7 @@ private fun DrawPieChart(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(dimensionResource(id = com.davidbugayov.financeanalyzer.ui.R.dimen.padding_tiny))
+                    .padding(dimensionResource(id = UiR.dimen.padding_tiny))
                     .pointerInput(pointerInputKey) {
                         detectTapGestures { offset ->
                             val size = this.size

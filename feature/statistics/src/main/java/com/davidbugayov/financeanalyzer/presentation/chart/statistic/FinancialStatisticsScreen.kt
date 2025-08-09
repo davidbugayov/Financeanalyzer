@@ -69,6 +69,7 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
+import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
 import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -77,6 +78,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -217,7 +219,7 @@ fun FinancialStatisticsScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.analytics_title),
+                title = stringResource(UiR.string.analytics_title),
                 showBackButton = true,
                 onBackClick = {
                     onNavigateBack()
@@ -231,7 +233,7 @@ fun FinancialStatisticsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Lightbulb,
-                                contentDescription = stringResource(R.string.show_tip),
+                                contentDescription = stringResource(UiR.string.show_tip),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -250,13 +252,13 @@ fun FinancialStatisticsScreen(
         ) {
             if (state.isLoading) {
                 CenteredLoadingIndicator(
-                    message = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.loading_data_default),
+                    message = stringResource(UiR.string.loading_data_default),
                 )
             } else if (state.error != null) {
                 ErrorContent(
                     error =
                         state.error
-                            ?: stringResource(com.davidbugayov.financeanalyzer.ui.R.string.unknown_error_message),
+                            ?: stringResource(UiR.string.unknown_error_message),
                     onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) },
                 )
             } else {
@@ -267,34 +269,17 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
-                    if (showTip && personalizedTips.isNotEmpty()) {
-                        // Показываем только лучшие 3 совета
-                        EnhancedTipCard(
-                            tips = personalizedTips.take(3),
-                            onDismiss = {
-                                showTip = false
-                            },
+                    if (personalizedTips.isNotEmpty()) {
+                        RecommendationsPanel(
+                            tips = personalizedTips,
                             onActionClick = { tip ->
-                                // Обработка действий по советам
                                 when (tip.actionResId) {
-                                    com.davidbugayov.financeanalyzer.ui.R.string.action_add_transaction -> onAddTransaction()
-                                    com.davidbugayov.financeanalyzer.ui.R.string.action_start_saving, com.davidbugayov.financeanalyzer.ui.R.string.action_continue_saving -> {
-                                        // TODO: Навигация к разделу сбережений
-                                    }
-                                    com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
-                                        // Закрываем совет и фокусируемся на графиках
-                                        showTip = false
-                                    }
-                                    com.davidbugayov.financeanalyzer.ui.R.string.action_view_categories -> {
-                                        onNavigateToTransactions?.invoke(
-                                            "",
-                                            state.startDate,
-                                            state.endDate,
-                                        )
-                                    }
+                                    UiR.string.action_add_transaction -> onAddTransaction()
+                                    UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
                                 }
                             },
                         )
+                        Spacer(Modifier.height(16.dp))
                     }
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
@@ -314,7 +299,7 @@ fun FinancialStatisticsScreen(
                                     .padding(
                                         horizontal =
                                             dimensionResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                UiR.dimen.finance_chart_screen_padding,
                                             ),
                                         vertical = 16.dp,
                                     )
@@ -335,12 +320,12 @@ fun FinancialStatisticsScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = stringResource(R.string.add_first_transaction),
+                                        text = stringResource(UiR.string.add_first_transaction),
                                         style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.primary,
                                     )
                                     Text(
-                                        text = stringResource(R.string.see_analytics_magic),
+                                        text = stringResource(UiR.string.see_analytics_magic),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.alpha(0.8f),
@@ -360,11 +345,11 @@ fun FinancialStatisticsScreen(
                                 .padding(
                                     horizontal =
                                         dimensionResource(
-                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                            UiR.dimen.finance_chart_screen_padding,
                                         ),
                                     vertical =
                                         dimensionResource(
-                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_vertical_spacing,
+                                            UiR.dimen.finance_chart_screen_vertical_spacing,
                                         ),
                                 ),
                     ) {
@@ -388,7 +373,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(0)
                                 }
                             },
-                            text = { Text(stringResource(R.string.categories)) },
+                            text = { Text(stringResource(UiR.string.categories)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 1,
@@ -397,7 +382,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(1)
                                 }
                             },
-                            text = { Text(stringResource(R.string.dynamics)) },
+                            text = { Text(stringResource(UiR.string.dynamics)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 2,
@@ -406,7 +391,7 @@ fun FinancialStatisticsScreen(
                                     pagerState.scrollToPage(2)
                                 }
                             },
-                            text = { Text(stringResource(R.string.analysis)) },
+                            text = { Text(stringResource(UiR.string.analysis)) },
                         )
                     }
 
@@ -424,7 +409,7 @@ fun FinancialStatisticsScreen(
                                             .fillMaxWidth()
                                             .padding(
                                                 dimensionResource(
-                                                    com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                    UiR.dimen.finance_chart_screen_padding,
                                                 ),
                                             ),
                                 ) {
@@ -444,13 +429,13 @@ fun FinancialStatisticsScreen(
                                                     .fillMaxWidth()
                                                     .height(
                                                         dimensionResource(
-                                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_piechart_height,
+                                                            UiR.dimen.finance_chart_screen_piechart_height,
                                                         ),
                                                     )
                                                     .padding(
                                                         top =
                                                             dimensionResource(
-                                                                com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                                UiR.dimen.finance_chart_screen_padding,
                                                             ),
                                                     ),
                                             contentAlignment = Alignment.Center,
@@ -458,7 +443,7 @@ fun FinancialStatisticsScreen(
                                             Text(
                                                 text =
                                                     stringResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.string.no_data,
+                                                        UiR.string.no_data,
                                                     ),
                                                 style = MaterialTheme.typography.bodyLarge,
                                             )
@@ -481,7 +466,7 @@ fun FinancialStatisticsScreen(
                                                 Modifier.padding(
                                                     top =
                                                         dimensionResource(
-                                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                            UiR.dimen.finance_chart_screen_padding,
                                                         ),
                                                 ),
                                             showExpenses = state.showExpenses,
@@ -505,7 +490,7 @@ fun FinancialStatisticsScreen(
                                             .fillMaxWidth()
                                             .padding(
                                                 dimensionResource(
-                                                    com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                    UiR.dimen.finance_chart_screen_padding,
                                                 ),
                                             ),
                                 ) {
@@ -526,7 +511,7 @@ fun FinancialStatisticsScreen(
                                         expenseData = state.expenseLineChartData,
                                         showIncome = lineChartDisplayMode.showIncome,
                                         showExpense = lineChartDisplayMode.showExpense,
-                                        title = stringResource(R.string.dynamics),
+                                        title = stringResource(UiR.string.dynamics),
                                         period = periodText,
                                     )
                                 }
@@ -543,11 +528,11 @@ fun FinancialStatisticsScreen(
                                                 bottom = 4.dp,
                                                 start =
                                                     dimensionResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                        UiR.dimen.finance_chart_screen_padding,
                                                     ),
                                                 end =
                                                     dimensionResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_padding,
+                                                        UiR.dimen.finance_chart_screen_padding,
                                                     ),
                                             ),
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -564,7 +549,7 @@ fun FinancialStatisticsScreen(
                                                 .padding(
                                                     bottom =
                                                         dimensionResource(
-                                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_card_bottom_padding,
+                                                            UiR.dimen.finance_chart_screen_card_bottom_padding,
                                                         ),
                                                 ),
                                         shape = RoundedCornerShape(16.dp),
@@ -588,7 +573,7 @@ fun FinancialStatisticsScreen(
                                                     .fillMaxWidth()
                                                     .padding(
                                                         dimensionResource(
-                                                            com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_card_content_padding,
+                                                            UiR.dimen.finance_chart_screen_card_content_padding,
                                                         ),
                                                     ),
                                             verticalAlignment = Alignment.CenterVertically,
@@ -598,7 +583,7 @@ fun FinancialStatisticsScreen(
                                                 Text(
                                                     text =
                                                         stringResource(
-                                                            com.davidbugayov.financeanalyzer.ui.R.string.detailed_financial_statistics,
+                                                            UiR.string.detailed_financial_statistics,
                                                         ),
                                                     style = MaterialTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
@@ -606,7 +591,7 @@ fun FinancialStatisticsScreen(
                                                 )
 
                                                 Text(
-                                                    text = stringResource(R.string.study_financial_indicators),
+                                                    text = stringResource(UiR.string.study_financial_indicators),
                                                     style = MaterialTheme.typography.bodyMedium,
                                                     color =
                                                         MaterialTheme.colorScheme.onPrimaryContainer.copy(
@@ -629,7 +614,7 @@ fun FinancialStatisticsScreen(
                                         modifier =
                                             Modifier.height(
                                                 dimensionResource(
-                                                    com.davidbugayov.financeanalyzer.ui.R.dimen.finance_chart_screen_vertical_spacing,
+                                                    UiR.dimen.finance_chart_screen_vertical_spacing,
                                                 ),
                                             ),
                                     )
@@ -642,14 +627,14 @@ fun FinancialStatisticsScreen(
                                             onDismiss = { /* Не показываем кнопку закрытия для дополнительных советов */ },
                                             onActionClick = { tip ->
                                                 when (tip.actionResId) {
-                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_add_transaction -> onAddTransaction()
-                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_start_saving, com.davidbugayov.financeanalyzer.ui.R.string.action_continue_saving -> {
+                                                    UiR.string.action_add_transaction -> onAddTransaction()
+                                                    UiR.string.action_start_saving, UiR.string.action_continue_saving -> {
                                                         // TODO: Навигация к разделу сбережений
                                                     }
-                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_study_statistics, com.davidbugayov.financeanalyzer.ui.R.string.action_analyze_spending -> {
+                                                    UiR.string.action_study_statistics, UiR.string.action_analyze_spending -> {
                                                         // Фокус на графиках
                                                     }
-                                                    com.davidbugayov.financeanalyzer.ui.R.string.action_view_categories -> {
+                                                    UiR.string.action_view_categories -> {
                                                         onNavigateToTransactions?.invoke(
                                                             "",
                                                             state.startDate,
@@ -687,7 +672,7 @@ fun FinancialStatisticsScreen(
                                             Text(
                                                 text =
                                                     stringResource(
-                                                        id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_title,
+                                                        id = UiR.string.prediction_title,
                                                     ),
                                                 style = MaterialTheme.typography.titleMedium,
                                                 color = MaterialTheme.colorScheme.onSurface,
@@ -696,7 +681,7 @@ fun FinancialStatisticsScreen(
                                             Text(
                                                 text =
                                                     stringResource(
-                                                        id = com.davidbugayov.financeanalyzer.ui.R.string.prediction_next_month,
+                                                        id = UiR.string.prediction_next_month,
                                                         predictedExpenses.amount.toString(),
                                                     ),
                                                 style = MaterialTheme.typography.bodyMedium,
@@ -709,19 +694,19 @@ fun FinancialStatisticsScreen(
                                     val keyInvestmentTips =
                                         listOf(
                                             stringResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_bonds,
+                                                UiR.string.investment_tip_bonds,
                                             ),
                                             stringResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_diversification,
+                                                UiR.string.investment_tip_diversification,
                                             ),
                                             stringResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.string.investment_tip_stocks,
+                                                UiR.string.investment_tip_stocks,
                                             ),
                                         )
                                     Column {
                                         Text(
                                             stringResource(
-                                                com.davidbugayov.financeanalyzer.ui.R.string.investment_tips,
+                                                UiR.string.investment_tips,
                                             ),
                                         )
                                         keyInvestmentTips.forEach { tip ->

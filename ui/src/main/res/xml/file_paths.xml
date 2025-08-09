@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Для доступа к файлам в публичной директории Downloads -->
+    <external-path
+        android:name="external_files"
+        android:path="." />
+    <external-path
+        android:name="downloads"
+        android:path="Download" />
+    <external-files-path
+        android:name="external_files"
+        android:path="." />
+    <cache-path
+        android:name="cache_files"
+        android:path="." />
+    <files-path
+        android:name="app_files"
+        android:path="." />
+</paths>
+
+

@@ -1,11 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="auth_enter_pin">Введите PIN-код для входа</string>
-    <string name="auth_use_biometric">Войти с биометрией</string>
+    <!-- auth_use_biometric определён в strings.xml -->
     <string name="auth_wrong_pin">Неверный PIN-код</string>
     <string name="security_title">Безопасность</string>
     <string name="security_app_lock_title">Блокировка приложения</string>
-    <string name="security_app_lock_description">Требовать PIN-код при запуске</string>
-    <string name="security_biometric_description">Разрешить вход по биометрии (отпечаток/Face ID)</string>
+    <!-- security_app_lock_description и security_biometric_description определены в strings.xml -->
 </resources>
 

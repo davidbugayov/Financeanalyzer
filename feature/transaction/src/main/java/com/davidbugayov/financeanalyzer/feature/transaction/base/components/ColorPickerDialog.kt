@@ -34,7 +34,7 @@ fun ColorPickerDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_color)) },
+        title = { Text(stringResource(UiR.string.select_color)) },
         text = {
             Column {
                 FlowRow(

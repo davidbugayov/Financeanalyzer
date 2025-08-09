@@ -58,7 +58,7 @@ fun CustomSubcategoryDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                        dimensionResource(UiR.dimen.spacing_small),
                     ),
             ) {
                 Icon(
@@ -68,7 +68,7 @@ fun CustomSubcategoryDialog(
                     modifier = Modifier.size(24.dp),
                 )
                 Text(
-                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.dialog_new_subcategory),
+                    text = stringResource(UiR.string.dialog_new_subcategory),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -79,7 +79,7 @@ fun CustomSubcategoryDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement =
                     Arrangement.spacedBy(
-                        dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                        dimensionResource(UiR.dimen.spacing_large),
                     ),
             ) {
                 // Показываем существующие подкатегории, если они есть
@@ -87,13 +87,13 @@ fun CustomSubcategoryDialog(
                     Column(
                         verticalArrangement =
                             Arrangement.spacedBy(
-                                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                dimensionResource(UiR.dimen.spacing_small),
                             ),
                     ) {
                         Text(
                             text =
                                 stringResource(
-                                    com.davidbugayov.financeanalyzer.ui.R.string.dialog_existing_subcategories,
+                                    UiR.string.dialog_existing_subcategories,
                                 ),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -102,7 +102,7 @@ fun CustomSubcategoryDialog(
                         LazyRow(
                             horizontalArrangement =
                                 Arrangement.spacedBy(
-                                    dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                    dimensionResource(UiR.dimen.spacing_small),
                                 ),
                         ) {
                             items(existingSubcategories) { subcategory ->
@@ -114,7 +114,7 @@ fun CustomSubcategoryDialog(
                                         ),
                                     shape =
                                         RoundedCornerShape(
-                                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_card),
+                                            dimensionResource(UiR.dimen.radius_card),
                                         ),
                                 ) {
                                     Row(
@@ -122,18 +122,18 @@ fun CustomSubcategoryDialog(
                                             Modifier.padding(
                                                 horizontal =
                                                     dimensionResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.card_horizontal_padding,
+                                                        UiR.dimen.card_horizontal_padding,
                                                     ),
                                                 vertical =
                                                     dimensionResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.card_vertical_padding,
+                                                        UiR.dimen.card_vertical_padding,
                                                     ),
                                             ),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement =
                                             Arrangement.spacedBy(
                                                 dimensionResource(
-                                                    com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny,
+                                                    UiR.dimen.spacing_tiny,
                                                 ),
                                             ),
                                     ) {
@@ -143,7 +143,7 @@ fun CustomSubcategoryDialog(
                                             modifier =
                                                 Modifier.size(
                                                     dimensionResource(
-                                                        com.davidbugayov.financeanalyzer.ui.R.dimen.icon_size_small,
+                                                        UiR.dimen.icon_size_small,
                                                     ),
                                                 ),
                                             tint = subcategory.color,
@@ -176,7 +176,7 @@ fun CustomSubcategoryDialog(
                     Text(
                         text =
                             stringResource(
-                                com.davidbugayov.financeanalyzer.ui.R.string.dialog_new_subcategory_name_label,
+                                UiR.string.dialog_new_subcategory_name_label,
                             ),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -190,30 +190,30 @@ fun CustomSubcategoryDialog(
                         },
                         label = {
                             Text(
-                                stringResource(com.davidbugayov.financeanalyzer.ui.R.string.input_hint_enter_name),
+                                stringResource(UiR.string.input_hint_enter_name),
                             )
                         },
                         placeholder = {
                             Text(
-                                stringResource(com.davidbugayov.financeanalyzer.ui.R.string.input_placeholder_examples),
+                                stringResource(UiR.string.input_placeholder_examples),
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         shape =
                             RoundedCornerShape(
-                                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_12dp),
+                                dimensionResource(UiR.dimen.radius_12dp),
                             ),
                     )
 
                     if (localSubcategory.isBlank()) {
                         Text(
-                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.tip_use_short_names),
+                            text = stringResource(UiR.string.tip_use_short_names),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier =
                                 Modifier.padding(
-                                    start = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny),
+                                    start = dimensionResource(UiR.dimen.spacing_tiny),
                                 ),
                         )
                     }
@@ -228,15 +228,15 @@ fun CustomSubcategoryDialog(
                     }
                 },
                 enabled = localSubcategory.isNotBlank(),
-                shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_small)),
+                shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_small)),
             ) {
-                Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.create))
+                Text(stringResource(UiR.string.create))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_small)),
+                shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_small)),
             ) {
                 Text(
                     text = stringResource(UiR.string.cancel),

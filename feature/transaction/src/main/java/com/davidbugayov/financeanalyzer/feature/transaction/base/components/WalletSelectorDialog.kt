@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора кошельков для добавления дохода
@@ -57,7 +58,7 @@ fun WalletSelectorDialog(
                 Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-            shape = RoundedCornerShape(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.radius_xlarge)),
+            shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_xlarge)),
             colors =
                 CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -67,15 +68,15 @@ fun WalletSelectorDialog(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large)),
+                        .padding(dimensionResource(UiR.dimen.spacing_large)),
             ) {
                 Text(
-                    text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.select_wallets),
+                    text = stringResource(UiR.string.select_wallets),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier =
                         Modifier.padding(
-                            bottom = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                            bottom = dimensionResource(UiR.dimen.spacing_large),
                         ),
                 )
 
@@ -85,12 +86,12 @@ fun WalletSelectorDialog(
                             Modifier
                                 .fillMaxWidth()
                                 .height(
-                                    dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_empty_state),
+                                    dimensionResource(UiR.dimen.height_empty_state),
                                 ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.no_wallets_available),
+                            text = stringResource(UiR.string.no_wallets_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -101,7 +102,7 @@ fun WalletSelectorDialog(
                             Modifier
                                 .fillMaxWidth()
                                 .heightIn(
-                                    max = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.height_dialog),
+                                    max = dimensionResource(UiR.dimen.height_dialog),
                                 ),
                     ) {
                         items(wallets) { wallet ->
@@ -121,18 +122,18 @@ fun WalletSelectorDialog(
                         Modifier
                             .fillMaxWidth()
                             .padding(
-                                top = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                                top = dimensionResource(UiR.dimen.spacing_large),
                             ),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.cancel))
+                        Text(stringResource(UiR.string.cancel))
                     }
 
                     Spacer(
                         modifier =
                             Modifier.width(
-                                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                dimensionResource(UiR.dimen.spacing_small),
                             ),
                     )
 
@@ -140,7 +141,7 @@ fun WalletSelectorDialog(
                         onClick = onConfirm,
                         enabled = selectedWalletIds.isNotEmpty(),
                     ) {
-                        Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.done))
+                        Text(stringResource(UiR.string.done))
                     }
                 }
             }
@@ -182,7 +183,7 @@ private fun WalletItem(
             )
 
             Text(
-                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
+                text = stringResource(UiR.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

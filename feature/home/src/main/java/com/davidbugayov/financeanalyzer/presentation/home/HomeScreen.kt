@@ -76,7 +76,7 @@ private fun HomeTopBar(
     onNavigateToProfile: () -> Unit,
 ) {
     AppTopBar(
-        title = stringResource(R.string.financial_analyzer),
+        title = stringResource(UiR.string.financial_analyzer),
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
@@ -93,7 +93,7 @@ private fun HomeTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.generate_test_data),
+                        contentDescription = stringResource(UiR.string.generate_test_data),
                     )
                 }
             }
@@ -320,9 +320,9 @@ fun HomeScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-    val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
-    val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
-    stringResource(R.string.empty_transaction_id_error)
+    val testDataGeneratedMsg = stringResource(UiR.string.test_data_generated)
+    val transactionDeletedMsg = stringResource(UiR.string.transaction_deleted)
+    stringResource(UiR.string.empty_transaction_id_error)
 
     // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
@@ -497,7 +497,7 @@ fun HomeScreen(
                         .padding(paddingValues),
             ) {
                 if (state.isLoading && state.transactions.isEmpty()) {
-                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                    CenteredLoadingIndicator(message = stringResource(UiR.string.loading_data))
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),
@@ -515,10 +515,10 @@ fun HomeScreen(
                 HomeFeedback(
                     title =
                         when (feedbackType) {
-                            FeedbackType.SUCCESS -> stringResource(R.string.feedback_success)
-                            FeedbackType.ERROR -> stringResource(R.string.feedback_error)
-                            FeedbackType.WARNING -> stringResource(R.string.feedback_warning)
-                            FeedbackType.INFO -> stringResource(R.string.feedback_info)
+                            FeedbackType.SUCCESS -> stringResource(UiR.string.feedback_success)
+                            FeedbackType.ERROR -> stringResource(UiR.string.feedback_error)
+                            FeedbackType.WARNING -> stringResource(UiR.string.feedback_warning)
+                            FeedbackType.INFO -> stringResource(UiR.string.feedback_info)
                         },
                     feedbackMessage = feedbackMessage,
                     feedbackType = feedbackType,
@@ -622,7 +622,7 @@ fun HomeScreen(
 //                modifier = Modifier.padding(8.dp)
 //            ) {
 //                Column(modifier = Modifier.padding(8.dp)) {
-//                    Text(text = stringResource(R.string.smart_tips_title))
+//                    Text(text = stringResource(UiR.string.smart_tips_title))
 //                    state.smartExpenseTips.forEach { tip ->
 //                        Text(text = tip, modifier = Modifier.padding(top = 4.dp))
 //                    }
@@ -634,7 +634,7 @@ fun HomeScreen(
 //                modifier = Modifier.padding(8.dp)
 //            ) {
 //                Column(modifier = Modifier.padding(8.dp)) {
-//                    Text(text = stringResource(R.string.expense_optimization_title))
+//                    Text(text = stringResource(UiR.string.expense_optimization_title))
 //                    state.expenseOptimizationRecommendations.forEach { rec ->
 //                        Text(text = rec, modifier = Modifier.padding(top = 4.dp))
 //                    }

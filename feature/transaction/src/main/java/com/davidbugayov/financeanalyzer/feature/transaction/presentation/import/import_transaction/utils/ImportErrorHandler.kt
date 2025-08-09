@@ -31,33 +31,33 @@ class ImportErrorHandler(context: Context) {
                             originalMessage.contains("средств", ignoreCase = true)
                     ) -> {
                     Timber.d("Определен тип ошибки: файл со статистикой")
-                    appContext.getString(R.string.import_error_statistics_file)
+                    appContext.getString(UiR.string.import_error_statistics_file)
                 }
                 originalMessage.contains("unsupported", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: неподдерживаемый формат")
-                    appContext.getString(R.string.import_error_unsupported_format)
+                    appContext.getString(UiR.string.import_error_unsupported_format)
                 }
                 originalMessage.contains("format", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: неизвестный формат")
-                    appContext.getString(R.string.import_error_unknown_format)
+                    appContext.getString(UiR.string.import_error_unknown_format)
                 }
                 originalMessage.contains("read", ignoreCase = true) ||
                     originalMessage.contains("open", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: ошибка чтения файла")
-                    appContext.getString(R.string.import_error_file_read)
+                    appContext.getString(UiR.string.import_error_file_read)
                 }
                 originalMessage.contains("no transaction", ignoreCase = true) ||
                     originalMessage.contains("empty", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: нет транзакций")
-                    appContext.getString(R.string.import_error_no_transactions)
+                    appContext.getString(UiR.string.import_error_no_transactions)
                 }
                 originalMessage.contains("date", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: неверный формат даты")
-                    appContext.getString(R.string.import_error_date_format)
+                    appContext.getString(UiR.string.import_error_date_format)
                 }
                 originalMessage.contains("csv", ignoreCase = true) -> {
                     Timber.d("Определен тип ошибки: проблема с форматом CSV")
-                    appContext.getString(R.string.import_error_csv_format)
+                    appContext.getString(UiR.string.import_error_csv_format)
                 }
                 else -> {
                     Timber.d("Неизвестный тип ошибки, возвращаем общее сообщение")

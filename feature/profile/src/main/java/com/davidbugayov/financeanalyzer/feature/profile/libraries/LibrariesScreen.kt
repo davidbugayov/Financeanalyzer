@@ -43,7 +43,7 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(id = R.string.libraries_title),
+                title = stringResource(id = UiR.string.libraries_title),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
             )
@@ -58,7 +58,7 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
         ) {
             item {
                 Text(
-                    text = stringResource(R.string.libraries_description),
+                    text = stringResource(UiR.string.libraries_description),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(bottom = dimensionResource(UiR.dimen.spacing_normal)),
                 )
@@ -81,7 +81,7 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_normal)))
 
                 Text(
-                    text = stringResource(R.string.licenses_note),
+                    text = stringResource(UiR.string.licenses_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -136,7 +136,7 @@ private fun LibraryItem(
                     .background(
                         brush = Brush.horizontalGradient(gradientColors),
                     )
-                    .padding(dimensionResource(R.dimen.spacing_normal)),
+                    .padding(dimensionResource(UiR.dimen.spacing_normal)),
         ) {
             Column {
                 Text(
@@ -177,7 +177,7 @@ private fun LibraryItem(
             Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
             Text(
-                text = stringResource(R.string.license_colon, license),
+                text = stringResource(UiR.string.license_colon, license),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
             )

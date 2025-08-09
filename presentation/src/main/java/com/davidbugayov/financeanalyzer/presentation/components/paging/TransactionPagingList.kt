@@ -26,6 +26,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
 fun TransactionPagingList(
@@ -42,10 +43,10 @@ fun TransactionPagingList(
 ) {
     val lazyState = listState ?: rememberLazyListState()
 
-    val headerContentKey = stringResource(R.string.header_content)
-    val appendLoadingKey = stringResource(R.string.append_loading)
-    val fabSpacerKey = stringResource(R.string.fab_spacer)
-    val errorLoadingAdditionalData = stringResource(R.string.error_loading_additional_data)
+    val headerContentKey = stringResource(UiR.string.header_content)
+    val appendLoadingKey = stringResource(UiR.string.append_loading)
+    val fabSpacerKey = stringResource(UiR.string.fab_spacer)
+    val errorLoadingAdditionalData = stringResource(UiR.string.error_loading_additional_data)
 
     LazyColumn(modifier = Modifier.fillMaxWidth(), state = lazyState) {
         // Optional header

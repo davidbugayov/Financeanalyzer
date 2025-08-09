@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.expenseCategoryColorsMap
 import com.davidbugayov.financeanalyzer.ui.theme.incomeCategoryColorsMap
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 object CategoryProvider {
     data class CategoryMeta(
@@ -90,27 +91,27 @@ object CategoryProvider {
         key: String,
     ): String {
         return when (key) {
-            "food" -> context.getString(R.string.category_food)
-            "transport" -> context.getString(R.string.category_transport)
-            "entertainment" -> context.getString(R.string.category_entertainment)
-            "restaurant" -> context.getString(R.string.category_restaurant)
-            "health" -> context.getString(R.string.category_health)
-            "clothing" -> context.getString(R.string.category_clothing)
-            "housing" -> context.getString(R.string.category_housing)
-            "communication" -> context.getString(R.string.category_communication)
-            "pet" -> context.getString(R.string.category_pet)
-            "services" -> context.getString(R.string.category_services)
-            "charity" -> context.getString(R.string.category_charity)
-            "credit" -> context.getString(R.string.category_credit)
-            "transfer" -> context.getString(R.string.category_transfer)
-            "other_expense" -> context.getString(R.string.category_other_expense)
-            "salary" -> context.getString(R.string.category_salary)
-            "freelance" -> context.getString(R.string.category_freelance)
-            "gifts" -> context.getString(R.string.category_gifts)
-            "interest" -> context.getString(R.string.category_interest)
-            "rental" -> context.getString(R.string.category_rental)
-            "other_income" -> context.getString(R.string.category_other_income)
-            else -> context.getString(R.string.category_other)
+            "food" -> context.getString(UiR.string.category_food)
+            "transport" -> context.getString(UiR.string.category_transport)
+            "entertainment" -> context.getString(UiR.string.category_entertainment)
+            "restaurant" -> context.getString(UiR.string.category_restaurant)
+            "health" -> context.getString(UiR.string.category_health)
+            "clothing" -> context.getString(UiR.string.category_clothing)
+            "housing" -> context.getString(UiR.string.category_housing)
+            "communication" -> context.getString(UiR.string.category_communication)
+            "pet" -> context.getString(UiR.string.category_pet)
+            "services" -> context.getString(UiR.string.category_services)
+            "charity" -> context.getString(UiR.string.category_charity)
+            "credit" -> context.getString(UiR.string.category_credit)
+            "transfer" -> context.getString(UiR.string.category_transfer)
+            "other_expense" -> context.getString(UiR.string.category_other_expense)
+            "salary" -> context.getString(UiR.string.category_salary)
+            "freelance" -> context.getString(UiR.string.category_freelance)
+            "gifts" -> context.getString(UiR.string.category_gifts)
+            "interest" -> context.getString(UiR.string.category_interest)
+            "rental" -> context.getString(UiR.string.category_rental)
+            "other_income" -> context.getString(UiR.string.category_other_income)
+            else -> context.getString(UiR.string.category_other)
         }
     }
 

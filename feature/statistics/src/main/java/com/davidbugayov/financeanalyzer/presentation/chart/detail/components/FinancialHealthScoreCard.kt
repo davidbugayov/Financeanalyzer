@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.feature.statistics.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Карточка с коэффициентом финансового здоровья.
@@ -50,7 +51,7 @@ fun FinancialHealthScoreCard(
         modifier = modifier.fillMaxWidth(),
         shape =
             RoundedCornerShape(
-                dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_corner_radius),
+                dimensionResource(UiR.dimen.financial_statistics_card_corner_radius),
             ),
         colors =
             CardDefaults.cardColors(
@@ -60,7 +61,7 @@ fun FinancialHealthScoreCard(
             CardDefaults.cardElevation(
                 defaultElevation =
                     dimensionResource(
-                        com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_elevation,
+                        UiR.dimen.financial_statistics_card_elevation,
                     ),
             ),
     ) {
@@ -70,7 +71,7 @@ fun FinancialHealthScoreCard(
                     .fillMaxWidth()
                     .padding(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_card_padding,
+                            UiR.dimen.financial_statistics_card_padding,
                         ),
                     ),
         ) {
@@ -94,7 +95,7 @@ fun FinancialHealthScoreCard(
 
             Spacer(
                 Modifier.height(
-                    dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_large),
+                    dimensionResource(UiR.dimen.financial_statistics_spacer_large),
                 ),
             )
 
@@ -151,7 +152,7 @@ fun FinancialHealthScoreCard(
                 modifier =
                     Modifier.height(
                         dimensionResource(
-                            com.davidbugayov.financeanalyzer.ui.R.dimen.financial_statistics_spacer_medium,
+                            UiR.dimen.financial_statistics_spacer_medium,
                         ),
                     ),
             )

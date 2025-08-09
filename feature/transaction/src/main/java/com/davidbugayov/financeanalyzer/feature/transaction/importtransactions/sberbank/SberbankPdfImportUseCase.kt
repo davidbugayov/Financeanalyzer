@@ -13,6 +13,7 @@ import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Класс для импорта транзакций из PDF-выписок Сбербанка
@@ -21,8 +22,8 @@ class SberbankPdfImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository,
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
-    override val bankName: String = context.getString(R.string.bank_sberbank_pdf)
-    private val transactionSource: String = context.getString(R.string.transaction_source_sber)
+    override val bankName: String = context.getString(UiR.string.bank_sberbank_pdf)
+    private val transactionSource: String = context.getString(UiR.string.transaction_source_sber)
 
     /**
      * Модель для обработки многострочных транзакций
@@ -231,28 +232,28 @@ class SberbankPdfImportUseCase(
             val noteParts = mutableListOf<String>()
             if (partial.time != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_time, partial.time),
+                    context.getString(UiR.string.transaction_note_time, partial.time),
                 )
             }
             if (partial.authCode != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_auth_code, partial.authCode),
+                    context.getString(UiR.string.transaction_note_auth_code, partial.authCode),
                 )
             }
             if (partial.balance != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_balance, partial.balance),
+                    context.getString(UiR.string.transaction_note_balance, partial.balance),
                 )
             }
             if (partial.description.isNotEmpty()) {
                 noteParts.add(
                     context.getString(
-                        R.string.transaction_note_details,
+                        UiR.string.transaction_note_details,
                         partial.description.joinToString(" "),
                     ),
                 )
             }
-            val title = partial.category ?: context.getString(R.string.transaction_title_unknown)
+            val title = partial.category ?: context.getString(UiR.string.transaction_title_unknown)
 
             // Используем банковскую категорию напрямую, если она соответствует нашим категориям
             val bankCategory = partial.category ?: ""

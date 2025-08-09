@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.davidbugayov.financeanalyzer.feature.security.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -47,7 +46,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 fun PinSetupDialog(
     onDismiss: () -> Unit,
     onPinSet: (String) -> Unit,
-    title: String = stringResource(R.string.security_pin_setup_title),
+    title: String = stringResource(UiR.string.security_pin_setup_title),
     isChanging: Boolean = false,
 ) {
     var currentPin by remember { mutableStateOf("") }
@@ -56,7 +55,7 @@ fun PinSetupDialog(
     var error by remember { mutableStateOf<String?>(null) }
 
     // Pre-load string resources
-    val pinMismatchMessage = stringResource(R.string.pin_mismatch)
+    val pinMismatchMessage = stringResource(UiR.string.pin_mismatch)
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -90,9 +89,9 @@ fun PinSetupDialog(
                 Text(
                     text =
                         if (isConfirming) {
-                            stringResource(R.string.pin_confirm_new)
+                            stringResource(UiR.string.pin_confirm_new)
                         } else {
-                            stringResource(R.string.pin_enter_new)
+                            stringResource(UiR.string.pin_enter_new)
                         },
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,

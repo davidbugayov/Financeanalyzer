@@ -53,7 +53,7 @@ fun SourceSelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_sources)) },
+        title = { Text(stringResource(UiR.string.select_sources)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -71,16 +71,16 @@ fun SourceSelectionDialog(
                                     }
                             }
                             .padding(
-                                vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                                vertical = dimensionResource(UiR.dimen.spacing_small),
                             ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text =
                             if (localSelectedSources.isEmpty()) {
-                                stringResource(R.string.all_sources)
+                                stringResource(UiR.string.all_sources)
                             } else if (localSelectedSources.size == sourceNames.size) {
-                                stringResource(R.string.clear_selection)
+                                stringResource(UiR.string.clear_selection)
                             } else {
                                 stringResource(UiR.string.dialog_select_all)
                             },
@@ -111,7 +111,7 @@ fun SourceSelectionDialog(
                 Spacer(
                     modifier =
                         Modifier.height(
-                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                            dimensionResource(UiR.dimen.spacing_large),
                         ),
                 )
 
@@ -180,7 +180,7 @@ private fun SourceCheckboxItem(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_tiny))
+                .padding(vertical = dimensionResource(UiR.dimen.spacing_tiny))
                 .clip(MaterialTheme.shapes.small)
                 .background(
                     if (isSelected) {
@@ -195,7 +195,7 @@ private fun SourceCheckboxItem(
                 Modifier
                     .fillMaxWidth()
                     .clickable(onClick = { onToggle(!isSelected) })
-                    .padding(dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
+                    .padding(dimensionResource(UiR.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
@@ -214,7 +214,7 @@ private fun SourceCheckboxItem(
                 modifier =
                     Modifier
                         .weight(1f)
-                        .padding(start = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small)),
+                        .padding(start = dimensionResource(UiR.dimen.spacing_small)),
             )
         }
     }

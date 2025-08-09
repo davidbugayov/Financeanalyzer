@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,14 +53,14 @@ fun OnboardingScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(dimensionResource(R.dimen.onboarding_header_padding_horizontal)),
+                     .padding(dimensionResource(UiR.dimen.onboarding_header_padding_horizontal)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(40.dp))
 
             // Заголовок приложения
             Text(
-                text = stringResource(R.string.onboarding_welcome_title),
+                text = stringResource(UiR.string.onboarding_welcome_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -69,7 +70,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = stringResource(R.string.onboarding_welcome_subtitle),
+                text = stringResource(UiR.string.onboarding_welcome_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -94,7 +95,7 @@ fun OnboardingScreen(
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.onboarding_start_button),
+                    text = stringResource(UiR.string.onboarding_start_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -104,7 +105,7 @@ fun OnboardingScreen(
 
             // Основные возможности приложения
             Text(
-                text = stringResource(R.string.onboarding_features_title),
+                text = stringResource(UiR.string.onboarding_features_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -116,8 +117,8 @@ fun OnboardingScreen(
             // Карточки с возможностями
             FeatureCard(
                 icon = Icons.Default.AccountBalance,
-                title = stringResource(R.string.onboarding_feature_tracking_title),
-                description = stringResource(R.string.onboarding_feature_tracking_description),
+                title = stringResource(UiR.string.onboarding_feature_tracking_title),
+                description = stringResource(UiR.string.onboarding_feature_tracking_description),
                 color = MaterialTheme.colorScheme.primary,
             )
 
@@ -125,8 +126,8 @@ fun OnboardingScreen(
 
             FeatureCard(
                 icon = Icons.AutoMirrored.Filled.TrendingUp,
-                title = stringResource(R.string.onboarding_feature_analytics_title),
-                description = stringResource(R.string.onboarding_feature_analytics_description),
+                title = stringResource(UiR.string.onboarding_feature_analytics_title),
+                description = stringResource(UiR.string.onboarding_feature_analytics_description),
                 color = MaterialTheme.colorScheme.secondary,
             )
 
@@ -134,8 +135,8 @@ fun OnboardingScreen(
 
             FeatureCard(
                 icon = Icons.Default.PieChart,
-                title = stringResource(R.string.onboarding_feature_budget_title),
-                description = stringResource(R.string.onboarding_feature_budget_description),
+                title = stringResource(UiR.string.onboarding_feature_budget_title),
+                description = stringResource(UiR.string.onboarding_feature_budget_description),
                 color = MaterialTheme.colorScheme.tertiary,
             )
 
@@ -143,8 +144,8 @@ fun OnboardingScreen(
 
             FeatureCard(
                 icon = Icons.Default.Security,
-                title = stringResource(R.string.onboarding_feature_security_title),
-                description = stringResource(R.string.onboarding_feature_security_description),
+                title = stringResource(UiR.string.onboarding_feature_security_title),
+                description = stringResource(UiR.string.onboarding_feature_security_description),
                 color = MaterialTheme.colorScheme.error,
             )
 
@@ -152,8 +153,8 @@ fun OnboardingScreen(
 
             FeatureCard(
                 icon = Icons.Default.Widgets,
-                title = stringResource(R.string.onboarding_feature_widgets_title),
-                description = stringResource(R.string.onboarding_feature_widgets_description),
+                title = stringResource(UiR.string.onboarding_feature_widgets_title),
+                description = stringResource(UiR.string.onboarding_feature_widgets_description),
                 color = Color(0xFF4CAF50),
             )
 
@@ -172,7 +173,7 @@ fun OnboardingScreen(
                     modifier = Modifier.padding(20.dp),
                 ) {
                     Text(
-                        text = stringResource(R.string.onboarding_benefits_title),
+                        text = stringResource(UiR.string.onboarding_benefits_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -180,10 +181,10 @@ fun OnboardingScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    BenefitItem(stringResource(R.string.onboarding_benefit_free))
-                    BenefitItem(stringResource(R.string.onboarding_benefit_offline))
-                    BenefitItem(stringResource(R.string.onboarding_benefit_privacy))
-                    BenefitItem(stringResource(R.string.onboarding_benefit_simple))
+                    BenefitItem(stringResource(UiR.string.onboarding_benefit_free))
+                    BenefitItem(stringResource(UiR.string.onboarding_benefit_offline))
+                    BenefitItem(stringResource(UiR.string.onboarding_benefit_privacy))
+                    BenefitItem(stringResource(UiR.string.onboarding_benefit_simple))
                 }
             }
 

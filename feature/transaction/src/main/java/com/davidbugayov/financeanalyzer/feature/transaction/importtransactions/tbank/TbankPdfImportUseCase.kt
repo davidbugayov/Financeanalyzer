@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class TbankPdfImportUseCase(
     context: Context,
@@ -24,7 +25,7 @@ class TbankPdfImportUseCase(
     override val bankName: String = "Тинькофф Банк (PDF)"
     private val transactionSource: String =
         context.getString(
-            com.davidbugayov.financeanalyzer.ui.R.string.transaction_source_tinkoff,
+            UiR.string.transaction_source_tinkoff,
         )
 
     private data class PartialTransaction(

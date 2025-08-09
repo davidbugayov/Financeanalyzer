@@ -63,7 +63,7 @@ fun CustomSourceDialog(
             Timber.d("CustomSourceDialog dismissed via outside click")
             onDismiss()
         },
-        title = { Text(stringResource(R.string.add_custom_source)) },
+        title = { Text(stringResource(UiR.string.add_custom_source)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(modifier = Modifier.padding(dimensionResource(UiR.dimen.padding_small))) {

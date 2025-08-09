@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +59,7 @@ fun ParentWalletCard(
 
             Text(
                 text = "${stringResource(
-                    com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance,
+                    UiR.string.wallet_balance,
                 )}: ${wallet.balance.formatForDisplay()}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
@@ -68,7 +69,7 @@ fun ParentWalletCard(
             Text(
                 text =
                     stringResource(
-                        com.davidbugayov.financeanalyzer.ui.R.string.in_wallets,
+                        UiR.string.in_wallets,
                         totalSubWalletAmount.formatForDisplay(),
                     ),
                 style = MaterialTheme.typography.bodyMedium,
@@ -79,7 +80,7 @@ fun ParentWalletCard(
             Text(
                 text =
                     stringResource(
-                        com.davidbugayov.financeanalyzer.ui.R.string.available_colon_value,
+                        UiR.string.available_colon_value,
                         availableAmount.formatForDisplay(),
                     ),
                 style = MaterialTheme.typography.bodyMedium,
@@ -127,7 +128,7 @@ fun SubWalletCard(
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
+                        text = stringResource(UiR.string.wallet_balance) + ": " + wallet.balance.formatForDisplay(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                     )
@@ -137,14 +138,14 @@ fun SubWalletCard(
                     IconButton(onClick = onEdit) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.edit),
+                            contentDescription = stringResource(UiR.string.edit),
                             tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete),
+                            contentDescription = stringResource(UiR.string.delete),
                             tint = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -156,10 +157,10 @@ fun SubWalletCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet)) },
+            title = { Text(stringResource(UiR.string.delete_subwallet)) },
             text = {
                 Text(
-                    stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete_subwallet_confirm, wallet.name),
+                    stringResource(UiR.string.delete_subwallet_confirm, wallet.name),
                 )
             },
             confirmButton = {
@@ -170,14 +171,14 @@ fun SubWalletCard(
                     },
                 ) {
                     Text(
-                        stringResource(com.davidbugayov.financeanalyzer.ui.R.string.delete),
+                        stringResource(UiR.string.delete),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.cancel))
+                    Text(stringResource(UiR.string.cancel))
                 }
             },
         )
@@ -213,20 +214,20 @@ fun EmptySubWalletsState(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.no_subwallets),
+                text = stringResource(UiR.string.no_subwallets),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
             )
 
             Text(
-                text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.create_subwallets_hint),
+                text = stringResource(UiR.string.create_subwallets_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                 modifier =
                     Modifier.padding(
-                        horizontal = dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_large),
+                        horizontal = dimensionResource(UiR.dimen.spacing_large),
                     ),
             )
 
@@ -244,10 +245,10 @@ fun EmptySubWalletsState(
                 Spacer(
                     modifier =
                         Modifier.width(
-                            dimensionResource(com.davidbugayov.financeanalyzer.ui.R.dimen.spacing_small),
+                            dimensionResource(UiR.dimen.spacing_small),
                         ),
                 )
-                Text(stringResource(com.davidbugayov.financeanalyzer.ui.R.string.add_subwallet))
+                Text(stringResource(UiR.string.add_subwallet))
             }
         }
     }

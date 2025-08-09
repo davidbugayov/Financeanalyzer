@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Класс для импорта транзакций из PDF-выписок Ozon Банка
@@ -34,7 +35,7 @@ class OzonPdfImportUseCase(
 ) : BankImportUseCase(transactionRepository, context) {
     override val bankName: String = "Ozon Банк (PDF)"
 
-    private val transactionSource: String = context.getString(R.string.transaction_source_ozon)
+    private val transactionSource: String = context.getString(UiR.string.transaction_source_ozon)
 
     // Состояние для парсинга многострочной транзакции
     private data class TransactionState(
@@ -124,7 +125,7 @@ class OzonPdfImportUseCase(
                 Timber.w("Обнаружен файл статистики: ${e.message}")
                 emit(
                     ImportResult.Error(
-                        message = context.getString(R.string.import_error_statistics_file),
+                        message = context.getString(UiR.string.import_error_statistics_file),
                     ),
                 )
                 return@flow

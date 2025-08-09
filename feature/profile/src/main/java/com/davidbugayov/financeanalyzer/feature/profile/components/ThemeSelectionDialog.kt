@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Диалог выбора темы приложения.
@@ -37,7 +38,7 @@ fun ThemeSelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.profile_theme_select)) },
+        title = { Text(text = stringResource(UiR.string.profile_theme_select)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -47,7 +48,7 @@ fun ThemeSelectionDialog(
                         .selectableGroup(),
             ) {
                 ThemeOption(
-                    text = stringResource(R.string.profile_theme_light),
+                    text = stringResource(UiR.string.profile_theme_light),
                     selected = selectedTheme == ThemeMode.LIGHT,
                     onClick = {
                         onThemeSelected(ThemeMode.LIGHT)
@@ -55,10 +56,10 @@ fun ThemeSelectionDialog(
                     },
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
                 ThemeOption(
-                    text = stringResource(R.string.profile_theme_dark),
+                    text = stringResource(UiR.string.profile_theme_dark),
                     selected = selectedTheme == ThemeMode.DARK,
                     onClick = {
                         onThemeSelected(ThemeMode.DARK)
@@ -66,10 +67,10 @@ fun ThemeSelectionDialog(
                     },
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
 
                 ThemeOption(
-                    text = stringResource(R.string.profile_theme_system),
+                    text = stringResource(UiR.string.profile_theme_system),
                     selected = selectedTheme == ThemeMode.SYSTEM,
                     onClick = {
                         onThemeSelected(ThemeMode.SYSTEM)
@@ -80,7 +81,7 @@ fun ThemeSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.done))
+                Text(stringResource(UiR.string.done))
             }
         },
     )
@@ -107,7 +108,7 @@ private fun ThemeOption(
                     onClick = onClick,
                     role = Role.RadioButton,
                 )
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+                .padding(dimensionResource(UiR.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
@@ -115,7 +116,7 @@ private fun ThemeOption(
             onClick = null, // null, так как обработка происходит внутри Row
         )
 
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+        Spacer(modifier = Modifier.width(dimensionResource(UiR.dimen.spacing_medium)))
 
         Text(
             text = text,

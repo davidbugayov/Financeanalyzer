@@ -47,6 +47,7 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран аутентификации для входа в приложение
@@ -181,7 +182,7 @@ fun AuthScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = stringResource(R.string.auth_title),
+                    text = stringResource(UiR.string.auth_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -191,7 +192,7 @@ fun AuthScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = stringResource(R.string.auth_enter_pin),
+                    text = stringResource(UiR.string.auth_enter_pin),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -270,7 +271,7 @@ fun AuthScreen(
                             modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.auth_use_biometric))
+                        Text(stringResource(UiR.string.auth_use_biometric))
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -293,7 +294,7 @@ fun AuthScreen(
                                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_PIN,
                                         reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED,
                                     )
-                                    error = context.getString(R.string.auth_wrong_pin)
+                                    error = context.getString(UiR.string.auth_wrong_pin)
                                     pin = ""
                                 }
                             }

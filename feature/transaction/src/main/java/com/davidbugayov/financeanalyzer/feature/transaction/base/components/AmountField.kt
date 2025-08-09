@@ -265,7 +265,7 @@ fun AmountField(
                     isError = isError,
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.amount_placeholder),
+                            text = stringResource(UiR.string.amount_placeholder),
                             style =
                                 MaterialTheme.typography.headlineMedium.copy(
                                     textAlign = TextAlign.Center,

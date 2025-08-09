@@ -46,7 +46,7 @@ fun SavingsOptimizationCard(
                     .padding(dimensionResource(UiR.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = stringResource(R.string.savings_optimization),
+                text = stringResource(UiR.string.savings_optimization),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -62,14 +62,14 @@ fun SavingsOptimizationCard(
                 title = stringResource(UiR.string.savings_rate_title),
                 value =
                     stringResource(
-                        com.davidbugayov.financeanalyzer.ui.R.string.insight_financial_health_metric,
+                        UiR.string.insight_financial_health_metric,
                         metrics.savingsRate.setScale(1).toInt(),
                     ),
             )
 
             MetricRow(
-                title = stringResource(R.string.months_of_savings),
-                value = stringResource(R.string.months_format, metrics.monthsOfSavings.toInt()),
+                title = stringResource(UiR.string.months_of_savings),
+                value = stringResource(UiR.string.months_format, metrics.monthsOfSavings.toInt()),
             )
         }
     }
