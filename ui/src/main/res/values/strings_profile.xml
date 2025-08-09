@@ -18,7 +18,9 @@
     <string name="reminder_time_description">Текущее время: %1$s</string>
     <string name="notification_settings">Настройки уведомлений</string>
     <string name="edit_time">Изменить время</string>
-    <!-- варианты тем определены в strings.xml -->
+    <string name="profile_theme_light">Светлая</string>
+    <string name="profile_theme_dark">Тёмная</string>
+    <string name="profile_theme_system">Системная</string>
     <string name="permission_required_title">Требуется разрешение</string>
     <string name="request_permission">Запросить разрешение</string>
     <string name="unknown">Неизвестно</string>

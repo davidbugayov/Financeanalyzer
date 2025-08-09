@@ -8,7 +8,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -71,11 +70,7 @@ class GenericCsvImportUseCase(
         reader.reset()
         if (firstLine == null) {
             val rp: ResourceProvider = GlobalContext.get().get()
-            Timber.w(
-                "[$bankName] ${rp.getString(
-                    com.davidbugayov.financeanalyzer.feature.transaction.UiR.string.csv_file_empty,
-                )}",
-            )
+            Timber.w("[$bankName] ${rp.getString(UiR.string.csv_file_empty)}")
             return false
         }
         val columns = firstLine.split(config.delimiter)

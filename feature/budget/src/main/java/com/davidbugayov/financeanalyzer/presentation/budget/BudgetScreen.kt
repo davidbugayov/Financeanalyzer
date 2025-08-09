@@ -48,6 +48,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -846,9 +847,15 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
         }
     }
 
-    if (state.overBudgetWallets.isNotEmpty()) {
+    // показываем алерт при наличии превышений; закрываем по нажатию/дисмиссу
+    var showOverBudgetAlert by remember { mutableStateOf(false) }
+    LaunchedEffect(state.overBudgetWallets) {
+        showOverBudgetAlert = state.overBudgetWallets.isNotEmpty()
+    }
+
+    if (showOverBudgetAlert) {
         AlertDialog(
-            onDismissRequest = {},
+            onDismissRequest = { showOverBudgetAlert = false },
             title = { Text(text = stringResource(UiR.string.budget_over_limit_title)) },
             text = {
                 Text(
@@ -860,8 +867,8 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                 )
             },
             confirmButton = {
-                Button(onClick = { /* TODO: скрыть предупреждение */ }) {
-                    Text(text = stringResource(android.UiR.string.ok))
+                Button(onClick = { showOverBudgetAlert = false }) {
+                    Text(text = stringResource(android.R.string.ok))
                 }
             },
         )

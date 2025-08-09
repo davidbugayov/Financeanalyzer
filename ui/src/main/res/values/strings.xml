@@ -915,7 +915,7 @@
     <string name="app_info">Информация о приложении</string>
     <string name="app_version">Версия</string>
     <string name="build_version">Сборка</string>
-    <string name="profile_theme_dark">Темная</string>
+    <!-- profile_theme_dark moved to strings_profile.xml -->
     <string name="security_app_lock_description">Защитите свои данные PIN-кодом</string>
     <string name="security_biometric_description">Используйте отпечаток пальца или лицо</string>
     <string name="security_pin_setup_title">Установка PIN-кода</string>
