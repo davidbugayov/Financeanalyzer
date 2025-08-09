@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.csv
+package com.davidbugayov.financeanalyzer.feature.transaction.importtransactions.csv
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Currency
@@ -15,6 +15,7 @@ import java.util.Locale
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import kotlin.math.abs
 
 /**
  * Конфигурация для парсинга CSV-файлов.
@@ -307,7 +308,7 @@ class GenericCsvImportUseCase(
                         ignoreCase = true,
                     ) ?: (amountValue < 0)
                 }
-            val absAmount = kotlin.math.abs(amountValue)
+            val absAmount = abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             val money = Money(absAmount, currency)
             val category = TransactionCategoryDetector.detect(description)

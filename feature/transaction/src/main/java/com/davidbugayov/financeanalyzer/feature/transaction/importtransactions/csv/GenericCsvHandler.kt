@@ -6,6 +6,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
+import com.davidbugayov.financeanalyzer.feature.transaction.importtransactions.csv.CsvParseConfig
+import com.davidbugayov.financeanalyzer.feature.transaction.importtransactions.csv.GenericCsvImportUseCase
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import timber.log.Timber

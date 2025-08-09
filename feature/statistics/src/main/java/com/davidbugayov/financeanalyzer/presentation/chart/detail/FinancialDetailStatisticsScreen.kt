@@ -14,15 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +27,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,8 +78,7 @@ fun FinancialDetailStatisticsScreen(
     val metrics = viewModel.metrics.collectAsState().value
 
     var selectedTabIndex by remember { mutableStateOf(0) }
-    var includeTransfers by remember { mutableStateOf(false) }
-    var includeRefunds by remember { mutableStateOf(false) }
+    
 
     // Временный лог для диагностики
     Timber.d(
@@ -142,92 +136,39 @@ fun FinancialDetailStatisticsScreen(
                         .fillMaxSize()
                         .padding(dimensionResource(UiR.dimen.financial_statistics_card_padding)),
             ) {
-                // Панель фильтров
+                // Период (верхняя карточка)
                 item {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Info, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(UiR.string.overview),
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-                        Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_small)))
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors =
-                                CardDefaults.cardColors(
-                                    containerColor =
-                                        MaterialTheme.colorScheme.surfaceVariant.copy(
-                                            alpha = 0.4f,
-                                        ),
-                                ),
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
+                        shape = RoundedCornerShape(
+                            dimensionResource(UiR.dimen.financial_statistics_card_corner_radius),
+                        ),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp),
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
                                 Text(
                                     text = stringResource(UiR.string.financial_statistics_period),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
                                 Text(
                                     text = state.period,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
-                                Spacer(Modifier.height(8.dp))
-                                Row {
-                                    val chips =
-                                        listOf(
-                                            UiR.string.all_time,
-                                            UiR.string.year,
-                                            UiR.string.month,
-                                            UiR.string.week,
-                                            UiR.string.day,
-                                        )
-                                    chips.forEachIndexed { index, resId ->
-                                        AssistChip(
-                                            onClick = { /* TODO: hook to VM */ },
-                                            label = { Text(stringResource(id = resId)) },
-                                            colors =
-                                                AssistChipDefaults.assistChipColors(
-                                                    containerColor = MaterialTheme.colorScheme.surface,
-                                                ),
-                                            modifier = Modifier.padding(end = 6.dp),
-                                        )
-                                    }
-                                }
-                                Spacer(Modifier.height(8.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Checkbox(checked = includeTransfers, onCheckedChange = { includeTransfers = it })
-                                    Text(
-                                        stringResource(
-                                            id = UiR.string.include_transfers,
-                                        ),
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                    Checkbox(checked = includeRefunds, onCheckedChange = { includeRefunds = it })
-                                    Text(
-                                        stringResource(
-                                            id = UiR.string.include_refunds,
-                                        ),
-                                    )
-                                    Spacer(Modifier.weight(1f))
-                                    TextButton(
-                                        onClick = {
-                                            includeTransfers = false
-                                            includeRefunds = false
-                                        },
-                                    ) {
-                                        Text(
-                                            stringResource(
-                                                id = UiR.string.reset_filters,
-                                            ),
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
@@ -251,33 +192,6 @@ fun FinancialDetailStatisticsScreen(
                             onClick = { selectedTabIndex = 1 },
                             text = {
                                 Text(
-                                    stringResource(id = UiR.string.stat_by_merchant),
-                                )
-                            },
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 2,
-                            onClick = { selectedTabIndex = 2 },
-                            text = {
-                                Text(
-                                    stringResource(id = UiR.string.stat_by_account),
-                                )
-                            },
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 3,
-                            onClick = { selectedTabIndex = 3 },
-                            text = {
-                                Text(
-                                    stringResource(id = UiR.string.stat_calendar),
-                                )
-                            },
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 4,
-                            onClick = { selectedTabIndex = 4 },
-                            text = {
-                                Text(
                                     stringResource(id = UiR.string.stat_trends),
                                 )
                             },
@@ -289,15 +203,8 @@ fun FinancialDetailStatisticsScreen(
                 item {
                     when (selectedTabIndex) {
                         0 -> {
-                            // Категории: ключевые метрики + анализ расходов
+                            // Категории: анализ расходов
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                KeyMetricsCard(
-                                    income = state.income,
-                                    expense = state.expense,
-                                    savingsRate = metrics.savingsRate,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                                Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
                                 val expenseAnalysis =
                                     FinancialDataMapper.createExpenseAnalysis(
                                         averageDailyExpense = metrics.averageDailyExpense.format(true),
@@ -323,42 +230,6 @@ fun FinancialDetailStatisticsScreen(
                             }
                         }
                         1 -> {
-                            // Контрагенты: паттерны и инсайты
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                val spendingPatterns =
-                                    FinancialDataMapper.createSpendingPatternInsights(
-                                        mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
-                                        expenseTransactionsCount = metrics.expenseTransactionsCount,
-                                        averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat(),
-                                    )
-                                PremiumInsightsCard(
-                                    title = stringResource(UiR.string.spending_patterns),
-                                    insights = spendingPatterns,
-                                    modifier = Modifier.fillMaxWidth(),
-                                )
-                            }
-                        }
-                        2 -> {
-                            // Счета: заглушка
-                            Text(
-                                text =
-                                    stringResource(
-                                        id = UiR.string.no_data_to_display,
-                                    ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        3 -> {
-                            // Календарь: заглушка
-                            Text(
-                                text =
-                                    stringResource(
-                                        id = UiR.string.no_data_to_display,
-                                    ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        4 -> {
                             // Тренды: статистика транзакций + предсказания
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 val transactionStats =
@@ -414,70 +285,9 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
 
-                // Советы (общая секция в конце)
-                item {
-                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_large)))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                    ) {
-                        Icon(Icons.Default.ThumbUp, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(UiR.string.tips),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                    val healthRecommendations =
-                        SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
-                            savingsRate = metrics.savingsRate,
-                            monthsOfEmergencyFund = metrics.monthsOfSavings,
-                        )
-                    SmartRecommendationCard(
-                        recommendations = healthRecommendations,
-                        title = stringResource(id = UiR.string.key_recommendations),
-                        subtitle =
-                            stringResource(
-                                id = UiR.string.for_financial_health,
-                            ),
-                    )
-                }
+                // Советы убраны — фокус на KPI и трендах
 
-                // Инвестиционные советы
-                item {
-                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
-                    ) {
-                        Icon(Icons.Default.Lightbulb, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(UiR.string.investment_tips),
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                    val keyInvestmentTips =
-                        listOf(
-                            stringResource(id = UiR.string.investment_tip_bonds),
-                            stringResource(
-                                id = UiR.string.investment_tip_diversification,
-                            ),
-                            stringResource(id = UiR.string.investment_tip_stocks),
-                        )
-                    Column {
-                        Text(
-                            stringResource(id = UiR.string.investment_tips),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        keyInvestmentTips.forEach { tip -> Text(tip) }
-                    }
-                    Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_large)))
-                }
+                // Инвестиционные советы убраны как вторичные
             }
         }
     }

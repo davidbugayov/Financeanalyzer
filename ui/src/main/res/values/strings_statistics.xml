@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <!-- custom_period дублируется в ui/values/strings.xml и удалён здесь -->
-    <string name="detailed_financial_statistics">Детальная финансовая статистика</string>
+    <string name="detailed_financial_statistics">Финансовая статистика</string>
     <string name="overview">Обзор</string>
     <string name="financial_statistics_period">Период финансовой статистики</string>
     <string name="expense_analysis">Анализ расходов</string>
@@ -54,5 +54,6 @@
     <!-- financial_health_tips_content и financial_health_recommended_values_content вынесены в strings.xml -->
     <string name="financial_health_recommended_values_title">Рекомендуемые значения</string>
     <string name="financial_health_tooltip_description">Нажмите для получения подробной информации о показателе и рекомендаций по улучшению</string>
+    <string name="prediction_subtitle">На основе ваших недавних операций и трендов</string>
 </resources>
 

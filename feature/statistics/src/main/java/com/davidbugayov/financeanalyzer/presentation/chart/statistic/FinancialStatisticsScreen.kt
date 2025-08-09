@@ -1,6 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic
-
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,7 +50,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
@@ -70,6 +67,7 @@ import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
+import com.davidbugayov.financeanalyzer.ui.components.tips.InvestmentTipsCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -98,6 +96,7 @@ fun FinancialStatisticsScreen(
     startDate: Date? = null,
     endDate: Date? = null,
     onAddTransaction: () -> Unit,
+    onNavigateToBudget: () -> Unit = {},
     onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null,
 ) {
     // Используем новую ViewModel
@@ -111,16 +110,8 @@ fun FinancialStatisticsScreen(
     val pagerState = rememberPagerState(pageCount = { 3 }, initialPage = 0)
     var lineChartDisplayMode by remember { mutableStateOf(LineChartDisplayMode.BOTH) }
 
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", Context.MODE_PRIVATE) }
-    var showTip by remember { mutableStateOf(prefs.getBoolean("show_statistics_tip", true)) }
-
-    // Показываем типс только один раз автоматически
-    LaunchedEffect(Unit) {
-        if (showTip) {
-            prefs.edit { putBoolean("show_statistics_tip", false) }
-        }
-    }
+    // Кнопка-лампочка раскрывает/скрывает рекомендации
+    var showRecommendations by remember { mutableStateOf(false) }
 
     // Получаем персонализированные советы на основе данных пользователя
     val personalizedTips =
@@ -198,7 +189,7 @@ fun FinancialStatisticsScreen(
                     }
                 }
                 is EnhancedFinanceChartEffect.NavigateToAddTransaction -> {
-                    // onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                    onAddTransaction()
                 }
             }
         }
@@ -225,18 +216,12 @@ fun FinancialStatisticsScreen(
                     onNavigateBack()
                 },
                 actions = {
-                    if (!showTip) {
-                        IconButton(
-                            onClick = {
-                                showTip = true
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Lightbulb,
-                                contentDescription = stringResource(UiR.string.show_tip),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
+                    IconButton(onClick = { showRecommendations = !showRecommendations }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Lightbulb,
+                            contentDescription = stringResource(UiR.string.show_tip),
+                            tint = if (showRecommendations) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 },
             )
@@ -270,25 +255,37 @@ fun FinancialStatisticsScreen(
                             .verticalScroll(scrollState),
                 ) {
                     if (personalizedTips.isNotEmpty()) {
-                        RecommendationsPanel(
-                            tips = personalizedTips,
-                            onActionClick = { tip ->
-                                when (tip.actionResId) {
-                                    UiR.string.action_add_transaction -> onAddTransaction()
-                                    UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
-                                }
-                            },
-                        )
-                        Spacer(Modifier.height(16.dp))
+                        androidx.compose.animation.AnimatedVisibility(visible = showRecommendations) {
+                            Column {
+                                RecommendationsPanel(
+                                    tips = personalizedTips,
+                                    onActionClick = { tip ->
+                                        when (tip.actionResId) {
+                                            UiR.string.action_add_transaction -> onAddTransaction()
+                                            UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                                            UiR.string.action_start_saving, UiR.string.action_review_budget, UiR.string.action_continue_saving, UiR.string.action_create_plan -> onNavigateToBudget()
+                                            UiR.string.action_study_statistics -> {
+                                                coroutineScope.launch { pagerState.scrollToPage(1) }
+                                            }
+                                            UiR.string.action_analyze_spending -> {
+                                                coroutineScope.launch { pagerState.scrollToPage(0) }
+                                                viewModel.handleIntent(
+                                                    EnhancedFinanceChartIntent.ToggleExpenseView(true),
+                                                )
+                                            }
+                                        }
+                                    },
+                                )
+                                Spacer(Modifier.height(16.dp))
+                            }
+                        }
                     }
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
                         Card(
                             onClick = {
-                                viewModel.handleIntent(
-                                    EnhancedFinanceChartIntent.AddTransactionClicked,
-                                )
+                                onAddTransaction()
                             },
                             shape = MaterialTheme.shapes.large,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -302,10 +299,7 @@ fun FinancialStatisticsScreen(
                                                 UiR.dimen.finance_chart_screen_padding,
                                             ),
                                         vertical = 16.dp,
-                                    )
-                                    .clickable {
-                                        onAddTransaction()
-                                    },
+                                    ),
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -621,26 +615,17 @@ fun FinancialStatisticsScreen(
 
                                     // Удаляем отдельные блоки советов, оставляем один
                                     // Дополнительные персонализированные советы (если есть)
-                                    if (personalizedTips.size > 1) {
+                                    if (personalizedTips.size > 1 && showRecommendations) {
                                         EnhancedTipCard(
-                                            tips = personalizedTips.drop(1).take(2), // Только 2 доп.совета
-                                            onDismiss = { /* Не показываем кнопку закрытия для дополнительных советов */ },
+                                            tips = personalizedTips.drop(1).take(2),
+                                            onDismiss = {},
                                             onActionClick = { tip ->
                                                 when (tip.actionResId) {
                                                     UiR.string.action_add_transaction -> onAddTransaction()
-                                                    UiR.string.action_start_saving, UiR.string.action_continue_saving -> {
-                                                        // TODO: Навигация к разделу сбережений
-                                                    }
-                                                    UiR.string.action_study_statistics, UiR.string.action_analyze_spending -> {
-                                                        // Фокус на графиках
-                                                    }
-                                                    UiR.string.action_view_categories -> {
-                                                        onNavigateToTransactions?.invoke(
-                                                            "",
-                                                            state.startDate,
-                                                            state.endDate,
-                                                        )
-                                                    }
+                                                    UiR.string.action_start_saving, UiR.string.action_continue_saving -> onNavigateToBudget()
+                                                    UiR.string.action_study_statistics -> coroutineScope.launch { pagerState.scrollToPage(1) }
+                                                    UiR.string.action_analyze_spending -> coroutineScope.launch { pagerState.scrollToPage(0) }
+                                                    UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
                                                 }
                                             },
                                         )
@@ -659,60 +644,56 @@ fun FinancialStatisticsScreen(
                                         modifier =
                                             Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp),
-                                        colors =
-                                            CardDefaults.cardColors(
-                                                containerColor =
-                                                    MaterialTheme.colorScheme.surfaceVariant.copy(
-                                                        alpha = 0.4f,
-                                                    ),
-                                            ),
+                                                .padding(12.dp),
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
+                                        ),
                                     ) {
-                                        Column(modifier = Modifier.padding(16.dp)) {
-                                            Text(
-                                                text =
-                                                    stringResource(
-                                                        id = UiR.string.prediction_title,
-                                                    ),
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                            )
+                                        Column(modifier = Modifier.padding(12.dp)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Analytics,
+                                                    contentDescription = null,
+                                                    tint = MaterialTheme.colorScheme.primary,
+                                                )
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = stringResource(id = UiR.string.prediction_title),
+                                                        style = MaterialTheme.typography.titleMedium,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                    )
+                                                    Text(
+                                                        text = stringResource(id = UiR.string.prediction_subtitle),
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                                    )
+                                                }
+                                            }
+
                                             Spacer(Modifier.height(6.dp))
+
+                                            // Форматируем сумму с валютой
+                                            val currency = stringResource(id = UiR.string.settings_currency_current_value)
+                                            val formatted = java.text.NumberFormat.getNumberInstance(java.util.Locale("ru","RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
+
                                             Text(
-                                                text =
-                                                    stringResource(
-                                                        id = UiR.string.prediction_next_month,
-                                                        predictedExpenses.amount.toString(),
-                                                    ),
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                text = stringResource(id = UiR.string.prediction_next_month, formatted),
+                                                style = MaterialTheme.typography.titleSmall,
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             )
                                         }
                                     }
 
-                                    // Ключевые инвестиционные советы без дублей
-                                    val keyInvestmentTips =
-                                        listOf(
-                                            stringResource(
-                                                UiR.string.investment_tip_bonds,
-                                            ),
-                                            stringResource(
-                                                UiR.string.investment_tip_diversification,
-                                            ),
-                                            stringResource(
-                                                UiR.string.investment_tip_stocks,
-                                            ),
-                                        )
-                                    Column {
-                                        Text(
-                                            stringResource(
-                                                UiR.string.investment_tips,
-                                            ),
-                                        )
-                                        keyInvestmentTips.forEach { tip ->
-                                            Text(tip)
-                                        }
-                                    }
+                                    // Инвестиционные советы в виде структурированной карточки
+                                    InvestmentTipsCard(
+                                        tipsRes = listOf(
+                                            UiR.string.investment_tip_bonds,
+                                            UiR.string.investment_tip_diversification,
+                                            UiR.string.investment_tip_stocks,
+                                        ),
+                                    )
                                 }
                             }
                         }

@@ -119,6 +119,18 @@ fun AppNavHostImpl(
                             NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)),
                         )
                     },
+                    onNavigateToBudget = {
+                        navigationManager.navigate(
+                            NavigationManager.Command.Navigate(Screen.Budget.route),
+                        )
+                    },
+                    onNavigateToTransactions = { _, _, _ ->
+                        // Пока история не принимает параметры периода/категории через роут,
+                        // просто открываем экран истории транзакций
+                        navigationManager.navigate(
+                            NavigationManager.Command.Navigate(Screen.History.route),
+                        )
+                    },
                 )
             }
         },
