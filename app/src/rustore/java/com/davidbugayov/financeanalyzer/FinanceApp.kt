@@ -12,6 +12,7 @@ import com.google.firebase.ktx.Firebase
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 
 /**
  * Основной класс приложения для RuStore flavor
@@ -31,6 +32,8 @@ class FinanceApp : BaseFinanceApp() {
     override fun initFlavor() {
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()
+        // Проверяем наличие обновлений в RuStore (с внутренним троттлингом)
+        RuStoreUtils.checkForUpdates(this)
     }
 
     /**

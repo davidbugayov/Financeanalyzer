@@ -74,6 +74,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -152,6 +153,28 @@ fun FinancialStatisticsScreen(
             )
         } else {
             viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData)
+        }
+    }
+    // Отложенный запрос оценки через 2 сек, отменяется при уходе со страницы (в других флейворах no-op)
+    val ctx = LocalContext.current
+    LaunchedEffect(Unit) {
+        val activity = (ctx as? android.app.Activity)
+        if (activity != null) {
+            delay(2000)
+            if (!activity.isFinishing) {
+                try {
+                    com.davidbugayov.financeanalyzer.utils.RuStoreUtils.requestReview(activity)
+                    com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logEvent(
+                        com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Events.USER_RATING,
+                        android.os.Bundle().apply {
+                            putString(com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Params.SOURCE, "rustore")
+                            putString("request_location", "statistics_screen")
+                        },
+                    )
+                } catch (e: Exception) {
+                    timber.log.Timber.e(e, "Ошибка при запросе оценки на статистике")
+                }
+            }
         }
     }
 

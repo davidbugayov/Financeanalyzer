@@ -194,7 +194,7 @@ android {
         }
         debug {
             isDebuggable = true
-            // applicationIdSuffix removed to keep same package for AGConnect compatibility
+            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
             resValue("string", "app_name", "Finanalyzer Debug")
@@ -320,6 +320,16 @@ android {
     }
 
     buildToolsVersion = "36.0.0"
+}
+
+// Для AGConnect: у Huawei debug должен быть тот же applicationId, что и у release
+androidComponents {
+    onVariants(
+        selector().withBuildType("debug").withFlavor("store" to "huawei"),
+    ) { variant ->
+        // Принудительно задаём applicationId без суффикса для Huawei Debug
+        variant.applicationId.set("com.davidbugayov.financeanalyzer")
+    }
 }
 
 dependencies {

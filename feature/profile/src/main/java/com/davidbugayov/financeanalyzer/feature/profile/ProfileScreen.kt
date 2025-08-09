@@ -67,6 +67,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
 import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -135,12 +136,11 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         )
         AnalyticsUtils.setUserProperty("savings_rate", state.savingsRate.toString())
 
-        // Запрашиваем оценку приложения в RuStore, если это rustore flavor
-        try {
-            (context as? Activity)?.let { activity ->
+        // Запрос оценки через 2 сек, если экран не закрыт (в других флейворах вызов no-op)
+        (context as? Activity)?.let { activity ->
+            delay(2000)
+            try {
                 RuStoreUtils.requestReview(activity)
-
-                // Логируем запрос на оценку
                 AnalyticsUtils.logEvent(
                     AnalyticsConstants.Events.USER_RATING,
                     android.os.Bundle().apply {
@@ -148,10 +148,10 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         putString("request_location", "profile_screen")
                     },
                 )
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при запросе оценки в RuStore")
+                CrashLoggerProvider.crashLogger.logException(e)
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при запросе оценки в RuStore")
-            CrashLoggerProvider.crashLogger.logException(e)
         }
 
         // Завершаем отслеживание загрузки экрана
