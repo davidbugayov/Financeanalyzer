@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core"))
     implementation(project(":utils"))
+    implementation(project(":ui"))
 
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)
