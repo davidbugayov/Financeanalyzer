@@ -122,34 +122,7 @@ android {
                 // Путь к стандартному debug.keystore
                 val debugKeystore = File(System.getenv("HOME") + "/.android/debug.keystore")
 
-                // Если файл отсутствует на CI-агенте, создаём его динамически
-                if (!debugKeystore.exists()) {
-                    debugKeystore.parentFile.mkdirs()
-                    println("[CI] Generating debug.keystore at ${debugKeystore.absolutePath}")
-                    project.exec {
-                        commandLine(
-                            "keytool",
-                            "-genkeypair",
-                            "-v",
-                            "-keystore",
-                            debugKeystore.absolutePath,
-                            "-storepass",
-                            "android",
-                            "-alias",
-                            "androiddebugkey",
-                            "-keypass",
-                            "android",
-                            "-dname",
-                            "CN=Android Debug,O=Android,C=US",
-                            "-keyalg",
-                            "RSA",
-                            "-keysize",
-                            "2048",
-                            "-validity",
-                            "10000",
-                        )
-                    }
-                }
+                // Генерация перенесена в задачу generateCiDebugKeystore (см. ниже)
 
                 storeFile = debugKeystore
                 storePassword = "android"
@@ -279,8 +252,8 @@ android {
         xmlReport = true
         xmlOutput = layout.buildDirectory.file("reports/lint/lint-report.xml").get().asFile
 
-        // Настройка игнорирования проблем в сгенерированном коде
-        ignore.addAll(
+        // Отключаем ряд проверок (ранее было ignore)
+        disable.addAll(
             listOf(
                 "Instantiatable", // Игнорируем проблемы с инстанцированием классов
                 "StringFormatMatches", // Игнорируем проблемы с форматированием строк
@@ -320,6 +293,43 @@ android {
     }
 
     buildToolsVersion = "36.0.0"
+}
+
+// Задача генерации debug.keystore на CI без устаревших API
+val generateCiDebugKeystore by tasks.registering(Exec::class) {
+    val isCi = System.getenv("CI") != null
+    if (isCi) {
+        val debugKeystore = File(System.getenv("HOME") + "/.android/debug.keystore")
+        debugKeystore.parentFile.mkdirs()
+        commandLine(
+            "keytool",
+            "-genkeypair",
+            "-v",
+            "-keystore",
+            debugKeystore.absolutePath,
+            "-storepass",
+            "android",
+            "-alias",
+            "androiddebugkey",
+            "-keypass",
+            "android",
+            "-dname",
+            "CN=Android Debug,O=Android,C=US",
+            "-keyalg",
+            "RSA",
+            "-keysize",
+            "2048",
+            "-validity",
+            "10000",
+        )
+        // Генерируем только если файла ещё нет
+        onlyIf { !debugKeystore.exists() }
+    }
+}
+
+// Обеспечиваем генерацию до сборки
+tasks.matching { it.name.startsWith("preBuild") }.configureEach {
+    dependsOn(generateCiDebugKeystore)
 }
 
 // Для AGConnect: у Huawei debug должен быть тот же applicationId, что и у release
@@ -664,15 +674,50 @@ tasks.register<Copy>("prepareGooglePlayRelease") {
     }
 }
 
+// Добавляем задачу для создания релиза для Huawei AppGallery
+tasks.register<Copy>("prepareHuaweiRelease") {
+    dependsOn("bundleHuaweiRelease")
+
+    // Путь к сгенерированному AAB файлу для Huawei
+    val aabFile = layout.buildDirectory.file("outputs/bundle/huaweiRelease/app-huawei-release.aab")
+
+    // Директория для Huawei релизов
+    val huaweiDir = layout.buildDirectory.dir("outputs/huawei")
+
+    // Копируем AAB файл в директорию Huawei с добавлением версии
+    from(aabFile) {
+        rename {
+            "financeanalyzer-huawei-v${android.defaultConfig.versionName}${
+                android.productFlavors.getByName(
+                    "huawei",
+                ).versionNameSuffix
+            }.aab"
+        }
+    }
+
+    into(huaweiDir)
+
+    doLast {
+        println("==========================================")
+        println("Huawei Release подготовлен:")
+        println(
+            "Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName("huawei").versionNameSuffix} (${android.defaultConfig.versionCode})",
+        )
+        println("Расположение: ${huaweiDir.get()}")
+        println("Примечание: при необходимости переименуйте .aab/.apk для загрузки в AGConnect")
+        println("==========================================")
+    }
+}
+
 // Добавляем задачу для создания всех релизов одновременно
 tasks.register("prepareAllReleases") {
-    dependsOn("prepareGooglePlayRelease", "prepareRuStoreRelease", "prepareFDroidRelease")
+    dependsOn("prepareGooglePlayRelease", "prepareRuStoreRelease", "prepareFDroidRelease", "prepareHuaweiRelease")
 
     doLast {
         println("==========================================")
         println("Все релизы подготовлены!")
         println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
-        println("Для Huawei: переименуйте APK в .app")
+        println("Для Huawei: доступен AAB в outputs/huawei")
         println("==========================================")
     }
 }
