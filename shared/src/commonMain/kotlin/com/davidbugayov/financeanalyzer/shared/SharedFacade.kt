@@ -5,6 +5,8 @@ import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateCategoryStatsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.GetCategoriesWithAmountUseCase
 import kotlinx.datetime.LocalDate
 
 /**
@@ -12,6 +14,8 @@ import kotlinx.datetime.LocalDate
  */
 class SharedFacade {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
+    private val calculateCategoryStats = CalculateCategoryStatsUseCase()
+    private val getCategoriesWithAmount = GetCategoriesWithAmountUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -25,6 +29,12 @@ class SharedFacade {
         val currency = Currency.fromCode(currencyCode)
         return calculateBalanceMetrics(transactions, currency, start, end)
     }
+
+    fun calculateCategoryStats(transactions: List<Transaction>): Triple<List<com.davidbugayov.financeanalyzer.shared.model.CategoryStats>, Money, Money> =
+        calculateCategoryStats(transactions)
+
+    fun getCategoriesWithAmount(transactions: List<Transaction>, isExpense: Boolean): List<com.davidbugayov.financeanalyzer.shared.model.CategoryWithAmount> =
+        getCategoriesWithAmount(transactions, isExpense)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
