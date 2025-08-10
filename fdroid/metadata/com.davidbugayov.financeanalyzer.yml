@@ -92,5 +92,20 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.23.0.fd
-CurrentVersionCode: 45 
+CurrentVersion: 2.26.0.fd
+CurrentVersionCode: 49
+
+  - versionName: 2.26.0.fd
+    versionCode: 49
+    commit: v2.26
+    subdir: app
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
+    changelog: |
+      • Новое: Отзыв RuStore через 2 сек. на Профиле/Статистике, без вызова при выходе
+      • Улучшено: Экран финансовой статистики — карточка периода сверху, меньше отступы
+      • Улучшено: Рекомендации — понятнее тексты, символ ₽, выделение прогнозов
+      • Рефакторинг: Все values перенесены в модуль ui, устранены дубликаты
+      • Исправлено: Навигация на добавление транзакции и ссылки на ресурсы

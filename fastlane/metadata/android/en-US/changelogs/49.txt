@@ -1,0 +1,7 @@
+• New: RuStore in-app review triggered on Profile/Statistics after 2s with safe cancel on exit
+• New: Release preparation tasks for F-Droid, Huawei, RuStore
+• Improved: Financial Statistics UI — compact Period card on top, reduced paddings
+• Improved: Recommendations design (clearer tips, currency symbol, highlighted predictions)
+• Refactor: Consolidated strings/dimens/colors/xml into ui module; fixed duplicates
+• Fixed: Navigation to Add Transaction; various unresolved resource references
+
