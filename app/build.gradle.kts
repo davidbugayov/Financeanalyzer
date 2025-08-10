@@ -298,33 +298,33 @@ android {
 // Задача генерации debug.keystore на CI без устаревших API
 val generateCiDebugKeystore by tasks.registering(Exec::class) {
     val isCi = System.getenv("CI") != null
-    if (isCi) {
-        val debugKeystore = File(System.getenv("HOME") + "/.android/debug.keystore")
-        debugKeystore.parentFile.mkdirs()
-        commandLine(
-            "keytool",
-            "-genkeypair",
-            "-v",
-            "-keystore",
-            debugKeystore.absolutePath,
-            "-storepass",
-            "android",
-            "-alias",
-            "androiddebugkey",
-            "-keypass",
-            "android",
-            "-dname",
-            "CN=Android Debug,O=Android,C=US",
-            "-keyalg",
-            "RSA",
-            "-keysize",
-            "2048",
-            "-validity",
-            "10000",
-        )
-        // Генерируем только если файла ещё нет
-        onlyIf { !debugKeystore.exists() }
-    }
+    enabled = isCi
+    val homeDir = System.getenv("HOME") ?: System.getProperty("user.home")
+    val debugKeystore = File("$homeDir/.android/debug.keystore")
+    // Запускаем только на CI и только если файла нет
+    onlyIf { isCi && !debugKeystore.exists() }
+    debugKeystore.parentFile.mkdirs()
+    commandLine(
+        "keytool",
+        "-genkeypair",
+        "-v",
+        "-keystore",
+        debugKeystore.absolutePath,
+        "-storepass",
+        "android",
+        "-alias",
+        "androiddebugkey",
+        "-keypass",
+        "android",
+        "-dname",
+        "CN=Android Debug,O=Android,C=US",
+        "-keyalg",
+        "RSA",
+        "-keysize",
+        "2048",
+        "-validity",
+        "10000",
+    )
 }
 
 // Обеспечиваем генерацию до сборки

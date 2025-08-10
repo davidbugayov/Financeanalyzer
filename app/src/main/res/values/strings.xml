@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="store_short_description">Track expenses, plan budgets, analyze finances — all offline and private.</string>
+    <string name="store_full_description">Money Under Control helps you manage personal finances: add transactions in seconds, categorize spending, plan budgets, and see clear analytics. Works offline, stores data only on your device, supports imports from banks and CSV, and offers helpful insights to improve your financial habits.</string>
+    <string name="description">Personal finance manager: track expenses and income, plan budgets, analyze spending, all offline and private.</string>
+</resources>
+

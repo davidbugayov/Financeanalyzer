@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="error_network_connection">Network connection error</string>
+    <string name="error_data_not_found">Data not found</string>
+    <string name="error_file_read">File read error</string>
+    <string name="error_unknown">Unknown error</string>
+</resources>
