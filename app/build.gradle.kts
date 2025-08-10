@@ -489,6 +489,7 @@ dependencies {
     // Presentation
     implementation(project(":presentation"))
     implementation(project(":feature:transaction"))
+    implementation(project(":shared"))
 
     // Lifecycle Process для отслеживания жизненного цикла приложения
     implementation(libs.androidx.lifecycle.process)

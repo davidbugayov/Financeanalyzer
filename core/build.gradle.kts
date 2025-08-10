@@ -48,9 +48,8 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
-    }
+    // composeOptions deprecated with K2; using composeCompiler plugin at root/app
+    // Removed explicit kotlinCompilerExtensionVersion to fix script compilation
 }
 
 dependencies {

@@ -59,6 +59,7 @@ include(":core")
 include(":navigation")
 include(":utils")
 include(":ui")
+include(":shared")
 
 // Feature modules
 include(":feature")

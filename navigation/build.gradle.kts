@@ -48,9 +48,7 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
-    }
+    // composeOptions removed; using composeCompiler plugin configuration
 
     // Исключаем тестовые классы из релизной сборки
     packaging {

@@ -7,6 +7,7 @@ javaVersion = "17"
 # Plugins
 androidGradlePlugin = "8.12.0"
 kotlin = "2.2.0"
+kotlin-multiplatform = "2.2.0"
 googleServices = "4.4.3"
 coroutines = "1.10.2"
 agconnectPlugin = "1.5.2.300"
@@ -73,6 +74,7 @@ kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coro
 kotlin-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 # AndroidX
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
@@ -172,6 +174,8 @@ firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "fireb
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin-multiplatform" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [bundles]
 # ... existing bundles ...

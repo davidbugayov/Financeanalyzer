@@ -48,10 +48,7 @@ android {
         compose = true
     }
 
-    @Suppress("UnstableApiUsage")
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
-    }
+    // composeOptions removed; using composeCompiler plugin
 }
 
 dependencies {

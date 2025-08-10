@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.Locale
 
 /**
  * Менеджер для работы с SharedPreferences.
@@ -211,13 +212,27 @@ class PreferencesManager(context: Context) {
      * Внутренний метод для первоначальной загрузки валюты
      */
     private fun getCurrencyInternal(): Currency {
+        // Если пользователь ещё не выбирал валюту, берём дефолт из текущей локали
+        if (!sharedPreferences.contains(KEY_CURRENCY)) {
+            return defaultCurrencyByLocale()
+        }
         val currencyName = sharedPreferences.getString(KEY_CURRENCY, Currency.RUB.name)
-        val currency =
-            try {
-                Currency.valueOf(currencyName ?: Currency.RUB.name)
-            } catch (_: Exception) {
-                Currency.RUB
-            }
-        return currency
+        return try {
+            Currency.valueOf(currencyName ?: Currency.RUB.name)
+        } catch (_: Exception) {
+            Currency.RUB
+        }
+    }
+
+    /**
+     * Определяет валюту по умолчанию на основе системной локали.
+     * zh -> CNY, en -> USD, иначе RUB.
+     */
+    private fun defaultCurrencyByLocale(): Currency {
+        return when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
+            "zh" -> Currency.CNY
+            "en" -> Currency.USD
+            else -> Currency.RUB
+        }
     }
 }
