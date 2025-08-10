@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Реализация репозитория для работы с кошельками
@@ -90,7 +91,7 @@ class WalletRepositoryImpl(
             // Для расходных транзакций или если транзакция не найдена, возвращаем пустой список
             return emptyList()
         } catch (e: Exception) {
-            Timber.e(e, resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_error_getting_wallets, transactionId))
+            Timber.e(e, resourceProvider.getString(UiR.string.log_error_getting_wallets, transactionId))
             return emptyList()
         }
     }
@@ -98,7 +99,7 @@ class WalletRepositoryImpl(
     // Вспомогательный метод для получения транзакции из репозитория транзакций
     private suspend fun getTransactionForWallets(transactionId: String): Transaction? {
         if (transactionRepository == null) {
-            Timber.d(resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_transaction_repository_not_set))
+            Timber.d(resourceProvider.getString(UiR.string.log_transaction_repository_not_set))
             return null
         }
 
@@ -106,7 +107,7 @@ class WalletRepositoryImpl(
             // В реальной реализации здесь используем репозиторий для получения транзакции
             return transactionRepository.getTransactionById(transactionId)
         } catch (e: Exception) {
-            Timber.e(e, resourceProvider.getString(com.davidbugayov.financeanalyzer.data.R.string.log_error_getting_transaction, transactionId))
+            Timber.e(e, resourceProvider.getString(UiR.string.log_error_getting_transaction, transactionId))
             return null
         }
     }

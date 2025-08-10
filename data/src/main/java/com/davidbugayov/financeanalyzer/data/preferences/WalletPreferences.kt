@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import org.koin.core.context.GlobalContext
 
 /**
@@ -81,7 +82,7 @@ class WalletPreferences private constructor(context: Context) {
                     saveWallets(migratedWallets)
                     Timber.i(
                         resourceProvider.getString(
-                            com.davidbugayov.financeanalyzer.data.R.string.log_wallet_migration_completed,
+                            UiR.string.log_wallet_migration_completed,
                             wallets.size - migratedWallets.count { it.type != null },
                         ),
                     )

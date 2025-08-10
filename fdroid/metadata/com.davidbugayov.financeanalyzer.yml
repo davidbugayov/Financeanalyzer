@@ -89,12 +89,6 @@ Builds:
       • Обновление: Повышен versionCode и versionName для релиза
       • F-Droid: Подготовлена чистая сборка без проприетарных зависимостей
       • Улучшено: Мелкие улучшения стабильности и кода
-
-AutoUpdateMode: Version
-UpdateCheckMode: Tags
-CurrentVersion: 2.26.0.fd
-CurrentVersionCode: 49
-
   - versionName: 2.26.0.fd
     versionCode: 49
     commit: v2.26
@@ -109,3 +103,8 @@ CurrentVersionCode: 49
       • Улучшено: Рекомендации — понятнее тексты, символ ₽, выделение прогнозов
       • Рефакторинг: Все values перенесены в модуль ui, устранены дубликаты
       • Исправлено: Навигация на добавление транзакции и ссылки на ресурсы
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 2.26.0.fd
+CurrentVersionCode: 49
