@@ -7,6 +7,10 @@ import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetCategoriesWithAmountUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseDisciplineIndexUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculatePeerComparisonUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
 import kotlinx.datetime.LocalDate
 
 /**
@@ -16,6 +20,10 @@ class SharedFacade {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
     private val calculateCategoryStats = CalculateCategoryStatsUseCase()
     private val getCategoriesWithAmount = GetCategoriesWithAmountUseCase()
+    private val calculateExpenseDisciplineIndex = CalculateExpenseDisciplineIndexUseCase()
+    private val calculatePeerComparison = CalculatePeerComparisonUseCase()
+    private val predictFutureExpenses = PredictFutureExpensesUseCase()
+    private val calculateRetirementForecast = CalculateRetirementForecastUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -35,6 +43,24 @@ class SharedFacade {
 
     fun getCategoriesWithAmount(transactions: List<Transaction>, isExpense: Boolean): List<com.davidbugayov.financeanalyzer.shared.model.CategoryWithAmount> =
         getCategoriesWithAmount(transactions, isExpense)
+
+    fun expenseDisciplineIndex(transactions: List<Transaction>, periodMonths: Int = 6): Double =
+        calculateExpenseDisciplineIndex(transactions, periodMonths)
+
+    fun peerComparison(transactions: List<Transaction>, healthScore: Double): com.davidbugayov.financeanalyzer.shared.model.PeerComparison =
+        calculatePeerComparison(transactions, healthScore)
+
+    fun predictExpenses(transactions: List<Transaction>, months: Int = 1): Money =
+        predictFutureExpenses(transactions, months)
+
+    fun retirementForecast(
+        transactions: List<Transaction>,
+        currentAge: Int = 30,
+        retirementAge: Int = 65,
+        currentSavings: Money = Money.zero(),
+        desiredMonthlyPension: Money? = null,
+    ): com.davidbugayov.financeanalyzer.shared.model.RetirementForecast =
+        calculateRetirementForecast(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
