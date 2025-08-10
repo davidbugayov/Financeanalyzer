@@ -15,7 +15,7 @@ import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -58,10 +57,17 @@ class ProfileViewModel(
 
         loadFinancialAnalytics()
 
+        val langLabel = when (preferencesManager.getAppLanguage()) {
+            "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
+            "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
+            else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
+        }
+
         _state.update {
             it.copy(
                 themeMode = preferencesManager.getThemeMode(),
                 selectedCurrency = preferencesManager.getCurrency(),
+                selectedLanguage = langLabel,
             )
         }
         preferencesManager.themeModeFlow
@@ -121,6 +127,12 @@ class ProfileViewModel(
             is ProfileEvent.HideThemeDialog -> {
                 _state.update { it.copy(isEditingTheme = false) }
             }
+            is ProfileEvent.ShowLanguageDialog -> {
+                _state.update { it.copy(showLanguageDialog = true) }
+            }
+            is ProfileEvent.HideLanguageDialog -> {
+                _state.update { it.copy(showLanguageDialog = false) }
+            }
             is ProfileEvent.ShowNotificationSettingsDialog -> {
                 _state.update { it.copy(isEditingNotifications = true) }
             }
@@ -148,8 +160,13 @@ class ProfileViewModel(
                 navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Libraries.route))
             }
             is ProfileEvent.ChangeLanguage -> {
-                _state.update { it.copy(selectedLanguage = event.language) }
-                // Здесь можно добавить сохранение настройки в DataStore
+                preferencesManager.setAppLanguage(event.language)
+                val label = when (event.language) {
+                    "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
+                    "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
+                    else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
+                }
+                _state.update { it.copy(selectedLanguage = label, showLanguageDialog = false) }
             }
             is ProfileEvent.ChangeCurrency -> {
                 viewModelScope.launch {

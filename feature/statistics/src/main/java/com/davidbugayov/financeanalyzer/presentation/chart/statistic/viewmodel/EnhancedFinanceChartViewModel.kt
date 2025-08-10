@@ -14,6 +14,9 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
+import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -291,12 +294,16 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 data.filter { it.value.amount > BigDecimal.ZERO }
             }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
+        val palette = if (showExpenses) ExpenseChartPalette else IncomeChartPalette
         val pieChartDataList =
             filteredData.entries.mapIndexed { index, entry ->
                 val categoryName = entry.key
                 val moneyValue = entry.value
                 val category = categories.find { it.name == categoryName }
-                val color = category?.color ?: Color.Gray
+                var color = category?.color ?: Color.Gray
+                if (color == Color.Gray || color == DefaultCategoryColor) {
+                    color = palette[index % palette.size]
+                }
                 UiCategory(
                     id = index.toLong(),
                     name = categoryName,

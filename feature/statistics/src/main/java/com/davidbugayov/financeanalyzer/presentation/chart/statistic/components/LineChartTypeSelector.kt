@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
@@ -51,14 +52,14 @@ fun LineChartTypeSelector(
     ) {
         // Кнопка для отображения расходов
         SelectorButton(
-            text = "Расходы",
+            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.expenses),
             isSelected = selectedMode == LineChartDisplayMode.EXPENSE,
             color = LocalExpenseColor.current,
             onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) },
         )
 
         SelectorButton(
-            text = "Доходы",
+            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.income),
             isSelected = selectedMode == LineChartDisplayMode.INCOME,
             color = LocalIncomeColor.current,
             onClick = { onModeSelected(LineChartDisplayMode.INCOME) },

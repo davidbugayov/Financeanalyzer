@@ -43,12 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.EnhancedFinanceChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -57,7 +57,6 @@ import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.delay
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенная карточка с информацией о балансе, доходах и расходах.
@@ -359,7 +358,7 @@ fun EnhancedSummaryCard(
                         }
 
                         Text(
-                            text = "Доходы",
+                            text = stringResource(UiR.string.income),
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =
@@ -412,7 +411,7 @@ fun EnhancedSummaryCard(
                         }
 
                         Text(
-                            text = "Расходы",
+                            text = stringResource(UiR.string.expenses),
                             style =
                                 MaterialTheme.typography.labelSmall.copy(
                                     fontSize =

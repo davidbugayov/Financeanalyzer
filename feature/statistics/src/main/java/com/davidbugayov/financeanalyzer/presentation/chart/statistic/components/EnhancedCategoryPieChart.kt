@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,8 +53,8 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.math.BigDecimal
@@ -63,7 +64,6 @@ import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий * с интерактивной легендой и компактным размером для лучшей наглядности
@@ -96,7 +96,7 @@ fun EnhancedCategoryPieChart(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = "Нет данных",
+                text = stringResource(UiR.string.no_data),
                 style = MaterialTheme.typography.bodyLarge,
             )
         }
@@ -195,7 +195,7 @@ fun EnhancedCategoryPieChart(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Расходы",
+                    text = stringResource(UiR.string.expenses),
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
@@ -205,7 +205,7 @@ fun EnhancedCategoryPieChart(
                 )
 
                 Text(
-                    text = "Доходы",
+                    text = stringResource(UiR.string.income),
                     style =
                         MaterialTheme.typography.titleMedium.copy(
                             fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
@@ -278,7 +278,7 @@ fun EnhancedCategoryPieChart(
 
             // Заголовок для списка категорий
             Text(
-                text = "Список категорий",
+                text = stringResource(UiR.string.category_list),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
@@ -731,8 +731,8 @@ private fun DrawPieChart(
     isIncome: Boolean,
     backgroundColor: Color,
 ) {
-    val incomeText = "Доходы"
-    val expenseText = "Расходы"
+    val incomeText = stringResource(UiR.string.income)
+    val expenseText = stringResource(UiR.string.expenses)
     val currentIncomeColor = LocalIncomeColor.current
     val currentExpenseColor = LocalExpenseColor.current
     val context = LocalContext.current

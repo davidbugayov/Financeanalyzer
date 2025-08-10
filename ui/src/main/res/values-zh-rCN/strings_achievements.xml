@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="achievements">成就</string>
+  <string name="achievements_your_achievements">您的成就</string>
+  <string name="achievements_unlocked_of_total">已解锁 %1$d/%2$d</string>
+  <string name="achievements_filters_title">📊 筛选</string>
+  <string name="achievements_categories_title">🎯 类别</string>
+  <string name="achievements_reward_coins">%1$d 枚硬币</string>
+  <string name="achievements_overall_progress">总体进度</string>
+  <string name="achievements_filter_all">全部</string>
+  <string name="achievements_filter_unlocked">已解锁</string>
+  <string name="achievements_filter_locked">未解锁</string>
+  <string name="achievements_category_transactions">交易</string>
+  <string name="achievements_category_budget">预算</string>
+  <string name="achievements_category_savings">储蓄</string>
+  <string name="achievements_category_habits">习惯</string>
+  <string name="achievements_category_statistics">统计</string>
+  <string name="achievements_category_milestones">里程碑</string>
+  <string name="achievements_category_special">特殊</string>
+  <string name="achievements_category_import">导入</string>
+  <string name="achievements_category_export">导出</string>
+  <string name="achievements_unlocked">已解锁</string>
+  <string name="achievements_progress">进度</string>
+  <string name="achievements_rarity_common">普通</string>
+  <string name="achievements_rarity_rare">稀有</string>
+  <string name="achievements_rarity_epic">史诗</string>
+  <string name="achievements_rarity_legendary">传说</string>
+</resources>
+

@@ -3,11 +3,10 @@ package com.davidbugayov.financeanalyzer.feature.profile.model
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Состояние экрана профиля.
@@ -25,7 +24,8 @@ data class ProfileState(
     // Настройки приложения
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isEditingTheme: Boolean = false,
-    val selectedLanguage: String = "Русский", // TODO: Вынести в ресурсы
+    val selectedLanguage: String = "Русский",
+    val showLanguageDialog: Boolean = false,
     val selectedCurrency: Currency = Currency.RUB,
     val showCurrencyDialog: Boolean = false,
     // Настройки уведомлений о транзакциях

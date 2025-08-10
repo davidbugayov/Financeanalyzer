@@ -5,6 +5,9 @@
     <string name="settings_theme_title">Тема</string>
     <string name="settings_language_title">Язык</string>
     <string name="settings_language_current_value">Русский</string>
+  <string name="settings_language_ru">Русский</string>
+  <string name="settings_language_en">English</string>
+  <string name="settings_language_zh">中文</string>
     <string name="profile_currency_title">Валюта</string>
     <string name="profile_transaction_reminders_title">Напоминания о транзакциях</string>
     <string name="notification_disabled_description">Уведомления выключены</string>

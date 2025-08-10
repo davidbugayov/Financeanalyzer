@@ -54,6 +54,7 @@ import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.feature.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.CurrencySelectionDialog
+import com.davidbugayov.financeanalyzer.feature.profile.components.LanguageSelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.NotificationSettingsDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.ProfileTopBar
 import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSection
@@ -62,7 +63,7 @@ import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
@@ -72,7 +73,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран профиля пользователя.
@@ -375,7 +375,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
 
                 SettingsSection(
                     onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
-                    onLanguageClick = { /* Открыть диалог выбора языка */ },
+                    onLanguageClick = { viewModel.onEvent(ProfileEvent.ShowLanguageDialog) },
                     onCurrencyClick = { viewModel.onEvent(ProfileEvent.ShowCurrencyDialog) },
                     onTransactionReminderClick = {
                         viewModel.onEvent(
@@ -383,6 +383,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         )
                     },
                     themeMode = state.themeMode,
+                    languageSubtitle = state.selectedLanguage,
                     selectedCurrency = state.selectedCurrency,
                     isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                     transactionReminderTime = state.transactionReminderTime,
@@ -530,6 +531,16 @@ private fun ShowDialogs(
                 viewModel.onEvent(ProfileEvent.ChangeCurrency(currency))
             },
             onDismiss = { viewModel.onEvent(ProfileEvent.HideCurrencyDialog) },
+        )
+    }
+
+    if (state.showLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguage = state.selectedLanguage,
+            onLanguageSelected = { code: String ->
+                viewModel.onEvent(ProfileEvent.ChangeLanguage(code))
+            },
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideLanguageDialog) },
         )
     }
 }

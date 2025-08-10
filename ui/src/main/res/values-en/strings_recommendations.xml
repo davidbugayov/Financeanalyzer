@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="recommendation_emergency_fund_title">Create an emergency fund NOW</string>
+  <string name="recommendation_emergency_fund_description">You have less than one month of expenses in reserve. This is critically risky for financial stability.</string>
+  <string name="recommendation_emergency_fund_impact">Protection against financial shock if income is lost</string>
+
+  <string name="recommendation_savings_rate_low_title">Savings rate is critically low</string>
+  <string name="recommendation_savings_rate_low_description">You save less than 5% of income. This endangers your financial future.</string>
+  <string name="recommendation_savings_rate_low_impact">Start from 10% — the minimum for financial safety</string>
+
+  <string name="recommendation_increase_savings_title">Increase your savings rate</string>
+  <string name="recommendation_increase_savings_description">Aim for 15–20% of income to stay financially stable.</string>
+  <string name="recommendation_increase_savings_impact">A +5% increase improves financial health</string>
+
+  <string name="recommendation_investments_title">Time to consider investments</string>
+  <string name="recommendation_investments_description">Great discipline! It’s time to grow capital.</string>
+  <string name="recommendation_investments_impact">Investing helps beat inflation</string>
+
+  <string name="recommendation_achievements_title">Explore your achievements</string>
+  <string name="recommendation_achievements_description">Track progress and stay motivated</string>
+
+  <string name="recommendation_enhanced_title">Enhanced recommendations</string>
+  <string name="recommendation_enhanced_subtitle">Detailed analysis with priorities</string>
+  <string name="recommendation_compact_title">Compact recommendations</string>
+  <string name="best_recommendations_title">Recommendations</string>
+  <string name="best_recommendations_subtitle">Based on your data</string>
+
+  <string name="recommendation_category_savings">savings</string>
+  <string name="recommendation_category_expenses">expenses</string>
+  <string name="recommendation_category_emergency_fund">emergency_fund</string>
+  <string name="recommendation_category_investments">investments</string>
+  <string name="recommendation_category_planning">planning</string>
+  <string name="recommendation_category_general">general</string>
+
+  <string name="recommendation_optimize_category_title">Reduce spending in %1$s</string>
+  <string name="recommendation_plan_purchases_title">Plan purchases for %1$s</string>
+</resources>
+

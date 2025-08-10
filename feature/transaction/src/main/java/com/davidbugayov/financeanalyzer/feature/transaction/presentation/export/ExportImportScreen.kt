@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
@@ -57,10 +56,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран экспорта/импорта транзакций.
@@ -94,7 +92,7 @@ fun ExportImportScreen(
     LaunchedEffect(exportError) {
         exportError?.let { message ->
             scope.launch {
-                snackbarHostState.showSnackbar("Ошибка: $message")
+                snackbarHostState.showSnackbar(message ?: "Error")
                 viewModel.clearExportMessages()
             }
         }
@@ -279,7 +277,7 @@ fun ModernCSVExportDialog(
             ) {
                 // Заголовок
                 Text(
-                    text = "Экспорт в CSV",
+                    text = stringResource(R.string.export_button_friendly),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 20.dp),
@@ -288,8 +286,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Поделиться"
                 ActionCard(
                     icon = Icons.Default.Share,
-                    title = "Поделиться",
-                    description = "Отправить через Telegram, WhatsApp, email и др.",
+                    title = stringResource(R.string.share),
+                    description = stringResource(R.string.share_description),
                     color = MaterialTheme.colorScheme.primary,
                     onClick = {
                         onShare()
@@ -302,8 +300,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Открыть"
                 ActionCard(
                     icon = Icons.AutoMirrored.Filled.OpenInNew,
-                    title = "Открыть",
-                    description = "Открыть в Excel, Google Sheets и др.",
+                    title = stringResource(R.string.open_file),
+                    description = stringResource(R.string.open_file_description),
                     color = MaterialTheme.colorScheme.secondary,
                     onClick = {
                         onOpen()
@@ -316,8 +314,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Сохранить"
                 ActionCard(
                     icon = Icons.Default.Download,
-                    title = "Сохранить",
-                    description = "Сохранить файл без дополнительных действий",
+                    title = stringResource(R.string.save),
+                    description = stringResource(R.string.save_without_actions),
                     color = MaterialTheme.colorScheme.tertiary,
                     onClick = {
                         onSave()
@@ -334,7 +332,7 @@ fun ModernCSVExportDialog(
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(
-                            text = "Отмена",
+                            text = stringResource(android.R.string.cancel),
                             style = MaterialTheme.typography.labelLarge,
                         )
                     }

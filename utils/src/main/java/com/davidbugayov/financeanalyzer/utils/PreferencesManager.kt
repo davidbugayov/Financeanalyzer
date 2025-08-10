@@ -6,10 +6,10 @@ import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.Locale
 
 /**
  * Менеджер для работы с SharedPreferences.
@@ -86,6 +86,7 @@ class PreferencesManager(context: Context) {
 
         // Ключ для валюты
         private const val KEY_CURRENCY = "currency"
+        private const val KEY_APP_LANGUAGE = "app_language" // values: ru, en, zh
     }
 
     /**
@@ -233,6 +234,29 @@ class PreferencesManager(context: Context) {
             "zh" -> Currency.CNY
             "en" -> Currency.USD
             else -> Currency.RUB
+        }
+    }
+
+    // ----- Language -----
+
+    /** Сохранить язык приложения ("ru", "en", "zh"). */
+    fun setAppLanguage(lang: String) {
+        val normalized = when (lang.lowercase(Locale.ROOT)) {
+            "ru", "en", "zh" -> lang.lowercase(Locale.ROOT)
+            else -> "en"
+        }
+        sharedPreferences.edit { putString(KEY_APP_LANGUAGE, normalized) }
+        AppLocale.apply(normalized)
+    }
+
+    /** Получить сохранённый язык; если нет — определить по системной локали. */
+    fun getAppLanguage(): String {
+        val saved = sharedPreferences.getString(KEY_APP_LANGUAGE, null)
+        if (saved != null) return saved
+        return when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
+            "en" -> "en"
+            "zh" -> "zh"
+            else -> "en"
         }
     }
 }

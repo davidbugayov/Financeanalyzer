@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="recommendation_emergency_fund_title">请立即建立应急金</string>
+  <string name="recommendation_emergency_fund_description">您的储备不足1个月的支出，这对财务稳定性非常危险。</string>
+  <string name="recommendation_emergency_fund_impact">在失去收入时提供财务缓冲</string>
+
+  <string name="recommendation_savings_rate_low_title">储蓄率过低</string>
+  <string name="recommendation_savings_rate_low_description">当前储蓄低于收入的5%。这将影响您的财务未来。</string>
+  <string name="recommendation_savings_rate_low_impact">从10%开始——财务安全的最低标准</string>
+
+  <string name="recommendation_increase_savings_title">提高储蓄率</string>
+  <string name="recommendation_increase_savings_description">建议将储蓄率提升至收入的15–20%。</string>
+  <string name="recommendation_increase_savings_impact">+5% 将提升财务健康</string>
+
+  <string name="recommendation_investments_title">考虑投资</string>
+  <string name="recommendation_investments_description">财务纪律良好，是时候增长资产了。</string>
+  <string name="recommendation_investments_impact">投资有助于跑赢通胀</string>
+
+  <string name="recommendation_achievements_title">查看成就</string>
+  <string name="recommendation_achievements_description">跟踪进度并保持动力</string>
+
+  <string name="recommendation_enhanced_title">增强型建议</string>
+  <string name="recommendation_enhanced_subtitle">带优先级的详细分析</string>
+  <string name="recommendation_compact_title">精简建议</string>
+  <string name="best_recommendations_title">建议</string>
+  <string name="best_recommendations_subtitle">基于您的数据</string>
+
+  <string name="recommendation_category_savings">savings</string>
+  <string name="recommendation_category_expenses">expenses</string>
+  <string name="recommendation_category_emergency_fund">emergency_fund</string>
+  <string name="recommendation_category_investments">investments</string>
+  <string name="recommendation_category_planning">planning</string>
+  <string name="recommendation_category_general">general</string>
+
+  <string name="recommendation_optimize_category_title">在“%1$s”中减少支出</string>
+  <string name="recommendation_plan_purchases_title">为“%1$s”规划采购</string>
+</resources>
+

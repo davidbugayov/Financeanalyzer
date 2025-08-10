@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="detailed_financial_statistics">财务统计</string>
+  <string name="overview">概览</string>
+  <string name="financial_statistics_period">财务统计期间</string>
+  <string name="expense_analysis">支出分析</string>
+  <string name="spending_patterns">支出模式</string>
+  <string name="transaction_statistics">交易统计</string>
+  <string name="tips">建议</string>
+  <string name="key_metrics">关键指标</string>
+
+  <string name="savings_rate_title">储蓄率</string>
+  <string name="savings_rate_0_percent">0%</string>
+  <string name="savings_rate_15_percent">15%</string>
+  <string name="savings_rate_30_percent">30%</string>
+  <string name="savings_rate_50_percent">50%</string>
+  <string name="financial_health_info_description">关于您当前财务状况及改进建议的详细信息</string>
+  <string name="average_expenses_explanation">平均支出基于所选期间内的花费计算。分析有助于发现趋势并优化预算。</string>
+  <string name="daily_expenses_title">日均支出</string>
+  <string name="monthly_expenses_title">月均支出</string>
+  <string name="yearly_expenses_title">年化支出</string>
+
+  <string name="savings_rate_excellent_qualification">优秀 (30%+)</string>
+  <string name="savings_rate_good_qualification">良好 (15–30%)</string>
+  <string name="savings_rate_satisfactory_qualification">可 (5–15%)</string>
+  <string name="savings_rate_needs_attention_qualification">需关注 (&lt;5%)</string>
+  <string name="savings_rate_excellent_recommendation">做得很好！储蓄率高于30%。可考虑将部分储蓄用于投资以获得额外收入。</string>
+  <string name="savings_rate_good_recommendation" formatted="false">15–30%的储蓄率不错。建议逐步提升至20–25%，以实现财务独立。</string>
+  <string name="savings_rate_satisfactory_recommendation" formatted="false">5–15%的储蓄率仍有提升空间。每月增加1–2%的储蓄。</string>
+  <string name="savings_rate_needs_attention_recommendation" formatted="false">低于5%的储蓄率需要关注。请分析支出，寻找节省机会，并至少存下10%的收入。</string>
+  <string name="savings_rate_explanation">储蓄率表示收入中被存下的百分比。计算公式：(收入 − 支出) / 收入 × 100%。</string>
+  <string name="savings_rate_percent">%1$s%%</string>
+
+  <string name="financial_cushion_excellent_qualification">优秀 (6+ 月)</string>
+  <string name="financial_cushion_good_qualification">良好 (3–6 月)</string>
+  <string name="financial_cushion_insufficient_qualification">不足 (&lt;3 月)</string>
+  <string name="financial_cushion_excellent_recommendation">6个月以上的应急金很充足。可考虑将部分资金用于投资。</string>
+  <string name="financial_cushion_good_recommendation">3–6个月的应急金较为稳妥。建议继续积累，目标6个月以获得更高安全性。</string>
+  <string name="financial_cushion_insufficient_recommendation">少于3个月的应急金不足。优先建立3–6个月的储备。</string>
+  <string name="financial_cushion_title">应急金</string>
+  <string name="financial_cushion_explanation">应急金指无需收入也能支撑3–6个月生活的金额。计算：月均支出 × 月数。</string>
+  <string name="financial_cushion_months">%1$s 个月</string>
+  <string name="financial_cushion_expenses">%1$s</string>
+
+  <string name="trend_positive_description">上升趋势</string>
+  <string name="trend_negative_description">下降趋势</string>
+  <string name="trend_neutral_description">稳定趋势</string>
+
+  <string name="financial_health_recommended_values_title">推荐值</string>
+  <string name="financial_health_tooltip_description">点击查看详细信息与建议</string>
+  <string name="prediction_subtitle">基于近期交易与趋势</string>
+</resources>
+

@@ -1,5 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Statistics/Financial health strings -->
+  <string name="financial_health_title">财务健康</string>
+  <string name="financial_health_explanation">“财务健康”是评估您当前财务状况与稳定性的综合指标。它考虑储蓄率、支出控制以及应急金是否充足。</string>
+  <string name="financial_health_savings_rate_title">储蓄率</string>
+  <string name="financial_health_average_expenses_title">平均支出</string>
+  <string name="financial_health_average_expenses_content">平均支出帮助理解消费趋势。会分析每日、每月与每年的指标，以发现优化预算的机会。</string>
+  <string name="financial_health_financial_cushion_title">应急金</string>
+  <string name="financial_health_financial_cushion_content">应急金是指可支撑3–6个月无收入生活的金额。计算方式：月均支出 × 月数。这是应对突发情况的安全缓冲。</string>
+  <string name="financial_health_tips_title">财务健康建议</string>
     <string name="achievement_alfabank_importer_desc">从阿尔法银行导入数据</string>
     <string name="achievement_alfabank_importer_title">阿尔法银行进口商</string>
     <string name="achievement_app_explorer_desc">打开了所有部分</string>
@@ -224,7 +233,7 @@
     <string name="expenses">开支</string>
     <string name="expenses_category">开支</string>
     <string name="fab_spacer">Fab的空间</string>
-    <string name="financial_health_ok_button">天气晴朗</string>
+  <string name="financial_health_ok_button">明白了</string>
     <string name="finish">完全的</string>
     <string name="for_financial_health">财务健康</string>
     <string name="for_note">以获取信息</string>
@@ -330,6 +339,12 @@
     <string name="month">月</string>
     <string name="months_short">月</string>
     <string name="my_wallets">我的钱包</string>
+  <string name="budget_summary">预算摘要</string>
+  <string name="calculation_period_days">结算周期：%1$d 天</string>
+  <string name="total_limit">总限额</string>
+  <string name="spent">已花费</string>
+  <string name="balance_label">余额</string>
+  <!-- duplicate removed -->
     <string name="nav_budget">预算</string>
     <string name="nav_history">历史</string>
     <string name="nav_home">首页</string>
@@ -359,6 +374,12 @@
     <string name="notification_transaction_reminder_title">提醒交易</string>
     <string name="ok">确定</string>
     <string name="ok_button">确定</string>
+  <string name="got_it">明白了</string>
+  <string name="share">分享</string>
+  <string name="share_description">通过 Telegram、WhatsApp、邮箱 等分享</string>
+  <string name="open_file">打开</string>
+  <string name="open_file_description">在 Excel、Google 表格 等中打开</string>
+  <string name="save_without_actions">直接保存文件</string>
     <string name="onboarding_skip_button">跳过</string>
     <string name="open_settings">打开设置</string>
     <string name="optimize_category_description">在类别％s中，您的支出超过平均水平。考虑储蓄的可能性。</string>
@@ -370,7 +391,7 @@
     <string name="period_day">%1$s</string>
     <string name="period_duration_description">在几天内设置持续时间</string>
     <string name="period_month">%1$s - %2$s</string>
-    <string name="period_quarter">%1$s - %2$s</string>
+  <string name="period_quarter">季度</string>
     <string name="period_settings">期间的设置</string>
     <string name="period_settings_title">期间的设置</string>
     <string name="period_week">%1$s - %2$s</string>

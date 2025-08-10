@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="detailed_financial_statistics">Financial statistics</string>
+  <string name="overview">Overview</string>
+  <string name="financial_statistics_period">Financial statistics period</string>
+  <string name="expense_analysis">Expense analysis</string>
+  <string name="spending_patterns">Spending patterns</string>
+  <string name="transaction_statistics">Transaction statistics</string>
+  <string name="tips">Tips</string>
+  <string name="key_metrics">Key metrics</string>
+
+  <string name="savings_rate_title">Savings rate</string>
+  <string name="savings_rate_0_percent">0%</string>
+  <string name="savings_rate_15_percent">15%</string>
+  <string name="savings_rate_30_percent">30%</string>
+  <string name="savings_rate_50_percent">50%</string>
+  <string name="financial_health_info_description">Detailed information about your financial condition and recommendations for improvement</string>
+  <string name="average_expenses_explanation">Average expenses are calculated from your spending for the selected period. The analysis helps reveal trends and opportunities to optimize your budget.</string>
+  <string name="daily_expenses_title">Daily expenses</string>
+  <string name="monthly_expenses_title">Monthly expenses</string>
+  <string name="yearly_expenses_title">Yearly expenses</string>
+
+  <string name="savings_rate_excellent_qualification">Excellent (30%+)</string>
+  <string name="savings_rate_good_qualification">Good (15–30%)</string>
+  <string name="savings_rate_satisfactory_qualification">Satisfactory (5–15%)</string>
+  <string name="savings_rate_needs_attention_qualification">Needs attention (&lt;5%)</string>
+  <string name="savings_rate_excellent_recommendation">Great job! Your savings rate is above 30%. Keep it up and consider investing part of your savings to generate extra income.</string>
+  <string name="savings_rate_good_recommendation" formatted="false">A solid savings rate of 15–30%. You are on track. Try to raise savings to about 20–25% to reach financial independence.</string>
+  <string name="savings_rate_satisfactory_recommendation" formatted="false">A savings rate of 5–15% leaves room for improvement. Start by increasing savings by 1–2% each month.</string>
+  <string name="savings_rate_needs_attention_recommendation" formatted="false">Savings below 5% require attention. Analyze expenses, find opportunities to save, and start setting aside at least 10% of income.</string>
+  <string name="savings_rate_explanation">Savings rate shows what percentage of income you set aside. Calculated as (Income − Expenses) / Income × 100%.</string>
+  <string name="savings_rate_percent">%1$s%%</string>
+
+  <string name="financial_cushion_excellent_qualification">Excellent (6+ months)</string>
+  <string name="financial_cushion_good_qualification">Good (3–6 months)</string>
+  <string name="financial_cushion_insufficient_qualification">Insufficient (&lt;3 months)</string>
+  <string name="financial_cushion_excellent_recommendation">Excellent emergency fund for 6+ months. Consider investing part of the funds.</string>
+  <string name="financial_cushion_good_recommendation">Good emergency fund for 3–6 months. Keep building the reserve and aim for 6 months for maximum safety.</string>
+  <string name="financial_cushion_insufficient_recommendation">Emergency fund less than 3 months. Prioritize building a 3–6 month reserve.</string>
+  <string name="financial_cushion_title">Emergency fund</string>
+  <string name="financial_cushion_explanation">An emergency fund is the amount that allows you to live 3–6 months without income. Calculated as average monthly expenses × number of months.</string>
+  <string name="financial_cushion_months">%1$s mo.</string>
+  <string name="financial_cushion_expenses">%1$s</string>
+
+  <string name="trend_positive_description">Positive trend</string>
+  <string name="trend_negative_description">Negative trend</string>
+  <string name="trend_neutral_description">Neutral trend</string>
+
+  <string name="financial_health_recommended_values_title">Recommended values</string>
+  <string name="financial_health_tooltip_description">Tap to see detailed information and tips</string>
+  <string name="prediction_subtitle">Based on your recent transactions and trends</string>
+</resources>
+

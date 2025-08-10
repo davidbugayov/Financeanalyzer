@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +43,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.drawGridLines
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.drawLineChart
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -56,7 +57,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.hypot
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 // --- Constants for Dimensions ---
 private val DefaultSelectionThreshold: Dp = 30.dp
@@ -613,7 +613,7 @@ fun EnhancedLineChart(
                 if (showIncome) {
                     ChartLegendItem(
                         color = currentIncomeColor,
-                        text = "Доходы", // Use string resource
+                        text = stringResource(R.string.income),
                     )
                     if (showExpense) {
                         Spacer(modifier = Modifier.width(spacingNormal))
@@ -622,7 +622,7 @@ fun EnhancedLineChart(
                 if (showExpense) {
                     ChartLegendItem(
                         color = currentExpenseColor,
-                        text = "Расходы", // Use string resource
+                        text = stringResource(R.string.expenses),
                     )
                 }
             }

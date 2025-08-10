@@ -53,7 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
-import com.davidbugayov.financeanalyzer.feature.statistics.R
+import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedLineChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.FinancialHealthMetricsCard
@@ -62,21 +63,24 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineC
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.EnhancedFinanceChartViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
+import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
-import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
-import com.davidbugayov.financeanalyzer.ui.components.tips.InvestmentTipsCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
+import com.davidbugayov.financeanalyzer.ui.components.tips.InvestmentTipsCard
+import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
+import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -92,7 +96,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 @Composable
 fun FinancialStatisticsScreen(
     onNavigateBack: () -> Unit,
-    periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType? = null,
+    periodType: PeriodType? = null,
     startDate: Date? = null,
     endDate: Date? = null,
     onAddTransaction: () -> Unit,
@@ -207,6 +211,20 @@ fun FinancialStatisticsScreen(
     // Форматтер дат
     val dateFormat = remember { SimpleDateFormat("dd MMMM", Locale.forLanguageTag("ru-RU")) }
 
+    // Локальное управление выбором периода (UI/UX как в подробной статистике)
+    var showPeriodDialog by remember { mutableStateOf(false) }
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+    var selectedPeriodType by remember { mutableStateOf(state.periodType ?: PeriodType.MONTH) }
+    var currentStartDate by remember { mutableStateOf(state.startDate) }
+    var currentEndDate by remember { mutableStateOf(state.endDate) }
+
+    LaunchedEffect(state.periodType, state.startDate, state.endDate) {
+        selectedPeriodType = state.periodType ?: PeriodType.MONTH
+        currentStartDate = state.startDate
+        currentEndDate = state.endDate
+    }
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -254,6 +272,110 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
+                    // Верхняя карточка периода — как в подробной статистике
+                    Card(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = dimensionResource(UiR.dimen.finance_chart_screen_padding),
+                                    vertical = 12.dp,
+                                )
+                                .clickable { showPeriodDialog = true },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Analytics,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(UiR.string.financial_statistics_period),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                                Text(
+                                    text = state.periodText,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            }
+                        }
+                    }
+
+                    // Диалоги выбора периода и дат
+                    if (showPeriodDialog) {
+                        PeriodSelectionDialog(
+                            selectedPeriod = selectedPeriodType,
+                            startDate = currentStartDate,
+                            endDate = currentEndDate,
+                            onPeriodSelected = { p ->
+                                selectedPeriodType = p
+                                if (p != PeriodType.CUSTOM) {
+                                    val (newStart, newEnd) =
+                                        DateUtils.updatePeriodDates(
+                                            periodType = p,
+                                            currentStartDate = currentStartDate,
+                                            currentEndDate = currentEndDate,
+                                        )
+                                    currentStartDate = newStart
+                                    currentEndDate = newEnd
+                                    viewModel.handleIntent(
+                                        EnhancedFinanceChartIntent.ChangePeriod(p, newStart, newEnd),
+                                    )
+                                    showPeriodDialog = false
+                                }
+                            },
+                            onStartDateClick = { showStartDatePicker = true },
+                            onEndDateClick = { showEndDatePicker = true },
+                            onConfirm = {
+                                showPeriodDialog = false
+                                viewModel.handleIntent(
+                                    EnhancedFinanceChartIntent.ChangePeriod(
+                                        PeriodType.CUSTOM,
+                                        currentStartDate,
+                                        currentEndDate,
+                                    ),
+                                )
+                            },
+                            onDismiss = { showPeriodDialog = false },
+                        )
+                    }
+
+                    if (showStartDatePicker) {
+                        DatePickerDialog(
+                            initialDate = currentStartDate,
+                            maxDate = minOf(currentEndDate, Calendar.getInstance().time),
+                            onDateSelected = { d ->
+                                currentStartDate = d
+                                showStartDatePicker = false
+                            },
+                            onDismiss = { showStartDatePicker = false },
+                        )
+                    }
+
+                    if (showEndDatePicker) {
+                        DatePickerDialog(
+                            initialDate = currentEndDate,
+                            minDate = currentStartDate,
+                            maxDate = Calendar.getInstance().time,
+                            onDateSelected = { d ->
+                                currentEndDate = d
+                                showEndDatePicker = false
+                            },
+                            onDismiss = { showEndDatePicker = false },
+                        )
+                    }
+
                     if (personalizedTips.isNotEmpty()) {
                         androidx.compose.animation.AnimatedVisibility(visible = showRecommendations) {
                             Column {
@@ -676,7 +798,7 @@ fun FinancialStatisticsScreen(
 
                                             // Форматируем сумму с валютой
                                             val currency = stringResource(id = UiR.string.settings_currency_current_value)
-                                            val formatted = java.text.NumberFormat.getNumberInstance(java.util.Locale("ru","RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
+                                            val formatted = java.text.NumberFormat.getNumberInstance(Locale("ru","RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
 
                                             Text(
                                                 text = stringResource(id = UiR.string.prediction_next_month, formatted),

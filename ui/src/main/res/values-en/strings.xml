@@ -1,5 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Statistics/Financial health strings -->
+  <string name="financial_health_title">Financial health</string>
+  <string name="financial_health_explanation">Financial health is a composite indicator that evaluates your current financial condition and resilience. It accounts for your savings rate, expense control, and the presence of an emergency fund.</string>
+  <string name="financial_health_savings_rate_title">Savings rate</string>
+  <string name="financial_health_average_expenses_title">Average expenses</string>
+  <string name="financial_health_average_expenses_content">Average expenses help you understand your spending dynamics. Daily, monthly, and yearly metrics are analyzed to reveal opportunities to optimize your budget.</string>
+  <string name="financial_health_financial_cushion_title">Emergency fund</string>
+  <string name="financial_health_financial_cushion_content">An emergency fund is the amount that allows you to live without income for 3–6 months. It is calculated as average monthly expenses × number of months. This is your safety buffer for unforeseen events.</string>
+  <string name="financial_health_tips_title">Financial health tips</string>
     <string name="achievement_alfabank_importer_desc">Imported data from Alfa-Bank</string>
     <string name="achievement_alfabank_importer_title">Alfa-Bank importer</string>
     <string name="achievement_app_explorer_desc">Opened all sections</string>
@@ -8,7 +17,7 @@
     <string name="achievement_backup_enthusiast_title">Enthusiast of backups</string>
     <string name="achievement_budget_keeper_desc">Do not exceed the budget 3 months</string>
     <string name="achievement_budget_keeper_title">The keeper of the budget</string>
-    <string name="achievement_budget_saver_desc">Saved 20%%%% of the budget</string>
+  <string name="achievement_budget_saver_desc">Saved 20% of the budget</string>
     <string name="achievement_budget_saver_title">Economist</string>
     <string name="achievement_category_organizer_desc">10 categories have been created</string>
     <string name="achievement_category_organizer_title">Organizer of categories</string>
@@ -32,7 +41,7 @@
     <string name="achievement_first_steps_title">The first steps</string>
     <string name="achievement_first_transaction_desc">The first transaction was created</string>
     <string name="achievement_first_transaction_title">The first transaction</string>
-    <string name="achievement_healthy_spender_desc">Spend less than 50%%%% of income</string>
+  <string name="achievement_healthy_spender_desc">Spend less than 50% of income</string>
     <string name="achievement_healthy_spender_title">Healthy wasteland</string>
     <string name="achievement_month_user_desc">Use the application for a month</string>
     <string name="achievement_month_user_title">Monthly user</string>
@@ -159,8 +168,8 @@
     <string name="critical_emoji">🚨</string>
     <string name="critical_level">Critical</string>
     <string name="critical_level_alt">Critical</string>
-    <string name="critical_low_savings_description">Your savings account for less than 5%%%% of income.This is a critically low level.</string>
-    <string name="critical_low_savings_impact">Immediately increase savings to a minimum of 10%%%%</string>
+  <string name="critical_low_savings_description">Your savings rate is less than 5% of income. This is critically low.</string>
+  <string name="critical_low_savings_impact">Immediately increase savings to at least 10%</string>
     <string name="critical_low_savings_title">Critically low savings</string>
     <string name="current_balance">Current balance</string>
     <string name="custom">Cash</string>
@@ -224,7 +233,7 @@
     <string name="expenses">Expenses</string>
     <string name="expenses_category">Expenses</string>
     <string name="fab_spacer">Space for FAB</string>
-    <string name="financial_health_ok_button">It&amp;#39;s clear</string>
+  <string name="financial_health_ok_button">Got it</string>
     <string name="finish">Complete</string>
     <string name="for_financial_health">For financial health</string>
     <string name="for_note">For information</string>
@@ -249,7 +258,7 @@
     <string name="important_emoji">⚠️</string>
     <string name="important_level">Important</string>
     <string name="improve_savings_rate_description">Your savings can be significantly increased for better financial security.</string>
-    <string name="improve_savings_rate_impact">Purpose: 15-20%%%% of income</string>
+  <string name="improve_savings_rate_impact">Goal: 15–20% of income</string>
     <string name="improve_savings_rate_title">Improve the norm of savings</string>
     <string name="include_refunds">Take into account refunds</string>
     <string name="include_transfers">Учитывать переводы</string>
@@ -259,7 +268,7 @@
     <string name="income_category">Income</string>
     <string name="income_type">Income</string>
     <string name="increase_savings_rate_description_ui">Your savings can be significantly increased to achieve financial goals.</string>
-    <string name="increase_savings_rate_impact_ui">Purpose: 20%%%% of income</string>
+  <string name="increase_savings_rate_impact_ui">Goal: 20% of income</string>
     <string name="increase_savings_rate_title_ui">Increase the norm of savings</string>
     <string name="initializing_subcategories">Initialization of subcategories ...</string>
     <string name="insight_active_weekday">Active day of the week</string>
@@ -270,7 +279,7 @@
     <string name="insight_expense_concentration_desc">Analysis of the distribution of costs by categories</string>
     <string name="insight_expense_concentration_good">Good distribution</string>
     <string name="insight_expense_concentration_high">High concentration</string>
-    <string name="insight_expense_concentration_metric">%s %%%%%%%% in one category</string>
+  <string name="insight_expense_concentration_metric">%s%% in one category</string>
     <string name="insight_expense_frequency">The frequency of expenses</string>
     <string name="insight_expense_frequency_desc">%d transactions for the period</string>
     <string name="insight_expense_frequency_metric">%d transactions</string>
@@ -282,7 +291,7 @@
     <string name="insight_financial_health_excellent">Excellent</string>
     <string name="insight_financial_health_good">Good</string>
     <string name="insight_financial_health_low">Low</string>
-    <string name="insight_financial_health_metric">Savings rate:%d %%%%%%%%</string>
+  <string name="insight_financial_health_metric">Savings rate: %d%%</string>
     <string name="insight_financial_health_ok">Satisfactory</string>
     <string name="insight_financial_protection">Financial protection</string>
     <string name="insight_financial_protection_excellent">Excellent</string>
@@ -300,7 +309,7 @@
     <string name="insight_small_expenses_desc">Analysis of small everyday expenses</string>
     <string name="insight_small_expenses_metric">%d small expenses</string>
     <string name="invalid_date">The wrong date</string>
-    <string name="investment_tip_bonds">Consider bonds for stable income: corporate with a profitability of 14-16%%%% of reliable issuers.</string>
+  <string name="investment_tip_bonds">Consider bonds for stable income: 14–16% yield from reliable issuers.</string>
     <string name="investment_tip_business">Increase in real business through shares or borrowings for high income with moderate risks.</string>
     <string name="investment_tip_diversification">Diversify the briefcase, avoiding high risks and leverage.</string>
     <string name="investment_tip_gold">Invest in gold as a protective asset against inflation and instability.</string>
@@ -330,6 +339,12 @@
     <string name="month">Month</string>
     <string name="months_short">month</string>
     <string name="my_wallets">My wallets</string>
+  <string name="budget_summary">Budget summary</string>
+  <string name="calculation_period_days">Calculation period: %1$d days</string>
+  <string name="total_limit">Total limit</string>
+  <string name="spent">Spent</string>
+  <string name="balance_label">Balance</string>
+  <!-- duplicate removed -->
     <string name="nav_budget">Budget</string>
     <string name="nav_history">History</string>
     <string name="nav_home">Home</string>
@@ -359,6 +374,12 @@
     <string name="notification_transaction_reminder_title">A reminder of the transaction</string>
     <string name="ok">OK</string>
     <string name="ok_button">OK</string>
+  <string name="got_it">Got it</string>
+  <string name="share">Share</string>
+  <string name="share_description">Send via Telegram, WhatsApp, email, etc.</string>
+  <string name="open_file">Open</string>
+  <string name="open_file_description">Open in Excel, Google Sheets, etc.</string>
+  <string name="save_without_actions">Save the file without extra actions</string>
     <string name="onboarding_skip_button">Skip</string>
     <string name="open_settings">Open settings</string>
     <string name="optimize_category_description">In category %s, you spend more than average.Consider the possibilities of saving.</string>
@@ -370,7 +391,7 @@
     <string name="period_day">%1$s</string>
     <string name="period_duration_description">Set the duration of the period in days</string>
     <string name="period_month">%1$s - %2$s</string>
-    <string name="period_quarter">%1$s - %2$s</string>
+  <string name="period_quarter">Quarter</string>
     <string name="period_settings">Settings of the period</string>
     <string name="period_settings_title">Settings of the period</string>
     <string name="period_week">%1$s - %2$s</string>
@@ -388,25 +409,25 @@
     <string name="preview_enhanced_title">Improved card</string>
     <string name="quarter">Quarter</string>
     <string name="rec_budget_auto_desc">Configure automatic transfers into saving.</string>
-    <string name="rec_budget_auto_impact">10%%%% of each income</string>
+  <string name="rec_budget_auto_impact">10% of each income</string>
     <string name="rec_budget_auto_title">Automatic savings</string>
     <string name="rec_budget_category_desc">Divide the budget by categories for better control.</string>
     <string name="rec_budget_category_impact">Create categories limits</string>
     <string name="rec_budget_category_title">Budget categories</string>
-    <string name="rec_budget_rule_desc">Try a 50%%%% rule for needs, 30%%%% for desires, 20%%%% for savings.</string>
+  <string name="rec_budget_rule_desc">Try the 50/30/20 rule: 50% needs, 30% wants, 20% savings.</string>
     <string name="rec_budget_rule_impact">Create a budget on this principle</string>
     <string name="rec_budget_rule_title">Rule 50/30/20</string>
     <string name="rec_budget_track_desc">Regularly check the compliance of expenses to the budget.</string>
     <string name="rec_budget_track_impact">Weekly control</string>
     <string name="rec_budget_track_title">Track the budget</string>
     <string name="rec_critical_debt_desc">You have a high level of debt load.</string>
-    <string name="rec_critical_debt_impact">Reduce debts to 30%%%% of income</string>
+  <string name="rec_critical_debt_impact">Reduce debts to 30% of income</string>
     <string name="rec_critical_debt_title">High debts</string>
     <string name="rec_critical_emergency_desc">You do not have a reserve fund.This is critical for financial security.</string>
     <string name="rec_critical_emergency_impact">Create a fund for 3-6 months of expenses</string>
     <string name="rec_critical_emergency_title">Create a reserve fund</string>
-    <string name="rec_critical_savings_desc">Your savings make up less than 10%%%% of income.</string>
-    <string name="rec_critical_savings_impact">Increase savings to 20%%%%</string>
+  <string name="rec_critical_savings_desc">Your savings are less than 10% of income.</string>
+  <string name="rec_critical_savings_impact">Increase savings to 20%</string>
     <string name="rec_critical_savings_title">Low savings</string>
     <string name="rec_high_emergency_desc">Your reserve fund is less than the recommended size.</string>
     <string name="rec_high_emergency_impact">Bring up to 6 months of expenses</string>
@@ -415,7 +436,7 @@
     <string name="rec_high_expense_impact">Analyze large expenses</string>
     <string name="rec_high_expense_title">Optimize the costs</string>
     <string name="rec_high_savings_desc">Your savings can be increased.</string>
-    <string name="rec_high_savings_impact">Purpose: 15-20%%%% of income</string>
+  <string name="rec_high_savings_impact">Goal: 15–20% of income</string>
     <string name="rec_high_savings_title">Improve savings</string>
     <string name="rec_medium_habits_desc">Regular tracking will help to better control finance.</string>
     <string name="rec_medium_habits_impact">Keep accounting daily</string>
@@ -605,17 +626,17 @@
     <string name="tip_automate_savings_title">Automate savings</string>
     <string name="tip_basic_tracking_desc">Write down all expenses - this is the basis of financial literacy</string>
     <string name="tip_basic_tracking_title">Keep records of income and expenses</string>
-    <string name="tip_control_expense_growth_desc">The costs increased by %1$s %%%%%%%%.Check subscriptions and large categories</string>
+  <string name="tip_control_expense_growth_desc">Expenses increased by %1$s%%. Check subscriptions and top categories</string>
     <string name="tip_control_expense_growth_title">Expert growth: what to do</string>
     <string name="tip_create_emergency_fund_desc">You have accumulations only at %1$s months.It is recommended to have 3-6 months of expenses</string>
     <string name="tip_create_emergency_fund_title">Create a reserve fund</string>
     <string name="tip_easy_savings_desc">Reduce 2-3 least useful categories (for example, delivery/subscriptions)</string>
-    <string name="tip_easy_savings_title">Save up to 10%%%% without effort</string>
+  <string name="tip_easy_savings_title">Save up to 10% without effort</string>
     <string name="tip_increase_income_desc">Consider the freelance/part -time work or monetization of skills</string>
-    <string name="tip_increase_income_title">Increase income by 5-10%%%%</string>
-    <string name="tip_increase_savings_desc">You put off %1$s %%%%%%%% income.The goal is at least 10–20 %%%%%%%%</string>
+  <string name="tip_increase_income_title">Increase income by 5–10%</string>
+  <string name="tip_increase_savings_desc">You save %1$s%% of income. Aim for at least 10–20%</string>
     <string name="tip_increase_savings_title">Increase the norm of savings</string>
-    <string name="tip_rule_50_30_20_desc">50%%%% for needs, 30%%%% for desires, 20%%%% for savings and investments</string>
+  <string name="tip_rule_50_30_20_desc">50% needs, 30% wants, 20% savings and investments</string>
     <string name="tip_rule_50_30_20_title">Follow the rule 50/30/20</string>
     <string name="tip_set_goals_desc">Define specific goals: vacation, purchase, investment</string>
     <string name="tip_set_goals_title">Set financial goals</string>
@@ -771,7 +792,7 @@
     <string name="log_achievement_statistics_viewed">🏆 Trigger: Statistics viewed</string>
     <string name="log_achievement_section_visited">🏆 trigger: Visiting section %1$s</string>
     <string name="log_achievement_savings_changed">🏆 Trigger: Accumulations have changed: %1$s</string>
-    <string name="log_achievement_budget_progress">🏆 Trigger: budget progress: %1$s %%%%%%%%</string>
+  <string name="log_achievement_budget_progress">🏆 Trigger: budget progress: %1$s%%</string>
     <string name="log_achievement_category_used">🏆 trigger: used category %1$s</string>
     <string name="log_achievement_milestone_reached">🏆 Trigger: Achoed milestone %1$s</string>
     <string name="achievement_explorer">Researcher</string>
@@ -779,7 +800,7 @@
     <string name="achievement_first_savings">The first penny</string>
     <string name="achievement_emergency_fund">Safety pillow</string>
     <string name="achievement_economical">Economical</string>
-    <string name="achievement_economical_desc">Spend less than 80%%%% of the budget per month</string>
+  <string name="achievement_economical_desc">Spend less than 80% of the monthly budget</string>
     <string name="achievement_regular_user">Permanent user</string>
     <string name="achievement_regular_user_desc">Use the application for a week in a row</string>
     <string name="achievement_loyal_user">True user</string>
@@ -819,14 +840,14 @@
     <string name="recommendation_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance and look for alternatives.</string>
     <string name="recommendation_cafe_spending">You often spend on cafes and restaurants.Try cooking at home more often - this will help to save.</string>
     <string name="recommendation_small_expenses">You have a lot of small expenses.Keep accounting and try to abandon unnecessary purchases.</string>
-    <string name="recommendation_no_savings">You do not make regular savings.Set aside at least 10%%%% of income every month.</string>
+  <string name="recommendation_no_savings">You don’t save regularly. Set aside at least 10% of income monthly.</string>
     <string name="recommendation_improve_financial_health">Improve overall financial health</string>
     <string name="recommendation_improve_financial_health_desc">Your financial health coefficient (%1$s/100) is lower than average.Focus on increasing the norms of savings and stabilization of income.</string>
     <string name="recommendation_improve_expense_control">Improve expenses</string>
     <string name="recommendation_improve_expense_control_desc">Your expenditure discipline (%1$s/100) indicates the need for better expenses.Try to keep the budget and avoid impulsive purchases.</string>
     <string name="recommendation_increase_retirement_savings">Increase pension savings</string>
-    <string name="recommendation_increase_retirement_savings_desc">To achieve a pension goal, increase monthly accumulations by %1$s.Current progress: %2$s %%%%%%%%</string>
-    <string name="recommendation_increase_savings_rate_desc">Your savings rate for %1$s %%%%%%%% below the average in your income group.Try to automatically postpone 10 %%%%%%%% from income.</string>
+  <string name="recommendation_increase_retirement_savings_desc">To reach the retirement goal, increase monthly savings by %1$s. Current progress: %2$s%%</string>
+  <string name="recommendation_increase_savings_rate_desc" formatted="false">Your savings rate is %1$s% below your income group average. Try auto-saving 10% of income.</string>
     <string name="recommendation_diversify_income">Diversify the sources of income</string>
     <string name="recommendation_diversify_income_desc">You only have %1$s source of income.Consider the possibility of additional earnings or passive income to increase financial stability.</string>
     <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about %1$s month.</string>
@@ -850,14 +871,14 @@
     <string name="tip_subscriptions_found">You have regular subscriptions.Check if you really need all of them.</string>
     <string name="tip_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance to avoid financial stress.</string>
     <string name="tip_small_expenses">You have a lot of small expenses.Try to combine purchases or abandon the excess.</string>
-    <string name="tip_expenses_equal_income">Your expenses are equal or exceeding income.Try to postpone at least 10%%%% of income.</string>
+  <string name="tip_expenses_equal_income">Your expenses equal or exceed income. Try saving at least 10% of income.</string>
     <string name="income_range_insufficient_data">Data is not enough</string>
     <string name="achievement_category_organizer">Categories expert</string>
     <string name="achievement_first_steps_desc">Create the first transaction</string>
     <string name="current_period">The current period</string>
     <string name="previous_period">The previous period</string>
-    <string name="increase_by_percent">Increase by %1$s %%%%%%%%</string>
-    <string name="decrease_by_percent">Reduction by %1$s %%%%%%%%</string>
+  <string name="increase_by_percent">Increase by %1$s%%</string>
+  <string name="decrease_by_percent">Decrease by %1$s%%</string>
     <string name="no_changes">Unchanged</string>
     <string name="select_sources">Choose sources</string>
     <string name="all_categories">All categories</string>
@@ -982,9 +1003,9 @@
     <string name="expense_control">Control of expenses</string>
     <string name="financial_health_analysis_title">Analysis of financial health</string>
     <string name="financial_health_evaluation_description">A comprehensive assessment of your financial health based on key indicators</string>
-    <string name="financial_health_recommended_values_content">• Savings rate: 10-20%%%% \n • Financial pillow: 3-6 months of expenses \n • Costs of expenses: not more than 90%%%% of income \n • Diversification of income: minimum 2 sources \n • regular analysis: weekly</string>
+  <string name="financial_health_recommended_values_content" formatted="false">• Savings rate: 10–20%\n• Emergency fund: 3–6 months of expenses\n• Expense control: ≤90% of income\n• Income diversification: ≥2 sources\n• Regular analysis: weekly</string>
     <string name="financial_health_score">Financial health coefficient</string>
-    <string name="financial_health_tips_content">• Set aside 10-20%%%% of each income \n • keep records of all expenses \n • Create a reserve fund for 3-6 months \n • diversify the sources of income \n • regularly analyze your finances</string>
+  <string name="financial_health_tips_content">• Set aside 10–20% of each income\n• Track all expenses\n• Build a 3–6 month emergency fund\n• Diversify income sources\n• Review finances weekly</string>
     <string name="friday">Friday</string>
     <string name="golden_budget_rules_subtitle">Verified principles of financial planning</string>
     <string name="golden_budget_rules_title">💰 Golden budget rules</string>
@@ -1172,7 +1193,7 @@
     <string name="ozon_instructions_title">Through the OZON Bank application:</string>
     <string name="proceed_to_import">Go to import</string>
     <string name="profile_export_import_subtitle">Export or import your data</string>
-    <string name="progress_percentage">%d%%%%%%%%</string>
+  <string name="progress_percentage">%d%%</string>
     <string name="sberbank_card_pattern">^(</string>
     <string name="sberbank_category">CATEGORY</string>
     <string name="sberbank_date_operation">The date of the operation</string>

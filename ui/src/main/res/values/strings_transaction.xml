@@ -6,7 +6,7 @@
     <string name="import_transactions_content_description">Импорт транзакций</string>
     <string name="dialog_delete">Удалить</string>
     <string name="delete_source_title">Удалить источник</string>
-    <string name="got_it">Понятно</string>
+    <!-- duplicate moved to strings.xml -->
     <!-- bank_* уже есть в strings.xml -->
     <string name="header_date">Дата</string>
     <string name="header_amount">Сумма</string>

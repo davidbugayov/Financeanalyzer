@@ -48,8 +48,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -76,7 +76,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
@@ -87,7 +87,6 @@ import java.util.Date
 import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1201,7 +1200,7 @@ private fun BudgetSummaryHeader(
                     .padding(20.dp),
         ) {
             Text(
-                text = "Сводка бюджета",
+                text = stringResource(UiR.string.budget_summary),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 16.dp),
@@ -1230,7 +1229,7 @@ private fun BudgetSummaryHeader(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Расчетный период: ${state.selectedPeriodDuration} дней",
+                    text = stringResource(UiR.string.calculation_period_days, state.selectedPeriodDuration),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -1241,7 +1240,7 @@ private fun BudgetSummaryHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 BudgetInfoCard(
-                    title = "Общий лимит",
+                    title = stringResource(UiR.string.total_limit),
                     value =
                         state.totalLimit.formatForDisplay(
                             showCurrency = true,
@@ -1255,7 +1254,7 @@ private fun BudgetSummaryHeader(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 BudgetInfoCard(
-                    title = "Потрачено",
+                    title = stringResource(UiR.string.spent),
                     value =
                         state.totalSpent.formatForDisplay(
                             showCurrency = true,
@@ -1269,7 +1268,7 @@ private fun BudgetSummaryHeader(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 BudgetInfoCard(
-                    title = "Баланс",
+                    title = stringResource(UiR.string.balance_label),
                     value =
                         state.totalWalletBalance.formatForDisplay(
                             showCurrency = true,
@@ -1302,7 +1301,7 @@ private fun BudgetSummaryHeader(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Добавить кошелек",
+                    text = stringResource(UiR.string.add_wallet),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 )

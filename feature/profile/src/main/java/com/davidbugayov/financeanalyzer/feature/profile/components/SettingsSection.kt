@@ -34,15 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
  * @param onThemeClick Обработчик нажатия на настройку темы.
  * @param onLanguageClick Обработчик нажатия на настройку языка.
+ * @param languageSubtitle Текущее значение языка в виде читаемой подписи.
  * @param onCurrencyClick Обработчик нажатия на настройку валюты.
  * @param onTransactionReminderClick Обработчик нажатия на настройку напоминаний о транзакциях.
  * @param themeMode Текущий режим темы приложения.
@@ -58,6 +58,7 @@ fun SettingsSection(
     onCurrencyClick: () -> Unit,
     onTransactionReminderClick: () -> Unit,
     themeMode: ThemeMode,
+    languageSubtitle: String,
     selectedCurrency: Currency,
     isTransactionReminderEnabled: Boolean,
     transactionReminderTime: Time?,
@@ -98,7 +99,7 @@ fun SettingsSection(
                 icon = Icons.Default.Language,
                 iconBackground = MaterialTheme.colorScheme.secondary,
                 title = stringResource(UiR.string.settings_language_title),
-                subtitle = stringResource(UiR.string.settings_language_current_value),
+                subtitle = languageSubtitle,
                 onClick = onLanguageClick,
             )
         }

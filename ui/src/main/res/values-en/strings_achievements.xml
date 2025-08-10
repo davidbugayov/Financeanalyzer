@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="achievements">Achievements</string>
+  <string name="achievements_your_achievements">Your achievements</string>
+  <string name="achievements_unlocked_of_total">%1$d of %2$d unlocked</string>
+  <string name="achievements_filters_title">📊 Filters</string>
+  <string name="achievements_categories_title">🎯 Categories</string>
+  <string name="achievements_reward_coins">%1$d coins</string>
+  <string name="achievements_overall_progress">Overall progress</string>
+  <string name="achievements_filter_all">All</string>
+  <string name="achievements_filter_unlocked">Unlocked</string>
+  <string name="achievements_filter_locked">Locked</string>
+  <string name="achievements_category_transactions">Transactions</string>
+  <string name="achievements_category_budget">Budget</string>
+  <string name="achievements_category_savings">Savings</string>
+  <string name="achievements_category_habits">Habits</string>
+  <string name="achievements_category_statistics">Statistics</string>
+  <string name="achievements_category_milestones">Milestones</string>
+  <string name="achievements_category_special">Special</string>
+  <string name="achievements_category_import">Import</string>
+  <string name="achievements_category_export">Export</string>
+  <string name="achievements_unlocked">Unlocked</string>
+  <string name="achievements_progress">Progress</string>
+  <string name="achievements_rarity_common">Common</string>
+  <string name="achievements_rarity_rare">Rare</string>
+  <string name="achievements_rarity_epic">Epic</string>
+  <string name="achievements_rarity_legendary">Legendary</string>
+</resources>
+

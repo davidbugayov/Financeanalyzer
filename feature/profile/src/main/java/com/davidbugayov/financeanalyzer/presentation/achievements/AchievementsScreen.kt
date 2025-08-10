@@ -56,7 +56,6 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Card
@@ -127,7 +126,7 @@ private fun AchievementsScreenContent(
     achievements: List<Achievement>,
     onBack: () -> Unit,
 ) {
-    val context = LocalContext.current
+    LocalContext.current
 
     // Аналитика: отслеживаем посещение экрана достижений
     LaunchedEffect(achievements) {
@@ -336,14 +335,18 @@ private fun ModernStatsCard(achievements: List<Achievement>) {
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "🏆 Ваши достижения",
+                            text = stringResource(UiR.string.achievements_your_achievements),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "$unlockedCount из ${achievements.size} разблокировано",
+                            text = stringResource(
+                                UiR.string.achievements_unlocked_of_total,
+                                unlockedCount,
+                                achievements.size,
+                            ),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -437,7 +440,7 @@ private fun ModernFilters(
     ) {
         // Статусные фильтры
         Text(
-            text = "📊 Фильтры",
+            text = stringResource(UiR.string.achievements_filters_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp),
@@ -484,7 +487,7 @@ private fun ModernFilters(
 
         // Категорийные фильтры
         Text(
-            text = "🎯 Категории",
+            text = stringResource(UiR.string.achievements_categories_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp),
@@ -705,7 +708,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${achievement.rewardCoins} монет",
+                            text = stringResource(UiR.string.achievements_reward_coins, achievement.rewardCoins),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (achievement.isUnlocked) Color(0xFFFF8F00) else Color.Gray,
                             fontWeight = FontWeight.Medium,

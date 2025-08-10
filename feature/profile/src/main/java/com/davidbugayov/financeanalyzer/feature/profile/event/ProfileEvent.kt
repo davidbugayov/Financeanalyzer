@@ -50,6 +50,12 @@ sealed class ProfileEvent {
      */
     data class ChangeLanguage(val language: String) : ProfileEvent()
 
+    /** Показать диалог выбора языка */
+    data object ShowLanguageDialog : ProfileEvent()
+
+    /** Скрыть диалог выбора языка */
+    data object HideLanguageDialog : ProfileEvent()
+
     /**
      * Событие изменения валюты по умолчанию.
      * @param currency Выбранная валюта.
