@@ -13,6 +13,8 @@ import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseC
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthScoreUseCase
 import kotlinx.datetime.LocalDate
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -26,6 +28,13 @@ class SharedFacade {
     private val predictFutureExpenses = PredictFutureExpensesUseCase()
     private val calculateRetirementForecast = CalculateRetirementForecastUseCase()
     private val calculateFinancialHealthScore = CalculateFinancialHealthScoreUseCase()
+    private val calculateEnhancedFinancialMetrics = CalculateEnhancedFinancialMetricsUseCase(
+        calculateFinancialHealthScore,
+        calculateExpenseDisciplineIndex,
+        calculateRetirementForecast,
+        calculatePeerComparison,
+    )
+    private val getSmartExpenseTips = GetSmartExpenseTipsUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -69,6 +78,24 @@ class SharedFacade {
      */
     fun financialHealthScore(transactions: List<Transaction>, periodMonths: Int = 6): Pair<Double, com.davidbugayov.financeanalyzer.shared.model.HealthScoreBreakdown> =
         calculateFinancialHealthScore(transactions, periodMonths)
+
+    /**
+     * Композитный расчет метрик и рекомендаций.
+     */
+    fun enhancedFinancialMetrics(
+        transactions: List<Transaction>,
+        currentAge: Int = 30,
+        retirementAge: Int = 65,
+        currentSavings: Money = Money.zero(),
+        desiredMonthlyPension: Money? = null,
+    ): com.davidbugayov.financeanalyzer.shared.model.FinancialHealthMetrics =
+        calculateEnhancedFinancialMetrics(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
+
+    /**
+     * Коды советов по экономии.
+     */
+    fun smartExpenseTips(transactions: List<Transaction>): List<String> =
+        getSmartExpenseTips.invoke(transactions)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
