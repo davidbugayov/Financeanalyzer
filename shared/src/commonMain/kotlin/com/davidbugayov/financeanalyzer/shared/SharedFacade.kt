@@ -16,6 +16,8 @@ import kotlinx.datetime.LocalDate
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetProfileAnalyticsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -37,6 +39,8 @@ class SharedFacade {
     )
     private val getSmartExpenseTips = GetSmartExpenseTipsUseCase()
     private val getProfileAnalytics = GetProfileAnalyticsUseCase()
+    private val filterTransactions = FilterTransactionsUseCase()
+    private val groupTransactions = GroupTransactionsUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -110,6 +114,23 @@ class SharedFacade {
         val currency = Currency.fromCode(currencyCode)
         return getProfileAnalytics(transactions, currency, totalWallets)
     }
+
+    /**
+     * Фильтрация и группировка транзакций.
+     */
+    fun filterTransactions(
+        transactions: List<Transaction>,
+        periodType: com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType,
+        now: kotlinx.datetime.LocalDate,
+        customStart: kotlinx.datetime.LocalDate? = null,
+        customEnd: kotlinx.datetime.LocalDate? = null,
+        isExpense: Boolean? = null,
+    ): List<Transaction> = filterTransactions(transactions, periodType, now, customStart, customEnd, isExpense)
+
+    fun groupTransactions(
+        transactions: List<Transaction>,
+        keyType: GroupTransactionsUseCase.KeyType,
+    ): Map<String, List<Transaction>> = groupTransactions(transactions, keyType)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
