@@ -1,0 +1,31 @@
+name: FinanceAnalyzerIOS
+options:
+  minimumXcodeGenVersion: 2.35.0
+  deploymentTarget:
+    iOS: 14.0
+targets:
+  FinanceAnalyzerIOS:
+    type: application
+    platform: iOS
+    deploymentTarget: 14.0
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davidbugayov.financeanalyzer.ios
+        SWIFT_VERSION: 5.0
+        INFOPLIST_FILE: Info.plist
+    postCompileScripts: []
+    postGenCommand: |
+      echo 'Running pod install...'
+      if command -v pod >/dev/null 2>&1; then
+        pod install --project-directory=.
+      else
+        echo 'CocoaPods not installed; please run: sudo gem install cocoapods && pod install'
+      fi
+schemes:
+  FinanceAnalyzerIOS:
+    build:
+      targets:
+        FinanceAnalyzerIOS: all
+
