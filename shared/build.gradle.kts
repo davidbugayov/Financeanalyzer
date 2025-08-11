@@ -4,6 +4,7 @@ plugins {
     // For iOS frameworks publishing
     id("com.android.library")
     alias(libs.plugins.kotlin.serialization)
+    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
@@ -13,11 +14,22 @@ kotlin {
     val iosArm64Target = iosArm64()
     val iosSimArm64Target = iosSimulatorArm64()
 
+    cocoapods {
+        version = "1.0.0"
+        summary = "FinanceAnalyzer shared logic"
+        homepage = "https://github.com/davidbugayov/FinanceAnalyzer"
+        ios.deploymentTarget = "14.0"
+        framework {
+            baseName = "shared"
+            isStatic = false
+        }
+    }
+
     // Configure iOS frameworks + XCFramework
     val xcf = XCFramework()
     listOf(iosX64Target, iosArm64Target, iosSimArm64Target).forEach { target ->
         target.binaries.framework {
-            baseName = "Shared"
+            baseName = "shared"
             isStatic = false
             xcf.add(this)
         }
