@@ -46,7 +46,7 @@ class CalculateFinancialHealthScoreUseCase {
     private fun groupByMonth(transactions: List<Transaction>): Map<String, List<Transaction>> {
         return transactions.groupBy { tx ->
             val d: LocalDate = tx.date
-            "${d.year}-${d.monthNumber}"
+            "${d.year}-${d.month}"
         }
     }
 

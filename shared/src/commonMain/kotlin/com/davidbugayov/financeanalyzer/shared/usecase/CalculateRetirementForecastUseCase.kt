@@ -72,7 +72,7 @@ class CalculateRetirementForecastUseCase {
 
     private fun calculateAverageMonthlySavings(transactions: List<Transaction>): Money {
         if (transactions.isEmpty()) return Money.zero()
-        val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.monthNumber}" }
+        val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val monthlySavings = byMonth.values.map { monthTxs ->
             val income = monthTxs.filter { !it.isExpense }.sumOf { it.amount.minor }
             val expense = monthTxs.filter { it.isExpense }.sumOf { it.amount.minor }
@@ -97,7 +97,7 @@ class CalculateRetirementForecastUseCase {
     private fun calculateAverageMonthlyExpense(transactions: List<Transaction>): Money {
         val expenses = transactions.filter { it.isExpense }
         if (expenses.isEmpty()) return Money(50_000_00L)
-        val byMonth = expenses.groupBy { t -> "${t.date.year}-${t.date.monthNumber}" }
+        val byMonth = expenses.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val monthly = byMonth.values.map { txs -> txs.sumOf { it.amount.minor } }
         return if (monthly.isNotEmpty()) Money(monthly.sum() / monthly.size) else Money(50_000_00L)
     }

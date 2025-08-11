@@ -19,7 +19,7 @@ class PredictFutureExpensesUseCase {
 
         if (cleaned.isEmpty()) return Money.zero()
 
-        val monthlyExpenses = cleaned.groupBy { tx -> "${tx.date.year}-${tx.date.monthNumber}" }
+        val monthlyExpenses = cleaned.groupBy { tx -> "${tx.date.year}-${tx.date.month}" }
             .mapValues { entry -> entry.value.sumOf { it.amount.minor } }
 
         if (monthlyExpenses.isEmpty()) return Money.zero()

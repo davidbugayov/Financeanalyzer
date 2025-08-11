@@ -29,7 +29,7 @@ class CalculatePeerComparisonUseCase {
 
     private fun calculateAverageMonthlyIncome(transactions: List<Transaction>): Money {
         val monthly = transactions.filter { !it.isExpense }
-            .groupBy { t -> "${t.date.year}-${t.date.monthNumber}" }
+            .groupBy { t -> "${t.date.year}-${t.date.month}" }
             .mapValues { (_, txs) -> txs.sumOf { it.amount.minor } }
         if (monthly.isEmpty()) return Money.zero()
         val avg = monthly.values.sum() / monthly.size
@@ -48,7 +48,7 @@ class CalculatePeerComparisonUseCase {
     }
 
     private fun calculateSavingsRate(transactions: List<Transaction>): Double {
-        val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.monthNumber}" }
+        val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val rates = byMonth.values.map { monthTxs ->
             val income = monthTxs.filter { !it.isExpense }.sumOf { it.amount.minor }.toDouble()
             val expense = monthTxs.filter { it.isExpense }.sumOf { it.amount.minor }.toDouble()
