@@ -15,6 +15,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthS
 import kotlinx.datetime.LocalDate
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.GetProfileAnalyticsUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -35,6 +36,7 @@ class SharedFacade {
         calculatePeerComparison,
     )
     private val getSmartExpenseTips = GetSmartExpenseTipsUseCase()
+    private val getProfileAnalytics = GetProfileAnalyticsUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -96,6 +98,18 @@ class SharedFacade {
      */
     fun smartExpenseTips(transactions: List<Transaction>): List<String> =
         getSmartExpenseTips.invoke(transactions)
+
+    /**
+     * Профильная аналитика по транзакциям.
+     */
+    fun profileAnalytics(
+        transactions: List<Transaction>,
+        currencyCode: String,
+        totalWallets: Int = 0,
+    ): com.davidbugayov.financeanalyzer.shared.model.ProfileAnalytics {
+        val currency = Currency.fromCode(currencyCode)
+        return getProfileAnalytics(transactions, currency, totalWallets)
+    }
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
