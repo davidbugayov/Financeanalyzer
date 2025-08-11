@@ -21,11 +21,15 @@ import com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetTransactionByIdUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
  */
-class SharedFacade {
+class SharedFacade(
+    private val transactionRepository: TransactionRepository? = null,
+) {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
     private val calculateCategoryStats = CalculateCategoryStatsUseCase()
     private val getCategoriesWithAmount = GetCategoriesWithAmountUseCase()
@@ -47,6 +51,7 @@ class SharedFacade {
     private val validateTransaction = ValidateTransactionUseCase()
     private val exportTransactionsToCSV = ExportTransactionsToCSVUseCase()
     private val getTransactionById = GetTransactionByIdUseCase()
+    private val loadTransactions: LoadTransactionsUseCase? = transactionRepository?.let { LoadTransactionsUseCase(it) }
 
     /**
      * Считает метрики по списку транзакций.
@@ -158,6 +163,12 @@ class SharedFacade {
      */
     fun getTransactionById(transactions: List<Transaction>, id: String): Transaction? =
         getTransactionById(transactions, id)
+
+    /**
+     * Загрузка транзакций (если передан репозиторий в конструктор фасада).
+     */
+    suspend fun loadTransactions(): List<Transaction> =
+        loadTransactions?.invoke() ?: emptyList()
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
