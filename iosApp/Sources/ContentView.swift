@@ -6,7 +6,7 @@ struct ContentView: View {
         VStack(spacing: 12) {
             Text("FinanceAnalyzer iOS")
                 .font(.title)
-            Text("KMP shared: " + (SharedFacade().moneyFromDouble(value: 123.45, currencyCode: "USD").toString()))
+            Text("KMP shared: " + SharedFacade().moneyFromDouble(value: 123.45, currencyCode: "USD").toPlainString())
                 .font(.footnote)
         }
         .padding()

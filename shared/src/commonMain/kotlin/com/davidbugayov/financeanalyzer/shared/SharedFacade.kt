@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseDisciplin
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculatePeerComparisonUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthScoreUseCase
 import kotlinx.datetime.LocalDate
 
 /**
@@ -24,6 +25,7 @@ class SharedFacade {
     private val calculatePeerComparison = CalculatePeerComparisonUseCase()
     private val predictFutureExpenses = PredictFutureExpensesUseCase()
     private val calculateRetirementForecast = CalculateRetirementForecastUseCase()
+    private val calculateFinancialHealthScore = CalculateFinancialHealthScoreUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -61,6 +63,12 @@ class SharedFacade {
         desiredMonthlyPension: Money? = null,
     ): com.davidbugayov.financeanalyzer.shared.model.RetirementForecast =
         calculateRetirementForecast(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
+
+    /**
+     * Возвращает коэффициент финансового здоровья и декомпозицию компонентов.
+     */
+    fun financialHealthScore(transactions: List<Transaction>, periodMonths: Int = 6): Pair<Double, com.davidbugayov.financeanalyzer.shared.model.HealthScoreBreakdown> =
+        calculateFinancialHealthScore(transactions, periodMonths)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
