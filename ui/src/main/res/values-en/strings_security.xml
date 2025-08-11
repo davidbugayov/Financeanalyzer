@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="security_title">Security</string>
+  <string name="security_app_lock_title">App lock</string>
+</resources>
+
+

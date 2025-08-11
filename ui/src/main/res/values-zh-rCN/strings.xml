@@ -106,7 +106,7 @@
     <string name="back">返回</string>
     <string name="balance">平衡</string>
     <string name="bank_alfabank">阿尔法银行</string>
-    <string name="bank_ozon">臭氧</string>
+  <string name="bank_ozon">OZON</string>
     <string name="bank_tinkoff">Tinkoff</string>
     <string name="budget">预算</string>
     <string name="budget_exceeded">预算超出了</string>
@@ -270,7 +270,7 @@
     <string name="increase_savings_rate_description_ui">您的积蓄可以大大增加以实现财务目标。</string>
     <string name="increase_savings_rate_impact_ui">目的：收入的20％</string>
     <string name="increase_savings_rate_title_ui">增加储蓄的规范</string>
-    <string name="initializing_subcategories">子类别的初始化...</string>
+  <string name="initializing_subcategories">子类别的初始化…</string>
     <string name="insight_active_weekday">一周中的活跃一天</string>
     <string name="insight_active_weekday_desc">最活跃的一天：％s</string>
     <string name="insight_active_weekday_metric">%s</string>
@@ -682,7 +682,7 @@
     <string name="wallet_budget_progress">预算进度</string>
     <string name="wallet_create_button">创建一个钱包</string>
     <string name="wallet_created_success">钱包已经成功地创建了</string>
-    <string name="wallet_creating">创建一个钱包...</string>
+  <string name="wallet_creating">创建一个钱包…</string>
     <string name="wallet_goal_amount_example">例如：100000</string>
     <string name="wallet_goal_amount_hint">输入目标数量</string>
     <string name="wallet_goal_amount_label">目标量</string>
@@ -953,6 +953,9 @@
     <string name="app_version">版本</string>
     <string name="build_version">集会</string>
     <string name="security_app_lock_description">使用PIN代码保护您的数据</string>
+  <!-- duplicate removed: profile_export_import_subtitle defined once below -->
+  <string name="profile_budget_subtitle">预算规划</string>
+  <string name="profile_achievements_subtitle">统计与目标</string>
     <string name="security_biometric_description">使用指纹或脸部</string>
     <string name="security_pin_setup_title">PIN码的安装</string>
     <string name="security_pin_confirm_title">确认PIN码</string>
@@ -1152,7 +1155,7 @@
     <string name="import_error_statistics_file">该文件包含统计信息，而不是交易。请选择带有交易的文件以进行导入。</string>
     <string name="import_error_unknown_format">未识别文件格式。仅支持银行的CSV文件和提取物。</string>
     <string name="import_error_unsupported_format">不支持的文件格式。请从受支持的银行中选择一个CSV文件或摘录。</string>
-    <string name="import_in_progress">我导入交易...</string>
+  <string name="import_in_progress">我导入交易…</string>
     <string name="import_instructions">1。以CSV，PDF或XLSX格式下载银行提取物
 2。对于Alpha Bank，最好使用XLSX格式
 3。对于Sberbank，也支持PDF
@@ -1162,11 +1165,11 @@
 单击下面的银行以查找详细说明。</string>
     <string name="import_progress_completed">文件导入%1$s完成</string>
     <string name="import_progress_count">%1$d来自%2$s transactions</string>
-    <string name="import_progress_format_validated_skipping_headers">文件格式%1$s经过验证，传递头条...</string>
-    <string name="import_progress_processing_transactions">从文件%1$s ...</string>
-    <string name="import_progress_saving_transactions">从文件中保存__p_0__交易%2$s ...</string>
+  <string name="import_progress_format_validated_skipping_headers">文件格式%1$s经过验证，传递头条…</string>
+  <string name="import_progress_processing_transactions">从文件%1$s …</string>
+  <string name="import_progress_saving_transactions">从文件中保存__p_0__交易%2$s …</string>
     <string name="import_progress_starting">文件导入%1$s</string>
-    <string name="import_progress_text_extracted_validating">文本是从%1$s提取的，检查格式...</string>
+  <string name="import_progress_text_extracted_validating">文本是从%1$s提取的，检查格式…</string>
     <string name="import_results">导入结果</string>
     <string name="import_section_description">从CSV文件或银行提取物中导入交易。支持Sberbank，T-Bank，Alfa-Bank和Ozon Bank。</string>
     <string name="import_section_description_friendly">从银行或CSV文件下载放电，以将交易添加到应用程序中。支持Sberbank，T-Bank，Alfa-Bank和Ozon Bank。</string>
@@ -1175,7 +1178,7 @@
     <string name="import_summary">导入成功完成。导入：%1$s，错过：%2$s</string>
     <string name="import_total_amount">总金额：％d₽</string>
     <string name="import_transactions_hint">点击从不同银行进口交易</string>
-    <string name="importing_file">我们导入文件...</string>
+  <string name="importing_file">我们导入文件…</string>
     <string name="log_category_expense_usage_increased">类别：增加的消耗类别使用仪表：%1$s</string>
     <string name="log_category_income_usage_increased">类别：收入类别的使用仪表增加：%1$s</string>
     <string name="log_category_positions_updated">[category_sort]更新类别的位置</string>

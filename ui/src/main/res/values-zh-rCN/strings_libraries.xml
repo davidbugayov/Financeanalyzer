@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="library_jetpack_compose_name">Jetpack Compose</string>
+  <string name="library_jetpack_compose_description">用于构建原生 Android 界面的现代工具集</string>
+
+  <string name="library_kotlin_coroutines_name">Kotlin 协程</string>
+  <string name="library_kotlin_coroutines_description">Kotlin 的异步编程库</string>
+
+  <string name="library_koin_name">Koin</string>
+  <string name="library_koin_description">轻量级依赖注入库</string>
+
+  <string name="library_room_name">Room</string>
+  <string name="library_room_description">用于 SQLite 数据库的持久化库</string>
+
+  <string name="library_material3_name">Material3</string>
+  <string name="library_material3_description">Android 的 Material Design 3 组件</string>
+
+  <string name="library_timber_name">Timber</string>
+  <string name="library_timber_description">Android 日志库</string>
+
+  <string name="library_pdfbox_android_name">PDFBox Android</string>
+  <string name="library_pdfbox_android_description">在 Android 上处理 PDF 文件</string>
+
+  <string name="library_apache_poi_name">Apache POI</string>
+  <string name="library_apache_poi_description">处理 Microsoft Office 文档</string>
+
+  <string name="library_navigation_compose_name">Navigation Compose</string>
+  <string name="library_navigation_compose_description">Jetpack Compose 应用的导航</string>
+
+  <string name="library_lifecycle_name">Lifecycle</string>
+  <string name="library_lifecycle_description">Android 生命周期感知组件</string>
+
+  <string name="library_core_ktx_name">Core KTX</string>
+  <string name="library_core_ktx_description">Android 核心库的 Kotlin 扩展</string>
+
+  <string name="library_accompanist_name">Accompanist</string>
+  <string name="library_accompanist_description">Jetpack Compose 的实用扩展库</string>
+
+  <string name="library_version_format">版本：%1$s</string>
+  <string name="library_license_format">许可证：%1$s</string>
+</resources>
+

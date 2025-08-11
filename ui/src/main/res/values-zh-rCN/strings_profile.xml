@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="profile_title">个人资料</string>
+  <string name="profile_settings_title">设置</string>
+  <string name="settings_theme_title">主题</string>
+  <string name="settings_language_title">语言</string>
+  <string name="profile_currency_title">货币</string>
+  <string name="profile_transaction_reminders_title">交易提醒</string>
+  <!-- duplicates removed; defined in values-zh-rCN/strings.xml -->
+  <string name="currency_name_rub">俄罗斯卢布</string>
+  <string name="currency_name_usd">美元</string>
+  <string name="currency_name_eur">欧元</string>
+  <string name="currency_name_cny">人民币</string>
+  <string name="notification_settings">通知设置</string>
+  <string name="enable_reminders">启用提醒</string>
+  <string name="reminder_description">接收每日提醒</string>
+  <string name="reminder_time">提醒时间</string>
+  <string name="reminder_time_description">当前时间：%1$s</string>
+  <string name="edit_time">编辑时间</string>
+  <string name="notification_permission_required">需要通知权限</string>
+  <string name="request_permission">请求权限</string>
+  <string name="off">关闭</string>
+  <string name="settings_reminder_time_format">时间：%1$d:%2$02d</string>
+</resources>
+
+

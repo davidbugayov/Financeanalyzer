@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string-array name="default_source_names">
+    <item>Sber</item>
+    <item>Tinkoff</item>
+    <item>Alfa</item>
+    <item>OZON</item>
+    <item>VTB</item>
+    <item>Gazprombank</item>
+    <item>Raiffeisen</item>
+    <item>Post Bank</item>
+    <item>YuMoney</item>
+    <item>Cash</item>
+  </string-array>
+</resources>
+
+

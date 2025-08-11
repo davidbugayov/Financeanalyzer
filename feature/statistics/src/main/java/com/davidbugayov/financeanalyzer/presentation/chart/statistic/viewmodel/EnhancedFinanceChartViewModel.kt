@@ -19,8 +19,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -58,30 +56,16 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun formatPeriod(
+    // Форматирование периода перенесено в UI-слой; в состоянии храним короткую форму
+    private fun formatPeriodCompact(
         periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType,
         startDate: java.util.Date,
         endDate: java.util.Date,
     ): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        val df = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.forLanguageTag("ru"))
         return when (periodType) {
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL -> "Все время"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.DAY -> "День: ${dateFormat.format(startDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.WEEK -> "Неделя: ${dateFormat.format(
-                startDate,
-            )} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.MONTH -> "Месяц: ${dateFormat.format(
-                startDate,
-            )} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.QUARTER -> "Квартал: ${dateFormat.format(
-                startDate,
-            )} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.YEAR -> "Год: ${dateFormat.format(
-                startDate,
-            )} - ${dateFormat.format(endDate)}"
-            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM -> "Произвольный: ${dateFormat.format(
-                startDate,
-            )} - ${dateFormat.format(endDate)}"
+            com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL -> ""
+            else -> df.format(startDate) + " - " + df.format(endDate)
         }
     }
 
@@ -205,12 +189,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         incomeLineChartData = incomeLineChartData,
                         expenseLineChartData = expenseLineChartData,
                         error = null,
-                        periodText =
-                            formatPeriod(
-                                it.periodType,
-                                it.startDate,
-                                it.endDate,
-                            ),
+                        periodText = formatPeriodCompact(it.periodType, it.startDate, it.endDate),
                         savingsRate = savingsRate,
                         averageDailyExpense = averageDailyExpense,
                         monthsOfSavings = monthsOfSavings,
@@ -270,15 +249,8 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     }
 
     private fun updatePeriodText() {
-        _state.update {
-            it.copy(
-                periodText =
-                    formatPeriod(
-                        it.periodType,
-                        it.startDate,
-                        it.endDate,
-                    ),
-            )
+        _state.update { st ->
+            st.copy(periodText = formatPeriodCompact(st.periodType, st.startDate, st.endDate))
         }
     }
 

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="no_transactions">No transactions</string>
+  <string name="add_first_transaction_description">Add the first transaction to start tracking your finances</string>
+  <string name="empty_state_icon">Empty state icon</string>
+  <string name="filter_all">All</string>
+  <string name="filter_today">Today</string>
+  <string name="filter_week">Week</string>
+  <string name="filter_month">Month</string>
+  <string name="show_incomes">Show incomes</string>
+  <string name="show_expenses">Show expenses</string>
+  <string name="and_more_categories">And %1$d more categories</string>
+  <string name="hide">Hide</string>
+</resources>
+
+

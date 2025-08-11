@@ -287,7 +287,10 @@ private fun SummaryCategoryList(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = categorySummary.category,
+                    text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                        androidx.compose.ui.platform.LocalContext.current,
+                        categorySummary.category,
+                    ),
                     fontSize = 13.sp,
                     color = textSecondary,
                     fontWeight = FontWeight.Medium,
@@ -371,10 +374,10 @@ private fun SummaryHideButton(
 @Composable
 private fun periodTitleForFilter(filter: TransactionFilter): String {
     return when (filter) {
-        TransactionFilter.TODAY -> "Сегодня"
-        TransactionFilter.WEEK -> "Неделя"
-        TransactionFilter.MONTH -> "Месяц"
-        TransactionFilter.ALL -> "Все время"
+        TransactionFilter.TODAY -> stringResource(UiR.string.filter_today)
+        TransactionFilter.WEEK -> stringResource(UiR.string.filter_week)
+        TransactionFilter.MONTH -> stringResource(UiR.string.filter_month)
+        TransactionFilter.ALL -> stringResource(UiR.string.all_time)
     }
 }
 

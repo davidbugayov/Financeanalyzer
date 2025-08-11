@@ -133,8 +133,8 @@ fun EnhancedCategoryPieChart(
             }
         }
 
-    // Determine if the first category is income
-    val isIncome = filteredData.firstOrNull()?.original?.isExpense == false
+    // Определяем режим по явному флагу: если показываем расходы, то не доход
+    val isIncome = !showExpenses
 
     // Используем белый цвет фона для карточки
     val cardColor = MaterialTheme.colorScheme.surface // Use theme surface color instead of hardcoded white
@@ -402,9 +402,12 @@ fun EnhancedCategoryPieChart(
                                     ),
                         )
 
-                        // Название категории
+                        // Название категории (локализуем дефолтные ключи)
                         Text(
-                            text = item.name,
+                            text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                LocalContext.current,
+                                item.name,
+                            ),
                             style =
                                 MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,

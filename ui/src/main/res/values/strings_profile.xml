@@ -31,5 +31,10 @@
     <!-- export_import и profile_export_import_subtitle определены в strings.xml -->
     <string name="achievements">Достижения</string>
     <string name="profile_achievements_subtitle">Статистика и цели</string>
+  <!-- currency names for localization -->
+  <string name="currency_name_rub">Российский рубль</string>
+  <string name="currency_name_usd">Доллар США</string>
+  <string name="currency_name_eur">Евро</string>
+  <string name="currency_name_cny">Китайский юань</string>
 </resources>
 

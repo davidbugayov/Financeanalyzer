@@ -51,7 +51,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
@@ -67,7 +67,6 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 object Formatters {
     fun formatAmount(
@@ -339,10 +338,10 @@ fun TransactionItem(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text =
-                        transaction.category.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                        },
+                    text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                        context,
+                        transaction.category,
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

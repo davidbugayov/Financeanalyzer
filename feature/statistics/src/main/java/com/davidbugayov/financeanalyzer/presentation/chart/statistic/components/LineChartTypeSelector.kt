@@ -66,7 +66,7 @@ fun LineChartTypeSelector(
         )
 
         SelectorButton(
-            text = "Оба",
+            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.both),
             isSelected = selectedMode == LineChartDisplayMode.BOTH,
             color = MaterialTheme.colorScheme.tertiary,
             onClick = { onModeSelected(LineChartDisplayMode.BOTH) },

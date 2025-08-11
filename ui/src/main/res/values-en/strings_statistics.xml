@@ -10,6 +10,7 @@
   <string name="key_metrics">Key metrics</string>
 
   <string name="savings_rate_title">Savings rate</string>
+  <string name="financial_health_savings_rate_content" formatted="false">Savings rate shows what percentage of your income you save. Calculated as (Income − Expenses) / Income × 100%. It is recommended to save 10–20% of income to achieve financial goals.</string>
   <string name="savings_rate_0_percent">0%</string>
   <string name="savings_rate_15_percent">15%</string>
   <string name="savings_rate_30_percent">30%</string>
@@ -50,4 +51,5 @@
   <string name="financial_health_tooltip_description">Tap to see detailed information and tips</string>
   <string name="prediction_subtitle">Based on your recent transactions and trends</string>
 </resources>
+
 

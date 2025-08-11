@@ -92,7 +92,7 @@ fun ExportImportScreen(
     LaunchedEffect(exportError) {
         exportError?.let { message ->
             scope.launch {
-                snackbarHostState.showSnackbar(message ?: "Error")
+                snackbarHostState.showSnackbar(message)
                 viewModel.clearExportMessages()
             }
         }
@@ -277,7 +277,7 @@ fun ModernCSVExportDialog(
             ) {
                 // Заголовок
                 Text(
-                    text = stringResource(R.string.export_button_friendly),
+                    text = stringResource(UiR.string.export_button_friendly),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 20.dp),
@@ -286,8 +286,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Поделиться"
                 ActionCard(
                     icon = Icons.Default.Share,
-                    title = stringResource(R.string.share),
-                    description = stringResource(R.string.share_description),
+                    title = stringResource(UiR.string.share),
+                    description = stringResource(UiR.string.share_description),
                     color = MaterialTheme.colorScheme.primary,
                     onClick = {
                         onShare()
@@ -300,8 +300,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Открыть"
                 ActionCard(
                     icon = Icons.AutoMirrored.Filled.OpenInNew,
-                    title = stringResource(R.string.open_file),
-                    description = stringResource(R.string.open_file_description),
+                    title = stringResource(UiR.string.open_file),
+                    description = stringResource(UiR.string.open_file_description),
                     color = MaterialTheme.colorScheme.secondary,
                     onClick = {
                         onOpen()
@@ -314,8 +314,8 @@ fun ModernCSVExportDialog(
                 // Кнопка "Сохранить"
                 ActionCard(
                     icon = Icons.Default.Download,
-                    title = stringResource(R.string.save),
-                    description = stringResource(R.string.save_without_actions),
+                    title = stringResource(UiR.string.save),
+                    description = stringResource(UiR.string.save_without_actions),
                     color = MaterialTheme.colorScheme.tertiary,
                     onClick = {
                         onSave()

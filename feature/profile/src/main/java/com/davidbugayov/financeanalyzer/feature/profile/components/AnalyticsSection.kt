@@ -48,13 +48,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
@@ -62,7 +61,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalWarningColor
 import java.math.BigDecimal
 import java.util.Locale
 import kotlinx.coroutines.delay
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Компонент для отображения финансовой статистики и аналитики.
@@ -222,7 +220,7 @@ fun AnalyticsSection(
                             title = stringResource(UiR.string.balance),
                             value = balance.formatForDisplay(useMinimalDecimals = true),
                             color = balanceColor,
-                            icon = painterResource(UiR.drawable.ic_rubble),
+                            icon = rememberVectorPainter(Icons.AutoMirrored.Filled.TrendingUp),
                             animationDelay = 200,
                             modifier = Modifier.weight(1f),
                         )

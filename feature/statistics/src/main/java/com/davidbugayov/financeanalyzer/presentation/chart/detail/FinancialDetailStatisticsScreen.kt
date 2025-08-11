@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.DateRange
@@ -37,27 +38,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.card.FinancialDataMapper
-import com.davidbugayov.financeanalyzer.ui.components.card.PremiumInsightsCard
 import com.davidbugayov.financeanalyzer.ui.components.card.PremiumStatisticsCard
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
-import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран подробной финансовой статистики
@@ -78,7 +72,7 @@ fun FinancialDetailStatisticsScreen(
     val metrics = viewModel.metrics.collectAsState().value
 
     var selectedTabIndex by remember { mutableStateOf(0) }
-    
+
 
     // Временный лог для диагностики
     Timber.d(
@@ -163,11 +157,13 @@ fun FinancialDetailStatisticsScreen(
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
-                                Text(
-                                    text = state.period,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                // Используем общий компонент PeriodFilterBar для локализованного периода
+                                com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.PeriodFilterBar(
+                                    periodType = com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM,
+                                    startDate = java.util.Date(startDate),
+                                    endDate = java.util.Date(endDate),
+                                    onChangePeriod = { _, _, _ -> },
+                                    modifier = Modifier,
                                 )
                             }
                         }

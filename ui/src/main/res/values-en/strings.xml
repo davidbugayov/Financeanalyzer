@@ -106,7 +106,7 @@
     <string name="back">Back</string>
     <string name="balance">Balance</string>
     <string name="bank_alfabank">Alfa-Bank</string>
-    <string name="bank_ozon">Ozone</string>
+  <string name="bank_ozon">OZON</string>
     <string name="bank_tinkoff">Tinkoff</string>
     <string name="budget">Budget</string>
     <string name="budget_exceeded">The budget is exceeded</string>
@@ -270,7 +270,7 @@
     <string name="increase_savings_rate_description_ui">Your savings can be significantly increased to achieve financial goals.</string>
   <string name="increase_savings_rate_impact_ui">Goal: 20% of income</string>
     <string name="increase_savings_rate_title_ui">Increase the norm of savings</string>
-    <string name="initializing_subcategories">Initialization of subcategories ...</string>
+  <string name="initializing_subcategories">Initialization of subcategories …</string>
     <string name="insight_active_weekday">Active day of the week</string>
     <string name="insight_active_weekday_desc">The most active day: %s</string>
     <string name="insight_active_weekday_metric">%s</string>
@@ -682,7 +682,7 @@
     <string name="wallet_budget_progress">Budget progress</string>
     <string name="wallet_create_button">Create a wallet</string>
     <string name="wallet_created_success">The wallet has been successfully created</string>
-    <string name="wallet_creating">Creating a wallet ...</string>
+  <string name="wallet_creating">Creating a wallet …</string>
     <string name="wallet_goal_amount_example">For example: 100000</string>
     <string name="wallet_goal_amount_hint">Enter the target amount</string>
     <string name="wallet_goal_amount_label">Target amount</string>
@@ -1091,7 +1091,7 @@
     <string name="error_zero_amount">The amount is less or equal to zero: %1$s</string>
     <string name="export_button_friendly">Export to CSV</string>
     <string name="export_import">Export and import</string>
-    <string name="export_import_screen_title">Export and import import</string>
+  <string name="export_import_screen_title">Export and import</string>
     <string name="export_import_section">Export and import section</string>
     <string name="export_section_description">Export all transactions to the CSV file for use in Excel or other programs.</string>
     <string name="export_section_description_friendly">Download all your transactions in CSV format - convenient for Excel and other programs.Your data is always at hand!</string>
@@ -1117,15 +1117,15 @@
     <string name="import_error_statistics_file">The file contains statistics, not transactions.Please select a file with transactions for imports.</string>
     <string name="import_error_unknown_format">The file format is not recognized.Only CSV files and extracts from banks are supported.</string>
     <string name="import_error_unsupported_format">Unsupported file format.Please select a CSV file or an extract from the supported bank.</string>
-    <string name="import_in_progress">I import transactions ...</string>
+  <string name="import_in_progress">I import transactions …</string>
     <string name="import_instructions">1. Download the discharge from the bank in CSV, PDF or XLSX \n2 format.For alpha bank, it is better to use the XLSX \n3 format.For Sberbank, PDF \n4 is also supported.Press the button below and select the \n5 file.Wait for the end of the \n \nnas on the bank below to find out detailed instructions.</string>
     <string name="import_progress_completed">File import %1$s completed</string>
     <string name="import_progress_count">%1$s from %2$s transactions</string>
-    <string name="import_progress_format_validated_skipping_headers">The file format %1$s verified, passing headlines ...</string>
-    <string name="import_progress_processing_transactions">Transaction processing from the file %1$s ...</string>
-    <string name="import_progress_saving_transactions">Preservation of %1$s transactions from the file %2$s ...</string>
+  <string name="import_progress_format_validated_skipping_headers">The file format %1$s verified, passing headlines …</string>
+  <string name="import_progress_processing_transactions">Transaction processing from the file %1$s …</string>
+  <string name="import_progress_saving_transactions">Preservation of %1$s transactions from the file %2$s …</string>
     <string name="import_progress_starting">File import %1$s</string>
-    <string name="import_progress_text_extracted_validating">The text is extracted from %1$s, checking the format ...</string>
+  <string name="import_progress_text_extracted_validating">The text is extracted from %1$s, checking the format …</string>
     <string name="import_results">Import results</string>
     <string name="import_section_description">Import transactions from CSV files or bank extracts.Sberbank, T-Bank, Alfa-Bank and Ozon Bank are supported.</string>
     <string name="import_section_description_friendly">Download the discharge from the bank or CSV file to add transactions to the application.Sberbank, T-Bank, Alfa-Bank and Ozon Bank are supported.</string>
@@ -1134,7 +1134,7 @@
     <string name="import_summary">Import is successfully completed.Imported: %1$s, missed: %2$s</string>
     <string name="import_total_amount">Total amount: %d ₽</string>
     <string name="import_transactions_hint">Click to import transactions from different banks</string>
-    <string name="importing_file">We import the file ...</string>
+  <string name="importing_file">We import the file …</string>
     <string name="log_category_expense_usage_increased">Category: Increased meter of use of the consumable category: %1$s</string>
     <string name="log_category_income_usage_increased">Category: Increased meter of use of the revenue category: %1$s</string>
     <string name="log_category_positions_updated">[Category_Sort] Updating the positions of categories</string>
@@ -1193,6 +1193,8 @@
     <string name="ozon_instructions_title">Through the OZON Bank application:</string>
     <string name="proceed_to_import">Go to import</string>
     <string name="profile_export_import_subtitle">Export or import your data</string>
+  <string name="profile_budget_subtitle">Budget planning</string>
+  <string name="profile_achievements_subtitle">Statistics and goals</string>
   <string name="progress_percentage">%d%%</string>
     <string name="sberbank_card_pattern">^(</string>
     <string name="sberbank_category">CATEGORY</string>

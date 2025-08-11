@@ -189,12 +189,13 @@ private fun CurrencyIcon(currency: Currency) {
     }
 }
 
+@Composable
 private fun getCurrencyName(currency: Currency): String {
     return when (currency) {
-        Currency.RUB -> "Российский рубль"
-        Currency.USD -> "Доллар США"
-        Currency.EUR -> "Евро"
-        Currency.CNY -> "Китайский юань"
+        Currency.RUB -> stringResource(UiR.string.currency_name_rub)
+        Currency.USD -> stringResource(UiR.string.currency_name_usd)
+        Currency.EUR -> stringResource(UiR.string.currency_name_eur)
+        Currency.CNY -> stringResource(UiR.string.currency_name_cny)
         else -> currency.name
     }
 }

@@ -30,6 +30,7 @@ object ColorUtils {
     fun getSourceColorByName(sourceName: String): Color? {
         val name = sourceName.lowercase()
         return when {
+            // Russian
             name.contains("сбер") -> BankSber
             name.contains("тинькофф") || name.contains("т-банк") -> BankTinkoff
             name.contains("альфа") -> BankAlfa
@@ -38,10 +39,28 @@ object ColorUtils {
             name.contains("газпромбанк") -> BankGazprom
             name.contains("райффайзен") -> BankRaiffeisen
             name.contains("почта банк") -> BankPochta
-            name.contains("юмани") || name.contains("yoomoney") -> BankYoomoney
-            name.contains("наличные") || name.contains("кэш") || name.contains("cash") -> CashColor
-            // "перевод" теперь обрабатывается через TransferColorLight/Dark в теме
-            // Если нужен специфичный цвет для источника "Перевод", его надо добавить в BankColors
+            name.contains("юмани") -> BankYoomoney
+            name.contains("наличные") || name.contains("кэш") -> CashColor
+
+            // English
+            name.contains("sber") || name.contains("sberbank") -> BankSber
+            name.contains("tinkoff") || name.contains("t-bank") -> BankTinkoff
+            name.contains("alfa") || name.contains("alfabank") -> BankAlfa
+            name.contains("ozon") -> BankOzon
+            name.contains("vtb") -> BankVTB
+            name.contains("gazprombank") -> BankGazprom
+            name.contains("raiffeisen") -> BankRaiffeisen
+            name.contains("post bank") || name.contains("postbank") -> BankPochta
+            name.contains("yoomoney") || name.contains("yumoney") -> BankYoomoney
+            name.contains("cash") -> CashColor
+
+            // Chinese (basic aliases used in arrays.xml-zh-rCN)
+            name.contains("俄储") -> BankSber
+            name.contains("阿尔法") -> BankAlfa
+            name.contains("邮政银行") -> BankPochta
+            name.contains("现金") -> CashColor
+
+            // Default
             else -> null
         }
     }

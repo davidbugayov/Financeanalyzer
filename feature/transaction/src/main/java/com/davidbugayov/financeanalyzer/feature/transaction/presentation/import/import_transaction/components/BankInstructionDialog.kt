@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -92,11 +91,11 @@ fun BankInstructionDialog(
 @Composable
 fun BankInstructionsContent(bankName: String) {
     when (bankName) {
-        "Сбербанк" -> SberbankInstructions()
-        "Тинькофф" -> TinkoffInstructions()
-        "Альфа-Банк" -> AlfaBankInstructions()
-        "Озон" -> OzonInstructions()
-        "CSV" -> CSVInstructions()
+        stringResource(UiR.string.bank_sberbank) -> SberbankInstructions()
+        stringResource(UiR.string.bank_tinkoff) -> TinkoffInstructions()
+        stringResource(UiR.string.bank_alfabank) -> AlfaBankInstructions()
+        stringResource(UiR.string.bank_ozon) -> OzonInstructions()
+        stringResource(UiR.string.bank_csv) -> CSVInstructions()
         else -> Text(text = stringResource(UiR.string.unavailable_instructions))
     }
 }

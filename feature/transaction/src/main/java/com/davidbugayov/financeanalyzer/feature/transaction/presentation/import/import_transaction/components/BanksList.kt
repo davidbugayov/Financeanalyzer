@@ -31,7 +31,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -39,6 +38,11 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  */
 @Composable
 fun BanksList(onBankClick: (String) -> Unit = {}) {
+    val sberName = stringResource(UiR.string.bank_sberbank)
+    val tinkoffName = stringResource(UiR.string.bank_tinkoff)
+    val alfaName = stringResource(UiR.string.bank_alfabank)
+    val ozonName = stringResource(UiR.string.bank_ozon)
+    val csvName = stringResource(UiR.string.bank_csv)
     Column(
         modifier =
             Modifier
@@ -47,38 +51,38 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
     ) {
         // Сбербанк
         BankItem(
-            name = stringResource(UiR.string.bank_sberbank),
+            name = sberName,
             color = colorResource(id = UiR.color.bank_sberbank),
-            onClick = { onBankClick("Сбербанк") },
+            onClick = { onBankClick(sberName) },
         )
 
         // Тинькофф
         BankItem(
-            name = stringResource(UiR.string.bank_tinkoff),
+            name = tinkoffName,
             color = colorResource(id = UiR.color.bank_tinkoff),
-            onClick = { onBankClick("Тинькофф") },
+            onClick = { onBankClick(tinkoffName) },
         )
 
         // Альфа-Банк
         BankItem(
-            name = stringResource(UiR.string.bank_alfabank),
+            name = alfaName,
             color = colorResource(id = UiR.color.bank_alfabank),
-            onClick = { onBankClick("Альфа-Банк") },
+            onClick = { onBankClick(alfaName) },
         )
 
         // Озон
         BankItem(
-            name = stringResource(UiR.string.bank_ozon),
+            name = ozonName,
             color = colorResource(id = UiR.color.bank_ozon),
-            onClick = { onBankClick("Озон") },
+            onClick = { onBankClick(ozonName) },
         )
 
         // CSV
         BankItem(
-            name = stringResource(UiR.string.bank_csv),
+            name = csvName,
             color = colorResource(id = UiR.color.bank_csv),
             isCSV = true,
-            onClick = { onBankClick("CSV") },
+            onClick = { onBankClick(csvName) },
         )
     }
 }

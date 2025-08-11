@@ -127,7 +127,7 @@ fun EnhancedLineChart(
     // Если нет данных для отображения, показываем сообщение
     if (!hasIncomeData && !hasExpenseData) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent(message = "Нет данных для отображения")
+            EmptyContent(message = stringResource(UiR.string.no_data_to_display))
         }
         return
     }
@@ -161,7 +161,7 @@ fun EnhancedLineChart(
     // Если список пуст после фильтрации, возвращаемся
     if (allPoints.isEmpty()) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent(message = "Нет данных для отображения")
+            EmptyContent(message = stringResource(UiR.string.no_data_to_display))
         }
         return
     }
@@ -451,9 +451,6 @@ fun EnhancedLineChart(
                                             }
                                         }
                                     }
-                                    // Если тапнули на уже выбранную точку - ничего не делаем
-                                    else {
-                                    }
                                 }
                             }
                             .drawBehind {
@@ -613,7 +610,7 @@ fun EnhancedLineChart(
                 if (showIncome) {
                     ChartLegendItem(
                         color = currentIncomeColor,
-                        text = stringResource(R.string.income),
+                        text = stringResource(UiR.string.income),
                     )
                     if (showExpense) {
                         Spacer(modifier = Modifier.width(spacingNormal))
@@ -622,7 +619,7 @@ fun EnhancedLineChart(
                 if (showExpense) {
                     ChartLegendItem(
                         color = currentExpenseColor,
-                        text = stringResource(R.string.expenses),
+                        text = stringResource(UiR.string.expenses),
                     )
                 }
             }

@@ -10,6 +10,7 @@
   <string name="key_metrics">关键指标</string>
 
   <string name="savings_rate_title">储蓄率</string>
+  <string name="financial_health_savings_rate_content" formatted="false">储蓄率表示您将收入的多少比例存起来。计算公式：(收入 − 支出) / 收入 × 100%。建议将收入的10–20%用于储蓄，以实现财务目标。</string>
   <string name="savings_rate_0_percent">0%</string>
   <string name="savings_rate_15_percent">15%</string>
   <string name="savings_rate_30_percent">30%</string>
@@ -50,4 +51,5 @@
   <string name="financial_health_tooltip_description">点击查看详细信息与建议</string>
   <string name="prediction_subtitle">基于近期交易与趋势</string>
 </resources>
+
 

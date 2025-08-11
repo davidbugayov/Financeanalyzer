@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string-array name="default_source_names">
+    <item>俄储银行</item>
+    <item>Tinkoff</item>
+    <item>阿尔法</item>
+    <item>OZON</item>
+    <item>VTB</item>
+    <item>Gazprombank</item>
+    <item>Raiffeisen</item>
+    <item>邮政银行</item>
+    <item>YooMoney</item>
+    <item>现金</item>
+  </string-array>
+</resources>
+
+

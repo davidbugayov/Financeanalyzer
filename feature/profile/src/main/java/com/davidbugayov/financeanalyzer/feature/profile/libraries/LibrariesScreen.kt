@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
@@ -196,31 +195,31 @@ private fun getLibraries(): List<Library> {
     return listOf(
         Library(
             nameResId = UiR.string.library_jetpack_compose_name,
-            version = "1.6.1",
+            version = "BOM 2025.06.01",
             descriptionResId = UiR.string.library_jetpack_compose_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_kotlin_coroutines_name,
-            version = "1.8.0",
+            version = "1.10.2",
             descriptionResId = UiR.string.library_kotlin_coroutines_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_koin_name,
-            version = "3.5.3",
+            version = "4.1.0",
             descriptionResId = UiR.string.library_koin_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_room_name,
-            version = "2.6.1",
+            version = "2.7.2",
             descriptionResId = UiR.string.library_room_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_material3_name,
-            version = "1.2.0",
+            version = "BOM 2025.06.01",
             descriptionResId = UiR.string.library_material3_description,
             license = "Apache License 2.0",
         ),
@@ -238,31 +237,31 @@ private fun getLibraries(): List<Library> {
         ),
         Library(
             nameResId = UiR.string.library_apache_poi_name,
-            version = "5.2.5",
+            version = "5.4.1",
             descriptionResId = UiR.string.library_apache_poi_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_navigation_compose_name,
-            version = "2.7.7",
+            version = "2.9.0",
             descriptionResId = UiR.string.library_navigation_compose_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_lifecycle_name,
-            version = "2.7.0",
+            version = "2.9.1",
             descriptionResId = UiR.string.library_lifecycle_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_core_ktx_name,
-            version = "1.12.0",
+            version = "1.16.0",
             descriptionResId = UiR.string.library_core_ktx_description,
             license = "Apache License 2.0",
         ),
         Library(
             nameResId = UiR.string.library_accompanist_name,
-            version = "0.34.0",
+            version = "0.36.0",
             descriptionResId = UiR.string.library_accompanist_description,
             license = "Apache License 2.0",
         ),

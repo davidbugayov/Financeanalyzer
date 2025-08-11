@@ -51,7 +51,7 @@ fun TransactionHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Кнопка выбора даты с улучшенным дизайном
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
         val formattedDate = dateFormat.format(date)
 
         Surface(
