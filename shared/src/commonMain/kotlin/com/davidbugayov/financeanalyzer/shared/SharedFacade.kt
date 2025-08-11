@@ -18,6 +18,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCas
 import com.davidbugayov.financeanalyzer.shared.usecase.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.ValidateTransactionUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -41,6 +42,7 @@ class SharedFacade {
     private val getProfileAnalytics = GetProfileAnalyticsUseCase()
     private val filterTransactions = FilterTransactionsUseCase()
     private val groupTransactions = GroupTransactionsUseCase()
+    private val validateTransaction = ValidateTransactionUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -131,6 +133,12 @@ class SharedFacade {
         transactions: List<Transaction>,
         keyType: GroupTransactionsUseCase.KeyType,
     ): Map<String, List<Transaction>> = groupTransactions(transactions, keyType)
+
+    /**
+     * Валидация транзакции (коды ошибок возвращаются для UI-локализации).
+     */
+    fun validateTransaction(amount: String, category: String, source: String): ValidateTransactionUseCase.Result =
+        validateTransaction.invoke(amount, category, source)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
