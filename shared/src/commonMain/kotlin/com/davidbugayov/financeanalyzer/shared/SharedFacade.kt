@@ -23,12 +23,16 @@ import com.davidbugayov.financeanalyzer.shared.usecase.ExportTransactionsToCSVUs
 import com.davidbugayov.financeanalyzer.shared.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
  */
 class SharedFacade(
     private val transactionRepository: TransactionRepository? = null,
+    private val walletRepository: WalletRepository? = null,
 ) {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
     private val calculateCategoryStats = CalculateCategoryStatsUseCase()
@@ -52,6 +56,8 @@ class SharedFacade(
     private val exportTransactionsToCSV = ExportTransactionsToCSVUseCase()
     private val getTransactionById = GetTransactionByIdUseCase()
     private val loadTransactions: LoadTransactionsUseCase? = transactionRepository?.let { LoadTransactionsUseCase(it) }
+    private val goalProgress = GoalProgressUseCase()
+    private val updateWalletBalances: UpdateWalletBalancesUseCase? = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
 
     /**
      * Считает метрики по списку транзакций.
@@ -169,6 +175,13 @@ class SharedFacade(
      */
     suspend fun loadTransactions(): List<Transaction> =
         loadTransactions?.invoke() ?: emptyList()
+
+    fun goalProgress(current: com.davidbugayov.financeanalyzer.shared.model.Money, target: com.davidbugayov.financeanalyzer.shared.model.Money): Double =
+        goalProgress(current, target)
+
+    suspend fun recomputeWalletBalances(transactions: List<Transaction>) {
+        updateWalletBalances?.invoke(transactions)
+    }
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
