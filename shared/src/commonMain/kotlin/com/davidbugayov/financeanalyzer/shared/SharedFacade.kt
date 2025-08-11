@@ -26,6 +26,8 @@ import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCase
+import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository
+import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -33,6 +35,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCa
 class SharedFacade(
     private val transactionRepository: TransactionRepository? = null,
     private val walletRepository: WalletRepository? = null,
+    private val subcategoryRepository: SubcategoryRepository? = null,
 ) {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
     private val calculateCategoryStats = CalculateCategoryStatsUseCase()
@@ -58,6 +61,7 @@ class SharedFacade(
     private val loadTransactions: LoadTransactionsUseCase? = transactionRepository?.let { LoadTransactionsUseCase(it) }
     private val goalProgress = GoalProgressUseCase()
     private val updateWalletBalances: UpdateWalletBalancesUseCase? = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
+    private val getSubcategoriesByCategoryId: GetSubcategoriesByCategoryIdUseCase? = subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
 
     /**
      * Считает метрики по списку транзакций.
@@ -182,6 +186,9 @@ class SharedFacade(
     suspend fun recomputeWalletBalances(transactions: List<Transaction>) {
         updateWalletBalances?.invoke(transactions)
     }
+
+    fun observeSubcategories(categoryId: Long): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Subcategory>>? =
+        getSubcategoriesByCategoryId?.invoke(categoryId)
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
