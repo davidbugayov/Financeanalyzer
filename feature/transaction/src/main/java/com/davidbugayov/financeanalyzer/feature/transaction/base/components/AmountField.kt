@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
@@ -252,7 +251,7 @@ fun AmountField(
                         // позаботится о форматировании и обновлении textFieldValueForDisplay.
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     textStyle =
                         MaterialTheme.typography.headlineMedium.copy(
                             textAlign = TextAlign.Center,

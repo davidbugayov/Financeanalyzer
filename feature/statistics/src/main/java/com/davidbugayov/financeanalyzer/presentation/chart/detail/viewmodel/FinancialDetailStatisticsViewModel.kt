@@ -13,8 +13,9 @@ import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.Calendar
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -301,17 +302,8 @@ class FinancialDetailStatisticsViewModel(
      * Получает название дня недели по дате
      */
     private fun getDayOfWeekName(date: Date): String {
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
-            Calendar.MONDAY -> "Понедельник"
-            Calendar.TUESDAY -> "Вторник"
-            Calendar.WEDNESDAY -> "Среда"
-            Calendar.THURSDAY -> "Четверг"
-            Calendar.FRIDAY -> "Пятница"
-            Calendar.SATURDAY -> "Суббота"
-            Calendar.SUNDAY -> "Воскресенье"
-            else -> ""
-        }
+        // Локализованное название дня недели (en/zh/ru и др.)
+        val formatter = SimpleDateFormat("EEEE", Locale.getDefault())
+        return formatter.format(date)
     }
 }

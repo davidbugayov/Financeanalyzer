@@ -6,6 +6,10 @@
   <string name="settings_language_title">语言</string>
   <string name="profile_currency_title">货币</string>
   <string name="profile_transaction_reminders_title">交易提醒</string>
+  <string name="profile_theme_select">主题选择</string>
+  <string name="profile_theme_light">浅色</string>
+  <string name="profile_theme_dark">深色</string>
+  <string name="profile_theme_system">系统</string>
   <!-- duplicates removed; defined in values-zh-rCN/strings.xml -->
   <string name="currency_name_rub">俄罗斯卢布</string>
   <string name="currency_name_usd">美元</string>

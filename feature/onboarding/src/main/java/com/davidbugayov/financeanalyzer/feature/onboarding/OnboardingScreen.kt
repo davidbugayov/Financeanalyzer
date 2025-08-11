@@ -1,28 +1,59 @@
 package com.davidbugayov.financeanalyzer.feature.onboarding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Widgets
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
+import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,7 +84,7 @@ fun OnboardingScreen(
                 Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                     .padding(dimensionResource(UiR.dimen.onboarding_header_padding_horizontal)),
+                    .padding(dimensionResource(UiR.dimen.onboarding_header_padding_horizontal)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(40.dp))
@@ -78,7 +109,46 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Кнопка начать - размещаем рано для быстрого доступа
+            // Выбор валюты при первом запуске
+            val context = LocalContext.current
+            val preferences = remember { PreferencesManager(context) }
+            var selectedCurrency by remember { mutableStateOf(preferences.getCurrency()) }
+
+            Text(
+                text = stringResource(UiR.string.profile_currency_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            @OptIn(ExperimentalLayoutApi::class)
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                @Composable
+                fun Chip(label: String, currency: Currency) {
+                    FilterChip(
+                        selected = selectedCurrency == currency,
+                        onClick = {
+                            selectedCurrency = currency
+                            preferences.saveCurrency(currency)
+                        },
+                        label = { Text(label) },
+                    )
+                }
+
+                Chip(stringResource(UiR.string.currency_name_rub), Currency.RUB)
+                Chip(stringResource(UiR.string.currency_name_usd), Currency.USD)
+                Chip(stringResource(UiR.string.currency_name_eur), Currency.EUR)
+                Chip(stringResource(UiR.string.currency_name_cny), Currency.CNY)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Кнопка начать
             Button(
                 onClick = {
                     viewModel.completeOnboarding()

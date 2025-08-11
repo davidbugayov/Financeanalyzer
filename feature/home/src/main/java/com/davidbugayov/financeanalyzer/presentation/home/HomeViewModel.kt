@@ -18,12 +18,12 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
@@ -46,7 +46,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для главного экрана.
@@ -427,7 +426,7 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
-                val testTransactions = TestDataGenerator.generateTransactions(500)
+                val testTransactions = TestDataGenerator.generateTransactions(80)
                 var hasError = false
                 testTransactions.forEach { transaction ->
                     addTransactionUseCase(transaction).fold(

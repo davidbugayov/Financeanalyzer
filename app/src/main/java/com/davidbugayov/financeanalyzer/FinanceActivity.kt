@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import com.davidbugayov.financeanalyzer.utils.AppLocale
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -42,6 +44,12 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
     // Флаг для отслеживания первого запуска приложения в текущей сессии
     private var isFirstLaunchInSession = true
 
+    override fun attachBaseContext(newBase: Context) {
+        // Оборачиваем контекст до super.onCreate
+        val wrapped = com.davidbugayov.financeanalyzer.utils.LocaleUtils.wrapContext(newBase)
+        super.attachBaseContext(wrapped)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super<FragmentActivity>.onCreate(savedInstanceState)
@@ -56,6 +64,11 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
                 preferencesManager.isAppLockEnabled() && isFirstLaunchInSession -> Screen.Auth.route
                 else -> Screen.Home.route
             }
+
+        // Применяем сохранённый язык приложения на старте, независимо от системного языка
+        val langCode = preferencesManager.getAppLanguage()
+        timber.log.Timber.tag("LANG").d("FinanceActivity.onCreate: applying lang=%s", langCode)
+        AppLocale.apply(langCode)
 
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)

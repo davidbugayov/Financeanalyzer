@@ -38,10 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -68,8 +68,9 @@ fun FinancialDetailStatisticsScreen(
     onNavigateBack: () -> Unit,
 ) {
     val viewModel: FinancialDetailStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
-    val state = viewModel.state.collectAsState().value
+    viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
+    val context = LocalContext.current
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -205,8 +206,14 @@ fun FinancialDetailStatisticsScreen(
                                     FinancialDataMapper.createExpenseAnalysis(
                                         averageDailyExpense = metrics.averageDailyExpense.format(true),
                                         averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
-                                        topIncomeCategory = metrics.topIncomeCategory,
-                                        topExpenseCategory = metrics.topExpenseCategory,
+                                        topIncomeCategory = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                            context,
+                                            metrics.topIncomeCategory,
+                                        ),
+                                        topExpenseCategory = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                            context,
+                                            metrics.topExpenseCategory,
+                                        ),
                                         topExpenseCategories =
                                             metrics.topExpenseCategories.map {
                                                 it.first to
@@ -250,32 +257,7 @@ fun FinancialDetailStatisticsScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                 )
 
-                                Spacer(Modifier.height(dimensionResource(UiR.dimen.financial_statistics_spacer_medium)))
-                                val predictExpensesUseCase =
-                                    remember {
-                                        org.koin.core.context.GlobalContext.get()
-                                            .get<PredictFutureExpensesUseCase>()
-                                    }
-                                val predictedExpenses =
-                                    remember { predictExpensesUseCase(transactions = state.transactions) }
-                                Card(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                ) {
-                                    Text(
-                                        stringResource(
-                                            id = UiR.string.prediction_title,
-                                        ),
-                                    )
-                                    Text(
-                                        stringResource(
-                                            id = UiR.string.prediction_next_month,
-                                            predictedExpenses.amount.toString(),
-                                        ),
-                                    )
-                                }
+                                // Блок предсказания расходов удалён по требованию
                             }
                         }
                     }

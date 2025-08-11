@@ -13,9 +13,12 @@ import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.utils.AppLocale
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -25,7 +28,6 @@ import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Базовый абстрактный класс приложения.
@@ -44,6 +46,16 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         PerformanceMetrics.startOperation(PerformanceMetrics.Operations.APP_STARTUP)
 
         super<Application>.onCreate()
+
+        // Применяем сохранённый язык приложения до инициализации UI/DI
+        try {
+            val prefs = PreferencesManager(this)
+            val lang = prefs.getAppLanguage()
+            Timber.tag("LANG").d("BaseFinanceApp.onCreate: applying lang=%s", lang)
+            AppLocale.apply(lang)
+        } catch (e: Exception) {
+            Timber.tag("LANG").e(e, "BaseFinanceApp.onCreate: failed to apply locale")
+        }
 
         // Инициализация StringProvider удалена. Используется ResourceProvider через Koin и stringResource в UI.
 

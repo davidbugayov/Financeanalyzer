@@ -246,13 +246,17 @@ class PreferencesManager(context: Context) {
             else -> "en"
         }
         sharedPreferences.edit { putString(KEY_APP_LANGUAGE, normalized) }
+        timber.log.Timber.tag("LANG").d("PreferencesManager.setAppLanguage: saved=%s", normalized)
         AppLocale.apply(normalized)
     }
 
     /** Получить сохранённый язык; если нет — определить по системной локали. */
     fun getAppLanguage(): String {
         val saved = sharedPreferences.getString(KEY_APP_LANGUAGE, null)
-        if (saved != null) return saved
+        if (saved != null) {
+            timber.log.Timber.tag("LANG").d("PreferencesManager.getAppLanguage: fromPrefs=%s", saved)
+            return saved
+        }
         return when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
             "en" -> "en"
             "zh" -> "zh"

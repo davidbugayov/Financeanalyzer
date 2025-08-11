@@ -6,6 +6,10 @@
   <string name="settings_language_title">Language</string>
   <string name="profile_currency_title">Currency</string>
   <string name="profile_transaction_reminders_title">Transaction reminders</string>
+  <string name="profile_theme_select">Theme selection</string>
+  <string name="profile_theme_light">Light</string>
+  <string name="profile_theme_dark">Dark</string>
+  <string name="profile_theme_system">System</string>
   <!-- duplicates removed; defined in values-en/strings.xml -->
   <string name="currency_name_rub">Russian ruble</string>
   <string name="currency_name_usd">US dollar</string>

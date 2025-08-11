@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
@@ -449,7 +448,7 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
                 // Секция выбора категории - улучшенная с видимыми подкатегориями
                 if (state.isExpense) {
@@ -562,17 +561,10 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
-                // Опциональное поле для комментария
-                OptionalCommentField(
-                    note = state.note,
-                    onNoteChange = { note ->
-                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetNote(note)), context)
-                    },
-                )
-
-                Spacer(Modifier.height(4.dp))
+                // Примечание: поле комментария перемещено ниже кнопки добавления
+                Spacer(Modifier.height(2.dp))
 
                 // Секция выбора кошельков (показывается только для доходов)
                 Timber.d(
@@ -598,7 +590,7 @@ fun <E> BaseTransactionScreen(
                     isExpense = state.isExpense,
                 )
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
 
                 // Кнопка добавления/сохранения
                 AddButton(
@@ -611,7 +603,15 @@ fun <E> BaseTransactionScreen(
                     isLoading = state.isLoading,
                 )
 
-                Spacer(Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
+                // Поле комментария под кнопкой
+                OptionalCommentField(
+                    note = state.note,
+                    onNoteChange = { note ->
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetNote(note)), context)
+                    },
+                )
+
+                Spacer(Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
             }
 
             // Диалоги

@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.feature.profile.components
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,11 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.AppLocale
 
 @Composable
 fun LanguageSelectionDialog(
@@ -40,6 +44,7 @@ fun LanguageSelectionDialog(
     onLanguageSelected: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
     var selectedCode by remember {
         mutableStateOf(
             when (currentLanguage) {
@@ -87,7 +92,25 @@ fun LanguageSelectionDialog(
         confirmButton = {
             Button(
                 onClick = {
+                    // Применяем локаль немедленно и пересоздаём активити для мгновенного эффекта
+                    timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: selected=%s", selectedCode)
+                    AppLocale.apply(selectedCode)
                     onLanguageSelected(selectedCode)
+                    val activity = (context as? Activity)
+                    timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: recreate activity=%s", activity)
+                    // Надёжный перезапуск Activity для применения локали по всему дереву
+                    val restartIntent =
+                        activity?.packageManager?.getLaunchIntentForPackage(activity.packageName)?.apply {
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                    if (restartIntent != null) {
+                        timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: restart via launch intent")
+                        activity.startActivity(restartIntent)
+                        activity.finish()
+                    } else {
+                        timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: restart via recreate()")
+                        activity?.recreate()
+                    }
                     onDismiss()
                 },
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(

@@ -40,7 +40,7 @@ object TestDataGenerator {
      * @param count Количество транзакций для генерации (по умолчанию 50)
      * @return Список сгенерированных транзакций за последний календарный месяц
      */
-    fun generateTransactions(count: Int = 50): List<Transaction> {
+    fun generateTransactions(count: Int = 80): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         val calendar = Calendar.getInstance()
 
@@ -105,6 +105,8 @@ object TestDataGenerator {
                     amount =
                         Money(
                             amount,
+                            // Учитываем выбранную пользователем валюту
+                            CurrencyProvider.getCurrency(),
                         ),
                     // Используем конструктор Money с Double, который правильно масштабирует значение
                     category = category,

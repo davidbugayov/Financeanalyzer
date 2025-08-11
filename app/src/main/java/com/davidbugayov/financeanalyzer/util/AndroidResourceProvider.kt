@@ -12,6 +12,7 @@ class AndroidResourceProvider(private val context: Context) : ResourceProvider {
         @StringRes id: Int,
         vararg args: Any?,
     ): String {
-        return if (args.isNotEmpty()) context.getString(id, *args) else context.getString(id)
+        val ctx = context.applicationContext
+        return if (args.isNotEmpty()) ctx.getString(id, *args) else ctx.getString(id)
     }
 }
