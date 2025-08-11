@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,15 +26,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
@@ -94,8 +95,9 @@ fun CategoryItemButton(
     category: UiCategory,
     onClick: () -> Unit,
 ) {
-    val backgroundColor = category.color
-    val contentColor = contentColorFor(backgroundColor = backgroundColor)
+    val isDarkTheme = isSystemInDarkTheme()
+    val backgroundColor = softenForFriendlyUi(category.color, isDarkTheme)
+    val contentColor = if (isDarkTheme) Color.Black else Color.White
 
     Surface(
         modifier =
@@ -127,12 +129,32 @@ fun CategoryItemButton(
                     ),
             )
             Text(
-                text = category.name,
+                text = CategoryLocalization.displayName(LocalContext.current, category.name),
                 style = MaterialTheme.typography.bodySmall,
                 color = contentColor,
             )
         }
     }
+}
+
+/**
+ * Делает цвет дружелюбнее: слегка пастелит фон в зависимости от темы.
+ */
+private fun softenForFriendlyUi(color: Color, isDarkTheme: Boolean): Color {
+    val mix = if (isDarkTheme) Color.Black else Color.White
+    val factor = 0.15f // 15% к белому в светлой и к чёрному в тёмной
+    return blendColors(color, mix, factor)
+}
+
+/**
+ * Линейное смешение двух цветов.
+ */
+private fun blendColors(base: Color, mix: Color, ratio: Float): Color {
+    val r = base.red * (1 - ratio) + mix.red * ratio
+    val g = base.green * (1 - ratio) + mix.green * ratio
+    val b = base.blue * (1 - ratio) + mix.blue * ratio
+    val a = base.alpha // сохраняем альфу базового цвета
+    return Color(r, g, b, a)
 }
 
 /**

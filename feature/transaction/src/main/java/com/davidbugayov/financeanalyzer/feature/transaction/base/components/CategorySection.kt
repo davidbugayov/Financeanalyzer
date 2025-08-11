@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,11 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateBackgroundColor
@@ -198,6 +200,7 @@ fun CategorySection(
             items(visibleCategories) { category ->
                 contentColorFor(backgroundColor = category.color)
                 val selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                val isDarkTheme = isSystemInDarkTheme()
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,6 +244,7 @@ fun CategorySection(
                                 ),
                         contentAlignment = Alignment.Center,
                     ) {
+                        // Ищем совпадение по ключу иконки, если список передан с локализованными именами
                         Icon(
                             imageVector = category.icon ?: Icons.Default.Category,
                             contentDescription = category.name,
@@ -248,7 +252,7 @@ fun CategorySection(
                                 when {
                                     isError && selectedCategory.isBlank() -> errorContentColor
                                     category.name == selectedCategory -> selectedContentColor
-                                    else -> Color.White
+                                    else -> if (isDarkTheme) Color.Black else Color.White
                                 },
                             modifier =
                                 Modifier.size(
@@ -263,7 +267,10 @@ fun CategorySection(
                             ),
                     )
                     Text(
-                        text = category.name,
+                        text = CategoryLocalization.displayName(
+                            LocalContext.current,
+                            category.name,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,

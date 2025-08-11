@@ -26,6 +26,12 @@ object CategoryLocalization {
         "credit" to listOf("кредиты", "кредит", "credit", "贷款"),
         "transfer" to listOf("перевод", "transfers", "transfer", "transfer\u044b", "转账"),
         "other_expense" to listOf("другие расходы", "прочие", "other expenses", "other expense", "其他支出"),
+        // Доп. ключи, чтобы иконки не терялись при русских названиях в EN локали
+        "utilities" to listOf("коммунальные", "коммунальные платежи", "utilities", "utility"),
+        "education" to listOf("образование", "учеба", "учёба", "education", "study"),
+        "shopping" to listOf("покупки", "шопинг", "shopping"),
+        "business" to listOf("бизнес", "business"),
+        "investments" to listOf("инвестиции", "investments", "investment"),
         "salary" to listOf("зарплата", "salary", "工资"),
         "freelance" to listOf("фриланс", "freelance", "自由职业"),
         "gifts" to listOf("подарки", "gifts", "礼物"),
@@ -35,7 +41,8 @@ object CategoryLocalization {
         "other" to listOf("другое", "other", "其他"),
     )
 
-    private fun keyFor(name: String): String? {
+    // Делаем функцию публичной, чтобы можно было нормализовать имя категории во всех слоях
+    fun keyFor(name: String): String? {
         val lower = name.trim().lowercase()
         return synonyms.entries.firstOrNull { entry ->
             entry.value.any { syn -> lower == syn.lowercase() }

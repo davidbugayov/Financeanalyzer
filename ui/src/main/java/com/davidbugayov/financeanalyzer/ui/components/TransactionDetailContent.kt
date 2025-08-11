@@ -36,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+// Нельзя напрямую зависеть от presentation в ui-модуле. Возьмём безопасную иконку, а маппинг сделаем локально.
+// оставляем дефолтную иконку через Icons.Default.Category
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
@@ -148,8 +150,9 @@ fun TransactionDetailContent(
                     label = stringResource(R.string.category),
                     value = transaction.category,
                     icon = {
+                        val icon = Icons.Default.Category // универсальная иконка категории
                         Icon(
-                            imageVector = Icons.Default.Category,
+                            imageVector = icon,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp),
@@ -169,8 +172,9 @@ fun TransactionDetailContent(
                         label = stringResource(R.string.subcategory),
                         value = subcategoryName,
                         icon = {
+                            val subIcon = Icons.Default.Category
                             Icon(
-                                imageVector = Icons.Default.Category,
+                                imageVector = subIcon,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.size(20.dp),

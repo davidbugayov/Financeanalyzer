@@ -51,6 +51,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
@@ -164,11 +165,22 @@ fun TransactionItem(
             incomeCategories,
         ) {
             val categories = if (transaction.isExpense) expenseCategories else incomeCategories
-            categories.find { it.name.equals(transaction.category, ignoreCase = true) }
+            val txKey = CategoryLocalization.keyFor(transaction.category)
+            // Сначала пытаемся сопоставить по ключу (нормализованное имя на любом языке), затем по строке
+            categories.find { cat ->
+                val catKey = CategoryLocalization.keyFor(cat.name)
+                (txKey != null && catKey != null && txKey == catKey) || cat.name.equals(
+                    transaction.category,
+                    ignoreCase = true,
+                )
+            }
         }
 
     val categoryActualColor = uiCategory?.color ?: DefaultCategoryColor
-    val categoryIcon = uiCategory?.icon ?: Icons.Default.Category
+    // Если нашли дефолтную категорию по ключу, но иконка в UiCategory отсутствует (локализованное имя),
+    // подстрахуемся дефолтной иконкой по ключу transfer/food/...: в нашем поиске выше уже нормализован txKey.
+    val fallbackIcon = Icons.Default.Category
+    val categoryIcon = uiCategory?.icon ?: fallbackIcon
 
     val sourceActualColor =
         remember(transaction.sourceColor, transaction.source, isDarkTheme) {
@@ -338,7 +350,7 @@ fun TransactionItem(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                    text = CategoryLocalization.displayName(
                         context,
                         transaction.category,
                     ),

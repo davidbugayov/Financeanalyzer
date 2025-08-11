@@ -73,6 +73,23 @@ private fun validateMoneyInput(input: String): String {
 }
 
 /**
+ * Удаляет символ валюты из форматированной строки (в начале или в конце, с пробелами/неразрывными пробелами).
+ */
+private fun stripCurrencySymbol(
+    formatted: String,
+    currency: com.davidbugayov.financeanalyzer.core.model.Currency,
+): String {
+    val symbol = currency.symbol
+    val escaped = Regex.escape(symbol)
+    var s = formatted.replace('\u00A0', ' ') // NBSP -> обычный пробел
+    // Удаляем ведущий символ валюты с пробелами
+    s = s.replace(Regex("^\\s*$escaped\\s*"), "")
+    // Удаляем завершающий символ валюты с пробелами
+    s = s.replace(Regex("\\s*$escaped\\s*$"), "")
+    return s.trim()
+}
+
+/**
  * Поле ввода суммы транзакции с улучшенным дизайном и акцентом
  */
 @Composable
@@ -91,10 +108,15 @@ fun AmountField(
     // TextFieldValue для отображения в OutlinedTextField
     var textFieldValueForDisplay by remember(currentCurrency) {
         val numericAmount = amount.toDoubleOrNull()
-        val initialText = if (numericAmount != null) Money(numericAmount, currentCurrency).format() else amount
-        mutableStateOf(
-            TextFieldValue(text = initialText, selection = TextRange(initialText.length)),
-        )
+        val initialFormatted = if (numericAmount != null) Money(numericAmount, currentCurrency).format() else amount
+        val money = Money(numericAmount ?: 0.0, currentCurrency)
+        val withoutSymbol =
+            if (numericAmount != null) stripCurrencySymbol(initialFormatted, money.currency) else initialFormatted
+        val sep = money.currency.decimalSeparator.toString()
+        val zeroSuffix = sep + "0".repeat(money.currency.decimalPlaces)
+        val initialText =
+            if (withoutSymbol.endsWith(zeroSuffix)) withoutSymbol.removeSuffix(zeroSuffix) else withoutSymbol
+        mutableStateOf(TextFieldValue(text = initialText, selection = TextRange(initialText.length)))
     }
 
     // Логируем изменения валюты для отладки и принудительно обновляем TextFieldValue
@@ -106,21 +128,13 @@ fun AmountField(
         if (numericValue != null) {
             val moneyObject = Money(numericValue, currentCurrency)
             val formattedWithSymbol = moneyObject.format()
-            val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
+            val withoutSymbol = stripCurrencySymbol(formattedWithSymbol, moneyObject.currency)
             val sep = moneyObject.currency.decimalSeparator.toString()
             val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
             val finalText =
-                if (withoutSymbol.endsWith(zeroSuffix)) {
-                    withoutSymbol.removeSuffix(zeroSuffix)
-                } else {
-                    withoutSymbol
-                }
+                if (withoutSymbol.endsWith(zeroSuffix)) withoutSymbol.removeSuffix(zeroSuffix) else withoutSymbol
 
-            textFieldValueForDisplay =
-                TextFieldValue(
-                    text = finalText,
-                    selection = TextRange(finalText.length),
-                )
+            textFieldValueForDisplay = TextFieldValue(text = finalText, selection = TextRange(finalText.length))
             timber.log.Timber.d("AmountField: Принудительно обновлен TextFieldValue: '$finalText'")
         }
     }
@@ -149,22 +163,18 @@ fun AmountField(
             } else {
                 val numericValue = internalRawAmount.toDoubleOrNull()
                 if (numericValue != null) {
-                    // Format number without currency symbol and drop trailing .00
+                    // Форматируем число, удаляем символ валюты (в начале или в конце) и отбрасываем .00
                     val moneyObject = Money(numericValue, currentCurrency)
                     val formattedWithSymbol = moneyObject.format()
                     timber.log.Timber.d(
                         "AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'",
                     )
 
-                    val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
+                    val withoutSymbol = stripCurrencySymbol(formattedWithSymbol, moneyObject.currency)
                     val sep = moneyObject.currency.decimalSeparator.toString()
                     val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
                     val finalText =
-                        if (withoutSymbol.endsWith(zeroSuffix)) {
-                            withoutSymbol.removeSuffix(zeroSuffix)
-                        } else {
-                            withoutSymbol
-                        }
+                        if (withoutSymbol.endsWith(zeroSuffix)) withoutSymbol.removeSuffix(zeroSuffix) else withoutSymbol
                     timber.log.Timber.d("AmountField: Финальный текст: '$finalText'")
                     finalText
                 } else {
