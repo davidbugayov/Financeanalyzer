@@ -1,0 +1,6 @@
+framework module Pods_FinanceAnalyzerIOS {
+  umbrella header "Pods-FinanceAnalyzerIOS-umbrella.h"
+
+  export *
+  module * { export * }
+}
