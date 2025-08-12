@@ -31,6 +31,8 @@ import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategor
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository
+import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -39,6 +41,8 @@ class SharedFacade(
     private val transactionRepository: TransactionRepository? = null,
     private val walletRepository: WalletRepository? = null,
     private val subcategoryRepository: SubcategoryRepository? = null,
+    private val achievementsRepository: AchievementsRepository? = null,
+    private val appScope: kotlinx.coroutines.CoroutineScope? = null,
 ) {
     private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
     private val calculateCategoryStats = CalculateCategoryStatsUseCase()
@@ -68,6 +72,7 @@ class SharedFacade(
     private val addTransaction: AddTransactionUseCase? = transactionRepository?.let { AddTransactionUseCase(it) }
     private val updateTransaction: UpdateTransactionUseCase? = transactionRepository?.let { UpdateTransactionUseCase(it) }
     private val deleteTransaction: DeleteTransactionUseCase? = transactionRepository?.let { DeleteTransactionUseCase(it) }
+    private val achievementEngine: AchievementEngine? = if (achievementsRepository != null && appScope != null) AchievementEngine(achievementsRepository, appScope) else null
 
     /**
      * Считает метрики по списку транзакций.
@@ -206,6 +211,13 @@ class SharedFacade(
 
     suspend fun deleteTransaction(id: String) {
         deleteTransaction?.invoke(id)
+    }
+
+    fun achievementsFlow(): kotlinx.coroutines.flow.SharedFlow<com.davidbugayov.financeanalyzer.shared.model.Achievement>? =
+        achievementEngine?.newAchievements
+
+    fun notifyTransactionAddedForAchievements() {
+        achievementEngine?.onTransactionAdded()
     }
 
     /**
