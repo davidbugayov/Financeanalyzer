@@ -9,26 +9,9 @@ import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetCategoriesWithAmountUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCaseImpl
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
@@ -83,31 +66,10 @@ val appModule =
         single { ImportFactory(androidContext(), get()) }
 
         // Use cases
-        single { LoadTransactionsUseCase(get()) }
-        single { AddTransactionUseCase(get()) }
-        single { DeleteTransactionUseCase(get()) }
-        single { UpdateTransactionUseCase(get()) }
-        single { FilterTransactionsUseCase() }
-        single { GroupTransactionsUseCase() }
-        single { CalculateCategoryStatsUseCase() }
-        single { ExportTransactionsToCSVUseCase(get()) }
-        single { ValidateTransactionUseCase() }
-        single { GetTransactionByIdUseCase(get()) }
-        single { CalculateBalanceMetricsUseCase() }
-        single { GetTransactionsForPeriodUseCase(get()) }
         single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
             com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher(androidContext())
         }
         single { com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase(get()) }
-        single { GetCategoriesWithAmountUseCase() }
-        single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
-        factory { UpdateWalletBalancesUseCase(get()) }
-        factory {
-            GetProfileAnalyticsUseCase(
-                transactionRepository = get(),
-                walletRepository = get(),
-            )
-        }
         single<ImportTransactionsUseCase> {
             com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl(
                 get<ImportTransactionsManager>(),

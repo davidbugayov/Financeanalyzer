@@ -4,6 +4,7 @@ data class Subcategory(
     val id: Long,
     val categoryId: Long,
     val name: String,
+    val isCustom: Boolean = false,
 )
 
 

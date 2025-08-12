@@ -16,6 +16,7 @@ val allModules =
         repositoryModule,
         utilsModule,
         useCaseModule,
+        kmpModule,
         viewModelModule,
         transactionModule,
         analyticsModule,

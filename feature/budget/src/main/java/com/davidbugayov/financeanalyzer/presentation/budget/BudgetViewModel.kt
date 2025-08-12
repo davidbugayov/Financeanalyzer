@@ -5,8 +5,8 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.AllocateIncomeUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
@@ -23,8 +23,7 @@ class BudgetViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
-    private val allocateIncomeUseCase: AllocateIncomeUseCase,
-    val goalProgressUseCase: GoalProgressUseCase,
+    private val sharedFacade: SharedFacade,
 ) : ViewModel() {
     private val _state = MutableStateFlow(BudgetState())
     val state: StateFlow<BudgetState> = _state.asStateFlow()
@@ -288,15 +287,13 @@ class BudgetViewModel(
      */
     private fun distributeIncome(amount: Money) {
         viewModelScope.launch {
-            when (val result = allocateIncomeUseCase(amount)) {
-                is com.davidbugayov.financeanalyzer.core.util.Result.Success -> {
-                    loadBudgetCategories()
-                    Timber.d("Доход успешно распределен через AllocateIncomeUseCase")
-                }
-                is com.davidbugayov.financeanalyzer.core.util.Result.Error -> {
-                    Timber.e(result.exception, "Ошибка при распределении дохода")
-                    _state.update { it.copy(error = result.exception.message ?: "Ошибка при распределении дохода") }
-                }
+            val success = sharedFacade.allocateIncome(amount.toShared())
+            if (success) {
+                loadBudgetCategories()
+                Timber.d("Доход успешно распределен через SharedFacade")
+            } else {
+                Timber.e("Ошибка при распределении дохода")
+                _state.update { it.copy(error = "Ошибка при распределении дохода") }
             }
         }
     }
@@ -575,5 +572,12 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при очистке существующих кошельков")
             }
         }
+    }
+
+    /**
+     * Вычисляет прогресс цели через SharedFacade.
+     */
+    fun goalProgress(current: Money, target: Money): Double {
+        return sharedFacade.goalProgress(current.toShared(), target.toShared())
     }
 }

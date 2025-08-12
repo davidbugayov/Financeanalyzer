@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":feature"))
     implementation(project(":feature:widget"))
     implementation(project(":presentation"))
+    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

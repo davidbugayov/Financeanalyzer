@@ -58,12 +58,14 @@ dependencies {
     implementation(project(":feature"))
     implementation(project(":presentation"))
     implementation(project(":feature:transaction"))
+    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.datetime)
 
     // Compose
     implementation(platform(libs.compose.bom))

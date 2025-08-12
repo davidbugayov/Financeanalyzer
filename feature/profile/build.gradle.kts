@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":utils"))
     implementation(project(":feature"))
     implementation(project(":feature:security"))
+    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
@@ -64,6 +65,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.datetime)
 
     // Compose
     implementation(platform(libs.compose.bom))

@@ -1,12 +1,18 @@
 package com.davidbugayov.financeanalyzer.shared.repository
 
 import com.davidbugayov.financeanalyzer.shared.model.Wallet
-import kotlinx.coroutines.flow.Flow
 
+/**
+ * Репозиторий для работы с кошельками в KMP.
+ */
 interface WalletRepository {
-    fun observeWallets(): Flow<List<Wallet>>
+    /**
+     * Получает все кошельки.
+     */
     suspend fun getAllWallets(): List<Wallet>
+
+    /**
+     * Обновляет кошелёк.
+     */
     suspend fun updateWallet(wallet: Wallet)
 }
-
-

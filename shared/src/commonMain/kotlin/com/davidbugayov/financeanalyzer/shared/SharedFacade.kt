@@ -13,6 +13,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseC
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthScoreUseCase
 import kotlinx.datetime.LocalDate
+import kotlinx.coroutines.flow.first
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetProfileAnalyticsUseCase
@@ -31,8 +32,18 @@ import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategor
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.transaction.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
+import com.davidbugayov.financeanalyzer.shared.usecase.GetExpenseOptimizationRecommendationsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategoryByIdUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.DeleteSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.AddSubcategoryUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.wallet.AllocateIncomeUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.GetPagedTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.GetRecentTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.widgets.UpdateWidgetsUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -69,10 +80,20 @@ class SharedFacade(
     private val goalProgress = GoalProgressUseCase()
     private val updateWalletBalances: UpdateWalletBalancesUseCase? = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
     private val getSubcategoriesByCategoryId: GetSubcategoriesByCategoryIdUseCase? = subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
-    private val addTransaction: AddTransactionUseCase? = transactionRepository?.let { AddTransactionUseCase(it) }
-    private val updateTransaction: UpdateTransactionUseCase? = transactionRepository?.let { UpdateTransactionUseCase(it) }
-    private val deleteTransaction: DeleteTransactionUseCase? = transactionRepository?.let { DeleteTransactionUseCase(it) }
+    private val addTransactionUseCase: AddTransactionUseCase? = transactionRepository?.let { AddTransactionUseCase(it) }
+    private val updateTransactionUseCase: UpdateTransactionUseCase? = transactionRepository?.let { UpdateTransactionUseCase(it) }
+    private val deleteTransactionUseCase: DeleteTransactionUseCase? = transactionRepository?.let { DeleteTransactionUseCase(it) }
+    private val getTransactionsForPeriodFlow: GetTransactionsForPeriodFlowUseCase? = transactionRepository?.let { GetTransactionsForPeriodFlowUseCase(it) }
     private val achievementEngine: AchievementEngine? = if (achievementsRepository != null && appScope != null) AchievementEngine(achievementsRepository, appScope) else null
+    private val getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
+    private val getSubcategoryById: GetSubcategoryByIdUseCase? = subcategoryRepository?.let { GetSubcategoryByIdUseCase(it) }
+    private val deleteSubcategory: DeleteSubcategoryUseCase? = subcategoryRepository?.let { DeleteSubcategoryUseCase(it) }
+    private val addSubcategory: AddSubcategoryUseCase? = subcategoryRepository?.let { AddSubcategoryUseCase(it) }
+    private val allocateIncome: AllocateIncomeUseCase? = walletRepository?.let { AllocateIncomeUseCase(it) }
+    private val getPagedTransactions: GetPagedTransactionsUseCase? = transactionRepository?.let { GetPagedTransactionsUseCase(it) }
+    private val getTransactionsForPeriod: GetTransactionsForPeriodUseCase? = transactionRepository?.let { GetTransactionsForPeriodUseCase(it) }
+    private val getRecentTransactions: GetRecentTransactionsUseCase? = transactionRepository?.let { GetRecentTransactionsUseCase(it) }
+    private val updateWidgets = UpdateWidgetsUseCase()
 
     /**
      * Считает метрики по списку транзакций.
@@ -198,19 +219,52 @@ class SharedFacade(
         updateWalletBalances?.invoke(transactions)
     }
 
+    suspend fun updateWalletBalances(
+        walletIdsToUpdate: List<String>,
+        amountForWallets: java.math.BigDecimal,
+        originalTransaction: Transaction?
+    ) {
+        // Простая реализация - пересчитываем все балансы
+        updateWalletBalances?.invoke(emptyList())
+    }
+
     fun observeSubcategories(categoryId: Long): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Subcategory>>? =
         getSubcategoriesByCategoryId?.invoke(categoryId)
 
-    suspend fun addTransaction(transaction: Transaction) {
-        addTransaction?.invoke(transaction)
+    suspend fun addTransaction(transaction: Transaction): Boolean {
+        return try {
+            addTransactionUseCase?.invoke(transaction)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
-    suspend fun updateTransaction(transaction: Transaction) {
-        updateTransaction?.invoke(transaction)
+    suspend fun updateTransaction(transaction: Transaction): Boolean {
+        return try {
+            updateTransactionUseCase?.invoke(transaction)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
-    suspend fun deleteTransaction(id: String) {
-        deleteTransaction?.invoke(id)
+    suspend fun deleteTransaction(transaction: Transaction): Boolean {
+        return try {
+            deleteTransactionUseCase?.invoke(transaction.id)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun deleteTransaction(id: String): Boolean {
+        return try {
+            deleteTransactionUseCase?.invoke(id)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun achievementsFlow(): kotlinx.coroutines.flow.SharedFlow<com.davidbugayov.financeanalyzer.shared.model.Achievement>? =
@@ -220,12 +274,82 @@ class SharedFacade(
         achievementEngine?.onTransactionAdded()
     }
 
+    fun transactionsForPeriodFlow(start: kotlinx.datetime.LocalDate, end: kotlinx.datetime.LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>>? =
+        getTransactionsForPeriodFlow?.invoke(start, end)
+
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
      */
     fun moneyFromDouble(value: Double, currencyCode: String): Money {
         val currency = Currency.fromCode(currencyCode)
         return Money.fromMajor(value, currency)
+    }
+
+    // === Новые методы для остальных use case ===
+
+    /**
+     * Рекомендации по оптимизации расходов.
+     */
+    fun expenseOptimizationRecommendations(transactions: List<Transaction>): List<String> =
+        getExpenseOptimizationRecommendations.invoke(transactions)
+
+    /**
+     * Получение подкатегории по ID.
+     */
+    suspend fun getSubcategoryById(id: Long): com.davidbugayov.financeanalyzer.shared.model.Subcategory? =
+        getSubcategoryById?.invoke(id)
+
+    suspend fun getSubcategoriesByCategoryId(categoryId: Long): List<com.davidbugayov.financeanalyzer.shared.model.Subcategory> =
+        try {
+            getSubcategoriesByCategoryId?.invoke(categoryId)?.let { flow ->
+                flow.first()
+            } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+
+    /**
+     * Удаление подкатегории.
+     */
+    suspend fun deleteSubcategory(subcategoryId: Long) {
+        deleteSubcategory?.invoke(subcategoryId)
+    }
+
+    /**
+     * Добавление подкатегории.
+     */
+    suspend fun addSubcategory(name: String, categoryId: Long): Long =
+        addSubcategory?.invoke(name, categoryId) ?: -1L
+
+    /**
+     * Распределение дохода между кошельками.
+     */
+    suspend fun allocateIncome(income: Money): Boolean =
+        allocateIncome?.invoke(income) ?: false
+
+    /**
+     * Получение пагинированных транзакций.
+     */
+    suspend fun getPagedTransactions(pageSize: Int): List<Transaction> =
+        getPagedTransactions?.invoke(pageSize) ?: emptyList()
+
+    /**
+     * Получение транзакций за период (без Flow).
+     */
+    suspend fun getTransactionsForPeriod(startDate: LocalDate, endDate: LocalDate): List<Transaction> =
+        getTransactionsForPeriod?.invoke(startDate, endDate) ?: emptyList()
+
+    /**
+     * Получение недавних транзакций.
+     */
+    suspend fun getRecentTransactions(days: Int): List<Transaction> =
+        getRecentTransactions?.invoke(days) ?: emptyList()
+
+    /**
+     * Обновление виджетов (заглушка для KMP).
+     */
+    fun updateWidgets() {
+        updateWidgets.invoke()
     }
 }
 

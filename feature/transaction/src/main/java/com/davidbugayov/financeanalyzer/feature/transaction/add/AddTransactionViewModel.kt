@@ -12,11 +12,8 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
@@ -37,26 +34,19 @@ import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class AddTransactionViewModel(
-    private val addTransactionUseCase: AddTransactionUseCase,
+    private val sharedFacade: SharedFacade,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val navigationManager: NavigationManager,
     application: Application,
-    addSubcategoryUseCase: AddSubcategoryUseCase,
-    getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
-    getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
         categoriesViewModel,
         sourcePreferences,
         walletRepository,
-        updateWalletBalancesUseCase,
+        sharedFacade,
         application.resources,
-        addSubcategoryUseCase,
-        getSubcategoriesByCategoryIdUseCase,
-        getSubcategoryByIdUseCase,
     ) {
     override val _state = MutableStateFlow(AddTransactionState())
 
@@ -208,11 +198,11 @@ class AddTransactionViewModel(
             val transactionToSave = prepareTransactionForAdd(moneyFromExpression)
 
             try {
-                val result = addTransactionUseCase(transactionToSave)
-                if (result is CoreResult.Success) {
-                    updateWalletBalancesUseCase(
+                val result = sharedFacade.addTransaction(transactionToSave.toShared())
+                if (result) {
+                    sharedFacade.updateWalletBalances(
                         transactionToSave.walletIds ?: emptyList(),
-                        transactionToSave.amount,
+                        transactionToSave.amount.amount,
                         null,
                     )
                     incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)
@@ -231,11 +221,11 @@ class AddTransactionViewModel(
                             isSuccess = true,
                         )
                     }
-                } else if (result is CoreResult.Error) {
+                } else {
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = result.exception.message,
+                            error = "Failed to add transaction",
                         )
                     }
                 }

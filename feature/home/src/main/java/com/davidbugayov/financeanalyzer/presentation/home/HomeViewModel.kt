@@ -11,12 +11,11 @@ import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
+
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -61,15 +60,10 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
-    private val addTransactionUseCase: AddTransactionUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val getTransactionsForPeriodFlowUseCase: GetTransactionsForPeriodFlowUseCase,
-    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val navigationManager: NavigationManager,
-    private val getSmartExpenseTipsUseCase: GetSmartExpenseTipsUseCase, // внедряем use case
-    private val getExpenseOptimizationRecommendationsUseCase: GetExpenseOptimizationRecommendationsUseCase, // внедряем use case
+    private val sharedFacade: SharedFacade,
 ) : ViewModel(), KoinComponent {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -243,32 +237,30 @@ class HomeViewModel(
     ) {
         viewModelScope.launch {
             try {
-                deleteTransactionUseCase(transaction).fold(
-                    onSuccess = {
-                        _state.update { it.copy(transactionToDelete = null) }
+                val result = sharedFacade.deleteTransaction(transaction.toShared())
+                if (result) {
+                    _state.update { it.copy(transactionToDelete = null) }
 
-                        // Логируем событие в аналитику
-                        com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
-                            amount = transaction.amount.abs(),
-                            category = transaction.category,
-                            isExpense = transaction.isExpense,
-                        )
+                    // Логируем событие в аналитику
+                    com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
+                        amount = transaction.amount.abs(),
+                        category = transaction.category,
+                        isExpense = transaction.isExpense,
+                    )
 
-                        context?.let { ctx ->
-                            updateWidgetsUseCase()
-                        } ?: Timber.w(
-                            "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
+                    context?.let { ctx ->
+                        updateWidgetsUseCase()
+                    } ?: Timber.w(
+                        "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
+                    )
+                } else {
+                    _state.update {
+                        it.copy(
+                            error = "Failed to delete transaction",
+                            transactionToDelete = null,
                         )
-                    },
-                    onFailure = { exception ->
-                        _state.update {
-                            it.copy(
-                                error = exception.message ?: "Failed to delete transaction",
-                                transactionToDelete = null,
-                            )
-                        }
-                    },
-                )
+                    }
+                }
             } catch (e: Exception) {
                 _state.update {
                     it.copy(
@@ -310,8 +302,8 @@ class HomeViewModel(
             try {
                 val currentState = _state.value
                 val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
-                // ОЧИЩАЕМ КЭШ ПЕРЕД ЗАГРУЗКОЙ
-                val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
+                val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
+                val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при плавном обновлении: %s", e.message)
@@ -371,7 +363,7 @@ class HomeViewModel(
 
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
-                getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
+                sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())?.first()
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, error = e.message) }
@@ -429,16 +421,19 @@ class HomeViewModel(
                 val testTransactions = TestDataGenerator.generateTransactions(80)
                 var hasError = false
                 testTransactions.forEach { transaction ->
-                    addTransactionUseCase(transaction).fold(
-                        onSuccess = { /* Transaction saved successfully */ },
-                        onFailure = { exception: Throwable ->
+                    try {
+                        val result = sharedFacade.addTransaction(transaction.toShared())
+                        if (!result) {
                             hasError = true
-                            Timber.e(
-                                exception,
-                                "Failed to save test transaction: ${transaction.category}",
-                            )
-                        },
-                    )
+                            Timber.e("Failed to save test transaction: ${transaction.category}")
+                        }
+                    } catch (exception: Exception) {
+                        hasError = true
+                        Timber.e(
+                            exception,
+                            "Failed to save test transaction: ${transaction.category}",
+                        )
+                    }
                 }
                 if (!hasError) {
                     Timber.d("Test data generation completed successfully")
@@ -464,7 +459,8 @@ class HomeViewModel(
     private fun updateFilteredTransactions(filter: TransactionFilter) {
         viewModelScope.launch {
             val (startDate, endDate) = getPeriodDates(filter)
-            val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
+            val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
+            val filteredTransactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
 
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
@@ -477,8 +473,8 @@ class HomeViewModel(
                     stats
                 }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
-            val tips = getSmartExpenseTipsUseCase.invoke(filteredTransactions)
-            val recommendations = getExpenseOptimizationRecommendationsUseCase.invoke(filteredTransactions)
+            val tips = sharedFacade.smartExpenseTips(filteredTransactions.map { it.toShared() })
+            val recommendations = sharedFacade.expenseOptimizationRecommendations(filteredTransactions.map { it.toShared() })
             _state.update {
                 it.copy(
                     filteredTransactions = filteredTransactions,
@@ -512,9 +508,14 @@ class HomeViewModel(
         val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
         val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
         val currentCurrency = CurrencyProvider.getCurrency()
-        val metrics = calculateBalanceMetricsUseCase(transactions, currentCurrency, startDate, endDate)
-        val income = metrics.income
-        val expense = metrics.expense
+        val metrics = sharedFacade.calculateMetrics(
+            transactions.map { it.toShared() },
+            currentCurrency.name,
+            startDate.toLocalDateKmp(),
+            endDate.toLocalDateKmp()
+        )
+        val income = Money(java.math.BigDecimal.valueOf(metrics.income.toMajorDouble()), currentCurrency)
+        val expense = Money(java.math.BigDecimal.valueOf(metrics.expense.toMajorDouble()), currentCurrency)
         val balance = income - expense
 
         val result = Triple(income, expense, balance)

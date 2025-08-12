@@ -34,7 +34,7 @@ val viewModelModule =
 
         viewModelOf(::AddTransactionViewModel)
 
-        viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get()) }
 
         viewModelOf(::HomeViewModel)
 
@@ -42,7 +42,7 @@ val viewModelModule =
 
         viewModelOf(::TransactionHistoryViewModel)
 
-        viewModel { BudgetViewModel(get(), get(), get(), get(), get()) }
+        viewModel { BudgetViewModel(get(), get(), get(), get()) }
 
         viewModelOf(::WalletTransactionsViewModel)
 

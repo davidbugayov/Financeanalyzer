@@ -3,10 +3,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
+import kotlinx.coroutines.flow.first
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -34,6 +38,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val calculateEnhancedFinancialMetricsUseCase: CalculateEnhancedFinancialMetricsUseCase by inject()
+    private val sharedFacade: SharedFacade by inject()
     private val categoriesViewModel: CategoriesViewModel by inject()
     private val navigationManager: NavigationManager by inject()
     private val _state = MutableStateFlow(EnhancedFinanceChartState())
@@ -111,11 +116,8 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             try {
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val filteredTransactions =
-                    getTransactionsForPeriodUseCase(
-                        _state.value.startDate,
-                        _state.value.endDate,
-                    )
+                val flow = sharedFacade.transactionsForPeriodFlow(_state.value.startDate.toLocalDateKmp(), _state.value.endDate.toLocalDateKmp())
+                val filteredTransactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
                 allTransactions = filteredTransactions
 
                 val currentCurrency = CurrencyProvider.getCurrency()

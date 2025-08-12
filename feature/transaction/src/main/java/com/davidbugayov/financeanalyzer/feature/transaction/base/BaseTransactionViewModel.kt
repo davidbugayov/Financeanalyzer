@@ -15,10 +15,8 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
@@ -39,11 +37,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected val categoriesViewModel: CategoriesViewModel,
     protected val sourcePreferences: SourcePreferences,
     protected val walletRepository: WalletRepository,
-    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
+    private val sharedFacade: SharedFacade,
     protected val resources: Resources,
-    private val addSubcategoryUseCase: AddSubcategoryUseCase,
-    private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
-    private val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
@@ -96,14 +91,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         originalTransaction: Transaction?,
     ) {
         if (walletIds.isNotEmpty()) {
-            val result =
-                updateWalletBalancesUseCase(
+            try {
+                sharedFacade.updateWalletBalances(
                     walletIdsToUpdate = walletIds,
-                    amountForWallets = amount,
-                    originalTransaction = originalTransaction,
+                    amountForWallets = amount.amount,
+                    originalTransaction = originalTransaction?.let { 
+                        it.toShared()
+                    },
                 )
-            if (result is CoreResult.Error) {
-                Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при обновлении баланса кошельков через SharedFacade")
             }
         }
     }
@@ -737,7 +734,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     if (currentCategory.isNotBlank()) {
                         val categoryId = getCategoryIdByName(currentCategory, _state.value.isExpense)
                         if (categoryId != null) {
-                            addSubcategoryUseCase(event.subcategory, categoryId)
+                            sharedFacade.addSubcategory(event.subcategory, categoryId)
                             loadSubcategoriesForCategory(categoryId)
                         }
                     }
@@ -1270,14 +1267,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun loadSubcategoriesForCategory(categoryId: Long) {
         viewModelScope.launch {
             try {
-                getSubcategoriesByCategoryIdUseCase(categoryId).collect { subcategories ->
-                    val uiSubcategories =
-                        subcategories.map { subcategory ->
-                            UiSubcategory.fromDomain(subcategory)
-                        }
-                    _state.update { state ->
-                        copyState(state, availableSubcategories = uiSubcategories)
-                    }
+                val subcategories = sharedFacade.getSubcategoriesByCategoryId(categoryId)
+                val uiSubcategories = subcategories.map { subcategory ->
+                    UiSubcategory(
+                        id = subcategory.id,
+                        name = subcategory.name,
+                        categoryId = subcategory.categoryId
+                    )
+                }
+                _state.update { state ->
+                    copyState(state, availableSubcategories = uiSubcategories)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке сабкатегорий для категории $categoryId")
@@ -1305,7 +1304,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      */
     protected suspend fun loadSubcategoryById(subcategoryId: Long): String {
         return try {
-            getSubcategoryByIdUseCase(subcategoryId)?.name ?: ""
+            sharedFacade.getSubcategoryById(subcategoryId)?.name ?: ""
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при загрузке подкатегории по ID: %d", subcategoryId)
             ""

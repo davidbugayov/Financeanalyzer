@@ -14,11 +14,12 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
 import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
+import kotlinx.datetime.*
+import kotlin.time.ExperimentalTime
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -54,16 +55,13 @@ import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
+@OptIn(ExperimentalTime::class)
 class TransactionHistoryViewModel(
-    private val filterTransactionsUseCase: FilterTransactionsUseCase,
-    private val groupTransactionsUseCase: GroupTransactionsUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val sharedFacade: SharedFacade,
     private val repository: TransactionRepository,
     val categoriesViewModel: CategoriesViewModel,
-    private val getTransactionsForPeriodFlowUseCase: GetTransactionsForPeriodFlowUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val navigationManager: NavigationManager,
-    private val updateTransactionUseCase: UpdateTransactionUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
@@ -230,12 +228,13 @@ class TransactionHistoryViewModel(
 
     private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            when (val result = deleteTransactionUseCase(transaction)) {
-                is Result.Success -> {
+            try {
+                val result = sharedFacade.deleteTransaction(transaction.toShared())
+                if (result) {
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
-                    Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown))
+                    Timber.d("Transaction deleted successfully")
 
                     // Логируем событие в аналитику
                     AnalyticsUtils.logTransactionDeleted(
@@ -243,29 +242,34 @@ class TransactionHistoryViewModel(
                         category = transaction.category,
                         isExpense = transaction.isExpense,
                     )
+                } else {
+                    Timber.e("Failed to delete transaction")
+                    _state.update { it.copy(error = "Failed to delete transaction") }
                 }
-                is Result.Error -> {
-                    Timber.e(result.exception, "Failed to delete transaction")
-                    val errorMessage = result.exception.message ?: "Unknown error"
-                    _state.update { it.copy(error = errorMessage) }
-                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to delete transaction")
+                val errorMessage = e.message ?: "Unknown error"
+                _state.update { it.copy(error = errorMessage) }
             }
         }
     }
 
     private fun updateTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            when (val result = updateTransactionUseCase(transaction)) {
-                is Result.Success -> {
+            try {
+                val result = sharedFacade.updateTransaction(transaction.toShared())
+                if (result) {
                     resetAndReloadTransactions()
                     updateWidgetsUseCase()
                     Timber.d("Транзакция успешно обновлена: ${transaction.id}")
+                } else {
+                    Timber.e("Ошибка обновления транзакции")
+                    _state.update { it.copy(error = "Failed to update transaction") }
                 }
-                is Result.Error -> {
-                    Timber.e(result.exception, "Ошибка обновления транзакции")
-                    val errorMessage = result.exception.message ?: "Unknown error"
-                    _state.update { it.copy(error = errorMessage) }
-                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка обновления транзакции")
+                val errorMessage = e.message ?: "Unknown error"
+                _state.update { it.copy(error = errorMessage) }
             }
         }
     }
@@ -338,12 +342,13 @@ class TransactionHistoryViewModel(
                                 }
                                 PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
                                     Timber.d(
-                                        "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}",
+                                        "Загружаем транзакции через SharedFacade по периоду: ${currentState.startDate} - ${currentState.endDate}",
                                     )
-                                    getTransactionsForPeriodFlowUseCase(
-                                        currentState.startDate,
-                                        currentState.endDate,
-                                    ).first()
+                                    val flow = sharedFacade.transactionsForPeriodFlow(
+                                        currentState.startDate.toLocalDateKmp(),
+                                        currentState.endDate.toLocalDateKmp()
+                                    )
+                                    (flow?.first() ?: emptyList()).map { it.toDomain() }
                                 }
                                 PeriodType.MONTH -> {
                                     val calendar = Calendar.getInstance()
@@ -583,14 +588,14 @@ class TransactionHistoryViewModel(
         transactions: List<Transaction>,
         state: TransactionHistoryState,
     ): List<Transaction> {
-        return filterTransactionsUseCase(
-            transactions = transactions,
-            periodType = toDomainPeriodType(state.periodType),
-            startDate = state.startDate,
-            endDate = state.endDate,
-            categories = state.selectedCategories,
-            sources = state.selectedSources,
-        )
+        return sharedFacade.filterTransactions(
+            transactions = transactions.map { it.toShared() },
+            periodType = com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(toDomainPeriodType(state.periodType).name),
+            now = java.util.Date().toLocalDateKmp(),
+            customStart = state.startDate.toLocalDateKmp(),
+            customEnd = state.endDate.toLocalDateKmp(),
+            isExpense = null
+        ).map { it.toDomain() }
     }
 
     /**
@@ -673,9 +678,9 @@ class TransactionHistoryViewModel(
 
                     // Используем более эффективный алгоритм группировки
                     val groups =
-                        groupTransactionsUseCase.invoke(
-                            transactions = filteredTransactions,
-                            groupingType = toDomainGroupingType(currentState.groupingType),
+                        sharedFacade.groupTransactions(
+                            transactions = filteredTransactions.map { it.toShared() },
+                            keyType = com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase.KeyType.valueOf(toDomainGroupingType(currentState.groupingType).name),
                         )
 
                     val endTime = System.currentTimeMillis()
@@ -683,7 +688,9 @@ class TransactionHistoryViewModel(
                         "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс",
                     )
 
-                    groups
+                    groups.mapValues { (_, transactions) -> 
+                        transactions.map { it.toDomain() }
+                    }
                 } else {
                     emptyMap()
                 }

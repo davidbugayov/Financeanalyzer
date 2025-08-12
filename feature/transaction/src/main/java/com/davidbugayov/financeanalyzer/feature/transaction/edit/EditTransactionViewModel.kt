@@ -12,12 +12,9 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.AddSubcategoryUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
@@ -34,27 +31,19 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class EditTransactionViewModel(
-    private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
-    private val updateTransactionUseCase: UpdateTransactionUseCase,
+    private val sharedFacade: SharedFacade,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     application: Application,
-    updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val navigationManager: NavigationManager,
-    addSubcategoryUseCase: AddSubcategoryUseCase,
-    getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase,
-    getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase,
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
         categoriesViewModel,
         sourcePreferences,
         walletRepository,
-        updateWalletBalancesUseCase,
+        sharedFacade,
         application.resources,
-        addSubcategoryUseCase,
-        getSubcategoriesByCategoryIdUseCase,
-        getSubcategoryByIdUseCase,
     ) {
     override val _state =
         MutableStateFlow(
@@ -114,22 +103,23 @@ class EditTransactionViewModel(
 
         viewModelScope.launch {
             try {
-                Timber.d("ТРАНЗАКЦИЯ: Вызов getTransactionByIdUseCase для ID=%s", id)
-                val result = getTransactionByIdUseCase(id)
-                Timber.d("ТРАНЗАКЦИЯ: Результат getTransactionByIdUseCase: %s", result)
+                Timber.d("ТРАНЗАКЦИЯ: Вызов sharedFacade.getTransactionById для ID=%s", id)
+                val allTransactions = sharedFacade.loadTransactions()
+                val transaction = sharedFacade.getTransactionById(allTransactions, id)
+                Timber.d("ТРАНЗАКЦИЯ: Результат sharedFacade.getTransactionById: %s", transaction)
 
-                if (result is CoreResult.Success) {
-                    val transaction = result.data
+                if (transaction != null) {
+                    val domainTransaction = transaction.toDomain()
                     Timber.d(
                         "ТРАНЗАКЦИЯ: Успешно получена транзакция: сумма=%s, категория=%s",
-                        transaction.amount,
-                        transaction.category,
+                        domainTransaction.amount,
+                        domainTransaction.category,
                     )
 
                     // Устанавливаем режим редактирования и саму транзакцию
                     _state.update {
                         it.copy(
-                            transactionToEdit = transaction,
+                            transactionToEdit = domainTransaction,
                             editMode = true,
                         )
                     }
@@ -139,11 +129,11 @@ class EditTransactionViewModel(
                         _state.value.transactionToEdit?.id,
                         _state.value.editMode,
                     )
-                } else if (result is CoreResult.Error) {
-                    Timber.e("ТРАНЗАКЦИЯ: Ошибка в useCase: %s", result.exception.message)
+                } else {
+                    Timber.e("ТРАНЗАКЦИЯ: Транзакция не найдена")
                     _state.update {
                         it.copy(
-                            error = result.exception.message,
+                            error = "Транзакция не найдена",
                             isLoading = false,
                         )
                     }
@@ -298,9 +288,9 @@ class EditTransactionViewModel(
             try {
                 Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции начато: %s", transactionToSave.id)
                 val originalTransaction = currentState.transactionToEdit
-                val result = updateTransactionUseCase(transactionToSave)
+                val success = sharedFacade.updateTransaction(transactionToSave.toShared())
 
-                if (result is CoreResult.Success) {
+                if (success) {
                     Timber.d(
                         "ТРАНЗАКЦИЯ: Обновление успешно выполнено. ID: %s, Сумма: %s, Категория: %s, Источник: %s",
                         transactionToSave.id,
@@ -356,12 +346,8 @@ class EditTransactionViewModel(
                     }
                     updateWidgetsUseCase()
                     Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transactionToSave.id)
-                } else if (result is CoreResult.Error) {
-                    Timber.e(
-                        result.exception,
-                        "ТРАНЗАКЦИЯ: Ошибка при обновлении: %s",
-                        result.exception.message,
-                    )
+                } else {
+                    Timber.e("ТРАНЗАКЦИЯ: Ошибка при обновлении транзакции")
                     _state.update {
                         it.copy(
                             isLoading = false,

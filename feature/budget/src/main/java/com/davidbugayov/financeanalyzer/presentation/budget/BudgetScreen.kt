@@ -221,7 +221,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             onSubWalletsClick = {
                                 viewModel.onNavigateToSubWallets(category.id)
                             },
-                            goalProgressUseCase = viewModel.goalProgressUseCase,
+                            goalProgressUseCase = { current, target -> viewModel.goalProgress(current, target) },
                         )
                     }
                 }
@@ -920,7 +920,7 @@ fun WalletCard(
     wallet: Wallet,
     onClick: () -> Unit,
     onSubWalletsClick: (() -> Unit)? = null,
-    goalProgressUseCase: GoalProgressUseCase? = null,
+    goalProgressUseCase: ((Money, Money) -> Double)? = null,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
@@ -935,7 +935,7 @@ fun WalletCard(
     val isGoal = wallet.type?.name == "GOAL"
     val percentUsed =
         if (isGoal && goalProgressUseCase != null) {
-            goalProgressUseCase.invoke(wallet)
+            (goalProgressUseCase.invoke(wallet.balance, wallet.goalAmount ?: Money.zero()) * 100).toInt().coerceIn(0, 100)
         } else if (wallet.limit.amount > BigDecimal.ZERO) {
             (
                 wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
