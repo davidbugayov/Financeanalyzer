@@ -28,6 +28,9 @@ import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository
 import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.transaction.DeleteTransactionUseCase
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
@@ -62,6 +65,9 @@ class SharedFacade(
     private val goalProgress = GoalProgressUseCase()
     private val updateWalletBalances: UpdateWalletBalancesUseCase? = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
     private val getSubcategoriesByCategoryId: GetSubcategoriesByCategoryIdUseCase? = subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
+    private val addTransaction: AddTransactionUseCase? = transactionRepository?.let { AddTransactionUseCase(it) }
+    private val updateTransaction: UpdateTransactionUseCase? = transactionRepository?.let { UpdateTransactionUseCase(it) }
+    private val deleteTransaction: DeleteTransactionUseCase? = transactionRepository?.let { DeleteTransactionUseCase(it) }
 
     /**
      * Считает метрики по списку транзакций.
@@ -189,6 +195,18 @@ class SharedFacade(
 
     fun observeSubcategories(categoryId: Long): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Subcategory>>? =
         getSubcategoriesByCategoryId?.invoke(categoryId)
+
+    suspend fun addTransaction(transaction: Transaction) {
+        addTransaction?.invoke(transaction)
+    }
+
+    suspend fun updateTransaction(transaction: Transaction) {
+        updateTransaction?.invoke(transaction)
+    }
+
+    suspend fun deleteTransaction(id: String) {
+        deleteTransaction?.invoke(id)
+    }
 
     /**
      * Утилита создания суммы из double (для удобства Swift-клиента).
