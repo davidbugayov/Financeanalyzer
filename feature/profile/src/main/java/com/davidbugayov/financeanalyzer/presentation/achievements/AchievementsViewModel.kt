@@ -7,13 +7,12 @@ import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для экрана достижений

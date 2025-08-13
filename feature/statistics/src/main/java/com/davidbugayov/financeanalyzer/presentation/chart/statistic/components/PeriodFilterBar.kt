@@ -114,12 +114,13 @@ fun PeriodFilterBar(
         )
     }
 
-    val formatted = UiUtils.formatPeriod(
-        context = androidx.compose.ui.platform.LocalContext.current,
-        periodType = selectedPeriod,
-        startDate = currentStart,
-        endDate = currentEnd,
-    )
+    val formatted =
+        UiUtils.formatPeriod(
+            context = androidx.compose.ui.platform.LocalContext.current,
+            periodType = selectedPeriod,
+            startDate = currentStart,
+            endDate = currentEnd,
+        )
 
     Row(
         modifier = modifier.clickable { showPeriodDialog = true },
@@ -138,5 +139,3 @@ fun PeriodFilterBar(
         )
     }
 }
-
-

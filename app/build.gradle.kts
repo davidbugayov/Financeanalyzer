@@ -702,7 +702,9 @@ tasks.register<Copy>("prepareHuaweiRelease") {
         println("==========================================")
         println("Huawei Release подготовлен:")
         println(
-            "Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName("huawei").versionNameSuffix} (${android.defaultConfig.versionCode})",
+            "Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName(
+                "huawei",
+            ).versionNameSuffix} (${android.defaultConfig.versionCode})",
         )
         println("Расположение: ${huaweiDir.get()}")
         println("Примечание: при необходимости переименуйте .aab/.apk для загрузки в AGConnect")

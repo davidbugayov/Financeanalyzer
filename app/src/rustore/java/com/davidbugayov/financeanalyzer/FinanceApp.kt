@@ -5,6 +5,7 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
+import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
@@ -12,7 +13,6 @@ import com.google.firebase.ktx.Firebase
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 
 /**
  * Основной класс приложения для RuStore flavor

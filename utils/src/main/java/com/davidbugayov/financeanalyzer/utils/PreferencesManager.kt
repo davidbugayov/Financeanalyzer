@@ -241,10 +241,11 @@ class PreferencesManager(context: Context) {
 
     /** Сохранить язык приложения ("ru", "en", "zh"). */
     fun setAppLanguage(lang: String) {
-        val normalized = when (lang.lowercase(Locale.ROOT)) {
-            "ru", "en", "zh" -> lang.lowercase(Locale.ROOT)
-            else -> "en"
-        }
+        val normalized =
+            when (lang.lowercase(Locale.ROOT)) {
+                "ru", "en", "zh" -> lang.lowercase(Locale.ROOT)
+                else -> "en"
+            }
         sharedPreferences.edit { putString(KEY_APP_LANGUAGE, normalized) }
         timber.log.Timber.tag("LANG").d("PreferencesManager.setAppLanguage: saved=%s", normalized)
         AppLocale.apply(normalized)

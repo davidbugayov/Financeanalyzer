@@ -15,11 +15,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * 🏠 Современная карточка советов для главного экрана

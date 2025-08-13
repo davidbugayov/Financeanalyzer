@@ -8,12 +8,11 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.AbstractPdfImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Класс для импорта транзакций из PDF-выписок Сбербанка

@@ -29,5 +29,3 @@ class SharedTransactionRepositoryAdapter(
         unifiedRepo.delete(id)
     }
 }
-
-

@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.dialogs.SourceColorPickerDialog
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber

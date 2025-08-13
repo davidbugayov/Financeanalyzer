@@ -8,14 +8,14 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
-import kotlin.math.abs
 
 /**
  * Конфигурация для парсинга CSV-файлов.

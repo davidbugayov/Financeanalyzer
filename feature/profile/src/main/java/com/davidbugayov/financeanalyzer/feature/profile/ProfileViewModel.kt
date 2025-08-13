@@ -53,11 +53,12 @@ class ProfileViewModel(
 
         loadFinancialAnalytics()
 
-        val langLabel = when (preferencesManager.getAppLanguage()) {
-            "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
-            "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
-            else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
-        }
+        val langLabel =
+            when (preferencesManager.getAppLanguage()) {
+                "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
+                "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
+                else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
+            }
 
         _state.update {
             it.copy(
@@ -155,11 +156,12 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeLanguage -> {
                 preferencesManager.setAppLanguage(event.language)
-                val label = when (event.language) {
-                    "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
-                    "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
-                    else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
-                }
+                val label =
+                    when (event.language) {
+                        "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
+                        "zh" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_zh)
+                        else -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_ru)
+                    }
                 _state.update { it.copy(selectedLanguage = label, showLanguageDialog = false) }
             }
             is ProfileEvent.ChangeCurrency -> {
@@ -269,9 +271,10 @@ class ProfileViewModel(
                 if (filePath != null) {
                     _state.update { currentState ->
                         currentState.copy(
-                            exportSuccess = GlobalContext.get()
-                                .get<ResourceProvider>()
-                                .getString(UiR.string.export_success_path, filePath),
+                            exportSuccess =
+                                GlobalContext.get()
+                                    .get<ResourceProvider>()
+                                    .getString(UiR.string.export_success_path, filePath),
                             exportedFilePath = filePath,
                             exportError = null,
                         )
@@ -287,9 +290,10 @@ class ProfileViewModel(
                 } else {
                     _state.update { currentState ->
                         currentState.copy(
-                            exportError = GlobalContext.get()
-                                .get<ResourceProvider>()
-                                .getString(UiR.string.export_failed_transactions),
+                            exportError =
+                                GlobalContext.get()
+                                    .get<ResourceProvider>()
+                                    .getString(UiR.string.export_failed_transactions),
                             exportSuccess = null,
                             exportedFilePath = null,
                         )
@@ -298,9 +302,10 @@ class ProfileViewModel(
             } catch (exception: Exception) {
                 _state.update { currentState ->
                     currentState.copy(
-                        exportError = exception.message ?: GlobalContext.get()
-                            .get<ResourceProvider>()
-                            .getString(UiR.string.export_unknown_error),
+                        exportError =
+                            exception.message ?: GlobalContext.get()
+                                .get<ResourceProvider>()
+                                .getString(UiR.string.export_unknown_error),
                         exportSuccess = null,
                         exportedFilePath = null,
                     )
@@ -328,19 +333,24 @@ class ProfileViewModel(
 
                 // Форматируем dateRange в строку
                 val dateRange = analytics.dateRange
-                val dateRangeStr = if (dateRange != null) {
-                    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-                    val startStr =
-                        dateFormat.format(java.util.Date(dateRange.first.toEpochDays() * 24L * 60L * 60L * 1000L))
-                    val endStr =
-                        dateFormat.format(java.util.Date(dateRange.second.toEpochDays() * 24L * 60L * 60L * 1000L))
-                    "$startStr - $endStr"
-                } else {
-                    GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
-                }
+                val dateRangeStr =
+                    if (dateRange != null) {
+                        val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                        val startStr =
+                            dateFormat.format(java.util.Date(dateRange.first.toEpochDays() * 24L * 60L * 60L * 1000L))
+                        val endStr =
+                            dateFormat.format(java.util.Date(dateRange.second.toEpochDays() * 24L * 60L * 60L * 1000L))
+                        "$startStr - $endStr"
+                    } else {
+                        GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
+                    }
 
                 // Форматируем averageExpense в строку
-                val averageExpenseStr = com.davidbugayov.financeanalyzer.core.model.Money(java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()), _state.value.selectedCurrency).formatForDisplay(useMinimalDecimals = true)
+                val averageExpenseStr =
+                    com.davidbugayov.financeanalyzer.core.model.Money(
+                        java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()),
+                        _state.value.selectedCurrency,
+                    ).formatForDisplay(useMinimalDecimals = true)
 
                 Timber.d(
                     "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
@@ -349,9 +359,21 @@ class ProfileViewModel(
                 val newState =
                     _state.value.copy(
                         isLoading = false,
-                        totalIncome = com.davidbugayov.financeanalyzer.core.model.Money(java.math.BigDecimal.valueOf(analytics.totalIncome.toMajorDouble()), _state.value.selectedCurrency),
-                        totalExpense = com.davidbugayov.financeanalyzer.core.model.Money(java.math.BigDecimal.valueOf(analytics.totalExpense.toMajorDouble()), _state.value.selectedCurrency),
-                        balance = com.davidbugayov.financeanalyzer.core.model.Money(java.math.BigDecimal.valueOf(analytics.balance.toMajorDouble()), _state.value.selectedCurrency),
+                        totalIncome =
+                            com.davidbugayov.financeanalyzer.core.model.Money(
+                                java.math.BigDecimal.valueOf(analytics.totalIncome.toMajorDouble()),
+                                _state.value.selectedCurrency,
+                            ),
+                        totalExpense =
+                            com.davidbugayov.financeanalyzer.core.model.Money(
+                                java.math.BigDecimal.valueOf(analytics.totalExpense.toMajorDouble()),
+                                _state.value.selectedCurrency,
+                            ),
+                        balance =
+                            com.davidbugayov.financeanalyzer.core.model.Money(
+                                java.math.BigDecimal.valueOf(analytics.balance.toMajorDouble()),
+                                _state.value.selectedCurrency,
+                            ),
                         savingsRate = analytics.savingsRate,
                         totalTransactions = analytics.totalTransactions,
                         totalExpenseCategories = analytics.totalExpenseCategories,

@@ -1,11 +1,10 @@
 package com.davidbugayov.financeanalyzer.presentation.util
 
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Утилитарный класс для работы с UI компонентами

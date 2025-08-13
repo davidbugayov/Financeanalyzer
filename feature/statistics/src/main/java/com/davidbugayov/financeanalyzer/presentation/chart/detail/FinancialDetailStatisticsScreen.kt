@@ -74,7 +74,6 @@ fun FinancialDetailStatisticsScreen(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-
     // Временный лог для диагностики
     Timber.d(
         "FinancialDetailStatisticsScreen: metrics.savingsRate=${metrics.savingsRate}, metrics.monthsOfSavings=${metrics.monthsOfSavings}",
@@ -135,12 +134,14 @@ fun FinancialDetailStatisticsScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        ),
-                        shape = RoundedCornerShape(
-                            dimensionResource(UiR.dimen.financial_statistics_card_corner_radius),
-                        ),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            ),
+                        shape =
+                            RoundedCornerShape(
+                                dimensionResource(UiR.dimen.financial_statistics_card_corner_radius),
+                            ),
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -206,14 +207,16 @@ fun FinancialDetailStatisticsScreen(
                                     FinancialDataMapper.createExpenseAnalysis(
                                         averageDailyExpense = metrics.averageDailyExpense.format(true),
                                         averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
-                                        topIncomeCategory = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                            context,
-                                            metrics.topIncomeCategory,
-                                        ),
-                                        topExpenseCategory = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                            context,
-                                            metrics.topExpenseCategory,
-                                        ),
+                                        topIncomeCategory =
+                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                                context,
+                                                metrics.topIncomeCategory,
+                                            ),
+                                        topExpenseCategory =
+                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                                context,
+                                                metrics.topExpenseCategory,
+                                            ),
                                         topExpenseCategories =
                                             metrics.topExpenseCategories.map {
                                                 it.first to

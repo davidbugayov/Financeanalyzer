@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.import_transaction.utils
 
 import android.content.Context
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 

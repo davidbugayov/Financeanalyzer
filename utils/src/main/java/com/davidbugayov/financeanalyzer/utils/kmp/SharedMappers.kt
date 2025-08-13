@@ -1,13 +1,13 @@
 package com.davidbugayov.financeanalyzer.utils.kmp
 
-import com.davidbugayov.financeanalyzer.domain.model.Transaction as DomainTransaction
-import com.davidbugayov.financeanalyzer.shared.model.Transaction as SharedTransaction
 import com.davidbugayov.financeanalyzer.core.model.Money as CoreMoney
-import com.davidbugayov.financeanalyzer.shared.model.Money as SharedMoney
+import com.davidbugayov.financeanalyzer.domain.model.Transaction as DomainTransaction
 import com.davidbugayov.financeanalyzer.shared.model.Currency as SharedCurrency
-import kotlinx.datetime.LocalDate
+import com.davidbugayov.financeanalyzer.shared.model.Money as SharedMoney
+import com.davidbugayov.financeanalyzer.shared.model.Transaction as SharedTransaction
 import java.time.Instant
 import java.time.ZoneId
+import kotlinx.datetime.LocalDate
 
 fun DomainTransaction.toShared(): SharedTransaction {
     val localDate = Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDate()
@@ -26,14 +26,19 @@ fun DomainTransaction.toShared(): SharedTransaction {
 
 fun List<DomainTransaction>.toShared(): List<SharedTransaction> = map { it.toShared() }
 
-fun SharedMoney.toCore(): CoreMoney = CoreMoney(this.toMajorDouble(), com.davidbugayov.financeanalyzer.core.model.Currency.fromCode(this.currency.code))
+fun SharedMoney.toCore(): CoreMoney =
+    CoreMoney(
+        this.toMajorDouble(),
+        com.davidbugayov.financeanalyzer.core.model.Currency.fromCode(this.currency.code),
+    )
 
 fun SharedTransaction.toDomain(): DomainTransaction {
-    val dateJava = java.util.Date.from(
-        java.time.LocalDate.of(date.year, date.monthNumber, date.day)
-            .atStartOfDay(java.time.ZoneId.systemDefault())
-            .toInstant(),
-    )
+    val dateJava =
+        java.util.Date.from(
+            java.time.LocalDate.of(date.year, date.monthNumber, date.day)
+                .atStartOfDay(java.time.ZoneId.systemDefault())
+                .toInstant(),
+        )
     val coreCurrency = com.davidbugayov.financeanalyzer.core.model.Currency.fromCode(this.amount.currency.code)
     val coreMoney = CoreMoney(this.amount.toMajorDouble(), coreCurrency)
     return DomainTransaction(
@@ -59,5 +64,3 @@ fun com.davidbugayov.financeanalyzer.core.model.Money.toShared(): com.davidbugay
     val currency = com.davidbugayov.financeanalyzer.shared.model.Currency.fromCode(this.currency.code)
     return com.davidbugayov.financeanalyzer.shared.model.Money.fromMajor(this.amount.toDouble(), currency)
 }
-
-

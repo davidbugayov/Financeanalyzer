@@ -12,10 +12,10 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.GenericExcelImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.SheetSelector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractExcelBankHandler
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedInputStream
 import java.util.Locale
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Обработчик Excel-выписок Альфа-Банка

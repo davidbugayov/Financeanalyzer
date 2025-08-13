@@ -13,10 +13,10 @@ import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.utils.ImportErrorHandler
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * ViewModel для экрана импорта транзакций.

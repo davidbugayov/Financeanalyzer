@@ -23,10 +23,9 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
 fun TransactionPagingList(

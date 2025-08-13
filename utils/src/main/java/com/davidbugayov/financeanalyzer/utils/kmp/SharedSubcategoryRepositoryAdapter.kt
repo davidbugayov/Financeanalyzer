@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.utils.kmp
 
-import com.davidbugayov.financeanalyzer.domain.repository.SubcategoryRepository as DomainSubcategoryRepository
-import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository as SharedSubcategoryRepository
-import com.davidbugayov.financeanalyzer.shared.model.Subcategory as SharedSubcategory
 import com.davidbugayov.financeanalyzer.domain.model.Subcategory as DomainSubcategory
+import com.davidbugayov.financeanalyzer.domain.repository.SubcategoryRepository as DomainSubcategoryRepository
+import com.davidbugayov.financeanalyzer.shared.model.Subcategory as SharedSubcategory
+import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository as SharedSubcategoryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.map
 class SharedSubcategoryRepositoryAdapter(
     private val domainRepo: DomainSubcategoryRepository,
 ) : SharedSubcategoryRepository {
-
     override suspend fun getSubcategoryById(id: Long): SharedSubcategory? {
         return domainRepo.getSubcategoryById(id)?.toShared()
     }

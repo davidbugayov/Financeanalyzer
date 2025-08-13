@@ -4,10 +4,9 @@ import android.content.res.Resources
 import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Source
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.CashColor
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 // import com.davidbugayov.financeanalyzer.utils.ColorUtils // ColorUtils может быть еще нужен для getSourceColorByName, если используется где-то еще
 

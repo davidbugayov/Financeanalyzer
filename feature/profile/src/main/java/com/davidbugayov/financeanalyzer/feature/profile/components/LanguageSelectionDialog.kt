@@ -113,10 +113,11 @@ fun LanguageSelectionDialog(
                     }
                     onDismiss()
                 },
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
+                colors =
+                    androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) { Text(stringResource(UiR.string.select)) }
         },
         dismissButton = {
@@ -130,7 +131,12 @@ fun LanguageSelectionDialog(
 }
 
 @Composable
-private fun LanguageItem(label: String, badge: String, selected: Boolean, onClick: () -> Unit) {
+private fun LanguageItem(
+    label: String,
+    badge: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
     val backgroundColor = MaterialTheme.colorScheme.surface
     val textColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
     val borderColor =
@@ -148,9 +154,10 @@ private fun LanguageItem(label: String, badge: String, selected: Boolean, onClic
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(8.dp)),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -174,11 +181,11 @@ private fun LanguageItem(label: String, badge: String, selected: Boolean, onClic
                 imageVector = Icons.Default.Check,
                 contentDescription = stringResource(UiR.string.select),
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(24.dp),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(24.dp),
             )
         }
     }
 }
-

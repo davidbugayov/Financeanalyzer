@@ -404,10 +404,11 @@ fun EnhancedCategoryPieChart(
 
                         // Название категории (локализуем дефолтные ключи)
                         Text(
-                            text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                LocalContext.current,
-                                item.name,
-                            ),
+                            text =
+                                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                                    LocalContext.current,
+                                    item.name,
+                                ),
                             style =
                                 MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
@@ -511,9 +512,10 @@ private fun DrawScope.drawInnerText(
     expenseText: String,
     incomeColor: Color,
     expenseColor: Color,
+    selectedItemDisplayName: String?,
 ) {
     if (selectedItem != null) {
-        drawSelectedItemText(center, size, selectedItem)
+        drawSelectedItemText(center, size, selectedItem, selectedItemDisplayName ?: selectedItem.name)
     } else {
         drawTotalAmountText(
             center,
@@ -532,6 +534,7 @@ private fun DrawScope.drawSelectedItemText(
     center: Offset,
     size: Size,
     selectedItem: UiCategory,
+    displayName: String,
 ) {
     drawIntoCanvas { canvas ->
         val itemMoney = selectedItem.money
@@ -566,12 +569,12 @@ private fun DrawScope.drawSelectedItemText(
                 isAntiAlias = true
             }
 
-        // Обрезаем слишком длинные названия категорий
+        // Обрезаем слишком длинные локализованные названия категорий
         val categoryName =
-            if (selectedItem.name.length > 15) {
-                "${selectedItem.name.take(12)}..."
+            if (displayName.length > 15) {
+                "${displayName.take(12)}..."
             } else {
-                selectedItem.name
+                displayName
             }
 
         val categoryY = center.y + categoryPaint.descent() * DonutTextConstants.CATEGORY_Y_OFFSET
@@ -740,6 +743,14 @@ private fun DrawPieChart(
     val currentExpenseColor = LocalExpenseColor.current
     val context = LocalContext.current
     val outlineColorForDonut = MaterialTheme.colorScheme.onSurface // Получаем цвет здесь
+    // Локализованное имя выбранной категории для центра
+    val selectedItemDisplayName =
+        selectedItem?.let {
+            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                LocalContext.current,
+                it.name,
+            )
+        }
 
     val animatedProgress = remember { Animatable(0f) }
 
@@ -893,6 +904,7 @@ private fun DrawPieChart(
                 expenseText = expenseText,
                 incomeColor = currentIncomeColor,
                 expenseColor = currentExpenseColor,
+                selectedItemDisplayName = selectedItemDisplayName,
             )
         }
     }

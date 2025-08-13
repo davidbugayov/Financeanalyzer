@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,8 +52,13 @@ fun TransactionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Кнопка выбора даты с улучшенным дизайном
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+        // Кнопка выбора даты: строго используем локаль приложения из Resources
+        val ctx = LocalContext.current
+        val cfg = ctx.resources.configuration
+
+        @Suppress("DEPRECATION")
+        val appLocale: Locale = if (Build.VERSION.SDK_INT >= 24) cfg.locales[0] else cfg.locale
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy", appLocale)
         val formattedDate = dateFormat.format(date)
 
         Surface(

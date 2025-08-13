@@ -121,7 +121,10 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             logDeviceInfo()
         } catch (e: Exception) {
             Timber.e(e, getString(UiR.string.device_info_log_error))
-            CrashReporter.trackError("DeviceInfoLog", getString(UiR.string.device_info_log_error_detail, e.message ?: ""))
+            CrashReporter.trackError(
+                "DeviceInfoLog",
+                getString(UiR.string.device_info_log_error_detail, e.message ?: ""),
+            )
         }
 
         try {

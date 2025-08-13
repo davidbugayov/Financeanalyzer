@@ -108,6 +108,13 @@
     <string name="bank_alfabank">Alfa-Bank</string>
   <string name="bank_ozon">OZON</string>
     <string name="bank_tinkoff">Tinkoff</string>
+  <string name="bank_vtb">VTB</string>
+  <string name="bank_alfa_short">Alfa</string>
+  <string name="bank_raiffeisen">Raiffeisen</string>
+  <string name="bank_post_bank">Post Bank</string>
+  <string name="bank_yoomoney">YuMoney</string>
+  <string name="bank_cash">Cash</string>
+  <string name="bank_gazprombank">Gazprombank</string>
     <string name="budget">Budget</string>
     <string name="budget_exceeded">The budget is exceeded</string>
     <string name="budget_limit">Budget limit</string>

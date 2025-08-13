@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.setScale
 import com.davidbugayov.financeanalyzer.ui.R as UiR

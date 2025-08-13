@@ -36,7 +36,6 @@ import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout

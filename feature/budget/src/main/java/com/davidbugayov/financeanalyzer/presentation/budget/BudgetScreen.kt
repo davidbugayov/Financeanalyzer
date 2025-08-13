@@ -73,7 +73,6 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -935,7 +934,10 @@ fun WalletCard(
     val isGoal = wallet.type?.name == "GOAL"
     val percentUsed =
         if (isGoal && goalProgressUseCase != null) {
-            (goalProgressUseCase.invoke(wallet.balance, wallet.goalAmount ?: Money.zero()) * 100).toInt().coerceIn(0, 100)
+            (goalProgressUseCase.invoke(wallet.balance, wallet.goalAmount ?: Money.zero()) * 100).toInt().coerceIn(
+                0,
+                100,
+            )
         } else if (wallet.limit.amount > BigDecimal.ZERO) {
             (
                 wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)

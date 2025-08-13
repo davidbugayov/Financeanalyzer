@@ -342,11 +342,12 @@ private fun ModernStatsCard(achievements: List<Achievement>) {
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = stringResource(
-                                UiR.string.achievements_unlocked_of_total,
-                                unlockedCount,
-                                achievements.size,
-                            ),
+                            text =
+                                stringResource(
+                                    UiR.string.achievements_unlocked_of_total,
+                                    unlockedCount,
+                                    achievements.size,
+                                ),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -199,6 +201,8 @@ fun CategorySection(
             items(visibleCategories) { category ->
                 contentColorFor(backgroundColor = category.color)
                 Color.White
+                val isDark = isSystemInDarkTheme()
+                if (isDark) Color.White else Color.Black
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -221,7 +225,6 @@ fun CategorySection(
                                 .background(
                                     when {
                                         isError && selectedCategory.isBlank() -> errorBackgroundColor
-                                        category.name == selectedCategory -> MaterialTheme.colorScheme.primaryContainer
                                         else -> category.color
                                     },
                                 )
@@ -243,19 +246,31 @@ fun CategorySection(
                         contentAlignment = Alignment.Center,
                     ) {
                         // Ищем совпадение по ключу иконки, если список передан с локализованными именами
-                        Icon(
-                            imageVector = category.icon ?: Icons.Default.Category,
-                            contentDescription = category.name,
-                            tint =
+                        run {
+                            val iconTint =
                                 when {
                                     isError && selectedCategory.isBlank() -> errorContentColor
+                                    category.name == selectedCategory ->
+                                        colorResource(
+                                            id = UiR.color.category_icon_selected_tint,
+                                        )
                                     else -> Color.White
-                                },
-                            modifier =
-                                Modifier.size(
-                                    dimensionResource(UiR.dimen.category_item_icon_size),
-                                ),
-                        )
+                                }
+                            Icon(
+                                imageVector = category.icon ?: Icons.Default.Category,
+                                contentDescription = category.name,
+                                tint = iconTint,
+                                modifier =
+                                    Modifier.size(
+                                        // Чуть больше при выборе, чтобы иконка читалась чётче
+                                        if (category.name == selectedCategory) {
+                                            dimensionResource(UiR.dimen.category_item_icon_size) * 1.08f
+                                        } else {
+                                            dimensionResource(UiR.dimen.category_item_icon_size)
+                                        },
+                                    ),
+                            )
+                        }
                     }
                     Spacer(
                         modifier =
@@ -264,17 +279,18 @@ fun CategorySection(
                             ),
                     )
                     Text(
-                        text = CategoryLocalization.displayName(
-                            LocalContext.current,
-                            category.name,
-                        ),
+                        text =
+                            CategoryLocalization.displayName(
+                                LocalContext.current,
+                                category.name,
+                            ),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                         color =
                             when {
                                 isError && selectedCategory.isBlank() -> errorContentColor
-                                category.name == selectedCategory -> Color.Black
+                                category.name == selectedCategory -> MaterialTheme.colorScheme.primary
                                 else -> MaterialTheme.colorScheme.onSurface
                             },
                     )

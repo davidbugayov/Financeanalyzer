@@ -106,8 +106,15 @@
     <string name="back">返回</string>
     <string name="balance">平衡</string>
     <string name="bank_alfabank">阿尔法银行</string>
-  <string name="bank_ozon">OZON</string>
-    <string name="bank_tinkoff">Tinkoff</string>
+  <string name="bank_ozon">OZON 银行</string>
+  <string name="bank_tinkoff">Tinkoff 银行</string>
+  <string name="bank_vtb">VTB 银行</string>
+  <string name="bank_alfa_short">Alfa 银行</string>
+  <string name="bank_raiffeisen">Raiffeisen 银行</string>
+  <string name="bank_post_bank">邮政银行</string>
+  <string name="bank_yoomoney">ЮMoney</string>
+  <string name="bank_cash">现金</string>
+  <string name="bank_gazprombank">Gazprombank 银行</string>
     <string name="budget">预算</string>
     <string name="budget_exceeded">预算超出了</string>
     <string name="budget_limit">预算限制</string>

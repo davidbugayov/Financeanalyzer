@@ -36,11 +36,10 @@ import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDial
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalTypeInference::class)
 @Composable

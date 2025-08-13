@@ -15,15 +15,14 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран добавления новой транзакции

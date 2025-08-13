@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
     <color name="primary_light">#BBDEFB</color>
     <color name="accent">#03A9F4</color>
     <color name="colorPrimary">#2196F3</color>
 
-    
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -15,19 +15,20 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+  <color name="category_icon_selected_tint">#FFE0E0E0</color>
 
-    
+
     <color name="success">#4CAF50</color>
     <color name="error">#F44336</color>
     <color name="warning">#FFA000</color>
     <color name="info">#2196F3</color>
 
-    
+
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#BDBDBD</color>
 
-    
+
     <color name="background">#FAFAFA</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_variant">#F5F5F5</color>
@@ -35,14 +36,14 @@
   <color name="outline">#37474F</color>
     <color name="divider_dark">#BDBDBD</color>
 
-    
+
   <color name="bank_sberbank">#1AB239</color>
     <color name="bank_tinkoff">#FFDD2D</color>
     <color name="bank_alfabank">#EF3124</color>
   <color name="bank_ozon">#1A6DFF</color>
   <color name="bank_csv">#455A64</color>
 
-  
+
   <color name="income">#00C853</color>
     <color name="expense">#F44336</color>
     <color name="expense_dark">#D32F2F</color>
@@ -51,7 +52,7 @@
     <color name="expense_primary">#FFF44336</color>
     <color name="expense_secondary">#FFFF5722</color>
 
-    
+
     <color name="chart_grid">#E0E0E0</color>
     <color name="chart_line">#2196F3</color>
     <color name="chart_bar">#03A9F4</color>
@@ -75,7 +76,7 @@
     <color name="chart_selector_selected">#2196F3</color>
     <color name="chart_selector_unselected">#E0E0E0</color>
 
-    
+
   <color name="enhanced_line_chart_income">#00C853</color>
     <color name="enhanced_line_chart_expense">#F44336</color>
     <color name="enhanced_line_chart_grid">#EEEEEE</color>
@@ -89,7 +90,7 @@
     <color name="enhanced_line_chart_label_text">#424242</color>
     <color name="enhanced_line_chart_no_data">#9E9E9E</color>
 
-    
+
     <color name="chart_selector_selected_text">#FFFFFF</color>
     <color name="chart_selector_unselected_text">#757575</color>
   <color name="chart_selector_income_bg">#00C853</color>
@@ -97,7 +98,7 @@
     <color name="chart_selector_both_bg">#2196F3</color>
     <color name="chart_selector_unselected_bg">#F0F0F0</color>
 
-  
+
     <color name="pie_chart_empty_color">#EEEEEE</color>
     <color name="pie_chart_income_text">#1B5E20</color>
     <color name="pie_chart_expense_text">#B71C1C</color>
@@ -114,7 +115,7 @@
     <color name="pie_chart_category_8">#00BCD4</color>
     <color name="pie_chart_other">#607D8B</color>
 
-  
+
     <color name="category_food">#FFF44336</color>
     <color name="category_transport">#FF2196F3</color>
     <color name="category_entertainment">#FFFF9800</color>
@@ -141,11 +142,11 @@
     <color name="category_interest">#FFD600</color>
     <color name="category_rent">#8D6E63</color>
 
-    
+
     <color name="enhanced_pie_chart_sector_outline_outer">#66FFFFFF</color>
     <color name="enhanced_pie_chart_sector_outline_inner">#4DFFFFFF</color>
 
-    
+
     <color name="savings_rate_excellent">#00C853</color>
     <color name="savings_rate_good">#66BB6A</color>
     <color name="savings_rate_satisfactory">#FFA726</color>
@@ -161,14 +162,14 @@
 
   <color name="qualification_badge_background_alpha">#26FFFFFF</color>
 
-    
+
     <color name="financial_statistics_progress_excellent">#00C853</color>
     <color name="financial_statistics_progress_good">#66BB6A</color>
     <color name="financial_statistics_progress_ok">#FFA726</color>
     <color name="financial_statistics_progress_attention">#EF5350</color>
 
-  
-    <color name="primaryContainer">#E3F2FD</color> 
-    <color name="onPrimaryContainer">#263238</color> 
+
+    <color name="primaryContainer">#E3F2FD</color>
+    <color name="onPrimaryContainer">#263238</color>
 
 </resources>

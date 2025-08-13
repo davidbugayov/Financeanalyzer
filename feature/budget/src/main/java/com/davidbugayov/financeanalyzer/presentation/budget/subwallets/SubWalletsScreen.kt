@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.EmptySubWalletsState
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.ParentWalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.SubWalletCard
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

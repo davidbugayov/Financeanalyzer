@@ -18,11 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.presentation.categories.model.SourceLocalization
 import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorContentColor
 
@@ -49,6 +51,8 @@ fun SourceItem(
                 )
                 .padding(vertical = 4.dp),
     ) {
+        val context = LocalContext.current
+        val localizedName = SourceLocalization.displayName(context, source.name)
         Box(
             modifier =
                 Modifier
@@ -78,9 +82,8 @@ fun SourceItem(
                     ),
             contentAlignment = Alignment.Center,
         ) {
-            // Здесь можно добавить иконку для источника
             Text(
-                text = source.name.first().toString().uppercase(),
+                text = localizedName.first().toString().uppercase(),
                 color = if (isError) SourceItemErrorContentColor else Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -91,7 +94,7 @@ fun SourceItem(
         Spacer(modifier = Modifier.height(2.dp))
 
         Text(
-            text = source.name,
+            text = localizedName,
             style =
                 MaterialTheme.typography.bodySmall.copy(
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

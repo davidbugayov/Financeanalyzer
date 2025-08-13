@@ -3,13 +3,12 @@ package com.davidbugayov.financeanalyzer.presentation.categories.model
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.expenseCategoryColorsMap
 import com.davidbugayov.financeanalyzer.ui.theme.incomeCategoryColorsMap
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 object CategoryProvider {
     data class CategoryMeta(

@@ -5,12 +5,12 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -577,7 +577,10 @@ class BudgetViewModel(
     /**
      * Вычисляет прогресс цели через SharedFacade.
      */
-    fun goalProgress(current: Money, target: Money): Double {
+    fun goalProgress(
+        current: Money,
+        target: Money,
+    ): Double {
         return sharedFacade.goalProgress(current.toShared(), target.toShared())
     }
 }

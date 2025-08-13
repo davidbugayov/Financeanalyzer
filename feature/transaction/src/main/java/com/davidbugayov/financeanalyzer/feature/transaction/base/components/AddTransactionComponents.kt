@@ -140,7 +140,10 @@ fun CategoryItemButton(
 /**
  * Делает цвет дружелюбнее: слегка пастелит фон в зависимости от темы.
  */
-private fun softenForFriendlyUi(color: Color, isDarkTheme: Boolean): Color {
+private fun softenForFriendlyUi(
+    color: Color,
+    isDarkTheme: Boolean,
+): Color {
     val mix = if (isDarkTheme) Color.Black else Color.White
     val factor = 0.15f // 15% к белому в светлой и к чёрному в тёмной
     return blendColors(color, mix, factor)
@@ -149,7 +152,11 @@ private fun softenForFriendlyUi(color: Color, isDarkTheme: Boolean): Color {
 /**
  * Линейное смешение двух цветов.
  */
-private fun blendColors(base: Color, mix: Color, ratio: Float): Color {
+private fun blendColors(
+    base: Color,
+    mix: Color,
+    ratio: Float,
+): Color {
     val r = base.red * (1 - ratio) + mix.red * ratio
     val g = base.green * (1 - ratio) + mix.green * ratio
     val b = base.blue * (1 - ratio) + mix.blue * ratio

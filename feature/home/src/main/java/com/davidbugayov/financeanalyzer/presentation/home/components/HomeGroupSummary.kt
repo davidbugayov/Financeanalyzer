@@ -287,10 +287,11 @@ private fun SummaryCategoryList(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                        androidx.compose.ui.platform.LocalContext.current,
-                        categorySummary.category,
-                    ),
+                    text =
+                        com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
+                            androidx.compose.ui.platform.LocalContext.current,
+                            categorySummary.category,
+                        ),
                     fontSize = 13.sp,
                     color = textSecondary,
                     fontWeight = FontWeight.Medium,

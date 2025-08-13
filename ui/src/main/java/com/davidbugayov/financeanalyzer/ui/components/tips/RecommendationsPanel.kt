@@ -56,28 +56,32 @@ fun RecommendationsPanel(
     val visibleTips = if (showAll) tips else tips.take(3)
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.card_corner_radius)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         // Градиентная шапка
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f),
-                        ),
-                    ),
-                )
-                .padding(dimensionResource(R.dimen.padding_large)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush =
+                            Brush.horizontalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f),
+                                ),
+                            ),
+                    )
+                    .padding(dimensionResource(R.dimen.padding_large)),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,10 +103,11 @@ fun RecommendationsPanel(
                 }
                 // Пилюля с количеством
                 Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                 ) {
                     Text(
                         text = "${tips.size}",
@@ -126,11 +131,12 @@ fun RecommendationsPanel(
                         text = if (showAll) stringResource(R.string.show_less) else stringResource(R.string.show_more),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                            .clickableNoRipple { showAll = !showAll },
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f))
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                                .clickableNoRipple { showAll = !showAll },
                     )
                 }
             }
@@ -146,10 +152,11 @@ private fun RecommendationRow(
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         // Кружок с иконкой
         Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+            modifier =
+                Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -169,11 +176,12 @@ private fun RecommendationRow(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                text = if (tip.descriptionArgs.isEmpty()) {
-                    stringResource(id = tip.descriptionResId)
-                } else {
-                    stringResource(id = tip.descriptionResId, *tip.descriptionArgs.toTypedArray())
-                },
+                text =
+                    if (tip.descriptionArgs.isEmpty()) {
+                        stringResource(id = tip.descriptionResId)
+                    } else {
+                        stringResource(id = tip.descriptionResId, *tip.descriptionArgs.toTypedArray())
+                    },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -192,5 +200,3 @@ private fun RecommendationRow(
 private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier {
     return this.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { onClick() }
 }
-
-

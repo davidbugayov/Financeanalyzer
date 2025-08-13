@@ -340,10 +340,11 @@ class TransactionHistoryViewModel(
                                     Timber.d(
                                         "Загружаем транзакции через SharedFacade по периоду: ${currentState.startDate} - ${currentState.endDate}",
                                     )
-                                    val flow = sharedFacade.transactionsForPeriodFlow(
-                                        currentState.startDate.toLocalDateKmp(),
-                                        currentState.endDate.toLocalDateKmp()
-                                    )
+                                    val flow =
+                                        sharedFacade.transactionsForPeriodFlow(
+                                            currentState.startDate.toLocalDateKmp(),
+                                            currentState.endDate.toLocalDateKmp(),
+                                        )
                                     (flow?.first() ?: emptyList()).map { it.toDomain() }
                                 }
                                 PeriodType.MONTH -> {
@@ -589,11 +590,14 @@ class TransactionHistoryViewModel(
     ): List<Transaction> {
         return sharedFacade.filterTransactions(
             transactions = transactions.map { it.toShared() },
-            periodType = com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(toDomainPeriodType(state.periodType).name),
+            periodType =
+                com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(
+                    toDomainPeriodType(state.periodType).name,
+                ),
             now = Date().toLocalDateKmp(),
             customStart = state.startDate.toLocalDateKmp(),
             customEnd = state.endDate.toLocalDateKmp(),
-            isExpense = null
+            isExpense = null,
         ).map { it.toDomain() }
     }
 
@@ -679,7 +683,10 @@ class TransactionHistoryViewModel(
                     val groups =
                         sharedFacade.groupTransactions(
                             transactions = filteredTransactions.map { it.toShared() },
-                            keyType = com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase.KeyType.valueOf(toDomainGroupingType(currentState.groupingType).name),
+                            keyType =
+                                com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase.KeyType.valueOf(
+                                    toDomainGroupingType(currentState.groupingType).name,
+                                ),
                         )
 
                     val endTime = System.currentTimeMillis()

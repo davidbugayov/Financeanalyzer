@@ -7,7 +7,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
@@ -174,7 +173,10 @@ abstract class AbstractPdfImportUseCase(
                     ImportResult.Progress(
                         10,
                         100,
-                        context.getString(UiR.string.import_progress_format_validated_skipping_headers, currentBankName),
+                        context.getString(
+                            UiR.string.import_progress_format_validated_skipping_headers,
+                            currentBankName,
+                        ),
                     ),
                 )
 

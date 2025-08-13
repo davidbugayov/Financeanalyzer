@@ -99,6 +99,13 @@
     <string name="bank_alfabank">Альфа-Банк</string>
     <string name="bank_ozon">Озон</string>
     <string name="bank_tinkoff">Тинькофф</string>
+  <string name="bank_vtb">ВТБ</string>
+  <string name="bank_alfa_short">Альфа</string>
+  <string name="bank_raiffeisen">Райффайзен</string>
+  <string name="bank_post_bank">Почта Банк</string>
+  <string name="bank_yoomoney">ЮMoney</string>
+  <string name="bank_cash">Наличные</string>
+  <string name="bank_gazprombank">Газпромбанк</string>
     <string name="budget">Бюджет</string>
     <string name="budget_exceeded">Бюджет превышен</string>
     <string name="budget_limit">Лимит бюджета</string>

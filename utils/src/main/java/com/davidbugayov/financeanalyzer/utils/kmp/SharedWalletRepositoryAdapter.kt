@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.utils.kmp
 
-import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository as DomainWalletRepository
-import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository as SharedWalletRepository
-import com.davidbugayov.financeanalyzer.shared.model.Wallet as SharedWallet
 import com.davidbugayov.financeanalyzer.domain.model.Wallet as DomainWallet
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository as DomainWalletRepository
+import com.davidbugayov.financeanalyzer.shared.model.Wallet as SharedWallet
+import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository as SharedWalletRepository
 
 /**
  * Адаптер domain WalletRepository под KMP SharedWalletRepository.
@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet as DomainWallet
 class SharedWalletRepositoryAdapter(
     private val domainRepo: DomainWalletRepository,
 ) : SharedWalletRepository {
-
     override suspend fun getAllWallets(): List<SharedWallet> {
         return domainRepo.getAllWallets().map { it.toShared() }
     }

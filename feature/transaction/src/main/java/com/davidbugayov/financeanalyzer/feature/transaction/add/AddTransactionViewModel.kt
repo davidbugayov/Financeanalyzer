@@ -7,21 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
 import java.util.Date
 import java.util.UUID
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 class AddTransactionViewModel(
     private val sharedFacade: SharedFacade,
@@ -104,7 +102,9 @@ class AddTransactionViewModel(
         amount: String,
         categoryId: String,
     ): Boolean {
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_validate_input, amount))
+        Timber.d(
+            GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_validate_input, amount),
+        )
         val validationBuilder = ValidationBuilder()
 
         _state.update {
@@ -117,7 +117,9 @@ class AddTransactionViewModel(
 
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
-            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_empty_amount_error))
+            Timber.d(
+                GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_empty_amount_error),
+            )
             CrashLoggerProvider.crashLogger.logException(
                 Exception(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_empty_amount)),
             )
@@ -202,7 +204,7 @@ class AddTransactionViewModel(
                 if (result) {
                     sharedFacade.updateWalletBalances(
                         transactionToSave.walletIds ?: emptyList(),
-                        transactionToSave.amount.amount,
+                        transactionToSave.amount.toShared(),
                         null,
                     )
                     incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)

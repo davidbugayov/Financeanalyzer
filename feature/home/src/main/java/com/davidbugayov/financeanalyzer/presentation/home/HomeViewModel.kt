@@ -480,7 +480,10 @@ class HomeViewModel(
                 }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
             val tips = sharedFacade.smartExpenseTips(filteredTransactions.map { it.toShared() })
-            val recommendations = sharedFacade.expenseOptimizationRecommendations(filteredTransactions.map { it.toShared() })
+            val recommendations =
+                sharedFacade.expenseOptimizationRecommendations(
+                    filteredTransactions.map { it.toShared() },
+                )
             _state.update {
                 it.copy(
                     filteredTransactions = filteredTransactions,
@@ -514,12 +517,13 @@ class HomeViewModel(
         val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
         val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
         val currentCurrency = CurrencyProvider.getCurrency()
-        val metrics = sharedFacade.calculateMetrics(
-            transactions.map { it.toShared() },
-            currentCurrency.name,
-            startDate.toLocalDateKmp(),
-            endDate.toLocalDateKmp()
-        )
+        val metrics =
+            sharedFacade.calculateMetrics(
+                transactions.map { it.toShared() },
+                currentCurrency.name,
+                startDate.toLocalDateKmp(),
+                endDate.toLocalDateKmp(),
+            )
         val income = Money(java.math.BigDecimal.valueOf(metrics.income.toMajorDouble()), currentCurrency)
         val expense = Money(java.math.BigDecimal.valueOf(metrics.expense.toMajorDouble()), currentCurrency)
         val balance = income - expense

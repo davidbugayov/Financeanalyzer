@@ -175,7 +175,14 @@ fun AmountField(
                     val sep = moneyObject.currency.decimalSeparator.toString()
                     val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
                     val finalText =
-                        if (withoutSymbol.endsWith(zeroSuffix)) withoutSymbol.removeSuffix(zeroSuffix) else withoutSymbol
+                        if (withoutSymbol.endsWith(
+                                zeroSuffix,
+                            )
+                        ) {
+                            withoutSymbol.removeSuffix(zeroSuffix)
+                        } else {
+                            withoutSymbol
+                        }
                     timber.log.Timber.d("AmountField: Финальный текст: '$finalText'")
                     finalText
                 } else {
@@ -261,11 +268,12 @@ fun AmountField(
                         // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
                         // позаботится о форматировании и обновлении textFieldValueForDisplay.
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            isFocused = focusState.isFocused
-                        },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                isFocused = focusState.isFocused
+                            },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     textStyle =
                         MaterialTheme.typography.headlineMedium.copy(

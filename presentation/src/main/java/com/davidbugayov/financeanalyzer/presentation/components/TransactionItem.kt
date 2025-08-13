@@ -169,10 +169,11 @@ fun TransactionItem(
             // Сначала пытаемся сопоставить по ключу (нормализованное имя на любом языке), затем по строке
             categories.find { cat ->
                 val catKey = CategoryLocalization.keyFor(cat.name)
-                (txKey != null && catKey != null && txKey == catKey) || cat.name.equals(
-                    transaction.category,
-                    ignoreCase = true,
-                )
+                (txKey != null && catKey != null && txKey == catKey) ||
+                    cat.name.equals(
+                        transaction.category,
+                        ignoreCase = true,
+                    )
             }
         }
 
@@ -350,10 +351,11 @@ fun TransactionItem(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = CategoryLocalization.displayName(
-                        context,
-                        transaction.category,
-                    ),
+                    text =
+                        CategoryLocalization.displayName(
+                            context,
+                            transaction.category,
+                        ),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

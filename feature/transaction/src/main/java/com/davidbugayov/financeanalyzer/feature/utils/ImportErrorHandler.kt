@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.feature.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 

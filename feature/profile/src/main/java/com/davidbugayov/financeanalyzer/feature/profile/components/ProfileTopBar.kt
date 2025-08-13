@@ -2,9 +2,8 @@ package com.davidbugayov.financeanalyzer.feature.profile.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.ui.R
-import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 
 /**
  * Верхняя панель для экрана профиля.

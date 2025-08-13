@@ -129,7 +129,10 @@ fun OnboardingScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 @Composable
-                fun Chip(label: String, currency: Currency) {
+                fun Chip(
+                    label: String,
+                    currency: Currency,
+                ) {
                     FilterChip(
                         selected = selectedCurrency == currency,
                         onClick = {

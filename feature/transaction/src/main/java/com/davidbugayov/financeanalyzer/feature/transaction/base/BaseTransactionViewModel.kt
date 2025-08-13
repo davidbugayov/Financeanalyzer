@@ -8,20 +8,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -94,10 +93,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             try {
                 sharedFacade.updateWalletBalances(
                     walletIdsToUpdate = walletIds,
-                    amountForWallets = amount.amount,
-                    originalTransaction = originalTransaction?.let { 
-                        it.toShared()
-                    },
+                    amountForWallets = amount.toShared(),
+                    originalTransaction =
+                        originalTransaction?.let {
+                            it.toShared()
+                        },
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении баланса кошельков через SharedFacade")
@@ -1268,13 +1268,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             try {
                 val subcategories = sharedFacade.getSubcategoriesByCategoryId(categoryId)
-                val uiSubcategories = subcategories.map { subcategory ->
-                    UiSubcategory(
-                        id = subcategory.id,
-                        name = subcategory.name,
-                        categoryId = subcategory.categoryId
-                    )
-                }
+                val uiSubcategories =
+                    subcategories.map { subcategory ->
+                        UiSubcategory(
+                            id = subcategory.id,
+                            name = subcategory.name,
+                            categoryId = subcategory.categoryId,
+                        )
+                    }
                 _state.update { state ->
                     copyState(state, availableSubcategories = uiSubcategories)
                 }

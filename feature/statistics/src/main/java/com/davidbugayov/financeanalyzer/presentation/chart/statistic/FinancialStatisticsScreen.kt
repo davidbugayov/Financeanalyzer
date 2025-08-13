@@ -164,7 +164,10 @@ fun FinancialStatisticsScreen(
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logEvent(
                         com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Events.USER_RATING,
                         android.os.Bundle().apply {
-                            putString(com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Params.SOURCE, "rustore")
+                            putString(
+                                com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Params.SOURCE,
+                                "rustore",
+                            )
                             putString("request_location", "statistics_screen")
                         },
                     )
@@ -220,7 +223,7 @@ fun FinancialStatisticsScreen(
     var currentEndDate by remember { mutableStateOf(state.endDate) }
 
     LaunchedEffect(state.periodType, state.startDate, state.endDate) {
-        selectedPeriodType = state.periodType ?: PeriodType.MONTH
+        selectedPeriodType = state.periodType
         currentStartDate = state.startDate
         currentEndDate = state.endDate
     }
@@ -384,7 +387,12 @@ fun FinancialStatisticsScreen(
                                     onActionClick = { tip ->
                                         when (tip.actionResId) {
                                             UiR.string.action_add_transaction -> onAddTransaction()
-                                            UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                                            UiR.string.action_view_categories ->
+                                                onNavigateToTransactions?.invoke(
+                                                    "",
+                                                    state.startDate,
+                                                    state.endDate,
+                                                )
                                             UiR.string.action_start_saving, UiR.string.action_review_budget, UiR.string.action_continue_saving, UiR.string.action_create_plan -> onNavigateToBudget()
                                             UiR.string.action_study_statistics -> {
                                                 coroutineScope.launch { pagerState.scrollToPage(1) }
@@ -569,14 +577,9 @@ fun FinancialStatisticsScreen(
                                         EnhancedCategoryPieChart(
                                             items = state.pieChartData,
                                             selectedIndex = null,
-                                            onSectorClick = { item ->
-                                                item?.original?.name?.let { categoryName ->
-                                                    onNavigateToTransactions?.invoke(
-                                                        categoryName,
-                                                        state.startDate,
-                                                        state.endDate,
-                                                    )
-                                                }
+                                            onSectorClick = {
+                                                    _ ->
+                                                // отключаем переход в историю по клику по сектору
                                             },
                                             modifier =
                                                 Modifier.padding(
@@ -745,21 +748,33 @@ fun FinancialStatisticsScreen(
                                                 when (tip.actionResId) {
                                                     UiR.string.action_add_transaction -> onAddTransaction()
                                                     UiR.string.action_start_saving, UiR.string.action_continue_saving -> onNavigateToBudget()
-                                                    UiR.string.action_study_statistics -> coroutineScope.launch { pagerState.scrollToPage(1) }
-                                                    UiR.string.action_analyze_spending -> coroutineScope.launch { pagerState.scrollToPage(0) }
-                                                    UiR.string.action_view_categories -> onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                                                    UiR.string.action_study_statistics ->
+                                                        coroutineScope.launch {
+                                                            pagerState.scrollToPage(
+                                                                1,
+                                                            )
+                                                        }
+                                                    UiR.string.action_analyze_spending ->
+                                                        coroutineScope.launch {
+                                                            pagerState.scrollToPage(
+                                                                0,
+                                                            )
+                                                        }
+                                                    UiR.string.action_view_categories ->
+                                                        onNavigateToTransactions?.invoke(
+                                                            "",
+                                                            state.startDate,
+                                                            state.endDate,
+                                                        )
                                                 }
                                             },
                                         )
                                     }
 
                                     // Оставляем предсказания
-                                    val predictExpensesUseCase =
-                                        remember {
-                                            org.koin.core.context.GlobalContext.get()
-                                                .get<PredictFutureExpensesUseCase>()
-                                        }
-                                    val predictedExpenses = remember { predictExpensesUseCase(state.transactions) }
+                                    val predictExpensesUseCase = remember { PredictFutureExpensesUseCase() }
+                                    val predictedExpenses =
+                                        remember(state.transactions) { predictExpensesUseCase(state.transactions) }
 
                                     // В UI, добавляем карточку предсказаний (тональная)
                                     Card(
@@ -768,12 +783,19 @@ fun FinancialStatisticsScreen(
                                                 .fillMaxWidth()
                                                 .padding(12.dp),
                                         shape = RoundedCornerShape(20.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
-                                        ),
+                                        colors =
+                                            CardDefaults.cardColors(
+                                                containerColor =
+                                                    MaterialTheme.colorScheme.primaryContainer.copy(
+                                                        alpha = 0.25f,
+                                                    ),
+                                            ),
                                     ) {
                                         Column(modifier = Modifier.padding(12.dp)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            ) {
                                                 Icon(
                                                     imageVector = Icons.Filled.Analytics,
                                                     contentDescription = null,
@@ -789,7 +811,10 @@ fun FinancialStatisticsScreen(
                                                     Text(
                                                         text = stringResource(id = UiR.string.prediction_subtitle),
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                                        color =
+                                                            MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                                alpha = 0.8f,
+                                                            ),
                                                     )
                                                 }
                                             }
@@ -797,8 +822,9 @@ fun FinancialStatisticsScreen(
                                             Spacer(Modifier.height(6.dp))
 
                                             // Форматируем сумму с валютой
-                                            val currency = stringResource(id = UiR.string.settings_currency_current_value)
-                                            val formatted = java.text.NumberFormat.getNumberInstance(Locale("ru","RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
+                                            val currency =
+                                                stringResource(id = UiR.string.settings_currency_current_value)
+                                            val formatted = java.text.NumberFormat.getNumberInstance(Locale("ru", "RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
 
                                             Text(
                                                 text = stringResource(id = UiR.string.prediction_next_month, formatted),
@@ -810,11 +836,12 @@ fun FinancialStatisticsScreen(
 
                                     // Инвестиционные советы в виде структурированной карточки
                                     InvestmentTipsCard(
-                                        tipsRes = listOf(
-                                            UiR.string.investment_tip_bonds,
-                                            UiR.string.investment_tip_diversification,
-                                            UiR.string.investment_tip_stocks,
-                                        ),
+                                        tipsRes =
+                                            listOf(
+                                                UiR.string.investment_tip_bonds,
+                                                UiR.string.investment_tip_diversification,
+                                                UiR.string.investment_tip_stocks,
+                                            ),
                                     )
                                 }
                             }

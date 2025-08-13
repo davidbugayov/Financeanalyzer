@@ -40,7 +40,6 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
-import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType

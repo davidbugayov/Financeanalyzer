@@ -11,7 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.catego
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
-import com.davidbugayov.financeanalyzer.feature.transaction.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.BufferedReader
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Класс для импорта транзакций из PDF-выписок Ozon Банка

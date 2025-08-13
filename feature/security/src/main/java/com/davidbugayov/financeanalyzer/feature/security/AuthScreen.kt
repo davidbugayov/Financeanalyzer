@@ -41,13 +41,12 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.feature.security.components.PinKeyboard
 import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.feature.security.viewmodel.AuthViewModel
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
  * Экран аутентификации для входа в приложение

@@ -331,9 +331,10 @@ private fun FinancialCushionSection(
                     Row(
                         verticalAlignment = Alignment.Bottom,
                     ) {
-                        val monthsInt = monthsOfSavings.toBigDecimal()
-                            .setScale(0, java.math.RoundingMode.FLOOR)
-                            .toInt()
+                        val monthsInt =
+                            monthsOfSavings.toBigDecimal()
+                                .setScale(0, java.math.RoundingMode.FLOOR)
+                                .toInt()
 
                         Text(
                             text = monthsInt.toString(),
