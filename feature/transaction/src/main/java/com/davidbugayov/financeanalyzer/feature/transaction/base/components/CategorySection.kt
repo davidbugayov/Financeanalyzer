@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -199,8 +198,7 @@ fun CategorySection(
         ) {
             items(visibleCategories) { category ->
                 contentColorFor(backgroundColor = category.color)
-                val selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                val isDarkTheme = isSystemInDarkTheme()
+                Color.White
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -230,7 +228,7 @@ fun CategorySection(
                                 .border(
                                     width =
                                         when {
-                                            category.name == selectedCategory -> 2.dp
+                                            category.name == selectedCategory -> 3.dp
                                             isError && selectedCategory.isBlank() -> 2.dp
                                             else -> 1.dp
                                         },
@@ -238,7 +236,7 @@ fun CategorySection(
                                         when {
                                             category.name == selectedCategory -> MaterialTheme.colorScheme.primary
                                             isError && selectedCategory.isBlank() -> MaterialTheme.colorScheme.error
-                                            else -> category.color.copy(alpha = 0.5f)
+                                            else -> category.color.copy(alpha = 0.6f)
                                         },
                                     shape = CircleShape,
                                 ),
@@ -251,8 +249,7 @@ fun CategorySection(
                             tint =
                                 when {
                                     isError && selectedCategory.isBlank() -> errorContentColor
-                                    category.name == selectedCategory -> selectedContentColor
-                                    else -> if (isDarkTheme) Color.Black else Color.White
+                                    else -> Color.White
                                 },
                             modifier =
                                 Modifier.size(
@@ -277,7 +274,7 @@ fun CategorySection(
                         color =
                             when {
                                 isError && selectedCategory.isBlank() -> errorContentColor
-                                category.name == selectedCategory -> selectedContentColor
+                                category.name == selectedCategory -> Color.Black
                                 else -> MaterialTheme.colorScheme.onSurface
                             },
                     )

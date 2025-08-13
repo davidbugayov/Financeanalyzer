@@ -1236,4 +1236,5 @@
     <string name="default_small_amount">0 ₽</string>
     <string name="balance_widget_description">Widget for displaying the current balance, income and expenses</string>
     <string name="small_balance_widget_description">Compact widget for displaying the current balance</string>
+  <string name="months_short_label">mo.</string>
 </resources>

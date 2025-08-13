@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -332,15 +331,12 @@ private fun FinancialCushionSection(
                     Row(
                         verticalAlignment = Alignment.Bottom,
                     ) {
+                        val monthsInt = monthsOfSavings.toBigDecimal()
+                            .setScale(0, java.math.RoundingMode.FLOOR)
+                            .toInt()
+
                         Text(
-                            text =
-                                stringResource(
-                                    UiR.string.financial_cushion_months,
-                                    monthsOfSavings.toBigDecimal().setScale(
-                                        0,
-                                        java.math.RoundingMode.FLOOR,
-                                    ).toPlainString(),
-                                ),
+                            text = monthsInt.toString(),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -349,7 +345,7 @@ private fun FinancialCushionSection(
                         Spacer(modifier = Modifier.width(4.dp))
 
                         Text(
-                            text = "${monthsOfSavings.toInt()} мес.",
+                            text = stringResource(UiR.string.months_short_label),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 4.dp),

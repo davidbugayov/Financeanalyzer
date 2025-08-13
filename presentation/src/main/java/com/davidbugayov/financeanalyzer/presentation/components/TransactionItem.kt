@@ -331,13 +331,13 @@ fun TransactionItem(
                     Modifier
                         .size(dimensionResource(id = UiR.dimen.icon_container_size_large))
                         .clip(CircleShape)
-                        .background(categoryActualColor.copy(alpha = 0.2f)),
+                        .background(categoryActualColor),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = categoryIcon,
                     contentDescription = transaction.category,
-                    tint = categoryActualColor,
+                    tint = Color.White,
                     modifier = Modifier.size(dimensionResource(id = UiR.dimen.icon_size_medium)),
                 )
             }

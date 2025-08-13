@@ -965,4 +965,11 @@
     <string name="default_small_amount">0 ₽</string>
     <string name="balance_widget_description">Виджет для отображения текущего баланса, доходов и расходов</string>
     <string name="small_balance_widget_description">Компактный виджет для отображения текущего баланса</string>
+  <string name="months_short_label">мес.</string>
+  <!-- Feedback and export/import messages -->
+  <string name="export_success_path">Экспорт выполнен: %1$s</string>
+  <string name="export_failed_transactions">Не удалось экспортировать транзакции</string>
+  <string name="export_unknown_error">Неизвестная ошибка экспорта</string>
+  <string name="error_failed_delete_transaction">Не удалось удалить транзакцию</string>
+  <string name="error_failed_update_transaction">Не удалось обновить транзакцию</string>
 </resources>

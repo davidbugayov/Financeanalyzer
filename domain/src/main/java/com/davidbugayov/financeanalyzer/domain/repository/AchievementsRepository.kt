@@ -1,64 +1,63 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
 import android.content.Context
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import com.davidbugayov.financeanalyzer.domain.R
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import org.koin.core.context.GlobalContext
 import timber.log.Timber
 
 /**
  * Репозиторий для управления достижениями
  */
 interface AchievementsRepository {
-    
+
     /**
      * Получает все достижения
      */
     fun getAllAchievements(): Flow<List<Achievement>>
-    
+
     /**
      * Получает достижение по ID
      */
     fun getAchievementById(id: String): Flow<Achievement?>
-    
+
     /**
      * Получает достижения по категории
      */
     fun getAchievementsByCategory(category: AchievementCategory): Flow<List<Achievement>>
-    
+
     /**
      * Получает разблокированные достижения
      */
     fun getUnlockedAchievements(): Flow<List<Achievement>>
-    
+
     /**
      * Получает заблокированные достижения
      */
     fun getLockedAchievements(): Flow<List<Achievement>>
-    
+
     /**
      * Обновляет достижение
      */
     suspend fun updateAchievement(achievement: Achievement)
-    
+
     /**
      * Разблокирует достижение
      */
     suspend fun unlockAchievement(id: String)
-    
+
     /**
      * Инициализирует достижения по умолчанию
      */
     suspend fun initializeDefaultAchievements(achievements: List<Achievement>)
-    
+
     /**
      * Получает общее количество монет от разблокированных достижений
      */
@@ -72,9 +71,9 @@ interface AchievementsRepository {
  * @param context Контекст приложения для доступа к SharedPreferences.
  */
 class AchievementsRepositoryImpl(private val context: Context) : AchievementsRepository {
-    
-    private val prefs = context.applicationContext.getSharedPreferences("achievements", android.content.Context.MODE_PRIVATE)
-    
+
+    private val prefs = context.applicationContext.getSharedPreferences("achievements", Context.MODE_PRIVATE)
+
     // Предустановленные достижения
     private val rp: ResourceProvider = GlobalContext.get().get()
 
@@ -302,30 +301,36 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     )
 
     private val _achievements = MutableStateFlow(loadAchievements())
-    
+
     /**
      * Загружает достижения из SharedPreferences
      */
     private fun loadAchievements(): List<Achievement> {
         return try {
-            // Загружаем прогресс для каждого достижения отдельно
-            defaultAchievements.map { achievement ->
-                val progress = prefs.getInt("${achievement.id}_progress", 0)
-                val isUnlocked = prefs.getBoolean("${achievement.id}_unlocked", false)
-                val dateUnlocked = prefs.getLong("${achievement.id}_date", 0L).takeIf { it > 0 }
-                
-                achievement.copy(
-                    currentProgress = progress,
-                    isUnlocked = isUnlocked,
-                    dateUnlocked = dateUnlocked
-                )
+            val initialized = prefs.getBoolean("achievements_initialized", false)
+            if (!initialized) {
+                // Пусть UI-слой инициализирует локализованными строками
+                emptyList()
+            } else {
+                // Загружаем прогресс для каждого достижения отдельно, базируясь на текущем списке по умолчанию
+                defaultAchievements.map { achievement ->
+                    val progress = prefs.getInt("${achievement.id}_progress", 0)
+                    val isUnlocked = prefs.getBoolean("${achievement.id}_unlocked", false)
+                    val dateUnlocked = prefs.getLong("${achievement.id}_date", 0L).takeIf { it > 0 }
+
+                    achievement.copy(
+                        currentProgress = progress,
+                        isUnlocked = isUnlocked,
+                        dateUnlocked = dateUnlocked,
+                    )
+                }
             }
         } catch (e: Exception) {
             Timber.e(e, rp.getString(R.string.log_error_loading_achievements))
-            defaultAchievements
+            emptyList()
         }
     }
-    
+
     /**
      * Сохраняет достижения в SharedPreferences
      */
@@ -339,38 +344,39 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
                     editor.putLong("${achievement.id}_date", date)
                 }
             }
+            editor.putBoolean("achievements_initialized", true)
             editor.apply()
         } catch (e: Exception) {
             Timber.e(e, rp.getString(R.string.log_error_saving_achievements))
         }
     }
-    
+
     override fun getAllAchievements(): Flow<List<Achievement>> = _achievements.asStateFlow()
-    
+
     override fun getAchievementById(id: String): Flow<Achievement?> {
         return _achievements.map { achievements ->
             achievements.find { it.id == id }
         }
     }
-    
+
     override fun getAchievementsByCategory(category: AchievementCategory): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { it.category == category }
         }
     }
-    
+
     override fun getUnlockedAchievements(): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { it.isUnlocked }
         }
     }
-    
+
     override fun getLockedAchievements(): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { !it.isUnlocked }
         }
     }
-    
+
     override suspend fun updateAchievement(achievement: Achievement) {
         val updatedList = _achievements.value.map { existing ->
             if (existing.id == achievement.id) {
@@ -382,7 +388,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         _achievements.value = updatedList
         saveAchievements(updatedList)
     }
-    
+
     override suspend fun unlockAchievement(id: String) {
         val updatedList = _achievements.value.map { achievement ->
             if (achievement.id == id && !achievement.isUnlocked) {
@@ -398,15 +404,15 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         _achievements.value = updatedList
         saveAchievements(updatedList)
     }
-    
+
     override suspend fun initializeDefaultAchievements(achievements: List<Achievement>) {
         // Эта функция теперь не нужна, так как мы автоматически мержим с дефолтными
         // Но оставляем для совместимости
     }
-    
+
     override fun getTotalCoins(): Flow<Int> {
         return _achievements.map { achievements ->
             achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
         }
     }
-} 
+}

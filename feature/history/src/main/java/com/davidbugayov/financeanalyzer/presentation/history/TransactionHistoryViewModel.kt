@@ -8,18 +8,10 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
 import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
-import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
-import kotlinx.datetime.*
-import kotlin.time.ExperimentalTime
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -28,15 +20,19 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -50,9 +46,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.context.GlobalContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 @OptIn(ExperimentalTime::class)
@@ -250,6 +244,7 @@ class TransactionHistoryViewModel(
                 Timber.e(e, "Failed to delete transaction")
                 val errorMessage = e.message ?: "Unknown error"
                 _state.update { it.copy(error = errorMessage) }
+                throw e
             }
         }
     }
@@ -270,6 +265,7 @@ class TransactionHistoryViewModel(
                 Timber.e(e, "Ошибка обновления транзакции")
                 val errorMessage = e.message ?: "Unknown error"
                 _state.update { it.copy(error = errorMessage) }
+                throw e
             }
         }
     }
@@ -419,6 +415,7 @@ class TransactionHistoryViewModel(
                         error = e.message ?: "Ошибка при загрузке транзакций",
                     )
                 }
+                throw e
             }
         }
     }
@@ -522,6 +519,7 @@ class TransactionHistoryViewModel(
                         error = e.message,
                     )
                 }
+                throw e
             }
         }
     }
@@ -573,6 +571,7 @@ class TransactionHistoryViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при расчете статистики по категории: ${e.message}")
                 _state.update { it.copy(categoryStats = null) }
+                throw e
             }
         }
     }
@@ -591,7 +590,7 @@ class TransactionHistoryViewModel(
         return sharedFacade.filterTransactions(
             transactions = transactions.map { it.toShared() },
             periodType = com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(toDomainPeriodType(state.periodType).name),
-            now = java.util.Date().toLocalDateKmp(),
+            now = Date().toLocalDateKmp(),
             customStart = state.startDate.toLocalDateKmp(),
             customEnd = state.endDate.toLocalDateKmp(),
             isExpense = null
@@ -688,7 +687,7 @@ class TransactionHistoryViewModel(
                         "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс",
                     )
 
-                    groups.mapValues { (_, transactions) -> 
+                    groups.mapValues { (_, transactions) ->
                         transactions.map { it.toDomain() }
                     }
                 } else {

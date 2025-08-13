@@ -3,14 +3,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
-import kotlinx.coroutines.flow.first
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
-import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -18,10 +14,13 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -113,95 +113,94 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
 
     private fun loadData() {
         viewModelScope.launch {
-            try {
-                _state.update { it.copy(isLoading = true, error = null) }
+            _state.update { it.copy(isLoading = true, error = null) }
 
-                val flow = sharedFacade.transactionsForPeriodFlow(_state.value.startDate.toLocalDateKmp(), _state.value.endDate.toLocalDateKmp())
-                val filteredTransactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
-                allTransactions = filteredTransactions
+            val flow =
+                sharedFacade.transactionsForPeriodFlow(
+                    _state.value.startDate.toLocalDateKmp(),
+                    _state.value.endDate.toLocalDateKmp(),
+                )
+            val filteredTransactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
+            allTransactions = filteredTransactions
 
-                val currentCurrency = CurrencyProvider.getCurrency()
-                val metrics =
-                    calculateBalanceMetricsUseCase(
-                        filteredTransactions,
-                        currentCurrency,
-                        _state.value.startDate,
-                        _state.value.endDate,
-                    )
-                val income = metrics.income
-                val expense = metrics.expense
-                val savingsRate = metrics.savingsRate
-                val averageDailyExpense = metrics.averageDailyExpense
-                val monthsOfSavings = metrics.monthsOfSavings
+            val currentCurrency = CurrencyProvider.getCurrency()
+            val metrics =
+                calculateBalanceMetricsUseCase(
+                    filteredTransactions,
+                    currentCurrency,
+                    _state.value.startDate,
+                    _state.value.endDate,
+                )
+            val income = metrics.income
+            val expense = metrics.expense
+            val savingsRate = metrics.savingsRate
+            val averageDailyExpense = metrics.averageDailyExpense
+            val monthsOfSavings = metrics.monthsOfSavings
 
-                // Агрегируем по категориям
-                val expensesByCategory =
-                    filteredTransactions
-                        .filter { it.isExpense }
-                        .groupBy { it.category.ifBlank { "Без категории" } }
-                        .mapValues { (_, transactions) ->
-                            transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
-                                // Приводим каждую транзакцию к текущей валюте
-                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
-                                acc + convertedAmount.abs()
-                            }
+            // Агрегируем по категориям
+            val expensesByCategory =
+                filteredTransactions
+                    .filter { it.isExpense }
+                    .groupBy { it.category.ifBlank { "Без категории" } }
+                    .mapValues { (_, transactions) ->
+                        transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                            // Приводим каждую транзакцию к текущей валюте
+                            val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                            acc + convertedAmount.abs()
                         }
-                val incomeByCategory =
-                    filteredTransactions
-                        .filter { !it.isExpense }
-                        .groupBy { it.category.ifBlank { "Без категории" } }
-                        .mapValues { (_, transactions) ->
-                            transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
-                                // Приводим каждую транзакцию к текущей валюте
-                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
-                                acc + convertedAmount
-                            }
+                    }
+            val incomeByCategory =
+                filteredTransactions
+                    .filter { !it.isExpense }
+                    .groupBy { it.category.ifBlank { "Без категории" } }
+                    .mapValues { (_, transactions) ->
+                        transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
+                            // Приводим каждую транзакцию к текущей валюте
+                            val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                            acc + convertedAmount
                         }
+                    }
 
-                // --- Новое: подготовка данных для линейного графика ---
-                val incomeLineChartData =
-                    createLineChartData(
-                        transactions = filteredTransactions,
-                        isIncome = true,
-                    )
-                val expenseLineChartData =
-                    createLineChartData(
-                        transactions = filteredTransactions,
-                        isIncome = false,
-                    )
-                // --- конец нового ---
+            // --- Новое: подготовка данных для линейного графика ---
+            val incomeLineChartData =
+                createLineChartData(
+                    transactions = filteredTransactions,
+                    isIncome = true,
+                )
+            val expenseLineChartData =
+                createLineChartData(
+                    transactions = filteredTransactions,
+                    isIncome = false,
+                )
+            // --- конец нового ---
 
-                // --- Новое: подготовка данных для PieChart ---
-                val showExpenses = _state.value.showExpenses
-                val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
-                val pieChartData = preparePieChartData(categoryData, showExpenses)
+            // --- Новое: подготовка данных для PieChart ---
+            val showExpenses = _state.value.showExpenses
+            val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
+            val pieChartData = preparePieChartData(categoryData, showExpenses)
 
-                // --- Новое: получаем рекомендации ---
-                val financialMetrics = calculateEnhancedFinancialMetricsUseCase.invoke(filteredTransactions)
-                val recommendations = financialMetrics.recommendations
+            // --- Новое: получаем рекомендации ---
+            val financialMetrics = calculateEnhancedFinancialMetricsUseCase.invoke(filteredTransactions)
+            val recommendations = financialMetrics.recommendations
 
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        transactions = filteredTransactions,
-                        income = income,
-                        expense = expense,
-                        expensesByCategory = expensesByCategory,
-                        incomeByCategory = incomeByCategory,
-                        incomeLineChartData = incomeLineChartData,
-                        expenseLineChartData = expenseLineChartData,
-                        error = null,
-                        periodText = formatPeriodCompact(it.periodType, it.startDate, it.endDate),
-                        savingsRate = savingsRate,
-                        averageDailyExpense = averageDailyExpense,
-                        monthsOfSavings = monthsOfSavings,
-                        pieChartData = pieChartData,
-                        recommendations = recommendations,
-                    )
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = e.message) }
-                _effect.emit(EnhancedFinanceChartEffect.ShowError(e.message ?: "Unknown error"))
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    transactions = filteredTransactions,
+                    income = income,
+                    expense = expense,
+                    expensesByCategory = expensesByCategory,
+                    incomeByCategory = incomeByCategory,
+                    incomeLineChartData = incomeLineChartData,
+                    expenseLineChartData = expenseLineChartData,
+                    error = null,
+                    periodText = formatPeriodCompact(it.periodType, it.startDate, it.endDate),
+                    savingsRate = savingsRate,
+                    averageDailyExpense = averageDailyExpense,
+                    monthsOfSavings = monthsOfSavings,
+                    pieChartData = pieChartData,
+                    recommendations = recommendations,
+                )
             }
         }
     }

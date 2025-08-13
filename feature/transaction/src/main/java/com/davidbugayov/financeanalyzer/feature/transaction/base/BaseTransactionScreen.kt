@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
@@ -768,7 +767,6 @@ fun <E> BaseTransactionScreen(
             }
 
             if (state.showCustomCategoryDialog) {
-                val addState = state as? AddTransactionState
                 CustomCategoryDialog(
                     categoryText = state.customCategory,
                     onCategoryTextChange = { name ->
@@ -791,8 +789,8 @@ fun <E> BaseTransactionScreen(
                             context,
                         )
                     },
-                    availableIcons = addState?.availableCategoryIcons ?: emptyList(),
-                    selectedIcon = addState?.customCategoryIcon,
+                    availableIcons = state.availableCategoryIcons,
+                    selectedIcon = state.customCategoryIcon,
                     onIconSelected = { icon ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetCustomCategoryIcon(icon)),

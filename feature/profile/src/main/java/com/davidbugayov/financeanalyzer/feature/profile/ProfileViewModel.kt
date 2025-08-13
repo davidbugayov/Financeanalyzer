@@ -6,22 +6,19 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import kotlinx.datetime.*
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
-import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -272,7 +269,9 @@ class ProfileViewModel(
                 if (filePath != null) {
                     _state.update { currentState ->
                         currentState.copy(
-                            exportSuccess = "Export successful: $filePath",
+                            exportSuccess = GlobalContext.get()
+                                .get<ResourceProvider>()
+                                .getString(UiR.string.export_success_path, filePath),
                             exportedFilePath = filePath,
                             exportError = null,
                         )
@@ -288,7 +287,9 @@ class ProfileViewModel(
                 } else {
                     _state.update { currentState ->
                         currentState.copy(
-                            exportError = "Failed to export transactions",
+                            exportError = GlobalContext.get()
+                                .get<ResourceProvider>()
+                                .getString(UiR.string.export_failed_transactions),
                             exportSuccess = null,
                             exportedFilePath = null,
                         )
@@ -297,11 +298,14 @@ class ProfileViewModel(
             } catch (exception: Exception) {
                 _state.update { currentState ->
                     currentState.copy(
-                        exportError = exception.message ?: "Unknown export error",
+                        exportError = exception.message ?: GlobalContext.get()
+                            .get<ResourceProvider>()
+                            .getString(UiR.string.export_unknown_error),
                         exportSuccess = null,
                         exportedFilePath = null,
                     )
                 }
+                throw exception
             }
         }
     }
@@ -323,21 +327,17 @@ class ProfileViewModel(
                 )
 
                 // Форматируем dateRange в строку
-                val dateRangeStr =
-                    try {
-                        val dateRange = analytics.dateRange
-                        if (dateRange != null) {
-                            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-                            val startStr = dateFormat.format(java.util.Date(dateRange.first.toEpochDays() * 24L * 60L * 60L * 1000L))
-                            val endStr = dateFormat.format(java.util.Date(dateRange.second.toEpochDays() * 24L * 60L * 60L * 1000L))
-                            "$startStr - $endStr"
-                        } else {
-                            GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
-                        }
-                    } catch (exception: Exception) {
-                        Timber.e(exception, "Ошибка при форматировании dateRange")
-                        GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
-                    }
+                val dateRange = analytics.dateRange
+                val dateRangeStr = if (dateRange != null) {
+                    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                    val startStr =
+                        dateFormat.format(java.util.Date(dateRange.first.toEpochDays() * 24L * 60L * 60L * 1000L))
+                    val endStr =
+                        dateFormat.format(java.util.Date(dateRange.second.toEpochDays() * 24L * 60L * 60L * 1000L))
+                    "$startStr - $endStr"
+                } else {
+                    GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
+                }
 
                 // Форматируем averageExpense в строку
                 val averageExpenseStr = com.davidbugayov.financeanalyzer.core.model.Money(java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()), _state.value.selectedCurrency).formatForDisplay(useMinimalDecimals = true)
@@ -375,6 +375,7 @@ class ProfileViewModel(
                         error = exception.message ?: GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
                     )
                 }
+                throw exception
             }
         }
     }

@@ -97,7 +97,7 @@ fun CategoryItemButton(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val backgroundColor = softenForFriendlyUi(category.color, isDarkTheme)
-    val contentColor = if (isDarkTheme) Color.Black else Color.White
+    val contentColor = Color.White
 
     Surface(
         modifier =

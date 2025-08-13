@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.home
+
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,25 +9,23 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
-import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -254,20 +253,23 @@ class HomeViewModel(
                         "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                     )
                 } else {
+                    val rp: ResourceProvider = GlobalContext.get().get()
                     _state.update {
                         it.copy(
-                            error = "Failed to delete transaction",
+                            error = rp.getString(UiR.string.error_failed_delete_transaction),
                             transactionToDelete = null,
                         )
                     }
                 }
             } catch (e: Exception) {
+                val rp: ResourceProvider = GlobalContext.get().get()
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Error deleting transaction",
+                        error = e.message ?: rp.getString(UiR.string.error_unknown),
                         transactionToDelete = null,
                     )
                 }
+                throw e
             }
         }
     }
@@ -308,6 +310,7 @@ class HomeViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при плавном обновлении: %s", e.message)
                 loadTransactions()
+                throw e
             }
         }
     }
@@ -367,6 +370,7 @@ class HomeViewModel(
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, error = e.message) }
+                throw e
             }
         }
     }
@@ -407,6 +411,7 @@ class HomeViewModel(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении статистики по категориям: ${e.message}")
+                throw e
             }
         }
     }
@@ -446,6 +451,7 @@ class HomeViewModel(
                 Timber.e(e, "Error generating test data")
                 val rp: ResourceProvider = GlobalContext.get().get()
                 _state.update { it.copy(error = e.message ?: rp.getString(UiR.string.error_generating_test_data)) }
+                throw e
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
