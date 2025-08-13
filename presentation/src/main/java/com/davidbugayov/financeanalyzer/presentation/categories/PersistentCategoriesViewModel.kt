@@ -89,7 +89,7 @@ class PersistentCategoriesViewModel(
                 name = name,
                 isExpense = isExpense,
                 icon = icon,
-                color = CategoryProvider.generateCategoryColorFromPalette(isExpense),
+                color = CategoryProvider.generateRandomCategoryColor(),
             )
 
         // Добавляем в UI

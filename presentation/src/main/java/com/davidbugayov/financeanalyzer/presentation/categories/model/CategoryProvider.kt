@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
+import com.davidbugayov.financeanalyzer.ui.theme.CategoryRandomPalette
 import com.davidbugayov.financeanalyzer.ui.theme.expenseCategoryColorsMap
 import com.davidbugayov.financeanalyzer.ui.theme.incomeCategoryColorsMap
 
@@ -121,6 +122,20 @@ object CategoryProvider {
     fun generateCategoryColorFromPalette(isExpense: Boolean): Color {
         val palette = if (isExpense) ExpenseChartPalette else IncomeChartPalette
         return palette.ifEmpty { listOf(DefaultCategoryColor) }.random()
+    }
+
+    /**
+     * Генерирует случайный цвет категории из общей палитры,
+     * исключая чисто белый и чисто черный.
+     */
+    fun generateRandomCategoryColor(): Color {
+        val filtered = CategoryRandomPalette.filter { color ->
+            val r = (color.red * 255).toInt()
+            val g = (color.green * 255).toInt()
+            val b = (color.blue * 255).toInt()
+            !((r == 0 && g == 0 && b == 0) || (r == 255 && g == 255 && b == 255))
+        }
+        return filtered.ifEmpty { listOf(DefaultCategoryColor) }.random()
     }
 
     /**

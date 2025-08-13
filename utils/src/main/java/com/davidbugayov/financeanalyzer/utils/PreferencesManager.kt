@@ -258,7 +258,9 @@ class PreferencesManager(context: Context) {
             timber.log.Timber.tag("LANG").d("PreferencesManager.getAppLanguage: fromPrefs=%s", saved)
             return saved
         }
-        return when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
+        val systemLang = Locale.getDefault().language.lowercase(Locale.ROOT)
+        return when (systemLang) {
+            "ru" -> "ru"
             "en" -> "en"
             "zh" -> "zh"
             else -> "en"

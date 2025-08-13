@@ -15,7 +15,8 @@ object AppLocale {
             when (normalized) {
                 "en" -> Locale.ENGLISH.toLanguageTag()
                 "zh" -> Locale.SIMPLIFIED_CHINESE.toLanguageTag()
-                else -> Locale("ru").toLanguageTag()
+                "ru" -> Locale("ru").toLanguageTag()
+                else -> Locale.ENGLISH.toLanguageTag()
             }
         Timber.tag("LANG").d("AppLocale.apply: lang=%s normalized=%s tag=%s", lang, normalized, tag)
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))

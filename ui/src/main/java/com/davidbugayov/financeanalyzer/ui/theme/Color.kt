@@ -236,6 +236,9 @@ val ExpenseChartPalette =
         Color(0xFFD50000),
     )
 
+// Палитра для случайного цвета категории (исключает черный/белый)
+val CategoryRandomPalette: List<Color> = IncomeChartPalette + ExpenseChartPalette
+
 // --- Мягкие цвета для HomeGroupSummary ---
 val SummaryCardBackgroundLight = Color(0xFFF8FAFC)
 val SummaryCardBackgroundDark = Color(0xFF232B36)
