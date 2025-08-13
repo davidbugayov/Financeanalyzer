@@ -1,0 +1,9 @@
+• Categories: random color for new custom categories (excluding black/white)
+• Statistics: localized category name in the donut center
+• Statistics: disabled history navigation on pie sector tap
+• Language: first launch uses system locale by default; can be changed in settings
+• Amount input: dot and comma supported as decimal separators on add/edit screens
+• Stability: fixed Koin crash (PredictFutureExpensesUseCase) — safe creation without DI
+• KMP: unified Money usage in wallet balance updates
+
+
