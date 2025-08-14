@@ -16,7 +16,7 @@ import timber.log.Timber
  * Экран редактирования существующей транзакции
  */
 @Composable
-fun EditTransactionScreen(
+fun editTransactionScreen(
     viewModel: EditTransactionViewModel = koinViewModel(),
     transactionId: String? = null,
 ) {

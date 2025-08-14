@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import com.davidbugayov.financeanalyzer.feature.onboarding.OnboardingScreen
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.feature.security.AuthScreen
-import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.editTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.exportImportScreen
-import com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add.AddTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add.addTransactionScreen
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
@@ -151,10 +151,10 @@ fun appNavHostImpl(
             )
         },
         onAddTransactionScreen = { category, forceExpense ->
-            AddTransactionScreen(category = category, forceExpense = forceExpense)
+            addTransactionScreen(category = category, forceExpense = forceExpense)
         },
         onEditTransactionScreen = { transactionId ->
-            EditTransactionScreen(transactionId = transactionId)
+            editTransactionScreen(transactionId = transactionId)
         },
         onImportTransactionsScreen = {
             importTransactionsScreen(

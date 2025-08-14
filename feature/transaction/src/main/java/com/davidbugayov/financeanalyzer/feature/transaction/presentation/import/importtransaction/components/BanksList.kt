@@ -50,35 +50,35 @@ fun banksList(onBankClick: (String) -> Unit = {}) {
                 .padding(vertical = dimensionResource(UiR.dimen.space_medium)),
     ) {
         // Сбербанк
-        BankItem(
+        bankItem(
             name = sberName,
             color = colorResource(id = UiR.color.bank_sberbank),
             onClick = { onBankClick(sberName) },
         )
 
         // Тинькофф
-        BankItem(
+        bankItem(
             name = tinkoffName,
             color = colorResource(id = UiR.color.bank_tinkoff),
             onClick = { onBankClick(tinkoffName) },
         )
 
         // Альфа-Банк
-        BankItem(
+        bankItem(
             name = alfaName,
             color = colorResource(id = UiR.color.bank_alfabank),
             onClick = { onBankClick(alfaName) },
         )
 
         // Озон
-        BankItem(
+        bankItem(
             name = ozonName,
             color = colorResource(id = UiR.color.bank_ozon),
             onClick = { onBankClick(ozonName) },
         )
 
         // CSV
-        BankItem(
+        bankItem(
             name = csvName,
             color = colorResource(id = UiR.color.bank_csv),
             isCSV = true,
@@ -91,7 +91,7 @@ fun banksList(onBankClick: (String) -> Unit = {}) {
  * Элемент списка банков
  */
 @Composable
-private fun BankItem(
+private fun bankItem(
     name: String,
     color: Color,
     isCSV: Boolean = false,

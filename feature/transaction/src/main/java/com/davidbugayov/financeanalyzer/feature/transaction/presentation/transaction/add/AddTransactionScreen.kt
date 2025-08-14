@@ -29,7 +29,7 @@ import timber.log.Timber
  * Использует BaseTransactionScreen для отображения UI
  */
 @Composable
-fun AddTransactionScreen(
+fun addTransactionScreen(
     category: String? = null,
     forceExpense: Boolean? = null,
     viewModel: AddTransactionViewModel = koinViewModel(),

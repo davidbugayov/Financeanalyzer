@@ -20,11 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.alfaBankInstructions
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.csvInstructions
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ozonInstructions
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.sberbankInstructions
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.tinkoffInstructions
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
