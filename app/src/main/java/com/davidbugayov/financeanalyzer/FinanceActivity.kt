@@ -156,7 +156,7 @@ class FinanceActivity :
 
     private fun applyContent() {
         setContent {
-            FinanceAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
+            financeAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
         }
     }
 
