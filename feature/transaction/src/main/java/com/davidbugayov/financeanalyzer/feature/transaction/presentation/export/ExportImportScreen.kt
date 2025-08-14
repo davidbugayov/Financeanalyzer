@@ -66,7 +66,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExportImportScreen(
+fun exportImportScreen(
     onNavigateBack: () -> Unit,
     onImportClick: () -> Unit,
     viewModel: ExportImportViewModel = koinViewModel(),

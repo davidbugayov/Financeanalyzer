@@ -19,7 +19,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.detail.FinancialDetai
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.ImportTransactionsScreen
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.importTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -157,7 +157,7 @@ fun AppNavHostImpl(
             EditTransactionScreen(transactionId = transactionId)
         },
         onImportTransactionsScreen = {
-            ImportTransactionsScreen(
+            importTransactionsScreen(
                 onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
                 viewModel = koinViewModel(),
             )
@@ -181,7 +181,7 @@ fun AppNavHostImpl(
             )
         },
         onExportImportScreen = {
-            ExportImportScreen(
+            exportImportScreen(
                 onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
                 onImportClick = {
                     navigationManager.navigate(

@@ -102,7 +102,13 @@ class ImportTransactionsViewModel(
             }
 
         val bankInfo = actualBankName ?: _state.value.fileName
-        val successMessage = context.getString(UiR.string.import_success_message, importedCount, skippedCount, bankInfo)
+        val successMessage =
+            context.getString(
+                UiR.string.import_success_message,
+                importedCount,
+                skippedCount,
+                bankInfo,
+            )
 
         Timber.i("Импорт завершен: импортировано=$importedCount, пропущено=$skippedCount, банк=$actualBankName")
 
@@ -485,7 +491,9 @@ class ImportTransactionsViewModel(
      */
     private fun determineBankName(fileName: String): String? {
         val lowerFileName = fileName.lowercase()
-        Timber.d("🏦 Определение банка для файла: '$fileName' (lowercased: '$lowerFileName')")
+        Timber.d(
+            "🏦 Определение банка для файла: '$fileName' (lowercased: '$lowerFileName')",
+        )
 
         return when {
             // Сбербанк - различные варианты

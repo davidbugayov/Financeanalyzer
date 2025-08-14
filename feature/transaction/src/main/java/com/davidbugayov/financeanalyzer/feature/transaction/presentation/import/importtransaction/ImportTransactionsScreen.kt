@@ -88,7 +88,7 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImportTransactionsScreen(
+fun importTransactionsScreen(
     onNavigateBack: () -> Unit,
     viewModel: ImportTransactionsViewModel = koinViewModel(),
     preferencesManager: PreferencesManager = koinInject(),
@@ -110,7 +110,10 @@ fun ImportTransactionsScreen(
     // Добавляем логирование для отслеживания изменений состояния
     LaunchedEffect(state) {
         Timber.d(
-            "[SCREEN-DEBUG] 📱 Состояние обновлено: isLoading=${state.isLoading}, successCount=${state.successCount}, error=${state.error}",
+            "[SCREEN-DEBUG] 📱 Состояние обновлено: " +
+                "isLoading=${state.isLoading}, " +
+                "successCount=${state.successCount}, " +
+                "error=${state.error}",
         )
     }
 
@@ -181,7 +184,10 @@ fun ImportTransactionsScreen(
     fun checkAndRequestPermissions() {
         // Логируем текущее состояние перед сбросом
         Timber.d(
-            "Текущее состояние перед сбросом: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}",
+            "Текущее состояние перед сбросом: " +
+                "isLoading=${state.isLoading}, " +
+                "error=${state.error}, " +
+                "successCount=${state.successCount}",
         )
 
         // Сбрасываем состояние импорта перед выбором нового файла
@@ -191,7 +197,10 @@ fun ImportTransactionsScreen(
         coroutineScope.launch {
             delay(100)
             Timber.d(
-                "Состояние после сброса: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}",
+                "Состояние после сброса: " +
+                    "isLoading=${state.isLoading}, " +
+                    "error=${state.error}, " +
+                    "successCount=${state.successCount}",
             )
 
             if (Build.VERSION.SDK_INT >= 35) {
