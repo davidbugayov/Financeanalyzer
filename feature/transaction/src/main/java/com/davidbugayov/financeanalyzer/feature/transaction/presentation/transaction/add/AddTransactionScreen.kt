@@ -16,7 +16,7 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.base.baseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -131,7 +131,7 @@ fun AddTransactionScreen(
         }
     }
 
-    BaseTransactionScreen(
+    baseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = {
             userEventTracker.trackUserAction(
