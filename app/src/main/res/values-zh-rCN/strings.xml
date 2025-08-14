@@ -1,10 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">金钱在掌控中</string>
-    <string name="app_store">华为应用商店</string>
-    <string name="store_short_description">记录支出、规划预算、分析财务——离线使用，数据私密。</string>
-    <string name="store_full_description">“金钱在掌控中”帮助您管理个人财务：秒级添加交易、按类别统计、规划预算、查看清晰的图表与分析。应用可离线运行，数据仅保存在您的设备中；支持从银行和 CSV 文件导入，并提供实用建议，帮助养成更健康的理财习惯。</string>
-    <string name="description">个人财务管家：记录收支、规划预算、分析花销，完全离线，数据仅存于本机。</string>
 </resources>
 
 
