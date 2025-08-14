@@ -1,3 +1,4 @@
+@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

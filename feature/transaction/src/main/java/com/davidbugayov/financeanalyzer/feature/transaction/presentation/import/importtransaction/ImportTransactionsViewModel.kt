@@ -1,3 +1,4 @@
+@file:Suppress("FunctionName", "MaxLineLength")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction
 
 import android.app.Application

@@ -1,3 +1,4 @@
+@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.feature.transaction.presentation.export
 
 import androidx.compose.foundation.BorderStroke

@@ -1,3 +1,4 @@
+@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction
 
 import android.Manifest
