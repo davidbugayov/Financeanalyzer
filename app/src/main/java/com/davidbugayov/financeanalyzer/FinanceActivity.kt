@@ -33,7 +33,9 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
 
-class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
+class FinanceActivity :
+    FragmentActivity(),
+    DefaultLifecycleObserver {
     private val navigationManager: NavigationManager by inject()
     private val onboardingManager: OnboardingManager by inject()
     private val preferencesManager: PreferencesManager by inject()
@@ -46,7 +48,9 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
 
     override fun attachBaseContext(newBase: Context) {
         // Оборачиваем контекст до super.onCreate
-        val wrapped = com.davidbugayov.financeanalyzer.utils.LocaleUtils.wrapContext(newBase)
+        val wrapped =
+            com.davidbugayov.financeanalyzer.utils.LocaleUtils
+                .wrapContext(newBase)
         super.attachBaseContext(wrapped)
     }
 
@@ -67,7 +71,9 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
 
         // Применяем сохранённый язык приложения на старте, независимо от системного языка
         val langCode = preferencesManager.getAppLanguage()
-        timber.log.Timber.tag("LANG").d("FinanceActivity.onCreate: applying lang=%s", langCode)
+        timber.log.Timber
+            .tag("LANG")
+            .d("FinanceActivity.onCreate: applying lang=%s", langCode)
         AppLocale.apply(langCode)
 
         // Делаем контент приложения отображаться под системными панелями
@@ -84,7 +90,10 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
             when (themeMode) {
                 ThemeMode.DARK -> true
                 ThemeMode.LIGHT -> false
-                ThemeMode.SYSTEM -> resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                ThemeMode.SYSTEM ->
+                    resources.configuration.uiMode and
+                        android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                        android.content.res.Configuration.UI_MODE_NIGHT_YES
             }
 
         // Устанавливаем цвет иконок в зависимости от темы:

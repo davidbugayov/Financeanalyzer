@@ -31,9 +31,13 @@ import timber.log.Timber
 // --- Configuration Data Classes Start ---
 
 sealed interface SheetSelector {
-    data class ByIndex(val index: Int) : SheetSelector
+    data class ByIndex(
+        val index: Int,
+    ) : SheetSelector
 
-    data class ByName(val name: String) : SheetSelector
+    data class ByName(
+        val name: String,
+    ) : SheetSelector
 }
 
 enum class ExpenseDetermination {
@@ -122,15 +126,22 @@ class GenericExcelImportUseCase(
             }
         val headerRow =
             headerCandidates.firstOrNull { row ->
-                val text = (0 until row.lastCellNum).joinToString(" ") { row.getCell(it)?.toString()?.lowercase() ?: "" }
-                (text.contains("альфа") || text.contains("alfa")) && text.contains("дата") &&
+                val text =
+                    (0 until row.lastCellNum).joinToString(
+                        " ",
+                    ) { row.getCell(it)?.toString()?.lowercase() ?: "" }
+                (text.contains("альфа") || text.contains("alfa")) &&
+                    text.contains("дата") &&
                     text.contains(
                         "сумма",
                     ) ||
                     (text.contains("дата") && text.contains("описание") && text.contains("сумма")) ||
                     (text.contains("дата операции") && text.contains("сумма"))
             } ?: headerCandidates.firstOrNull { row ->
-                val text = (0 until row.lastCellNum).joinToString(" ") { row.getCell(it)?.toString()?.lowercase() ?: "" }
+                val text =
+                    (0 until row.lastCellNum).joinToString(
+                        " ",
+                    ) { row.getCell(it)?.toString()?.lowercase() ?: "" }
                 text.contains("дата") && text.contains("сумма")
             }
         if (headerRow != null) {
@@ -140,14 +151,21 @@ class GenericExcelImportUseCase(
             var descIdx: Int? = null
             var catIdx: Int? = null
             for (i in 0 until headerRow.lastCellNum) {
-                val cellVal = headerRow.getCell(i)?.toString()?.lowercase()?.trim() ?: continue
+                val cellVal =
+                    headerRow
+                        .getCell(i)
+                        ?.toString()
+                        ?.lowercase()
+                        ?.trim() ?: continue
                 if (dateIdx == null && cellVal.contains("дата")) dateIdx = i
                 if (amountIdx == null && cellVal.contains("сумма")) amountIdx = i
-                if (descIdx == null && (
+                if (descIdx == null &&
+                    (
                         cellVal.contains("описание") ||
                             cellVal.contains(
                                 "примечание",
-                            ) || cellVal.contains("назначение")
+                            ) ||
+                            cellVal.contains("назначение")
                     )
                 ) {
                     descIdx = i
@@ -225,8 +243,10 @@ class GenericExcelImportUseCase(
                             if (bytesRead >= 8) {
                                 (buffer[0] == 0x50.toByte() && buffer[1] == 0x4B.toByte()) ||
                                     (
-                                        buffer[0] == 0xD0.toByte() && buffer[1] == 0xCF.toByte() &&
-                                            buffer[2] == 0x11.toByte() && buffer[3] == 0xE0.toByte()
+                                        buffer[0] == 0xD0.toByte() &&
+                                            buffer[1] == 0xCF.toByte() &&
+                                            buffer[2] == 0x11.toByte() &&
+                                            buffer[3] == 0xE0.toByte()
                                     )
                             } else {
                                 false
@@ -317,11 +337,18 @@ class GenericExcelImportUseCase(
                                     return@forEach
                                 }
                                 // --- ДОБАВЛЕНО: пропуск служебных строк Альфа-Банка ---
-                                val firstCell = row.getCell(0)?.toString()?.lowercase()?.trim() ?: ""
-                                if (firstCell.contains("итого") || firstCell.contains("остаток") ||
+                                val firstCell =
+                                    row
+                                        .getCell(0)
+                                        ?.toString()
+                                        ?.lowercase()
+                                        ?.trim() ?: ""
+                                if (firstCell.contains("итого") ||
+                                    firstCell.contains("остаток") ||
                                     firstCell.contains(
                                         "оборот",
-                                    ) || firstCell.contains("сумма")
+                                    ) ||
+                                    firstCell.contains("сумма")
                                 ) {
                                     Timber.d("[$bankName] Пропуск служебной строки: '$firstCell'")
                                     rowsProcessedForProgress++
@@ -338,9 +365,10 @@ class GenericExcelImportUseCase(
                                         )
                                     val cellValue =
                                         if (cell != null) {
-                                            dataFormatter.formatCellValue(
-                                                cell,
-                                            ).trim()
+                                            dataFormatter
+                                                .formatCellValue(
+                                                    cell,
+                                                ).trim()
                                         } else {
                                             ""
                                         }
@@ -354,7 +382,10 @@ class GenericExcelImportUseCase(
                                         }
                                     }
                                 }
-                                if (config.skipEmptyRows && !hasAnyValueInMappedColumns && rowData.all { it.isBlank() }) {
+                                if (config.skipEmptyRows &&
+                                    !hasAnyValueInMappedColumns &&
+                                    rowData.all { it.isBlank() }
+                                ) {
                                     Timber.d("[$bankName] Пропуск пустой строки ${rowIndex + 1}")
                                     rowsProcessedForProgress++
                                 } else {
@@ -369,14 +400,19 @@ class GenericExcelImportUseCase(
                                 }
                                 if (physicalRows > 0 && rowsProcessedForProgress % 20 == 0) {
                                     val progress =
-                                        BigDecimal(rowsProcessedForProgress).divide(
-                                            BigDecimal(physicalRows),
-                                            4,
-                                            java.math.RoundingMode.HALF_EVEN,
-                                        ).multiply(BigDecimal(80)).setScale(0, java.math.RoundingMode.FLOOR).toInt().coerceIn(
-                                            0,
-                                            80,
-                                        ) + 10
+                                        BigDecimal(rowsProcessedForProgress)
+                                            .divide(
+                                                BigDecimal(physicalRows),
+                                                4,
+                                                java.math.RoundingMode.HALF_EVEN,
+                                            ).multiply(
+                                                BigDecimal(80),
+                                            ).setScale(0, java.math.RoundingMode.FLOOR)
+                                            .toInt()
+                                            .coerceIn(
+                                                0,
+                                                80,
+                                            ) + 10
                                     progressCallback.onProgress(
                                         progress,
                                         100,
@@ -673,7 +709,8 @@ class GenericExcelImportUseCase(
                                     it,
                                 )
                             }
-                        expVal?.equals(config.amountParseConfig.isExpenseTrueValue, ignoreCase = true) ?: (amountValue < 0)
+                        expVal?.equals(config.amountParseConfig.isExpenseTrueValue, ignoreCase = true)
+                            ?: (amountValue < 0)
                     }
                 }
 

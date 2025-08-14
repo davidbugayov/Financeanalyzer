@@ -33,27 +33,28 @@ fun AppNavHost(
     content: NavGraphBuilder.() -> Unit,
 ) {
     LaunchedEffect("navigation") {
-        navigationManager.commands.onEach { command ->
-            when (command) {
-                is NavigationManager.Command.Navigate ->
-                    navController.navigate(
-                        command.destination,
-                    ) { launchSingleTop = true }
-                is NavigationManager.Command.NavigateUp -> navController.navigateUp()
-                is NavigationManager.Command.PopUpTo ->
-                    navController.popBackStack(
-                        command.destination,
-                        command.inclusive,
-                    )
-                is NavigationManager.Command.NavigateAndClearBackStack ->
-                    navController.navigate(
-                        command.destination,
-                    ) {
-                        popUpTo(command.popUpTo) { inclusive = true }
-                        launchSingleTop = true
-                    }
-            }
-        }.launchIn(this)
+        navigationManager.commands
+            .onEach { command ->
+                when (command) {
+                    is NavigationManager.Command.Navigate ->
+                        navController.navigate(
+                            command.destination,
+                        ) { launchSingleTop = true }
+                    is NavigationManager.Command.NavigateUp -> navController.navigateUp()
+                    is NavigationManager.Command.PopUpTo ->
+                        navController.popBackStack(
+                            command.destination,
+                            command.inclusive,
+                        )
+                    is NavigationManager.Command.NavigateAndClearBackStack ->
+                        navController.navigate(
+                            command.destination,
+                        ) {
+                            popUpTo(command.popUpTo) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                }
+            }.launchIn(this)
     }
 
     NavHost(

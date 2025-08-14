@@ -61,9 +61,10 @@ object CategoryLocalization {
     // Делаем функцию публичной, чтобы можно было нормализовать имя категории во всех слоях
     fun keyFor(name: String): String? {
         val lower = name.trim().lowercase()
-        return synonyms.entries.firstOrNull { entry ->
-            entry.value.any { syn -> lower == syn.lowercase() }
-        }?.key
+        return synonyms.entries
+            .firstOrNull { entry ->
+                entry.value.any { syn -> lower == syn.lowercase() }
+            }?.key
     }
 
     fun displayName(

@@ -185,7 +185,8 @@ class OzonPdfImportUseCase(
                     linesProcessed++
 
                     if (linesProcessed % 10 == 0) {
-                        val currentProgress = startProgress + (linesProcessed.coerceAtMost(1000) * (endProgress - startProgress) / 1000)
+                        val currentProgress =
+                            startProgress + (linesProcessed.coerceAtMost(1000) * (endProgress - startProgress) / 1000)
                         emit(
                             ImportResult.Progress(
                                 currentProgress,
@@ -348,10 +349,23 @@ class OzonPdfImportUseCase(
                     } ||
                     headerLines.any {
                         // Проверка для формата из скриншота
-                        (it.contains("Дата операции", ignoreCase = true) && it.contains("Документ", ignoreCase = true)) ||
-                            (it.contains("Назначение платежа", ignoreCase = true) && it.contains("Сумма операции", ignoreCase = true)) ||
-                            (it.contains("Российские рубли", ignoreCase = true) && it.contains("Валюта", ignoreCase = true))
-                    } || textSample.contains("Входящий остаток", ignoreCase = true) // Дополнительный индикатор для выписки с транзакциями
+                        (
+                            it.contains(
+                                "Дата операции",
+                                ignoreCase = true,
+                            ) &&
+                                it.contains("Документ", ignoreCase = true)
+                        ) ||
+                            (
+                                it.contains("Назначение платежа", ignoreCase = true) &&
+                                    it.contains("Сумма операции", ignoreCase = true)
+                            ) ||
+                            (
+                                it.contains("Российские рубли", ignoreCase = true) &&
+                                    it.contains("Валюта", ignoreCase = true)
+                            )
+                    } ||
+                    textSample.contains("Входящий остаток", ignoreCase = true) // Дополнительный индикатор для выписки с транзакциями
 
             // Подробные логи для отладки определения маркеров таблицы
             Timber.i("ОТЛАДКА-ОЗОН: Содержимое первых строк файла для определения формата:")
@@ -378,7 +392,9 @@ class OzonPdfImportUseCase(
 
             // Проверка на статистический файл (справка о движении средств без таблицы транзакций)
             val isStatisticsFile =
-                hasBankIndicator && hasStatementTitle && !hasTableMarker &&
+                hasBankIndicator &&
+                    hasStatementTitle &&
+                    !hasTableMarker &&
                     textSample.contains("движени", ignoreCase = true) &&
                     textSample.contains("средств", ignoreCase = true) &&
                     !textSample.contains("Входящий остаток", ignoreCase = true) // Если есть "Входящий остаток", то это не статистика, а выписка
@@ -476,7 +492,8 @@ class OzonPdfImportUseCase(
                 reader.mark(1024)
                 val nextLine = reader.readLine()?.replace("\\u0000", "")
 
-                if (nextLine != null && (
+                if (nextLine != null &&
+                    (
                         nextLine.contains("Сумма операции", ignoreCase = true) ||
                             nextLine.contains("Российские рубли", ignoreCase = true) ||
                             nextLine.contains("Валюта", ignoreCase = true)
@@ -493,7 +510,8 @@ class OzonPdfImportUseCase(
                     reader.mark(1024)
                     val thirdLine = reader.readLine()?.replace("\\u0000", "")
 
-                    if (thirdLine != null && (
+                    if (thirdLine != null &&
+                        (
                             thirdLine.contains("Российские рубли", ignoreCase = true) ||
                                 thirdLine.contains("Валюта", ignoreCase = true)
                         )
@@ -943,16 +961,18 @@ class OzonPdfImportUseCase(
 
         // Если у нас есть незавершенная транзакция, и текущая строка не пустая и не соответствует
         // ни одному из специальных форматов, считаем её частью описания
-        if (currentTransactionState != null && trimmedLine.isNotBlank() &&
+        if (currentTransactionState != null &&
+            trimmedLine.isNotBlank() &&
             !trimmedLine.matches(Regex("^\\d{2}\\.\\d{2}\\.\\d{4}$")) &&
             !trimmedLine.matches(Regex("^\\d{2}:\\d{2}:\\d{2}$")) &&
             !trimmedLine.matches(Regex("^\\d+$")) &&
             !amountLineRegex.matches(trimmedLine)
         ) {
-            currentTransactionState?.description?.append(
-                if (currentTransactionState?.description?.isEmpty() == true) "" else " ",
-            )
-                ?.append(trimmedLine)
+            currentTransactionState
+                ?.description
+                ?.append(
+                    if (currentTransactionState?.description?.isEmpty() == true) "" else " ",
+                )?.append(trimmedLine)
             Timber.i(
                 "ОТЛАДКА-ОЗОН: Добавлена строка к описанию текущей транзакции: '%s'",
                 trimmedLine,
@@ -1002,5 +1022,7 @@ class OzonPdfImportUseCase(
     /**
      * Специальное исключение для случаев, когда файл содержит статистические данные, а не транзакции
      */
-    class StatisticsFileException(message: String) : Exception(message)
+    class StatisticsFileException(
+        message: String,
+    ) : Exception(message)
 }

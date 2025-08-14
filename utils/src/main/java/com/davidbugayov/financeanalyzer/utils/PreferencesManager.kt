@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * Менеджер для работы с SharedPreferences.
  * Отвечает за сохранение и загрузку пользовательских настроек и данных.
  */
-class PreferencesManager(context: Context) {
+class PreferencesManager(
+    context: Context,
+) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(
             PREFERENCES_NAME,
@@ -93,9 +95,7 @@ class PreferencesManager(context: Context) {
      * Возвращает, включены ли уведомления о транзакциях.
      * @return true, если уведомления о транзакциях включены
      */
-    fun isTransactionReminderEnabled(): Boolean {
-        return sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
-    }
+    fun isTransactionReminderEnabled(): Boolean = sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
 
     fun setTransactionReminderEnabled(enabled: Boolean) {
         sharedPreferences.edit { putBoolean(KEY_TRANSACTION_REMINDER_ENABLED, enabled) }
@@ -121,9 +121,7 @@ class PreferencesManager(context: Context) {
      * Проверяет, было ли показано напоминание об импорте транзакций.
      * @return true, если напоминание уже было показано
      */
-    fun isImportReminderShown(): Boolean {
-        return sharedPreferences.getBoolean(KEY_IMPORT_REMINDER_SHOWN, false)
-    }
+    fun isImportReminderShown(): Boolean = sharedPreferences.getBoolean(KEY_IMPORT_REMINDER_SHOWN, false)
 
     /**
      * Отмечает напоминание об импорте транзакций как показанное.
@@ -138,9 +136,7 @@ class PreferencesManager(context: Context) {
      * Проверяет, включена ли блокировка приложения
      * @return true, если блокировка приложения включена
      */
-    fun isAppLockEnabled(): Boolean {
-        return sharedPreferences.getBoolean(KEY_APP_LOCK_ENABLED, false)
-    }
+    fun isAppLockEnabled(): Boolean = sharedPreferences.getBoolean(KEY_APP_LOCK_ENABLED, false)
 
     /**
      * Устанавливает состояние блокировки приложения
@@ -154,9 +150,7 @@ class PreferencesManager(context: Context) {
      * Проверяет, включена ли биометрическая аутентификация
      * @return true, если биометрическая аутентификация включена
      */
-    fun isBiometricEnabled(): Boolean {
-        return sharedPreferences.getBoolean(KEY_BIOMETRIC_ENABLED, false)
-    }
+    fun isBiometricEnabled(): Boolean = sharedPreferences.getBoolean(KEY_BIOMETRIC_ENABLED, false)
 
     /**
      * Устанавливает состояние биометрической аутентификации
@@ -178,9 +172,7 @@ class PreferencesManager(context: Context) {
      * Получает сохраненный PIN-код
      * @return Сохраненный PIN-код или null, если не установлен
      */
-    fun getPinCode(): String? {
-        return sharedPreferences.getString(KEY_PIN_CODE, null)
-    }
+    fun getPinCode(): String? = sharedPreferences.getString(KEY_PIN_CODE, null)
 
     /**
      * Удаляет сохраненный PIN-код
@@ -229,13 +221,12 @@ class PreferencesManager(context: Context) {
      * Определяет валюту по умолчанию на основе системной локали.
      * zh -> CNY, en -> USD, иначе RUB.
      */
-    private fun defaultCurrencyByLocale(): Currency {
-        return when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
+    private fun defaultCurrencyByLocale(): Currency =
+        when (Locale.getDefault().language.lowercase(Locale.ROOT)) {
             "zh" -> Currency.CNY
             "en" -> Currency.USD
             else -> Currency.RUB
         }
-    }
 
     // ----- Language -----
 
@@ -247,7 +238,9 @@ class PreferencesManager(context: Context) {
                 else -> "en"
             }
         sharedPreferences.edit { putString(KEY_APP_LANGUAGE, normalized) }
-        timber.log.Timber.tag("LANG").d("PreferencesManager.setAppLanguage: saved=%s", normalized)
+        timber.log.Timber
+            .tag("LANG")
+            .d("PreferencesManager.setAppLanguage: saved=%s", normalized)
         AppLocale.apply(normalized)
     }
 
@@ -255,7 +248,9 @@ class PreferencesManager(context: Context) {
     fun getAppLanguage(): String {
         val saved = sharedPreferences.getString(KEY_APP_LANGUAGE, null)
         if (saved != null) {
-            timber.log.Timber.tag("LANG").d("PreferencesManager.getAppLanguage: fromPrefs=%s", saved)
+            timber.log.Timber
+                .tag("LANG")
+                .d("PreferencesManager.getAppLanguage: fromPrefs=%s", saved)
             return saved
         }
         val systemLang = Locale.getDefault().language.lowercase(Locale.ROOT)

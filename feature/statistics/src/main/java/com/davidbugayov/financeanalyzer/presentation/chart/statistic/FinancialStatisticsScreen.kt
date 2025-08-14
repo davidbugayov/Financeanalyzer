@@ -160,7 +160,8 @@ fun FinancialStatisticsScreen(
             delay(2000)
             if (!activity.isFinishing) {
                 try {
-                    com.davidbugayov.financeanalyzer.utils.RuStoreUtils.requestReview(activity)
+                    com.davidbugayov.financeanalyzer.utils.RuStoreUtils
+                        .requestReview(activity)
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logEvent(
                         com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Events.USER_RATING,
                         android.os.Bundle().apply {
@@ -283,8 +284,7 @@ fun FinancialStatisticsScreen(
                                 .padding(
                                     horizontal = dimensionResource(UiR.dimen.finance_chart_screen_padding),
                                     vertical = 12.dp,
-                                )
-                                .clickable { showPeriodDialog = true },
+                                ).clickable { showPeriodDialog = true },
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -555,8 +555,7 @@ fun FinancialStatisticsScreen(
                                                         dimensionResource(
                                                             UiR.dimen.finance_chart_screen_piechart_height,
                                                         ),
-                                                    )
-                                                    .padding(
+                                                    ).padding(
                                                         top =
                                                             dimensionResource(
                                                                 UiR.dimen.finance_chart_screen_padding,
@@ -577,8 +576,7 @@ fun FinancialStatisticsScreen(
                                         EnhancedCategoryPieChart(
                                             items = state.pieChartData,
                                             selectedIndex = null,
-                                            onSectorClick = {
-                                                    _ ->
+                                            onSectorClick = { _ ->
                                                 // отключаем переход в историю по клику по сектору
                                             },
                                             modifier =
@@ -824,7 +822,13 @@ fun FinancialStatisticsScreen(
                                             // Форматируем сумму с валютой
                                             val currency =
                                                 stringResource(id = UiR.string.settings_currency_current_value)
-                                            val formatted = java.text.NumberFormat.getNumberInstance(Locale("ru", "RU")).format(predictedExpenses.amount.toDouble()) + " " + currency
+                                            val formatted =
+                                                java.text.NumberFormat
+                                                    .getNumberInstance(
+                                                        Locale("ru", "RU"),
+                                                    ).format(predictedExpenses.amount.toDouble()) +
+                                                    " " +
+                                                    currency
 
                                             Text(
                                                 text = stringResource(id = UiR.string.prediction_next_month, formatted),
@@ -882,8 +886,16 @@ private fun calculateExpenseGrowth(
     if (recentPoints.size < 2) return 0.0
 
     // Рассчитываем простой линейный тренд
-    val firstValue = recentPoints.first().value.amount.toDouble()
-    val lastValue = recentPoints.last().value.amount.toDouble()
+    val firstValue =
+        recentPoints
+            .first()
+            .value.amount
+            .toDouble()
+    val lastValue =
+        recentPoints
+            .last()
+            .value.amount
+            .toDouble()
 
     // Избегаем деления на ноль
     if (firstValue <= 0.0) return 0.0

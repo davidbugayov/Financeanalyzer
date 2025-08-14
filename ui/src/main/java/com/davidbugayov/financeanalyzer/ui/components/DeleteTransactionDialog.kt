@@ -136,7 +136,11 @@ fun DeleteTransactionDialog(
                 Column {
                     Text(
                         text =
-                            stringResource(R.string.amount, transaction.amount.formatForDisplay(useMinimalDecimals = true)) + "\n" +
+                            stringResource(
+                                R.string.amount,
+                                transaction.amount.formatForDisplay(useMinimalDecimals = true),
+                            ) +
+                                "\n" +
                                 stringResource(R.string.category, transaction.category),
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
                     )
@@ -144,7 +148,9 @@ fun DeleteTransactionDialog(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = (if (transaction.isExpense) "-" else "+") + moneyFormatter.abs().formatForDisplay(showCurrency = true, useMinimalDecimals = true),
+                        text =
+                            (if (transaction.isExpense) "-" else "+") +
+                                moneyFormatter.abs().formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                         style =
                             MaterialTheme.typography.headlineMedium.copy(
                                 fontSize = 20.sp,

@@ -80,8 +80,7 @@ fun RecommendationsPanel(
                                     MaterialTheme.colorScheme.secondary.copy(alpha = 0.12f),
                                 ),
                             ),
-                    )
-                    .padding(dimensionResource(R.dimen.padding_large)),
+                    ).padding(dimensionResource(R.dimen.padding_large)),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -197,6 +196,11 @@ private fun RecommendationRow(
 }
 
 @Composable
-private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier {
-    return this.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) { onClick() }
-}
+private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier =
+    this.clickable(
+        indication = null,
+        interactionSource =
+            remember {
+                MutableInteractionSource()
+            },
+    ) { onClick() }

@@ -46,7 +46,8 @@ val analyticsModule =
             // AppMetrica Analytics
             try {
                 val config =
-                    AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+                    AppMetricaConfig
+                        .newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
                         .withLogs()
                         .withSessionTimeout(60)
                         .withCrashReporting(true)

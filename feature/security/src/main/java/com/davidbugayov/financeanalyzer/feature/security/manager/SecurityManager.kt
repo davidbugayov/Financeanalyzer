@@ -185,7 +185,8 @@ class SecurityManager(
                 )
 
             val promptInfo =
-                BiometricPrompt.PromptInfo.Builder()
+                BiometricPrompt.PromptInfo
+                    .Builder()
                     .setTitle(title)
                     .setSubtitle(subtitle)
                     .setNegativeButtonText(negativeButtonText)
@@ -232,27 +233,23 @@ class SecurityManager(
     /**
      * Проверяет, установлен ли PIN-код
      */
-    fun hasPinCode(): Boolean {
-        return preferencesManager.getPinCode() != null
-    }
+    fun hasPinCode(): Boolean = preferencesManager.getPinCode() != null
 
     /**
      * Возвращает текущий тип аутентификации
      */
-    fun getCurrentAuthType(): AuthType {
-        return when {
+    fun getCurrentAuthType(): AuthType =
+        when {
             preferencesManager.isBiometricEnabled() && isBiometricSupported() -> AuthType.BIOMETRIC
             preferencesManager.isAppLockEnabled() -> AuthType.PIN
             else -> AuthType.NONE
         }
-    }
 
     /**
      * Проверяет, нужна ли аутентификация
      */
-    fun isAuthenticationRequired(): Boolean {
-        return preferencesManager.isAppLockEnabled() || preferencesManager.isBiometricEnabled()
-    }
+    fun isAuthenticationRequired(): Boolean =
+        preferencesManager.isAppLockEnabled() || preferencesManager.isBiometricEnabled()
 
     /**
      * Включает блокировку приложения

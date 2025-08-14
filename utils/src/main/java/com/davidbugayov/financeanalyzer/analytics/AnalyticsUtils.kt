@@ -242,7 +242,9 @@ object AnalyticsUtils : KoinComponent {
             }
         logEvent(AnalyticsConstants.Events.ACHIEVEMENT_FILTER_CHANGED, params)
         Timber.d(
-            "Achievement filter changed: $filterType${categoryFilter?.let { ", category: $it" } ?: ""}, results: $resultCount",
+            "Achievement filter changed: $filterType${categoryFilter?.let {
+                ", category: $it"
+            } ?: ""}, results: $resultCount",
         )
     }
 

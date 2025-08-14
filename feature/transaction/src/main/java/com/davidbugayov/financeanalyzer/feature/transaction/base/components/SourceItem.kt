@@ -48,8 +48,7 @@ fun SourceItem(
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,
-                )
-                .padding(vertical = 4.dp),
+                ).padding(vertical = 4.dp),
     ) {
         val context = LocalContext.current
         val localizedName = SourceLocalization.displayName(context, source.name)
@@ -64,8 +63,7 @@ fun SourceItem(
                             isSelected -> Color(source.color)
                             else -> Color(source.color).copy(alpha = 0.8f)
                         },
-                    )
-                    .border(
+                    ).border(
                         width =
                             when {
                                 isSelected -> 3.dp

@@ -134,8 +134,7 @@ private fun LibraryItem(
                     .fillMaxWidth()
                     .background(
                         brush = Brush.horizontalGradient(gradientColors),
-                    )
-                    .padding(dimensionResource(UiR.dimen.spacing_normal)),
+                    ).padding(dimensionResource(UiR.dimen.spacing_normal)),
         ) {
             Column {
                 Text(
@@ -191,8 +190,8 @@ data class Library(
     val license: String,
 )
 
-private fun getLibraries(): List<Library> {
-    return listOf(
+private fun getLibraries(): List<Library> =
+    listOf(
         Library(
             nameResId = UiR.string.library_jetpack_compose_name,
             version = "BOM 2025.06.01",
@@ -266,4 +265,3 @@ private fun getLibraries(): List<Library> {
             license = "Apache License 2.0",
         ),
     )
-}

@@ -20,7 +20,10 @@ val useCaseModule =
         single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
             AndroidWidgetRefresher(androidContext())
         }
-        single { com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase(get()) }
+        single {
+            com.davidbugayov.financeanalyzer.domain.usecase.widgets
+                .UpdateWidgetsUseCase(get())
+        }
 
         // Import / Export
         single<ImportTransactionsUseCase> {

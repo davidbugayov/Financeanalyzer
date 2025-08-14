@@ -39,8 +39,7 @@ fun AddButton(
                 .padding(
                     horizontal = dimensionResource(UiR.dimen.add_button_padding_horizontal),
                     vertical = dimensionResource(UiR.dimen.add_button_padding_vertical),
-                )
-                .height(dimensionResource(UiR.dimen.add_button_height)),
+                ).height(dimensionResource(UiR.dimen.add_button_height)),
         shape = RoundedCornerShape(dimensionResource(UiR.dimen.add_button_corner_radius)),
         colors =
             ButtonDefaults.buttonColors(

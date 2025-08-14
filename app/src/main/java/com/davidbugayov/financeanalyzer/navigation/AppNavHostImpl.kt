@@ -138,7 +138,8 @@ fun AppNavHostImpl(
             WalletTransactionsScreen(walletId = walletId)
         },
         onWalletSetupScreen = {
-            com.davidbugayov.financeanalyzer.presentation.budget.setup.WalletSetupScreen()
+            com.davidbugayov.financeanalyzer.presentation.budget.setup
+                .WalletSetupScreen()
         },
         onSubWalletsScreen = { parentWalletId ->
             SubWalletsScreen(

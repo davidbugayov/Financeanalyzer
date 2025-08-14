@@ -19,14 +19,20 @@ object FinancialDetailStatisticsContract {
     sealed class Intent {
         object LoadData : Intent()
 
-        data class ToggleIncludeTransfers(val include: Boolean) : Intent()
+        data class ToggleIncludeTransfers(
+            val include: Boolean,
+        ) : Intent()
 
-        data class ToggleIncludeRefunds(val include: Boolean) : Intent()
+        data class ToggleIncludeRefunds(
+            val include: Boolean,
+        ) : Intent()
     }
 
     // Эффекты (одноразовые события)
     sealed class Effect {
-        data class ShowError(val message: String) : Effect()
+        data class ShowError(
+            val message: String,
+        ) : Effect()
         // Добавь другие эффекты по необходимости
     }
 }

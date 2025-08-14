@@ -22,8 +22,8 @@ data class UiSubcategory(
         fun fromDomain(
             subcategory: Subcategory,
             color: Color = Color.Gray,
-        ): UiSubcategory {
-            return UiSubcategory(
+        ): UiSubcategory =
+            UiSubcategory(
                 id = subcategory.id,
                 name = subcategory.name,
                 categoryId = subcategory.categoryId,
@@ -32,7 +32,6 @@ data class UiSubcategory(
                 color = color,
                 original = subcategory,
             )
-        }
 
         /**
          * Создает кастомную UI подкатегорию
@@ -41,14 +40,13 @@ data class UiSubcategory(
             name: String,
             categoryId: Long,
             color: Color = Color.Gray,
-        ): UiSubcategory {
-            return UiSubcategory(
+        ): UiSubcategory =
+            UiSubcategory(
                 id = System.currentTimeMillis(),
                 name = name,
                 categoryId = categoryId,
                 isCustom = true,
                 color = color,
             )
-        }
     }
 }

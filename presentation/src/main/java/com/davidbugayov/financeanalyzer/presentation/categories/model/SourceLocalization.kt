@@ -40,9 +40,10 @@ object SourceLocalization {
     ): String {
         val lower = rawName.trim().lowercase()
         val key =
-            keys.entries.firstOrNull { entry ->
-                entry.value.any { syn -> syn.lowercase() == lower }
-            }?.key
+            keys.entries
+                .firstOrNull { entry ->
+                    entry.value.any { syn -> syn.lowercase() == lower }
+                }?.key
 
         return when (key) {
             "sber" -> context.getString(UiR.string.transaction_source_sber)

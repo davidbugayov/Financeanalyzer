@@ -24,12 +24,21 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.compileSdk
+            .get()
+            .toInt()
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.compileSdk.get().toInt()
+        minSdk =
+            libs.versions.minSdk
+                .get()
+                .toInt()
+        targetSdk =
+            libs.versions.compileSdk
+                .get()
+                .toInt()
         versionCode = 51
         versionName = "2.26.2"
 
@@ -213,7 +222,10 @@ android {
     // Migrated to new Kotlin compilerOptions DSL
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
+            jvmTarget.set(
+                org.jetbrains.kotlin.gradle.dsl.JvmTarget
+                    .fromTarget(libs.versions.javaVersion.get()),
+            )
             freeCompilerArgs.addAll(
                 listOf(
                     "-Xcontext-parameters",
@@ -248,69 +260,17 @@ android {
         checkReleaseBuilds = true
         baseline = file("lint-baseline.xml")
         htmlReport = true
-        htmlOutput = layout.buildDirectory.file("reports/lint/lint-report.html").get().asFile
+        htmlOutput =
+            layout.buildDirectory
+                .file("reports/lint/lint-report.html")
+                .get()
+                .asFile
         xmlReport = true
-        xmlOutput = layout.buildDirectory.file("reports/lint/lint-report.xml").get().asFile
-
-        // Отключаем ряд проверок (ранее было ignore)
-        disable.addAll(
-            listOf(
-                // Игнорируем проблемы с инстанцированием классов
-                "Instantiatable",
-                // Игнорируем проблемы с форматированием строк
-                "StringFormatMatches",
-                // Игнорируем проблемы с пакетами в зависимостях
-                "InvalidPackage",
-                // Можно включить обратно после очистки неиспользуемых ресурсов
-                "UnusedResources",
-            ),
-        )
-
-        // Превращаем ошибки в предупреждения для несерьезных проблем
-        warning.addAll(
-            listOf(
-                // Недостающие переводы - предупреждение
-                "MissingTranslation",
-                // Лишние переводы - предупреждение
-                "ExtraTranslation",
-                // Проблемы с типографикой - предупреждение
-                "TypographyFractions",
-                // Проблемы с дефисами - предупреждение
-                "TypographyDashes",
-            ),
-        )
-
-        // Отключаем проблемы в зависимостях, которые мы не можем контролировать
-        disable.addAll(
-            listOf(
-                // Отключаем проверку description для изображений
-                "ContentDescription",
-                // Временно отключаем для постепенного перевода строк в ресурсы
-                "HardcodedText",
-                // Не критично для векторных иконок
-                "IconMissingDensityFolder",
-                // Не используем App Indexing
-                "GoogleAppIndexingWarning",
-                // Разрешаем использование Log без условий
-                "LogConditional",
-                // Проблемы в сторонних библиотеках (POI, BouncyCastle)
-                "TrustAllX509TrustManager",
-                // Устаревшие версии SDK - не критично
-                "ObsoleteSdkInt",
-                // Предупреждения о версиях Gradle - не критично
-                "AndroidGradlePluginVersion",
-                // Предупреждения о новых версиях зависимостей
-                "GradleDependency",
-                // Предупреждения о новых версиях библиотек
-                "NewerVersionAvailable",
-                // Типографские кавычки - не критично для функциональности
-                "TypographyQuotes",
-                // Типографские дефисы - не критично для функциональности
-                "TypographyDashes",
-                // Типографские дроби - не критично для функциональности
-                "TypographyFractions",
-            ),
-        )
+        xmlOutput =
+            layout.buildDirectory
+                .file("reports/lint/lint-report.xml")
+                .get()
+                .asFile
     }
 
     buildToolsVersion = "36.0.0"

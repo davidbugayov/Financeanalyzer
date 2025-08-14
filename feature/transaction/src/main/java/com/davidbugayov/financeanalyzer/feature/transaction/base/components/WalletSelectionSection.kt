@@ -218,8 +218,7 @@ private fun WalletSelectorButton(
                     width = 1.dp,
                     color = borderColor,
                     shape = RoundedCornerShape(8.dp),
-                )
-                .clickable { onClick() }
+                ).clickable { onClick() }
                 .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

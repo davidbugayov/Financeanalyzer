@@ -26,13 +26,17 @@ sealed class ProfileEvent {
      * Событие установки ошибки экспорта.
      * @param message Сообщение об ошибке.
      */
-    data class SetExportError(val message: String) : ProfileEvent()
+    data class SetExportError(
+        val message: String,
+    ) : ProfileEvent()
 
     /**
      * Событие изменения темы приложения.
      * @param theme Выбранный режим темы (светлая, темная или системная).
      */
-    data class ChangeTheme(val theme: ThemeMode) : ProfileEvent()
+    data class ChangeTheme(
+        val theme: ThemeMode,
+    ) : ProfileEvent()
 
     /**
      * Событие отображения диалога выбора темы.
@@ -48,7 +52,9 @@ sealed class ProfileEvent {
      * Событие изменения языка приложения.
      * @param language Выбранный язык.
      */
-    data class ChangeLanguage(val language: String) : ProfileEvent()
+    data class ChangeLanguage(
+        val language: String,
+    ) : ProfileEvent()
 
     /** Показать диалог выбора языка */
     data object ShowLanguageDialog : ProfileEvent()
@@ -60,7 +66,9 @@ sealed class ProfileEvent {
      * Событие изменения валюты по умолчанию.
      * @param currency Выбранная валюта.
      */
-    data class ChangeCurrency(val currency: Currency) : ProfileEvent()
+    data class ChangeCurrency(
+        val currency: Currency,
+    ) : ProfileEvent()
 
     /**
      * Событие отображения диалога выбора валюты.
@@ -76,7 +84,9 @@ sealed class ProfileEvent {
      * Событие изменения настроек уведомлений.
      * @param enabled Включены ли уведомления.
      */
-    data class ChangeNotifications(val enabled: Boolean) : ProfileEvent()
+    data class ChangeNotifications(
+        val enabled: Boolean,
+    ) : ProfileEvent()
 
     /**
      * Событие открытия диалога настройки уведомлений о транзакциях.
@@ -93,19 +103,26 @@ sealed class ProfileEvent {
      * @param isEnabled Включены ли уведомления.
      * @param reminderTime Время напоминания (часы и минуты) или null, если уведомления отключены.
      */
-    data class UpdateTransactionReminder(val isEnabled: Boolean, val reminderTime: Pair<Int, Int>?) : ProfileEvent()
+    data class UpdateTransactionReminder(
+        val isEnabled: Boolean,
+        val reminderTime: Pair<Int, Int>?,
+    ) : ProfileEvent()
 
     /**
      * Событие изменения блокировки приложения.
      * @param enabled Включена ли блокировка.
      */
-    data class ChangeAppLock(val enabled: Boolean) : ProfileEvent()
+    data class ChangeAppLock(
+        val enabled: Boolean,
+    ) : ProfileEvent()
 
     /**
      * Событие изменения биометрической аутентификации.
      * @param enabled Включена ли биометрическая аутентификация.
      */
-    data class ChangeBiometric(val enabled: Boolean) : ProfileEvent()
+    data class ChangeBiometric(
+        val enabled: Boolean,
+    ) : ProfileEvent()
 
     /**
      * Событие отображения диалога настройки PIN-кода.
@@ -121,7 +138,9 @@ sealed class ProfileEvent {
      * Событие установки PIN-кода.
      * @param pinCode PIN-код для установки.
      */
-    data class SetPinCode(val pinCode: String) : ProfileEvent()
+    data class SetPinCode(
+        val pinCode: String,
+    ) : ProfileEvent()
 
     /**
      * Событие загрузки финансовой аналитики.

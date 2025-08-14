@@ -121,8 +121,7 @@ private fun PinKeyboardButton(
                     width = dimensionResource(UiR.dimen.border_width_small),
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                     shape = CircleShape,
-                )
-                .clickable { onClick() },
+                ).clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         if (content != null) {

@@ -18,8 +18,8 @@ object PermissionUtils {
     private const val PREFS_NAME = "permission_prefs"
     private const val KEY_NOTIFICATION_REQUESTED = "notification_permission_requested"
 
-    fun hasNotificationPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    fun hasNotificationPermission(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS,
@@ -27,7 +27,6 @@ object PermissionUtils {
         } else {
             true
         }
-    }
 
     fun openNotificationSettings(context: Context) {
         try {
@@ -47,8 +46,8 @@ object PermissionUtils {
         }
     }
 
-    fun hasReadExternalStoragePermission(context: Context): Boolean {
-        return when {
+    fun hasReadExternalStoragePermission(context: Context): Boolean =
+        when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
                 ContextCompat.checkSelfPermission(
                     context,
@@ -68,15 +67,13 @@ object PermissionUtils {
                 ) == PackageManager.PERMISSION_GRANTED
             }
         }
-    }
 
-    fun getReadStoragePermission(): String {
-        return when {
+    fun getReadStoragePermission(): String =
+        when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> Manifest.permission.READ_MEDIA_IMAGES
             else -> Manifest.permission.READ_EXTERNAL_STORAGE
         }
-    }
 
     fun hasRequestedNotificationPermission(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

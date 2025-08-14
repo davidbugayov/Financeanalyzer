@@ -174,35 +174,27 @@ object UserEventTracker {
      * @param screenName Название экрана
      * @return Время в миллисекундах
      */
-    fun getTotalScreenTime(screenName: String): Long {
-        return screenTimeMap[screenName] ?: 0L
-    }
+    fun getTotalScreenTime(screenName: String): Long = screenTimeMap[screenName] ?: 0L
 
     /**
      * Получить количество использований функции
      * @param featureName Название функции
      * @return Количество использований
      */
-    fun getFeatureUsageCount(featureName: String): Int {
-        return featureUsageCount[featureName] ?: 0
-    }
+    fun getFeatureUsageCount(featureName: String): Int = featureUsageCount[featureName] ?: 0
 
     /**
      * Получить время последнего использования функции
      * @param featureName Название функции
      * @return Время в миллисекундах с начала эпохи или null, если функция не использовалась
      */
-    fun getFeatureLastUsed(featureName: String): Long? {
-        return featureLastUsed[featureName]
-    }
+    fun getFeatureLastUsed(featureName: String): Long? = featureLastUsed[featureName]
 
     /**
      * Получить продолжительность текущей сессии
      * @return Время в миллисекундах
      */
-    fun getSessionDuration(): Long {
-        return SystemClock.elapsedRealtime() - sessionStartTime
-    }
+    fun getSessionDuration(): Long = SystemClock.elapsedRealtime() - sessionStartTime
 
     /**
      * Отправить данные о сессии в аналитику

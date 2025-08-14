@@ -13,14 +13,22 @@ class NavigationManager {
     }
 
     sealed class Command : Serializable {
-        data class Navigate(val destination: String) : Command()
+        data class Navigate(
+            val destination: String,
+        ) : Command()
 
         data object NavigateUp : Command() {
             private fun readResolve(): Any = NavigateUp
         }
 
-        data class PopUpTo(val destination: String, val inclusive: Boolean) : Command()
+        data class PopUpTo(
+            val destination: String,
+            val inclusive: Boolean,
+        ) : Command()
 
-        data class NavigateAndClearBackStack(val destination: String, val popUpTo: String) : Command()
+        data class NavigateAndClearBackStack(
+            val destination: String,
+            val popUpTo: String,
+        ) : Command()
     }
 }

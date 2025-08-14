@@ -294,8 +294,8 @@ private fun DetailRow(
 private fun rememberSourceColor(
     transaction: Transaction,
     isDarkTheme: Boolean,
-): Color {
-    return remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
+): Color =
+    remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
@@ -306,4 +306,3 @@ private fun rememberSourceColor(
             isDarkTheme = isDarkTheme,
         )
     }
-}

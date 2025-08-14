@@ -13,39 +13,34 @@ import kotlinx.coroutines.flow.map
 class SharedSubcategoryRepositoryAdapter(
     private val domainRepo: DomainSubcategoryRepository,
 ) : SharedSubcategoryRepository {
-    override suspend fun getSubcategoryById(id: Long): SharedSubcategory? {
-        return domainRepo.getSubcategoryById(id)?.toShared()
-    }
+    override suspend fun getSubcategoryById(id: Long): SharedSubcategory? =
+        domainRepo.getSubcategoryById(id)?.toShared()
 
-    override fun getSubcategoriesByCategoryId(categoryId: Long): Flow<List<SharedSubcategory>> {
-        return domainRepo.observeSubcategoriesByCategoryId(categoryId).map { list ->
+    override fun getSubcategoriesByCategoryId(categoryId: Long): Flow<List<SharedSubcategory>> =
+        domainRepo.observeSubcategoriesByCategoryId(categoryId).map { list ->
             list.map { it.toShared() }
         }
-    }
 
-    override suspend fun insertSubcategory(subcategory: SharedSubcategory): Long {
-        return domainRepo.insertSubcategory(subcategory.toDomain())
-    }
+    override suspend fun insertSubcategory(subcategory: SharedSubcategory): Long =
+        domainRepo.insertSubcategory(subcategory.toDomain())
 
     override suspend fun deleteSubcategoryById(subcategoryId: Long) {
         domainRepo.deleteSubcategoryById(subcategoryId)
     }
 }
 
-private fun DomainSubcategory.toShared(): SharedSubcategory {
-    return SharedSubcategory(
+private fun DomainSubcategory.toShared(): SharedSubcategory =
+    SharedSubcategory(
         id = this.id,
         categoryId = this.categoryId,
         name = this.name,
         isCustom = this.isCustom,
     )
-}
 
-private fun SharedSubcategory.toDomain(): DomainSubcategory {
-    return DomainSubcategory(
+private fun SharedSubcategory.toDomain(): DomainSubcategory =
+    DomainSubcategory(
         id = this.id,
         categoryId = this.categoryId,
         name = this.name,
         isCustom = this.isCustom,
     )
-}

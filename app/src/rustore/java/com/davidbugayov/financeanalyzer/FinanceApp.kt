@@ -57,7 +57,8 @@ class FinanceApp : BaseFinanceApp() {
         try {
             // Настройка AppMetrica
             val config =
-                AppMetricaConfig.newConfigBuilder(appMetricaApiKey)
+                AppMetricaConfig
+                    .newConfigBuilder(appMetricaApiKey)
                     .withLogs()
                     .withSessionTimeout(60)
                     .withCrashReporting(true)

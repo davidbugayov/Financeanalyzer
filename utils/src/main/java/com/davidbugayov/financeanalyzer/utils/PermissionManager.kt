@@ -9,7 +9,9 @@ import timber.log.Timber
  * Менеджер состояний разрешения для уведомлений.
  * Реализует конечный автомат для управления жизненным циклом разрешения.
  */
-class PermissionManager(context: Context) {
+class PermissionManager(
+    context: Context,
+) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("finance_analyzer_prefs", 0)
 

@@ -29,9 +29,17 @@ class AlfaBankExcelHandler(
     // Ключевые слова для Excel-файлов Альфа-Банка
     override val excelKeywords: List<String> =
         listOf(
-            "alfabank", "альфабанк", "альфа-банк", "alfa",
-            "statement", "выписка", "операци", "движени",
-            "excel", "xlsx", "xls",
+            "alfabank",
+            "альфабанк",
+            "альфа-банк",
+            "alfa",
+            "statement",
+            "выписка",
+            "операци",
+            "движени",
+            "excel",
+            "xlsx",
+            "xls",
         )
 
     // Негативные ключевые слова для исключения ложных срабатываний

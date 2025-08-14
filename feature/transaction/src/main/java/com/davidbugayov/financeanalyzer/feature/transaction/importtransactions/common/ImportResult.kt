@@ -59,9 +59,7 @@ sealed class ImportResult {
          * @param message Сообщение об ошибке
          * @return Объект ошибки
          */
-        fun error(message: String): Error {
-            return Error(message = message)
-        }
+        fun error(message: String): Error = Error(message = message)
 
         /**
          * Создает объект ошибки с указанным исключением.
@@ -69,9 +67,7 @@ sealed class ImportResult {
          * @param exception Исключение
          * @return Объект ошибки
          */
-        fun error(exception: Exception): Error {
-            return Error(exception, exception.message ?: "Неизвестная ошибка")
-        }
+        fun error(exception: Exception): Error = Error(exception, exception.message ?: "Неизвестная ошибка")
 
         /**
          * Создает объект успеха с указанными параметрами.
@@ -106,8 +102,6 @@ sealed class ImportResult {
             current: Int,
             total: Int,
             message: String = "",
-        ): Progress {
-            return Progress(current, total, message)
-        }
+        ): Progress = Progress(current, total, message)
     }
 }

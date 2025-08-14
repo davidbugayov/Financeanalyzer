@@ -71,8 +71,7 @@ fun PremiumStatisticsCard(
                                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                         ),
                                 ),
-                        )
-                        .padding(20.dp),
+                        ).padding(20.dp),
             ) {
                 // Заголовок с иконкой и градиентом
                 PremiumStatisticsHeader(
@@ -332,8 +331,7 @@ fun PremiumInsightsCard(
                                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                                         ),
                                 ),
-                        )
-                        .padding(20.dp),
+                        ).padding(20.dp),
             ) {
                 // Заголовок инсайтов
                 Row(

@@ -60,7 +60,8 @@ class ImportFactory(
         Timber.d("Attempting to find importer for: $fileName, type: $fileType")
 
         // Явно проверяем, является ли файл выпиской с движением средств
-        if (fileType == FileType.PDF && (
+        if (fileType == FileType.PDF &&
+            (
                 fileName.contains("движени", ignoreCase = true) ||
                     fileName.contains("справка", ignoreCase = true)
             )

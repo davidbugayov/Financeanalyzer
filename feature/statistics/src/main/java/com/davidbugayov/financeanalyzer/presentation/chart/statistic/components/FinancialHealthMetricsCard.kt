@@ -332,7 +332,8 @@ private fun FinancialCushionSection(
                         verticalAlignment = Alignment.Bottom,
                     ) {
                         val monthsInt =
-                            monthsOfSavings.toBigDecimal()
+                            monthsOfSavings
+                                .toBigDecimal()
                                 .setScale(0, java.math.RoundingMode.FLOOR)
                                 .toInt()
 
@@ -401,8 +402,7 @@ private fun QualificationBadge(
             Modifier
                 .clip(
                     RoundedCornerShape(dimensionResource(UiR.dimen.financial_health_badge_corner_radius)),
-                )
-                .background(qualificationColor.copy(alpha = 0.15f))
+                ).background(qualificationColor.copy(alpha = 0.15f))
                 .padding(
                     horizontal = dimensionResource(UiR.dimen.financial_health_badge_padding_horizontal),
                     vertical = dimensionResource(UiR.dimen.financial_health_badge_padding_vertical),

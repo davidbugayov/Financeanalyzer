@@ -28,8 +28,8 @@ val analyticsModule =
             val composite = CompositeAnalytics()
 
             // Проверка наличия GMS
-            fun isGmsAvailable(context: Context): Boolean {
-                return try {
+            fun isGmsAvailable(context: Context): Boolean =
+                try {
                     val gms = Class.forName("com.google.android.gms.common.GoogleApiAvailability")
                     val method = gms.getMethod("isGooglePlayServicesAvailable", Context::class.java)
                     val result = method.invoke(gms.getDeclaredConstructor().newInstance(), context) as Int
@@ -37,7 +37,6 @@ val analyticsModule =
                 } catch (e: Exception) {
                     false
                 }
-            }
 
             // Firebase Analytics (только если есть GMS)
             if (isGmsAvailable(app)) {
@@ -64,7 +63,8 @@ val analyticsModule =
             // AppMetrica Analytics
             try {
                 val config =
-                    AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+                    AppMetricaConfig
+                        .newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
                         .withLogs()
                         .withSessionTimeout(60)
                         .withCrashReporting(true)

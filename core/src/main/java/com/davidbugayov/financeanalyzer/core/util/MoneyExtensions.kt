@@ -21,9 +21,7 @@ import java.util.Locale
 fun Money.formatForDisplay(
     showCurrency: Boolean = true,
     useMinimalDecimals: Boolean = false,
-): String {
-    return format(showCurrency, useMinimalDecimals)
-}
+): String = format(showCurrency, useMinimalDecimals)
 
 /**
  * Formats money with options for showing currency and using minimal decimals

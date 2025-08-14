@@ -140,7 +140,11 @@ class BudgetViewModel(
                 // Обрабатываем каждый кошелек
                 wallets.forEach { wallet ->
                     // Находим транзакции, относящиеся к этому кошельку
-                    val walletTransactions = expenseTransactions.filter { it.category == wallet.name || it.categoryId == wallet.id }
+                    val walletTransactions =
+                        expenseTransactions.filter {
+                            it.category == wallet.name ||
+                                it.categoryId == wallet.id
+                        }
 
                     // Рассчитываем сумму трат
                     val totalSpent =
@@ -183,7 +187,8 @@ class BudgetViewModel(
 
         // Находим кошельки с превышением лимита
         val overBudgetWallets =
-            wallets.filter { it.limit.amount > java.math.BigDecimal.ZERO && it.spent.amount > it.limit.amount }
+            wallets
+                .filter { it.limit.amount > java.math.BigDecimal.ZERO && it.spent.amount > it.limit.amount }
                 .map { it.name }
 
         _state.update {
@@ -558,8 +563,11 @@ class BudgetViewModel(
                 // (сохраняем кошельки созданные пользователем)
                 val walletsToRemove =
                     wallets.filter {
-                        it.name == "Продукты" || it.name == "Транспорт" || // Можно добавить и другие имена тестовых кошельков, если они есть
-                            it.name == "Развлечения" && it.linkedCategories.isEmpty() // Удаляем пустой кошелек "Развлечения" без связанных категорий
+                        it.name == "Продукты" ||
+                            it.name == "Транспорт" ||
+                            // Можно добавить и другие имена тестовых кошельков, если они есть
+                            it.name == "Развлечения" &&
+                            it.linkedCategories.isEmpty() // Удаляем пустой кошелек "Развлечения" без связанных категорий
                     }
 
                 // Удаляем выбранные кошельки
@@ -580,7 +588,5 @@ class BudgetViewModel(
     fun goalProgress(
         current: Money,
         target: Money,
-    ): Double {
-        return sharedFacade.goalProgress(current.toShared(), target.toShared())
-    }
+    ): Double = sharedFacade.goalProgress(current.toShared(), target.toShared())
 }

@@ -97,8 +97,7 @@ private fun SelectorButton(
                             MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         },
                     shape = RoundedCornerShape(SelectorButtonCornerRadius),
-                )
-                .clickable(onClick = onClick)
+                ).clickable(onClick = onClick)
                 .padding(
                     horizontal = SelectorButtonTextHorizontalPadding,
                     vertical = SelectorButtonTextVerticalPadding,

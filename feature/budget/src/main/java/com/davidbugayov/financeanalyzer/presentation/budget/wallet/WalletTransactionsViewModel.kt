@@ -26,7 +26,8 @@ class WalletTransactionsViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
-) : ViewModel(), KoinComponent {
+) : ViewModel(),
+    KoinComponent {
     private val _state = MutableStateFlow(WalletTransactionsState())
     val state: StateFlow<WalletTransactionsState> = _state.asStateFlow()
 
@@ -130,17 +131,23 @@ class WalletTransactionsViewModel(
 
                 // Фильтруем транзакции, относящиеся к данному кошельку
                 val walletTransactions =
-                    allTransactions.filter {
-                            transaction -> // Учитываем основное условие: совпадение по имени или ID категории
-                        val baseMatch = transaction.category == wallet.name || transaction.categoryId == wallet.id
+                    allTransactions
+                        .filter { transaction ->
+                            // Учитываем основное условие: совпадение по имени или ID категории
+                            val baseMatch = transaction.category == wallet.name || transaction.categoryId == wallet.id
 
-                        // Проверяем наличие в связанных категориях
-                        val linkedCategories = wallet.linkedCategories
-                        val linkedCategoryMatch = linkedCategories.isNotEmpty() && (linkedCategories.contains(transaction.category) || linkedCategories.contains(transaction.categoryId))
+                            // Проверяем наличие в связанных категориях
+                            val linkedCategories = wallet.linkedCategories
+                            val linkedCategoryMatch =
+                                linkedCategories.isNotEmpty() &&
+                                    (
+                                        linkedCategories.contains(transaction.category) ||
+                                            linkedCategories.contains(transaction.categoryId)
+                                    )
 
-                        // Транзакция подходит, если выполняется любое из условий
-                        baseMatch || linkedCategoryMatch
-                    }.sortedByDescending { it.date }
+                            // Транзакция подходит, если выполняется любое из условий
+                            baseMatch || linkedCategoryMatch
+                        }.sortedByDescending { it.date }
 
                 _state.update {
                     it.copy(

@@ -337,23 +337,21 @@ private fun HealthScoreInterpretation(score: Double) {
 /**
  * Получает цвет для общего скора здоровья
  */
-private fun getHealthScoreColor(score: Double): Color {
-    return when {
+private fun getHealthScoreColor(score: Double): Color =
+    when {
         score >= 80 -> Color(0xFF4CAF50) // Зеленый
         score >= 60 -> Color(0xFF8BC34A) // Светло-зеленый
         score >= 40 -> Color(0xFFFF9800) // Оранжевый
         else -> Color(0xFFF44336) // Красный
     }
-}
 
 /**
  * Получает цвет для компонента скора
  */
-private fun getComponentScoreColor(progress: Double): Color {
-    return when {
+private fun getComponentScoreColor(progress: Double): Color =
+    when {
         progress >= 0.8 -> Color(0xFF4CAF50)
         progress >= 0.6 -> Color(0xFF8BC34A)
         progress >= 0.4 -> Color(0xFFFF9800)
         else -> Color(0xFFF44336)
     }
-}

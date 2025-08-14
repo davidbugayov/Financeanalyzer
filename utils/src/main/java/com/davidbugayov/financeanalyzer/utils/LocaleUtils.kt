@@ -12,8 +12,8 @@ import timber.log.Timber
  * Нужна как fallback, когда AppCompatDelegate.setApplicationLocales не срабатывает.
  */
 object LocaleUtils {
-    fun wrapContext(base: Context): Context {
-        return try {
+    fun wrapContext(base: Context): Context =
+        try {
             val prefs = PreferencesManager(base)
             val code = prefs.getAppLanguage()
             val locale =
@@ -39,5 +39,4 @@ object LocaleUtils {
             Timber.tag("LANG").e(e, "LocaleUtils.wrapContext: failed, returning base")
             base
         }
-    }
 }

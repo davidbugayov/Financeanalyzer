@@ -74,12 +74,14 @@ fun AnimatedBottomNavigationBar(
         enter =
             fadeIn(animationSpec = tween(400, easing = EaseInOut)) +
                 slideInVertically(
-                    initialOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
+                    initialOffsetY = { it },
+                    animationSpec = tween(400, easing = EaseInOut),
                 ),
         exit =
             fadeOut(animationSpec = tween(400, easing = EaseInOut)) +
                 slideOutVertically(
-                    targetOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
+                    targetOffsetY = { it },
+                    animationSpec = tween(400, easing = EaseInOut),
                 ),
         modifier = modifier,
     ) {
@@ -99,8 +101,7 @@ fun AnimatedBottomNavigationBar(
                             end = dimensionResource(R.dimen.spacing_small),
                             top = dimensionResource(R.dimen.spacing_xxsmall),
                             bottom = dimensionResource(R.dimen.spacing_xxsmall),
-                        )
-                        .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
+                        ).heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -153,8 +154,7 @@ private fun NavButton(
                     Modifier
                         .clip(
                             CircleShape,
-                        )
-                        .background(MaterialTheme.colorScheme.primary)
+                        ).background(MaterialTheme.colorScheme.primary)
                         .padding(8.dp)
                         .size(iconSize),
                 tint = Color.White,

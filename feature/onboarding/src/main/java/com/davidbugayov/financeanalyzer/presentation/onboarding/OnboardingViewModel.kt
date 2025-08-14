@@ -17,9 +17,7 @@ class OnboardingViewModel(
      * Проверяет, нужно ли показывать онбординг пользователю.
      * @return true, если онбординг уже был завершен ранее
      */
-    fun isOnboardingCompleted(): Boolean {
-        return onboardingManager.isOnboardingCompleted()
-    }
+    fun isOnboardingCompleted(): Boolean = onboardingManager.isOnboardingCompleted()
 
     /**
      * Отмечает онбординг как завершенный.

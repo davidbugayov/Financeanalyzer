@@ -6,7 +6,9 @@ package com.davidbugayov.financeanalyzer.navigation
  *
  * @property route Уникальный маршрут для навигации к экрану
  */
-sealed class Screen(val route: String) {
+sealed class Screen(
+    val route: String,
+) {
     /** Экран онбординга для новых пользователей */
     data object Onboarding : Screen("onboarding")
 
@@ -110,7 +112,9 @@ sealed class Screen(val route: String) {
     /** Экран мастера создания кошелька */
     data object WalletSetup : Screen("wallet_setup")
 
-    data class SubWallets(val parentWalletId: String) : Screen("sub_wallets/{parentWalletId}") {
+    data class SubWallets(
+        val parentWalletId: String,
+    ) : Screen("sub_wallets/{parentWalletId}") {
         companion object {
             const val route = "sub_wallets/{parentWalletId}"
         }

@@ -212,7 +212,8 @@ class AddTransactionViewModel(
                     updateWidgetsUseCase()
 
                     // Триггер достижения за добавление транзакции
-                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onTransactionAdded()
+                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+                        .onTransactionAdded()
 
                     // Запрос отзыва (только RuStore). Реализация предоставляется в app-модуле.
                     // Для независимой компиляции feature-модуля просто пропускаем вызов здесь.
@@ -348,8 +349,8 @@ class AddTransactionViewModel(
         showCustomSubcategoryDialog: Boolean,
         customSubcategory: String,
         availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory>,
-    ): AddTransactionState {
-        return state.copy(
+    ): AddTransactionState =
+        state.copy(
             title = title,
             amount = amount,
             amountError = amountError,
@@ -400,7 +401,6 @@ class AddTransactionViewModel(
             customSubcategory = customSubcategory,
             availableSubcategories = availableSubcategories,
         )
-    }
 
     fun setCategory(category: String) {
         val walletsList = _wallets.value

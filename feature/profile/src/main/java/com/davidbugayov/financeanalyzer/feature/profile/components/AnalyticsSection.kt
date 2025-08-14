@@ -242,7 +242,13 @@ fun AnalyticsSection(
                             color = savingsRateColor,
                             icon =
                                 rememberVectorPainter(
-                                    if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    if (calculatedSavingsRate >
+                                        0
+                                    ) {
+                                        Icons.Default.KeyboardArrowUp
+                                    } else {
+                                        Icons.Default.KeyboardArrowDown
+                                    },
                                 ),
                             animationDelay = 300,
                             modifier =

@@ -95,8 +95,7 @@ fun CustomSourceDialog(
                             .clickable {
                                 Timber.d("Color picker clicked, showing color picker dialog")
                                 showColorPicker = true
-                            }
-                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
+                            }.padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                 ) {
                     Text(
                         text = stringResource(UiR.string.select_color),

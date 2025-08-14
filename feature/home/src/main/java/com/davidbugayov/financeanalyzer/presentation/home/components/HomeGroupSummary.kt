@@ -73,13 +73,14 @@ fun HomeGroupSummary(
         remember(filteredTransactions, showExpenses) {
             val filteredByType = filteredTransactions.filter { it.isExpense == showExpenses }
             val groupedByCategory = filteredByType.groupBy { it.category }
-            groupedByCategory.map { (category, transactions) ->
-                CategorySummary(
-                    category = category,
-                    amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
-                    isExpense = showExpenses,
-                )
-            }.sortedByDescending { it.amount.amount }
+            groupedByCategory
+                .map { (category, transactions) ->
+                    CategorySummary(
+                        category = category,
+                        amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
+                        isExpense = showExpenses,
+                    )
+                }.sortedByDescending { it.amount.amount }
         }
 
     Card(
@@ -373,14 +374,13 @@ private fun SummaryHideButton(
 }
 
 @Composable
-private fun periodTitleForFilter(filter: TransactionFilter): String {
-    return when (filter) {
+private fun periodTitleForFilter(filter: TransactionFilter): String =
+    when (filter) {
         TransactionFilter.TODAY -> stringResource(UiR.string.filter_today)
         TransactionFilter.WEEK -> stringResource(UiR.string.filter_week)
         TransactionFilter.MONTH -> stringResource(UiR.string.filter_month)
         TransactionFilter.ALL -> stringResource(UiR.string.all_time)
     }
-}
 
 /**
  * Класс для хранения сводной информации о категории

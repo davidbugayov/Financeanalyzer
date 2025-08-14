@@ -9,12 +9,16 @@ sealed class Result<out T> {
     /**
      * Успешный результат операции
      */
-    data class Success<T>(val data: T) : Result<T>()
+    data class Success<T>(
+        val data: T,
+    ) : Result<T>()
 
     /**
      * Ошибка операции
      */
-    data class Error(val exception: AppException) : Result<Nothing>()
+    data class Error(
+        val exception: AppException,
+    ) : Result<Nothing>()
 
     companion object {
         /**

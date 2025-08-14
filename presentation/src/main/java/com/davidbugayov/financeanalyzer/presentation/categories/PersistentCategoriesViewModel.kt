@@ -16,7 +16,8 @@ import timber.log.Timber
  */
 class PersistentCategoriesViewModel(
     application: Application,
-) : AndroidViewModel(application), CategoriesViewModel {
+) : AndroidViewModel(application),
+    CategoriesViewModel {
     private val categoryPreferences = CategoryPreferences.getInstance(application)
 
     private val _expenseCategories = MutableStateFlow<List<UiCategory>>(emptyList())

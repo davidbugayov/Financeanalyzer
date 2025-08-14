@@ -58,6 +58,4 @@ data class FinancialMetrics(
 )
 
 // Метод для форматирования процентов
-fun Float.setScale(scale: Int): Float {
-    return BigDecimal(this.toDouble()).setScale(scale, RoundingMode.HALF_UP).toFloat()
-}
+fun Float.setScale(scale: Int): Float = BigDecimal(this.toDouble()).setScale(scale, RoundingMode.HALF_UP).toFloat()

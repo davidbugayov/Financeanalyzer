@@ -63,7 +63,8 @@ class HomeViewModel(
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val navigationManager: NavigationManager,
     private val sharedFacade: SharedFacade,
-) : ViewModel(), KoinComponent {
+) : ViewModel(),
+    KoinComponent {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
@@ -84,8 +85,7 @@ class HomeViewModel(
                 } else {
                     repository.getByPeriodPaged(startDate, endDate, pageSize)
                 }
-            }
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
 
     val pagedUiModels: Flow<PagingData<TransactionListItem>> =
         pagedTransactions
@@ -104,8 +104,7 @@ class HomeViewModel(
                             null
                         }
                     }
-            }
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
 
     private fun reloadPaged() {
         pagerTrigger.tryEmit(Unit)
@@ -394,13 +393,13 @@ class HomeViewModel(
                     transactions
                         .filter { it.isExpense } // Считаем только расходы
                         .groupBy { it.category }
-                        .mapValues { (_, txs) -> // Суммируем расходы по категории с использованием Money
+                        .mapValues { (_, txs) ->
+                            // Суммируем расходы по категории с использованием Money
                             txs.fold(Money.zero(currentCurrency)) { acc, transaction ->
                                 val convertedAmount = Money(transaction.amount.amount, currentCurrency)
                                 acc + convertedAmount
                             }
-                        }
-                        .toList()
+                        }.toList()
                         .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
                         .take(3) // Берем только топ-3 категории
                         .toMap()

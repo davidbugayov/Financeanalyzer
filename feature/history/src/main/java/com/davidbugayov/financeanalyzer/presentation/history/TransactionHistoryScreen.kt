@@ -72,12 +72,11 @@ import timber.log.Timber
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
  */
-fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
-    return TransactionDialogState(
+fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState =
+    TransactionDialogState(
         transactionToDelete = this.transactionToDelete,
         showDeleteConfirmDialog = this.transactionToDelete != null,
     )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -217,7 +216,13 @@ fun TransactionHistoryScreen(
     if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
-            maxDate = minOf(state.endDate, java.util.Calendar.getInstance().time),
+            maxDate =
+                minOf(
+                    state.endDate,
+                    java.util.Calendar
+                        .getInstance()
+                        .time,
+                ),
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
@@ -232,7 +237,10 @@ fun TransactionHistoryScreen(
         DatePickerDialog(
             initialDate = state.endDate,
             minDate = state.startDate,
-            maxDate = java.util.Calendar.getInstance().time,
+            maxDate =
+                java.util.Calendar
+                    .getInstance()
+                    .time,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)

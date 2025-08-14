@@ -130,8 +130,7 @@ fun FeedbackMessage(
                                             Color.Transparent
                                         },
                                         shape = MaterialTheme.shapes.small,
-                                    )
-                                    .clickable {
+                                    ).clickable {
                                         val clipboard = android.content.Context.CLIPBOARD_SERVICE
                                         val clip =
                                             android.content.ClipData.newPlainText(
@@ -145,14 +144,14 @@ fun FeedbackMessage(
                                         )?.setPrimaryClip(
                                             clip,
                                         )
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.path_copied),
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                context.getString(R.string.path_copied),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
                                         isCopied = true
-                                    }
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    }.padding(horizontal = 8.dp, vertical = 4.dp),
                         )
                         if (isCopied) {
                             LaunchedEffect(isCopied) {

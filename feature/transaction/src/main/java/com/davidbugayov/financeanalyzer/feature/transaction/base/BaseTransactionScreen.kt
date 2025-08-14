@@ -295,7 +295,11 @@ fun <E> BaseTransactionScreen(
 
     // Функция для перехода на экран импорта
     fun navigateToImport() {
-        if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
+        if (state.title.isNotBlank() ||
+            state.amount.isNotBlank() ||
+            state.category.isNotBlank() ||
+            state.note.isNotBlank()
+        ) {
             showImportConfirmation = true
         } else if (onNavigateToImport != null) {
             onNavigateToImport()
@@ -314,7 +318,11 @@ fun <E> BaseTransactionScreen(
                 title = actualScreenTitle,
                 showBackButton = true,
                 onBackClick = {
-                    if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
+                    if (state.title.isNotBlank() ||
+                        state.amount.isNotBlank() ||
+                        state.category.isNotBlank() ||
+                        state.note.isNotBlank()
+                    ) {
                         showCancelConfirmation = true
                     } else {
                         handleExit()

@@ -93,22 +93,30 @@ fun LanguageSelectionDialog(
             Button(
                 onClick = {
                     // Применяем локаль немедленно и пересоздаём активити для мгновенного эффекта
-                    timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: selected=%s", selectedCode)
+                    timber.log.Timber
+                        .tag("LANG")
+                        .d("LanguageSelectionDialog.confirm: selected=%s", selectedCode)
                     AppLocale.apply(selectedCode)
                     onLanguageSelected(selectedCode)
                     val activity = (context as? Activity)
-                    timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: recreate activity=%s", activity)
+                    timber.log.Timber
+                        .tag("LANG")
+                        .d("LanguageSelectionDialog.confirm: recreate activity=%s", activity)
                     // Надёжный перезапуск Activity для применения локали по всему дереву
                     val restartIntent =
                         activity?.packageManager?.getLaunchIntentForPackage(activity.packageName)?.apply {
                             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                     if (restartIntent != null) {
-                        timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: restart via launch intent")
+                        timber.log.Timber
+                            .tag("LANG")
+                            .d("LanguageSelectionDialog.confirm: restart via launch intent")
                         activity.startActivity(restartIntent)
                         activity.finish()
                     } else {
-                        timber.log.Timber.tag("LANG").d("LanguageSelectionDialog.confirm: restart via recreate()")
+                        timber.log.Timber
+                            .tag("LANG")
+                            .d("LanguageSelectionDialog.confirm: restart via recreate()")
                         activity?.recreate()
                     }
                     onDismiss()
@@ -126,7 +134,9 @@ fun LanguageSelectionDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(dimensionResource(UiR.dimen.radius_xlarge)),
         tonalElevation = 0.dp,
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+        properties =
+            androidx.compose.ui.window
+                .DialogProperties(usePlatformDefaultWidth = false),
     )
 }
 

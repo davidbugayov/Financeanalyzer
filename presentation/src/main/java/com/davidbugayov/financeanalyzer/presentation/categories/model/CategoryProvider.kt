@@ -47,13 +47,12 @@ object CategoryProvider {
     private fun getCategoryColorByKey(
         key: String,
         isExpense: Boolean,
-    ): Color {
-        return if (isExpense) {
+    ): Color =
+        if (isExpense) {
             expenseCategoryColorsMap.getValue(key)
         } else {
             incomeCategoryColorsMap.getValue(key)
         }
-    }
 
     fun getDefaultExpenseCategories(context: Context): List<UiCategory> =
         defaultCategories.filter { it.isExpense }.mapIndexed { idx, meta ->
@@ -90,8 +89,8 @@ object CategoryProvider {
     private fun getCategoryNameByKey(
         context: Context,
         key: String,
-    ): String {
-        return when (key) {
+    ): String =
+        when (key) {
             "food" -> context.getString(UiR.string.category_food)
             "transport" -> context.getString(UiR.string.category_transport)
             "entertainment" -> context.getString(UiR.string.category_entertainment)
@@ -114,7 +113,6 @@ object CategoryProvider {
             "other_income" -> context.getString(UiR.string.category_other_income)
             else -> context.getString(UiR.string.category_other)
         }
-    }
 
     /**
      * Генерирует цвет для новой категории, выбирая его из соответствующей палитры.
@@ -143,9 +141,8 @@ object CategoryProvider {
     /**
      * Получает иконку по имени
      */
-    fun getIconByName(name: String): androidx.compose.ui.graphics.vector.ImageVector {
-        return CategoryIconProvider.getIconByName(name)
-    }
+    fun getIconByName(name: String): androidx.compose.ui.graphics.vector.ImageVector =
+        CategoryIconProvider.getIconByName(name)
 
     /**
      * Получает имя иконки из ImageVector
@@ -159,20 +156,17 @@ object CategoryProvider {
     /**
      * Парсит цвет из hex строки
      */
-    fun parseColorFromHex(hex: String): Color {
-        return try {
+    fun parseColorFromHex(hex: String): Color =
+        try {
             Color(android.graphics.Color.parseColor(hex))
         } catch (e: Exception) {
             DefaultCategoryColor
         }
-    }
 
     /**
      * Конвертирует цвет в hex строку
      */
-    fun colorToHex(color: Color): String {
-        return color.toHexString()
-    }
+    fun colorToHex(color: Color): String = color.toHexString()
 
     /**
      * Возвращает безопасный цвет категории: если чёрный/белый — подменяем на дефолтный.

@@ -15,7 +15,9 @@ import timber.log.Timber
 /**
  * BroadcastReceiver для показа уведомлений о необходимости внести транзакции.
  */
-class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
+class TransactionReminderReceiver :
+    BroadcastReceiver(),
+    KoinComponent {
     companion object {
         private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
         private const val TRANSACTION_REMINDER_NOTIFICATION_ID = 1001
@@ -79,7 +81,8 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
 
         // Создаем уведомление
         val builder =
-            NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
+            NotificationCompat
+                .Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_wallet)
                 .setContentTitle(context.getString(R.string.notification_permission_title_hardcoded))
                 .setContentText(context.getString(R.string.notification_permission_text_hardcoded))
@@ -119,7 +122,8 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
 
         // Создаем уведомление
         val builder =
-            NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
+            NotificationCompat
+                .Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_wallet) // Используем иконку кошелька с деньгами
                 .setContentTitle(context.getString(R.string.notification_transaction_reminder_title))
                 .setContentText(context.getString(R.string.notification_transaction_reminder_text))

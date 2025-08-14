@@ -35,11 +35,10 @@ class FinancialMetrics private constructor() : KoinComponent {
         @Volatile
         private var instance: FinancialMetrics? = null
 
-        fun getInstance(): FinancialMetrics {
-            return instance ?: synchronized(this) {
+        fun getInstance(): FinancialMetrics =
+            instance ?: synchronized(this) {
                 instance ?: FinancialMetrics().also { instance = it }
             }
-        }
     }
 
     init {

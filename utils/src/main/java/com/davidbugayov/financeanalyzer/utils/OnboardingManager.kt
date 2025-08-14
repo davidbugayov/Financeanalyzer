@@ -8,7 +8,9 @@ import androidx.core.content.edit
  * Класс для управления состоянием онбординга.
  * Отвечает за хранение информации о том, был ли показан онбординг пользователю.
  */
-class OnboardingManager(context: Context) {
+class OnboardingManager(
+    context: Context,
+) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(
             PREFERENCES_NAME,
@@ -19,9 +21,7 @@ class OnboardingManager(context: Context) {
      * Проверяет, был ли уже показан онбординг пользователю.
      * @return true, если онбординг уже был показан
      */
-    fun isOnboardingCompleted(): Boolean {
-        return sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETED, false)
-    }
+    fun isOnboardingCompleted(): Boolean = sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETED, false)
 
     /**
      * Отмечает онбординг как завершенный.

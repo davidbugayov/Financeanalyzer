@@ -484,9 +484,7 @@ class EditTransactionViewModel(
      * @param subcategoryId ID сабкатегории
      * @return Название сабкатегории или пустая строка
      */
-    private suspend fun loadSubcategoryByIdAsync(subcategoryId: Long): String {
-        return loadSubcategoryById(subcategoryId)
-    }
+    private suspend fun loadSubcategoryByIdAsync(subcategoryId: Long): String = loadSubcategoryById(subcategoryId)
 
     // Загрузка транзакции для редактирования по ID
     fun loadTransactionForEditById(transactionId: String) {
@@ -829,8 +827,8 @@ class EditTransactionViewModel(
         showCustomSubcategoryDialog: Boolean,
         customSubcategory: String,
         availableSubcategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory>,
-    ): EditTransactionState {
-        return state.copy(
+    ): EditTransactionState =
+        state.copy(
             title = title,
             amount = amount,
             amountError = amountError,
@@ -881,7 +879,6 @@ class EditTransactionViewModel(
             customSubcategory = customSubcategory,
             availableSubcategories = availableSubcategories,
         )
-    }
 
     // Установка ошибки с отключением индикатора загрузки
     fun setError(errorMessage: String) {

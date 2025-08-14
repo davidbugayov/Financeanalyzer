@@ -34,7 +34,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
+class EnhancedFinanceChartViewModel :
+    ViewModel(),
+    KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val calculateEnhancedFinancialMetricsUseCase: CalculateEnhancedFinancialMetricsUseCase by inject()
@@ -229,8 +231,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     calendar.set(java.util.Calendar.SECOND, 0)
                     calendar.set(java.util.Calendar.MILLISECOND, 0)
                     calendar.time
-                }
-                .mapValues { (_, transactions) ->
+                }.mapValues { (_, transactions) ->
                     transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                         // Приводим транзакцию к текущей валюте
                         val convertedAmount = Money(transaction.amount.amount, currentCurrency)
@@ -307,15 +308,20 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             pieChartDataList.map { item ->
                 val percent =
                     if (showExpenses) {
-                        item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(
-                            BigDecimal(100),
-                        ).toFloat()
+                        item.money.amount
+                            .divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN)
+                            .multiply(
+                                BigDecimal(100),
+                            ).toFloat()
                     } else {
-                        item.money.amount.max(BigDecimal.ZERO).divide(
-                            totalMoney,
-                            4,
-                            java.math.RoundingMode.HALF_EVEN,
-                        ).multiply(BigDecimal(100)).toFloat()
+                        item.money.amount
+                            .max(BigDecimal.ZERO)
+                            .divide(
+                                totalMoney,
+                                4,
+                                java.math.RoundingMode.HALF_EVEN,
+                            ).multiply(BigDecimal(100))
+                            .toFloat()
                     }
                 item.copy(percentage = percent)
             }

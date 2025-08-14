@@ -29,7 +29,9 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class Connection(cause: Throwable? = null) : Network(RStrings.errorNetworkConnection, cause)
+        class Connection(
+            cause: Throwable? = null,
+        ) : Network(RStrings.errorNetworkConnection, cause)
     }
 
     /**
@@ -39,7 +41,9 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class NotFound(message: String? = null) : Data(message ?: RStrings.errorDataNotFound)
+        class NotFound(
+            message: String? = null,
+        ) : Data(message ?: RStrings.errorDataNotFound)
     }
 
     /**
@@ -49,10 +53,13 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(
-            message ?: RStrings.errorFileRead,
-            cause,
-        )
+        class ReadError(
+            message: String? = null,
+            cause: Throwable? = null,
+        ) : FileSystem(
+                message ?: RStrings.errorFileRead,
+                cause,
+            )
     }
 
     /**
@@ -62,7 +69,9 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-        class InvalidOperation(message: String) : Business(message)
+        class InvalidOperation(
+            message: String,
+        ) : Business(message)
     }
 
     /**
@@ -77,8 +86,8 @@ sealed class AppException(
         /**
          * Преобразует стандартное исключение в AppException
          */
-        fun mapException(exception: Throwable): AppException {
-            return when (exception) {
+        fun mapException(exception: Throwable): AppException =
+            when (exception) {
                 is AppException -> exception
                 is java.net.UnknownHostException,
                 is java.net.ConnectException,
@@ -88,6 +97,5 @@ sealed class AppException(
                 is java.io.IOException -> FileSystem.ReadError(cause = exception)
                 else -> Unknown(exception.message, exception)
             }
-        }
     }
 }

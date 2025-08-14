@@ -47,7 +47,8 @@ fun OptionalCommentField(
             modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = dimensionResource(UiR.dimen.padding_horizontal_12dp) + dimensionResource(UiR.dimen.padding_8dp),
+                    horizontal =
+                        dimensionResource(UiR.dimen.padding_horizontal_12dp) + dimensionResource(UiR.dimen.padding_8dp),
                     vertical = dimensionResource(UiR.dimen.comment_field_padding_vertical),
                 ),
     ) {

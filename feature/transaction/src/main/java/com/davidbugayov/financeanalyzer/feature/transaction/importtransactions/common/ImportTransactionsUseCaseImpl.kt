@@ -35,17 +35,16 @@ class ImportTransactionsUseCaseImpl(
             // ImportTransactionsManager.importFromUri теперь возвращает Flow.
             // Мы используем flowOn перед emitAll, чтобы контекст эмиссии совпадал с контекстом текущего flow
             val managerFlow =
-                importTransactionsManager.importFromUri(uri, progressCallback)
+                importTransactionsManager
+                    .importFromUri(uri, progressCallback)
                     .onStart {
                         Timber.d("ImportTransactionsUseCaseImpl - Flow от менеджера стартовал")
                         // Можно эмитить начальный прогресс здесь, если менеджер или BankImportUseCase этого не делают первыми
                         // emit(ImportResult.progress(0, 100, "Подготовка к импорту..."))
-                    }
-                    .catch { e ->
+                    }.catch { e ->
                         Timber.e(e, "❌ ОШИБКА в Flow импорта транзакций: ${e.message}")
                         emit(ImportResult.error("Ошибка при импорте: ${e.message}"))
-                    }
-                    .flowOn(Dispatchers.IO) // Убедимся, что эмиссии от managerFlow происходят в правильном контексте
+                    }.flowOn(Dispatchers.IO) // Убедимся, что эмиссии от managerFlow происходят в правильном контексте
 
             emitAll(managerFlow)
         }.flowOn(

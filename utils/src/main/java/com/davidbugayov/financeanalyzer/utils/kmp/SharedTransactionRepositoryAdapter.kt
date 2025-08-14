@@ -9,13 +9,9 @@ import kotlinx.coroutines.flow.map
 class SharedTransactionRepositoryAdapter(
     private val unifiedRepo: UnifiedTransactionRepository,
 ) : SharedRepo {
-    override suspend fun loadTransactions(): List<SharedTransaction> {
-        return unifiedRepo.loadTransactions().toShared()
-    }
+    override suspend fun loadTransactions(): List<SharedTransaction> = unifiedRepo.loadTransactions().toShared()
 
-    override fun observeTransactions(): Flow<List<SharedTransaction>> {
-        return unifiedRepo.getAll().map { it.toShared() }
-    }
+    override fun observeTransactions(): Flow<List<SharedTransaction>> = unifiedRepo.getAll().map { it.toShared() }
 
     override suspend fun addTransaction(transaction: SharedTransaction) {
         unifiedRepo.add(transaction.toDomain())

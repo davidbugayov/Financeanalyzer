@@ -98,13 +98,12 @@ abstract class AbstractPdfBankHandler(
         fileName: String,
         uri: Uri,
         fileType: FileType,
-    ): Boolean {
-        return supportsFileType(fileType) &&
+    ): Boolean =
+        supportsFileType(fileType) &&
             pdfKeywords.any {
                 fileName.contains(
                     it,
                     ignoreCase = true,
                 )
             }
-    }
 }

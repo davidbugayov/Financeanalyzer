@@ -60,8 +60,7 @@ fun SourcePickerDialog(
                                             Timber.d("Long press on source: ${source.name}")
                                             onDeleteSource(source.name)
                                         },
-                                    )
-                                    .padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
+                                    ).padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(

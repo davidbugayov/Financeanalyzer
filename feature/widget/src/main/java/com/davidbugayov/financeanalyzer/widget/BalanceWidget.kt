@@ -23,7 +23,9 @@ import timber.log.Timber
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.
  */
-class BalanceWidget : AppWidgetProvider(), KoinComponent {
+class BalanceWidget :
+    AppWidgetProvider(),
+    KoinComponent {
     private val loadTransactionsUseCase: LoadTransactionsUseCase by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -61,7 +63,14 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         scope.launch {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions ->
-                    val currency = if (transactions.isNotEmpty()) transactions.first().amount.currency else Money.zero().currency
+                    val currency =
+                        if (transactions.isNotEmpty()) {
+                            transactions.first().amount.currency
+                        } else {
+                            Money
+                                .zero()
+                                .currency
+                        }
                     val income =
                         transactions.filter { !it.isExpense }.fold(
                             Money.zero(currency),

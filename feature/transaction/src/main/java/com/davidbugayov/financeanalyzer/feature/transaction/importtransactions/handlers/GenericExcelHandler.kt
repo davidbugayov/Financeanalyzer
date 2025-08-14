@@ -44,9 +44,7 @@ class GenericExcelHandler(
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 
-    override fun getFileNameKeywords(): List<String> {
-        return listOf(".xlsx", ".xls", "excel_export", "workbook")
-    }
+    override fun getFileNameKeywords(): List<String> = listOf(".xlsx", ".xls", "excel_export", "workbook")
 
     override fun canHandle(
         fileName: String,

@@ -70,8 +70,7 @@ class ProfileViewModel(
         preferencesManager.themeModeFlow
             .onEach { newTheme ->
                 _state.update { it.copy(themeMode = newTheme) }
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
 
         // Подписываемся на изменения валюты
         viewModelScope.launch {
@@ -205,7 +204,10 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeBiometric -> {
                 viewModelScope.launch {
-                    if (event.enabled && securityManager.isBiometricSupported() && securityManager.isBiometricEnrolled()) {
+                    if (event.enabled &&
+                        securityManager.isBiometricSupported() &&
+                        securityManager.isBiometricEnrolled()
+                    ) {
                         preferencesManager.setBiometricEnabled(event.enabled)
                         AnalyticsUtils.logSecurityBiometricChanged(true)
                     } else if (!event.enabled) {
@@ -272,7 +274,8 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             exportSuccess =
-                                GlobalContext.get()
+                                GlobalContext
+                                    .get()
                                     .get<ResourceProvider>()
                                     .getString(UiR.string.export_success_path, filePath),
                             exportedFilePath = filePath,
@@ -291,7 +294,8 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             exportError =
-                                GlobalContext.get()
+                                GlobalContext
+                                    .get()
                                     .get<ResourceProvider>()
                                     .getString(UiR.string.export_failed_transactions),
                             exportSuccess = null,
@@ -303,7 +307,8 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         exportError =
-                            exception.message ?: GlobalContext.get()
+                            exception.message ?: GlobalContext
+                                .get()
                                 .get<ResourceProvider>()
                                 .getString(UiR.string.export_unknown_error),
                         exportSuccess = null,
@@ -347,10 +352,11 @@ class ProfileViewModel(
 
                 // Форматируем averageExpense в строку
                 val averageExpenseStr =
-                    com.davidbugayov.financeanalyzer.core.model.Money(
-                        java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()),
-                        _state.value.selectedCurrency,
-                    ).formatForDisplay(useMinimalDecimals = true)
+                    com.davidbugayov.financeanalyzer.core.model
+                        .Money(
+                            java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()),
+                            _state.value.selectedCurrency,
+                        ).formatForDisplay(useMinimalDecimals = true)
 
                 Timber.d(
                     "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
@@ -394,7 +400,9 @@ class ProfileViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        error = exception.message ?: GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
+                        error =
+                            exception.message
+                                ?: GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
                     )
                 }
                 throw exception

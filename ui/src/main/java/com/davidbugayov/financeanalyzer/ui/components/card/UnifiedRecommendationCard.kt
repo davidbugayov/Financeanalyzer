@@ -130,8 +130,7 @@ private fun SimpleRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }
-                    .padding(vertical = 8.dp),
+                    }.padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -287,8 +286,7 @@ private fun CompactRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }
-                    .padding(vertical = 4.dp),
+                    }.padding(vertical = 4.dp),
             verticalAlignment = Alignment.Top,
         ) {
             Text(

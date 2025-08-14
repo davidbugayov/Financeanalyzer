@@ -109,9 +109,7 @@ object ColorUtils {
      * @param colorInt Целочисленное представление цвета (ARGB)
      * @return HEX-строка цвета в формате "#RRGGBB"
      */
-    fun colorToHex(colorInt: Int): String {
-        return String.format("#%06X", 0xFFFFFF and colorInt)
-    }
+    fun colorToHex(colorInt: Int): String = String.format("#%06X", 0xFFFFFF and colorInt)
 
     /**
      * Преобразует HEX-строку в целочисленное представление цвета.
@@ -137,7 +135,5 @@ object ColorUtils {
     fun getIntColorFromXml(
         context: Context,
         resId: Int,
-    ): Int {
-        return ContextCompat.getColor(context, resId)
-    }
+    ): Int = ContextCompat.getColor(context, resId)
 }

@@ -58,7 +58,10 @@ fun PermissionUtilsHomeFilterChips(
     }
 }
 
-private data class FilterChipData(val filter: TransactionFilter, val label: String)
+private data class FilterChipData(
+    val filter: TransactionFilter,
+    val label: String,
+)
 
 @Composable
 private fun FilterChipItem(

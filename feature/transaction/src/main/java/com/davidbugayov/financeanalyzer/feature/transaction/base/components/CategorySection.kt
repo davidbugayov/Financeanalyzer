@@ -129,8 +129,7 @@ fun CategorySection(
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                                         CircleShape,
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    ).padding(horizontal = 8.dp, vertical = 4.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Row(
@@ -212,8 +211,7 @@ fun CategorySection(
                             .combinedClickable(
                                 onClick = { onCategorySelected(category) },
                                 onLongClick = { onCategoryLongClick(category) },
-                            )
-                            .padding(
+                            ).padding(
                                 vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
                             ),
                 ) {
@@ -227,8 +225,7 @@ fun CategorySection(
                                         isError && selectedCategory.isBlank() -> errorBackgroundColor
                                         else -> category.color
                                     },
-                                )
-                                .border(
+                                ).border(
                                     width =
                                         when {
                                             category.name == selectedCategory -> 3.dp

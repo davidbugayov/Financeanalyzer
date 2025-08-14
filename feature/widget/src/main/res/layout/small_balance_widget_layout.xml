@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="1dp"
-    android:background="@drawable/small_widget_background"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -18,7 +17,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/current_balance"
-        android:textColor="#757575"
+        android:textColor="@android:color/darker_gray"
         android:textSize="11sp" />
 
     <TextView
@@ -31,7 +30,7 @@
         android:includeFontPadding="false"
         android:maxLines="1"
         android:text="@string/default_small_amount"
-        android:textColor="#4CAF50"
+        android:textColor="@android:color/holo_green_dark"
         android:textSize="14sp"
         android:textStyle="bold" />
 

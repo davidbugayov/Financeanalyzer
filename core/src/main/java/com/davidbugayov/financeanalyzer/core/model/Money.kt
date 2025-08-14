@@ -45,9 +45,7 @@ enum class Currency(
          * @param code Код валюты
          * @return Валюта или RUB, если валюта не найдена
          */
-        fun fromCode(code: String): Currency {
-            return values().find { it.code == code } ?: RUB
-        }
+        fun fromCode(code: String): Currency = values().find { it.code == code } ?: RUB
     }
 }
 
@@ -94,9 +92,7 @@ data class Money(
          * @param currency Валюта (по умолчанию RUB)
          * @return Денежное значение, равное нулю
          */
-        fun zero(currency: Currency = Currency.RUB): Money {
-            return Money(BigDecimal.ZERO, currency)
-        }
+        fun zero(currency: Currency = Currency.RUB): Money = Money(BigDecimal.ZERO, currency)
     }
 
     /**
@@ -145,48 +141,39 @@ data class Money(
      * @param multiplier Множитель
      * @return Результат умножения
      */
-    operator fun times(multiplier: Double): Money {
-        return times(BigDecimal.valueOf(multiplier))
-    }
+    operator fun times(multiplier: Double): Money = times(BigDecimal.valueOf(multiplier))
 
     /**
      * Умножение денежного значения на число
      * @param multiplier Множитель
      * @return Результат умножения
      */
-    operator fun times(multiplier: Int): Money {
-        return times(BigDecimal.valueOf(multiplier.toLong()))
-    }
+    operator fun times(multiplier: Int): Money = times(BigDecimal.valueOf(multiplier.toLong()))
 
     /**
      * Деление денежного значения на число
      * @param divisor Делитель
      * @return Результат деления
      */
-    operator fun div(divisor: BigDecimal): Money {
-        return Money(
+    operator fun div(divisor: BigDecimal): Money =
+        Money(
             amount.divide(divisor, currency.decimalPlaces, RoundingMode.HALF_EVEN),
             currency,
         )
-    }
 
     /**
      * Деление денежного значения на число
      * @param divisor Делитель
      * @return Результат деления
      */
-    operator fun div(divisor: Double): Money {
-        return div(BigDecimal.valueOf(divisor))
-    }
+    operator fun div(divisor: Double): Money = div(BigDecimal.valueOf(divisor))
 
     /**
      * Деление денежного значения на число
      * @param divisor Делитель
      * @return Результат деления
      */
-    operator fun div(divisor: Int): Money {
-        return div(BigDecimal.valueOf(divisor.toLong()))
-    }
+    operator fun div(divisor: Int): Money = div(BigDecimal.valueOf(divisor.toLong()))
 
     /**
      * Сравнение денежных значений

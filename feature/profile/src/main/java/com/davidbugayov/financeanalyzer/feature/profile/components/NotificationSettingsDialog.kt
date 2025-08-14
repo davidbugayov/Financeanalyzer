@@ -220,7 +220,10 @@ fun NotificationSettingsDialog(
                     Switch(
                         checked = state.isTransactionReminderEnabled,
                         onCheckedChange = { checked ->
-                            if (checked && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (checked &&
+                                !hasNotificationPermission &&
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ) {
                                 permissionManager.processEvent(
                                     PermissionManager.PermissionEvent.REQUEST_PERMISSION,
                                 )

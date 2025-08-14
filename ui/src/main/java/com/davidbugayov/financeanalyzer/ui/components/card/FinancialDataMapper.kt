@@ -27,8 +27,8 @@ object FinancialDataMapper {
         maxExpense: String,
         savingsRate: Float,
         monthsOfSavings: Float,
-    ): List<StatisticItem> {
-        return listOf(
+    ): List<StatisticItem> =
+        listOf(
             StatisticItem(
                 label = stringResource(id = R.string.stat_total_transactions),
                 value = totalTransactions.toString(),
@@ -116,7 +116,6 @@ object FinancialDataMapper {
                     },
             ),
         )
-    }
 
     /**
      * 📈 Создание анализа расходов
@@ -213,7 +212,17 @@ object FinancialDataMapper {
                 }
             val percentage =
                 if (totalExpense > 0) {
-                    (((topCategory.second.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0) / totalExpense) * 100).toInt()
+                    (
+                        (
+                            (
+                                topCategory.second
+                                    .replace(
+                                        Regex("[^\\d.]"),
+                                        "",
+                                    ).toDoubleOrNull() ?: 0.0
+                            ) / totalExpense
+                        ) * 100
+                    ).toInt()
                 } else {
                     0
                 }

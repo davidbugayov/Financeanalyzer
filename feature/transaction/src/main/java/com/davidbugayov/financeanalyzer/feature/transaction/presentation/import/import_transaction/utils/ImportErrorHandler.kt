@@ -7,7 +7,9 @@ import timber.log.Timber
 /**
  * Класс для обработки ошибок импорта и преобразования их в понятные пользователю сообщения
  */
-class ImportErrorHandler(context: Context) {
+class ImportErrorHandler(
+    context: Context,
+) {
     private val appContext = context.applicationContext
 
     /**

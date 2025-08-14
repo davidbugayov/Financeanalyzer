@@ -78,8 +78,7 @@ class TransactionHistoryViewModel(
                 } else {
                     repository.getByPeriodPaged(s.startDate, s.endDate, pageSize)
                 }
-            }
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
 
     // ---------- Helpers для заголовков ----------
     private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
@@ -88,8 +87,8 @@ class TransactionHistoryViewModel(
     private fun headerKey(
         date: Date,
         grouping: GroupingType,
-    ): String {
-        return when (grouping) {
+    ): String =
+        when (grouping) {
             GroupingType.DAY -> dayFormatter.format(date)
             GroupingType.WEEK -> {
                 val cal = Calendar.getInstance().apply { time = date }
@@ -99,22 +98,21 @@ class TransactionHistoryViewModel(
             }
             GroupingType.MONTH -> monthFormatter.format(date)
         }
-    }
 
     /** PagingData с Header/Item согласно выбранной группировке */
     val pagedUiModels: Flow<PagingData<TransactionListItem>> =
         pagedTransactions
             .map { pagingData ->
                 val grouping = state.value.groupingType
-                pagingData.map { tx -> TransactionListItem.Item(tx) }
+                pagingData
+                    .map { tx -> TransactionListItem.Item(tx) }
                     .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
                         if (after == null) return@insertSeparators null
                         val beforeKey = before?.transaction?.date?.let { headerKey(it, grouping) }
                         val afterKey = headerKey(after.transaction.date, grouping)
                         if (before == null || beforeKey != afterKey) TransactionListItem.Header(afterKey) else null
                     }
-            }
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
 
     private fun reloadPagedTransactions() {
         pagerTrigger.tryEmit(Unit)
@@ -587,25 +585,25 @@ class TransactionHistoryViewModel(
     private fun filterTransactions(
         transactions: List<Transaction>,
         state: TransactionHistoryState,
-    ): List<Transaction> {
-        return sharedFacade.filterTransactions(
-            transactions = transactions.map { it.toShared() },
-            periodType =
-                com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(
-                    toDomainPeriodType(state.periodType).name,
-                ),
-            now = Date().toLocalDateKmp(),
-            customStart = state.startDate.toLocalDateKmp(),
-            customEnd = state.endDate.toLocalDateKmp(),
-            isExpense = null,
-        ).map { it.toDomain() }
-    }
+    ): List<Transaction> =
+        sharedFacade
+            .filterTransactions(
+                transactions = transactions.map { it.toShared() },
+                periodType =
+                    com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(
+                        toDomainPeriodType(state.periodType).name,
+                    ),
+                now = Date().toLocalDateKmp(),
+                customStart = state.startDate.toLocalDateKmp(),
+                customEnd = state.endDate.toLocalDateKmp(),
+                isExpense = null,
+            ).map { it.toDomain() }
 
     /**
      * Преобразует PeriodType из presentation в PeriodType из domain
      */
-    private fun toDomainPeriodType(periodType: PeriodType): DomainPeriodType {
-        return when (periodType) {
+    private fun toDomainPeriodType(periodType: PeriodType): DomainPeriodType =
+        when (periodType) {
             PeriodType.DAY -> DomainPeriodType.DAY
             PeriodType.WEEK -> DomainPeriodType.WEEK
             PeriodType.MONTH -> DomainPeriodType.MONTH
@@ -614,18 +612,16 @@ class TransactionHistoryViewModel(
             PeriodType.ALL -> DomainPeriodType.ALL
             PeriodType.CUSTOM -> DomainPeriodType.CUSTOM
         }
-    }
 
     /**
      * Преобразует GroupingType из presentation в GroupingType из domain
      */
-    private fun toDomainGroupingType(groupingType: GroupingType): DomainGroupingType {
-        return when (groupingType) {
+    private fun toDomainGroupingType(groupingType: GroupingType): DomainGroupingType =
+        when (groupingType) {
             GroupingType.DAY -> DomainGroupingType.DAY
             GroupingType.WEEK -> DomainGroupingType.WEEK
             GroupingType.MONTH -> DomainGroupingType.MONTH
         }
-    }
 
     /**
      * Обновляет отфильтрованные и сгруппированные транзакции
@@ -684,9 +680,10 @@ class TransactionHistoryViewModel(
                         sharedFacade.groupTransactions(
                             transactions = filteredTransactions.map { it.toShared() },
                             keyType =
-                                com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase.KeyType.valueOf(
-                                    toDomainGroupingType(currentState.groupingType).name,
-                                ),
+                                com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase.KeyType
+                                    .valueOf(
+                                        toDomainGroupingType(currentState.groupingType).name,
+                                    ),
                         )
 
                     val endTime = System.currentTimeMillis()

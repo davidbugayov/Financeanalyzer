@@ -89,9 +89,10 @@ fun EnhancedCategoryPieChart(
             items.map { item ->
                 item.copy(
                     color =
-                        com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider.ensureNonBlackWhite(
-                            item.color,
-                        ),
+                        com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
+                            .ensureNonBlackWhite(
+                                item.color,
+                            ),
                 )
             }
         }
@@ -183,8 +184,7 @@ fun EnhancedCategoryPieChart(
                                 id = UiR.dimen.padding_medium,
                             ),
                         // Use standard padding
-                    )
-                    .clickable(
+                    ).clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null, // Убираем визуальный эффект нажатия
                     ) {
@@ -371,15 +371,13 @@ fun EnhancedCategoryPieChart(
                                         }
 
                                     onSectorClick(newSelectedItem)
-                                }
-                                .background(
+                                }.background(
                                     if (isSelected) {
                                         item.color.copy(alpha = 0.15f)
                                     } else {
                                         Color.Transparent
                                     },
-                                )
-                                .padding(
+                                ).padding(
                                     vertical =
                                         dimensionResource(
                                             id = UiR.dimen.padding_extra_small,
@@ -418,10 +416,11 @@ fun EnhancedCategoryPieChart(
                         // Название категории (локализуем дефолтные ключи)
                         Text(
                             text =
-                                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                    LocalContext.current,
-                                    item.name,
-                                ),
+                                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+                                    .displayName(
+                                        LocalContext.current,
+                                        item.name,
+                                    ),
                             style =
                                 MaterialTheme.typography.bodySmall.copy(
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
@@ -434,8 +433,7 @@ fun EnhancedCategoryPieChart(
                                             dimensionResource(
                                                 id = UiR.dimen.padding_small,
                                             ),
-                                    )
-                                    .weight(1f),
+                                    ).weight(1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -479,8 +477,7 @@ fun EnhancedCategoryPieChart(
                                         dimensionResource(
                                             id = UiR.dimen.divider_height,
                                         ),
-                                    )
-                                    .background(
+                                    ).background(
                                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
                                     ),
                         )
@@ -793,14 +790,17 @@ private fun DrawPieChart(
 
             // Сначала вычисляем общую сумму процентов
             val totalPercent =
-                data.fold(
-                    BigDecimal.ZERO,
-                ) { acc, item -> acc + item.percentage.toBigDecimal() }.toFloat()
+                data
+                    .fold(
+                        BigDecimal.ZERO,
+                    ) { acc, item -> acc + item.percentage.toBigDecimal() }
+                    .toFloat()
 
             // Нормализуем до 100% для корректного отображения
             val normalizationFactor = if (totalPercent > 0) 100f / totalPercent else 1f
 
-            data.forEach { item -> // Нормализуем процент
+            data.forEach { item ->
+                // Нормализуем процент
                 val normalizedPercentage = item.percentage * normalizationFactor
                 val sweepAngle = normalizedPercentage * 3.6f // 360 / 100 = 3.6
 
@@ -893,7 +893,8 @@ private fun DrawPieChart(
                     startAngle = startAngle,
                     sweepAngle = animatedSweepAngle,
                     color = data[index].color,
-                    holeColor = backgroundColor, addOutline = isSelected,
+                    holeColor = backgroundColor,
+                    addOutline = isSelected,
                     alpha = 1f,
                     outlineBaseColor = outlineColorForDonut,
                 )

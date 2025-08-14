@@ -32,7 +32,8 @@ data class WalletSetupState(
 class WalletSetupViewModel(
     private val walletRepository: WalletRepository,
     private val navigationManager: NavigationManager,
-) : ViewModel(), KoinComponent {
+) : ViewModel(),
+    KoinComponent {
     private val resourceProvider: ResourceProvider by inject()
     private val _state = MutableStateFlow(WalletSetupState())
     val state: StateFlow<WalletSetupState> = _state
@@ -91,7 +92,8 @@ class WalletSetupViewModel(
                 try {
                     val amount = s.goalAmountText.toDouble()
                     if (amount <= 0) {
-                        _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_target_amount_positive))
+                        _state.value =
+                            s.copy(error = resourceProvider.getString(UiR.string.error_target_amount_positive))
                         return
                     }
                     Money(amount)

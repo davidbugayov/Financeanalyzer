@@ -11,7 +11,9 @@ sealed class ImportTransactionsIntent {
      * Намерение начать импорт транзакций из указанного файла.
      * @param uri URI файла для импорта
      */
-    data class StartImport(val uri: Uri) : ImportTransactionsIntent()
+    data class StartImport(
+        val uri: Uri,
+    ) : ImportTransactionsIntent()
 
     /**
      * Намерение обновить логи импорта.

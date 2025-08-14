@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher
 
-class AndroidWidgetRefresher(context: Context) : WidgetRefresher {
+class AndroidWidgetRefresher(
+    context: Context,
+) : WidgetRefresher {
     private val appContext = context.applicationContext
 
     override fun refresh() {

@@ -26,9 +26,7 @@ class AuthViewModel(
     /**
      * Проверяет PIN-код
      */
-    fun validatePin(pin: String): Boolean {
-        return securityManager.validatePinCode(pin)
-    }
+    fun validatePin(pin: String): Boolean = securityManager.validatePinCode(pin)
 
     /**
      * Выполняет биометрическую аутентификацию

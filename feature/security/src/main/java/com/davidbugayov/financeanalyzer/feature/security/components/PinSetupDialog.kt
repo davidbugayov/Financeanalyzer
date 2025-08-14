@@ -230,8 +230,7 @@ private fun PinKeyboardButton(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                     shape = CircleShape,
-                )
-                .clickable { onClick() },
+                ).clickable { onClick() },
         contentAlignment = Alignment.Center,
     ) {
         if (content != null) {

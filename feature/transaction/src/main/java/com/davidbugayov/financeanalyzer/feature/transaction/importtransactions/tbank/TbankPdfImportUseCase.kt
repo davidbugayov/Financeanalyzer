@@ -71,9 +71,15 @@ class TbankPdfImportUseCase(
             )
         private val TBANK_STATEMENT_TITLES =
             listOf(
-                "Выписка по счетам", "Выписка по карте", "Операции по счету", "История операций",
-                "Справка о движении средств", "Движение средств", "Платежное поручение",
-                "С движением средств", "Справка о движении",
+                "Выписка по счетам",
+                "Выписка по карте",
+                "Операции по счету",
+                "История операций",
+                "Справка о движении средств",
+                "Движение средств",
+                "Платежное поручение",
+                "С движением средств",
+                "Справка о движении",
             )
         private const val MAX_VALIDATION_LINES = 40
         private const val MAX_HEADER_SKIP_LINES = 300
@@ -228,13 +234,14 @@ class TbankPdfImportUseCase(
                     )
                 val amountValue = amountStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
                 partial.amount = amountValue.toDouble()
-                partial.isExpense = sign == "-" || (
-                    sign.isEmpty() &&
-                        !partial.buildDescription().contains(
-                            "Пополнение",
-                            ignoreCase = true,
-                        )
-                )
+                partial.isExpense = sign == "-" ||
+                    (
+                        sign.isEmpty() &&
+                            !partial.buildDescription().contains(
+                                "Пополнение",
+                                ignoreCase = true,
+                            )
+                    )
                 partial.currency = Currency.RUB
                 val remainingText = trimmedLine.substring(simpleAmountMatch.range.last + 1).trim()
                 if (remainingText.isNotEmpty()) partial.descriptionLines.add(remainingText)

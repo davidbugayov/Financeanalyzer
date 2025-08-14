@@ -60,11 +60,10 @@ fun HomeTransactionsHeader(
 }
 
 @Composable
-private fun headerTitleForFilter(filter: TransactionFilter): String {
-    return when (filter) {
+private fun headerTitleForFilter(filter: TransactionFilter): String =
+    when (filter) {
         TransactionFilter.TODAY -> stringResource(UiR.string.transactions_today)
         TransactionFilter.WEEK -> stringResource(UiR.string.transactions_week)
         TransactionFilter.MONTH -> stringResource(UiR.string.transactions_month)
         TransactionFilter.ALL -> stringResource(UiR.string.transactions_all)
     }
-}

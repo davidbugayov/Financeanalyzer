@@ -22,7 +22,8 @@ import timber.log.Timber
  */
 class ExportImportViewModel(
     application: Application,
-) : AndroidViewModel(application), KoinComponent {
+) : AndroidViewModel(application),
+    KoinComponent {
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase by inject()
 
     private val _isExporting = MutableStateFlow(false)
@@ -120,8 +121,8 @@ class ExportImportViewModel(
     /**
      * Открывает файл через системный диалог
      */
-    private fun openFile(file: File): Result<Unit> {
-        return try {
+    private fun openFile(file: File): Result<Unit> =
+        try {
             val context = getApplication<Application>()
             val uri =
                 FileProvider.getUriForFile(
@@ -174,13 +175,12 @@ class ExportImportViewModel(
                 ),
             )
         }
-    }
 
     /**
      * Делится файлом через системный диалог
      */
-    private fun shareFile(file: File): Result<Unit> {
-        return try {
+    private fun shareFile(file: File): Result<Unit> =
+        try {
             val context = getApplication<Application>()
             val uri =
                 FileProvider.getUriForFile(
@@ -231,7 +231,6 @@ class ExportImportViewModel(
                 ),
             )
         }
-    }
 
     /**
      * Типы действий для экспорта.

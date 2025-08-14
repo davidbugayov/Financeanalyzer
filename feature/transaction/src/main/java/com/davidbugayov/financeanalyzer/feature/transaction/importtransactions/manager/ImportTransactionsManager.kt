@@ -192,7 +192,8 @@ class ImportTransactionsManager(
 
             // Использование flowOn для согласования контекста эмиссии
             val importFlow =
-                importerUseCase.importTransactions(uri, progressCallback)
+                importerUseCase
+                    .importTransactions(uri, progressCallback)
                     .flowOn(Dispatchers.IO)
 
             emitAll(importFlow)

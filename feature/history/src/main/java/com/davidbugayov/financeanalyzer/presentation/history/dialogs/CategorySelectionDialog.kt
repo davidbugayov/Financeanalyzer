@@ -99,8 +99,7 @@ fun CategorySelectionDialog(
                                     } else {
                                         emptyList()
                                     }
-                            }
-                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
+                            }.padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(

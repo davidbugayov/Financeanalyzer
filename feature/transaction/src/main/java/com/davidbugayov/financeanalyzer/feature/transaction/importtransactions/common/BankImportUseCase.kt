@@ -56,9 +56,7 @@ abstract class BankImportUseCase(
      * @param line Строка из файла.
      * @return true, если строку следует пропустить.
      */
-    open fun shouldSkipLine(line: String): Boolean {
-        return line.isBlank()
-    }
+    open fun shouldSkipLine(line: String): Boolean = line.isBlank()
 
     /**
      * Processes transactions from a given BufferedReader.

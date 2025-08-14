@@ -71,7 +71,14 @@ object RecommendationGenerator {
 
         // Рекомендации по финансовой подушке
         if (monthsOfSavings < 3) {
-            val priority = if (monthsOfSavings < 1) UnifiedRecommendationPriority.HIGH else UnifiedRecommendationPriority.MEDIUM
+            val priority =
+                if (monthsOfSavings <
+                    1
+                ) {
+                    UnifiedRecommendationPriority.HIGH
+                } else {
+                    UnifiedRecommendationPriority.MEDIUM
+                }
             recommendations.add(
                 UnifiedRecommendation(
                     title = stringResource(R.string.create_emergency_fund_title_ui),

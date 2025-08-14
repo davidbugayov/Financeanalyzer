@@ -244,16 +244,18 @@ fun AmountField(
                             val originalSelection = newTextFieldValue.selection
                             val newSelectionStart =
                                 originalSelection.start -
-                                    newTextFieldValue.text.substring(
-                                        0,
-                                        originalSelection.start,
-                                    ).count { it == ' ' }
+                                    newTextFieldValue.text
+                                        .substring(
+                                            0,
+                                            originalSelection.start,
+                                        ).count { it == ' ' }
                             val newSelectionEnd =
                                 originalSelection.end -
-                                    newTextFieldValue.text.substring(
-                                        0,
-                                        originalSelection.end,
-                                    ).count { it == ' ' }
+                                    newTextFieldValue.text
+                                        .substring(
+                                            0,
+                                            originalSelection.end,
+                                        ).count { it == ' ' }
 
                             textFieldValueForDisplay =
                                 TextFieldValue(

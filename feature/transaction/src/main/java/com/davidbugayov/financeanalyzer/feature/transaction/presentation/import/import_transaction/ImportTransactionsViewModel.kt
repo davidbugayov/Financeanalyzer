@@ -35,7 +35,8 @@ import timber.log.Timber
 class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
     application: Application,
-) : AndroidViewModel(application), KoinComponent {
+) : AndroidViewModel(application),
+    KoinComponent {
     // Инъекция TransactionDao через Koin
     private val transactionDao: TransactionDao by inject()
 
@@ -274,155 +275,161 @@ class ImportTransactionsViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                importTransactionsUseCase.importTransactions(uri) { current, total, message ->
-                    val progress = if (total > 0) (current * 100 / total) else 0
-                    // Во время прогресса убираем ошибку, если она была
-                    _state.value =
-                        _state.value.copy(
-                            progress = progress,
-                            progressMessage = message,
-                            error = null, // Важно: убираем ошибку во время прогресса
-                        )
-                    _uiState.postValue(ImportUiState.Loading(message, progress))
-                }.collect { result ->
-                    // Handle different result types based on their actual class
-                    when {
-                        result is CoreResult.Success<*> -> {
-                            // Безопасное извлечение данных
-                            val data = result.data
-                            var importedCount = 0
-                            var skippedCount = 0
+                importTransactionsUseCase
+                    .importTransactions(uri) { current, total, message ->
+                        val progress = if (total > 0) (current * 100 / total) else 0
+                        // Во время прогресса убираем ошибку, если она была
+                        _state.value =
+                            _state.value.copy(
+                                progress = progress,
+                                progressMessage = message,
+                                error = null, // Важно: убираем ошибку во время прогресса
+                            )
+                        _uiState.postValue(ImportUiState.Loading(message, progress))
+                    }.collect { result ->
+                        // Handle different result types based on their actual class
+                        when {
+                            result is CoreResult.Success<*> -> {
+                                // Безопасное извлечение данных
+                                val data = result.data
+                                var importedCount = 0
+                                var skippedCount = 0
 
-                            // Проверяем тип данных для извлечения значений
-                            when (data) {
-                                is Pair<*, *> -> {
-                                    val first = data.first
-                                    val second = data.second
-                                    if (first is Int) {
-                                        importedCount = first
-                                    } else if (first is Number) {
-                                        importedCount = first.toInt()
+                                // Проверяем тип данных для извлечения значений
+                                when (data) {
+                                    is Pair<*, *> -> {
+                                        val first = data.first
+                                        val second = data.second
+                                        if (first is Int) {
+                                            importedCount = first
+                                        } else if (first is Number) {
+                                            importedCount = first.toInt()
+                                        }
+                                        if (second is Int) {
+                                            skippedCount = second
+                                        } else if (second is Number) {
+                                            skippedCount = second.toInt()
+                                        }
                                     }
-                                    if (second is Int) {
-                                        skippedCount = second
-                                    } else if (second is Number) {
-                                        skippedCount = second.toInt()
+                                    else -> {
+                                        Timber.d(
+                                            "Неизвестный тип данных в CoreResult.Success: ${data?.javaClass?.name}",
+                                        )
                                     }
                                 }
-                                else -> {
-                                    Timber.d("Неизвестный тип данных в CoreResult.Success: ${data?.javaClass?.name}")
+
+                                Timber.i(
+                                    "Импорт завершен успешно! Импортировано: $importedCount, Пропущено: $skippedCount",
+                                )
+
+                                // Устанавливаем состояние успешного импорта через главный поток
+                                viewModelScope.launch(Dispatchers.Main) {
+                                    setSuccessState(importedCount, skippedCount, bankName)
+                                }
+
+                                // Триггеры достижений за импорт из банков
+                                triggerBankImportAchievements(bankName)
+
+                                // Проверка наличия транзакций в базе
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    try {
+                                        val count = transactionDao.getTransactionsCount()
+                                        Timber.i("Проверка после импорта: всего транзакций в базе данных: $count")
+                                    } catch (e: Exception) {
+                                        Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
+                                    }
                                 }
                             }
+                            result is CoreResult.Error -> {
+                                // Получаем исходное сообщение об ошибке
+                                val originalMessage = result.exception?.message ?: "Неизвестная ошибка"
 
-                            Timber.i("Импорт завершен успешно! Импортировано: $importedCount, Пропущено: $skippedCount")
+                                // Используем отдельный класс для обработки ошибок
+                                val context = getApplication<Application>().applicationContext
+                                val errorHandler = ImportErrorHandler(context)
+                                val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
-                            // Устанавливаем состояние успешного импорта через главный поток
-                            viewModelScope.launch(Dispatchers.Main) {
-                                setSuccessState(importedCount, skippedCount, bankName)
+                                Timber.e(result.exception, "Ошибка импорта: $originalMessage")
+                                CrashLoggerProvider.crashLogger.logException(
+                                    result.exception ?: Exception("Unknown import error"),
+                                )
+                                _state.value =
+                                    _state.value.copy(
+                                        isLoading = false,
+                                        error = userFriendlyMessage,
+                                        progress = 0,
+                                        progressMessage = "",
+                                        fileName = _state.value.fileName, // Сохраняем имя файла
+                                    )
+                                _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                             }
+                            result is ImportResult.Progress -> {
+                                // Обрабатываем прогресс, но не устанавливаем ошибку
+                                val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
+                                _state.value =
+                                    _state.value.copy(
+                                        isLoading = true,
+                                        progress = progress,
+                                        progressMessage = result.message,
+                                        error = null, // Важно: убираем ошибку во время прогресса
+                                    )
+                                _uiState.postValue(ImportUiState.Loading(result.message, progress))
+                            }
+                            result is ImportResult.Error -> {
+                                // Обработка ошибки из ImportResult.Error
+                                val originalMessage =
+                                    result.message ?: result.exception?.message ?: "Неизвестная ошибка"
+                                val context = getApplication<Application>().applicationContext
+                                val errorHandler = ImportErrorHandler(context)
+                                val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
-                            // Триггеры достижений за импорт из банков
-                            triggerBankImportAchievements(bankName)
+                                Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
+                                CrashLoggerProvider.crashLogger.logException(
+                                    result.exception ?: Exception("Unknown import error"),
+                                )
+                                _state.value =
+                                    _state.value.copy(
+                                        isLoading = false,
+                                        error = userFriendlyMessage,
+                                        progress = 0,
+                                        progressMessage = "",
+                                        fileName = _state.value.fileName, // Сохраняем имя файла
+                                    )
+                                _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
+                            }
+                            result is ImportResult.Success -> {
+                                // Обработка успешного результата из ImportResult.Success
+                                val importedCount = result.importedCount
+                                val skippedCount = result.skippedCount
+                                val bankName = result.bankName
 
-                            // Проверка наличия транзакций в базе
-                            viewModelScope.launch(Dispatchers.IO) {
-                                try {
-                                    val count = transactionDao.getTransactionsCount()
-                                    Timber.i("Проверка после импорта: всего транзакций в базе данных: $count")
-                                } catch (e: Exception) {
-                                    Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
+                                Timber.i(
+                                    "Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount, Банк: $bankName",
+                                )
+
+                                // Устанавливаем состояние успешного импорта через главный поток
+                                viewModelScope.launch(Dispatchers.Main) {
+                                    setSuccessState(importedCount, skippedCount, bankName)
+                                }
+
+                                // Триггеры достижений за импорт из банков
+                                triggerBankImportAchievements(bankName)
+
+                                // Проверка наличия транзакций в базе
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    try {
+                                        val count = transactionDao.getTransactionsCount()
+                                        Timber.i("Проверка после импорта: всего транзакций в базе данных: $count")
+                                    } catch (e: Exception) {
+                                        Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
+                                    }
                                 }
                             }
-                        }
-                        result is CoreResult.Error -> {
-                            // Получаем исходное сообщение об ошибке
-                            val originalMessage = result.exception?.message ?: "Неизвестная ошибка"
-
-                            // Используем отдельный класс для обработки ошибок
-                            val context = getApplication<Application>().applicationContext
-                            val errorHandler = ImportErrorHandler(context)
-                            val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
-
-                            Timber.e(result.exception, "Ошибка импорта: $originalMessage")
-                            CrashLoggerProvider.crashLogger.logException(
-                                result.exception ?: Exception("Unknown import error"),
-                            )
-                            _state.value =
-                                _state.value.copy(
-                                    isLoading = false,
-                                    error = userFriendlyMessage,
-                                    progress = 0,
-                                    progressMessage = "",
-                                    fileName = _state.value.fileName, // Сохраняем имя файла
-                                )
-                            _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
-                        }
-                        result is ImportResult.Progress -> {
-                            // Обрабатываем прогресс, но не устанавливаем ошибку
-                            val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
-                            _state.value =
-                                _state.value.copy(
-                                    isLoading = true,
-                                    progress = progress,
-                                    progressMessage = result.message,
-                                    error = null, // Важно: убираем ошибку во время прогресса
-                                )
-                            _uiState.postValue(ImportUiState.Loading(result.message, progress))
-                        }
-                        result is ImportResult.Error -> {
-                            // Обработка ошибки из ImportResult.Error
-                            val originalMessage = result.message ?: result.exception?.message ?: "Неизвестная ошибка"
-                            val context = getApplication<Application>().applicationContext
-                            val errorHandler = ImportErrorHandler(context)
-                            val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
-
-                            Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
-                            CrashLoggerProvider.crashLogger.logException(
-                                result.exception ?: Exception("Unknown import error"),
-                            )
-                            _state.value =
-                                _state.value.copy(
-                                    isLoading = false,
-                                    error = userFriendlyMessage,
-                                    progress = 0,
-                                    progressMessage = "",
-                                    fileName = _state.value.fileName, // Сохраняем имя файла
-                                )
-                            _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
-                        }
-                        result is ImportResult.Success -> {
-                            // Обработка успешного результата из ImportResult.Success
-                            val importedCount = result.importedCount
-                            val skippedCount = result.skippedCount
-                            val bankName = result.bankName
-
-                            Timber.i(
-                                "Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount, Банк: $bankName",
-                            )
-
-                            // Устанавливаем состояние успешного импорта через главный поток
-                            viewModelScope.launch(Dispatchers.Main) {
-                                setSuccessState(importedCount, skippedCount, bankName)
+                            else -> {
+                                Timber.w("Получен неизвестный тип результата: ${result?.javaClass?.name}")
                             }
-
-                            // Триггеры достижений за импорт из банков
-                            triggerBankImportAchievements(bankName)
-
-                            // Проверка наличия транзакций в базе
-                            viewModelScope.launch(Dispatchers.IO) {
-                                try {
-                                    val count = transactionDao.getTransactionsCount()
-                                    Timber.i("Проверка после импорта: всего транзакций в базе данных: $count")
-                                } catch (e: Exception) {
-                                    Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
-                                }
-                            }
-                        }
-                        else -> {
-                            Timber.w("Получен неизвестный тип результата: ${result?.javaClass?.name}")
                         }
                     }
-                }
             } catch (e: Exception) {
                 Timber.e(e, "Необработанное исключение при импорте: ${e.message}")
                 _state.value =
@@ -616,7 +623,10 @@ sealed class ImportUiState {
      * @param message Информационное сообщение
      * @param progress Прогресс импорта (0-100)
      */
-    data class Loading(val message: String, val progress: Int = 0) : ImportUiState()
+    data class Loading(
+        val message: String,
+        val progress: Int = 0,
+    ) : ImportUiState()
 
     /**
      * Состояние успешного завершения импорта.
@@ -634,5 +644,7 @@ sealed class ImportUiState {
      * Состояние ошибки.
      * @param message Сообщение об ошибке
      */
-    data class Error(val message: String) : ImportUiState()
+    data class Error(
+        val message: String,
+    ) : ImportUiState()
 }

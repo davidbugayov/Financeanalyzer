@@ -7,7 +7,9 @@ import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 /**
  * Android-реализация ResourceProvider через Context
  */
-class AndroidResourceProvider(private val context: Context) : ResourceProvider {
+class AndroidResourceProvider(
+    private val context: Context,
+) : ResourceProvider {
     override fun getString(
         @StringRes id: Int,
         vararg args: Any?,

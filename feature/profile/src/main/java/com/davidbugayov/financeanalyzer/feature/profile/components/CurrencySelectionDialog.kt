@@ -124,8 +124,7 @@ private fun CurrencyItem(
                     width = if (isSelected) 2.dp else 1.dp,
                     color = borderColor,
                     shape = RoundedCornerShape(12.dp),
-                )
-                .clickable { onClick() }
+                ).clickable { onClick() }
                 .padding(16.dp),
     ) {
         Row(
@@ -190,12 +189,11 @@ private fun CurrencyIcon(currency: Currency) {
 }
 
 @Composable
-private fun getCurrencyName(currency: Currency): String {
-    return when (currency) {
+private fun getCurrencyName(currency: Currency): String =
+    when (currency) {
         Currency.RUB -> stringResource(UiR.string.currency_name_rub)
         Currency.USD -> stringResource(UiR.string.currency_name_usd)
         Currency.EUR -> stringResource(UiR.string.currency_name_eur)
         Currency.CNY -> stringResource(UiR.string.currency_name_cny)
         else -> currency.name
     }
-}

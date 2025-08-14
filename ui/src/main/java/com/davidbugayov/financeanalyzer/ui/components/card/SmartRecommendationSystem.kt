@@ -71,8 +71,7 @@ fun SmartRecommendationCard(
                                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                     ),
                             ),
-                    )
-                    .padding(20.dp),
+                    ).padding(20.dp),
         ) {
             // Заголовок с улучшенной типографикой
             SmartCardHeader(
@@ -182,8 +181,7 @@ private fun MinimalRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }
-                    .padding(vertical = 12.dp),
+                    }.padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Иконка с анимацией
@@ -275,8 +273,7 @@ private fun EnhancedRecommendationsList(
                         .fillMaxWidth()
                         .clickable(enabled = onRecommendationClick != null) {
                             onRecommendationClick?.invoke(recommendation)
-                        }
-                        .padding(bottom = 12.dp),
+                        }.padding(bottom = 12.dp),
             ) {
                 Column(
                     modifier =
@@ -427,8 +424,7 @@ private fun CompactRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }
-                    .padding(vertical = 8.dp),
+                    }.padding(vertical = 8.dp),
             verticalAlignment = Alignment.Top,
         ) {
             // Современная bullet точка
@@ -585,7 +581,9 @@ enum class SmartRecommendationPriority(
 /**
  * 🏷️ Категории рекомендаций
  */
-enum class RecommendationCategory(val label: String) {
+enum class RecommendationCategory(
+    val label: String,
+) {
     SAVINGS("Сбережения"),
     EXPENSES("Расходы"),
     BUDGETING("Бюджетирование"),

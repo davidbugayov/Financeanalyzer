@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.update
  */
 class AppCategoriesViewModel(
     application: Application,
-) : AndroidViewModel(application), CategoriesViewModel {
+) : AndroidViewModel(application),
+    CategoriesViewModel {
     private val _expenseCategories =
         MutableStateFlow<List<UiCategory>>(
             CategoryProvider.getDefaultExpenseCategories(application),

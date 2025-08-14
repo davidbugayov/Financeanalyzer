@@ -20,20 +20,30 @@ sealed class EnhancedFinanceChartIntent {
         val endDate: Date,
     ) : EnhancedFinanceChartIntent()
 
-    data class SelectCategory(val category: Category?) : EnhancedFinanceChartIntent()
+    data class SelectCategory(
+        val category: Category?,
+    ) : EnhancedFinanceChartIntent()
 
-    data class ChangeChartTab(val tabIndex: Int) : EnhancedFinanceChartIntent()
+    data class ChangeChartTab(
+        val tabIndex: Int,
+    ) : EnhancedFinanceChartIntent()
 
-    data class ChangeLineChartMode(val mode: LineChartDisplayMode) : EnhancedFinanceChartIntent()
+    data class ChangeLineChartMode(
+        val mode: LineChartDisplayMode,
+    ) : EnhancedFinanceChartIntent()
 
-    data class ToggleExpenseView(val showExpenses: Boolean) : EnhancedFinanceChartIntent()
+    data class ToggleExpenseView(
+        val showExpenses: Boolean,
+    ) : EnhancedFinanceChartIntent()
 
     object AddTransactionClicked : EnhancedFinanceChartIntent()
     // Добавляй другие интенты по мере необходимости
 }
 
 sealed class EnhancedFinanceChartEffect {
-    data class ShowError(val message: String) : EnhancedFinanceChartEffect()
+    data class ShowError(
+        val message: String,
+    ) : EnhancedFinanceChartEffect()
 
     object ScrollToSummary : EnhancedFinanceChartEffect()
 
@@ -48,20 +58,24 @@ data class EnhancedFinanceChartState(
     val income: Money? = null,
     val expense: Money? = null,
     val startDate: Date =
-        Calendar.getInstance().apply {
-            add(Calendar.MONTH, -1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.time,
+        Calendar
+            .getInstance()
+            .apply {
+                add(Calendar.MONTH, -1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time,
     val endDate: Date =
-        Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }.time,
+        Calendar
+            .getInstance()
+            .apply {
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
+            }.time,
     val periodType: PeriodType = PeriodType.MONTH,
     val selectedCategory: Category? = null,
     val selectedTab: Int = 0,

@@ -228,7 +228,8 @@ object CrashReporter : CrashLogger {
             return
         }
         try {
-            io.appmetrica.analytics.AppMetrica.reportError(throwable.message ?: "", throwable)
+            io.appmetrica.analytics.AppMetrica
+                .reportError(throwable.message ?: "", throwable)
         } catch (e: Exception) {
             Timber.e(e, "[CrashReporter] Ошибка при отправке в AppMetrica: %s", e.message)
         }

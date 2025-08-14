@@ -133,7 +133,10 @@ class GenericCsvImportUseCase(
             )
             return null
         }
-        if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
+        if (config.skipTransactionIfStatusInvalid &&
+            config.statusColumnIndex != null &&
+            config.validStatusValues?.isNotEmpty() == true
+        ) {
             val status = columns.getOrNull(config.statusColumnIndex)
             if (status == null ||
                 config.validStatusValues.none {

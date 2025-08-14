@@ -180,8 +180,8 @@ object SmartRecommendationGenerator {
      * 🏠 Рекомендации для главного экрана (онбординг)
      */
     @Composable
-    fun generateOnboardingRecommendations(): List<SmartRecommendation> {
-        return listOf(
+    fun generateOnboardingRecommendations(): List<SmartRecommendation> =
+        listOf(
             SmartRecommendation(
                 title = stringResource(R.string.rec_onboarding_achievements_title),
                 description = stringResource(R.string.rec_onboarding_achievements_desc),
@@ -211,7 +211,6 @@ object SmartRecommendationGenerator {
                 category = RecommendationCategory.GENERAL,
             ),
         )
-    }
 
     /**
      * 📊 Динамические советы для экрана статистики
@@ -249,8 +248,8 @@ object SmartRecommendationGenerator {
      * 🎯 Самые важные советы для бюджетирования
      */
     @Composable
-    fun generateTopBudgetingTips(): List<SmartRecommendation> {
-        return listOf(
+    fun generateTopBudgetingTips(): List<SmartRecommendation> =
+        listOf(
             SmartRecommendation(
                 title = stringResource(R.string.rec_budget_rule_title),
                 description = stringResource(R.string.rec_budget_rule_desc),
@@ -284,7 +283,6 @@ object SmartRecommendationGenerator {
                 category = RecommendationCategory.BUDGETING,
             ),
         )
-    }
 
     /**
      * 🔄 Конвертация старых рекомендаций в новый формат

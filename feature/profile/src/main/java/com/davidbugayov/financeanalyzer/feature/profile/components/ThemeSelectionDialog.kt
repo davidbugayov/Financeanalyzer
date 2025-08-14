@@ -106,8 +106,7 @@ private fun ThemeOption(
                     selected = selected,
                     onClick = onClick,
                     role = Role.RadioButton,
-                )
-                .padding(dimensionResource(UiR.dimen.spacing_medium)),
+                ).padding(dimensionResource(UiR.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(

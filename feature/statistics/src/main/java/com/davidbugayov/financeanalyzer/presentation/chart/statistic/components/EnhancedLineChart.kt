@@ -452,8 +452,7 @@ fun EnhancedLineChart(
                                         }
                                     }
                                 }
-                            }
-                            .drawBehind {
+                            }.drawBehind {
                                 val width = size.width
                                 val height = size.height
                                 val yLabelStyle =

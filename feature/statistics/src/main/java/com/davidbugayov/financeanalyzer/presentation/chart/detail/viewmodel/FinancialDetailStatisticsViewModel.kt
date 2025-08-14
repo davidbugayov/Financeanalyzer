@@ -250,7 +250,8 @@ class FinancialDetailStatisticsViewModel(
             transactions
                 .filter { it.isExpense }
                 .maxByOrNull { it.amount.amount.abs() }
-                ?.amount?.let { Money(it.amount.abs(), CurrencyProvider.getCurrency()) }
+                ?.amount
+                ?.let { Money(it.amount.abs(), CurrencyProvider.getCurrency()) }
                 ?: Money.zero(CurrencyProvider.getCurrency())
 
         // Определяем самый частый день расходов

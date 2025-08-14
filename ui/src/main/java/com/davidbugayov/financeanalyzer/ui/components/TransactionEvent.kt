@@ -10,7 +10,9 @@ sealed class TransactionEvent {
     /**
      * Показать диалог подтверждения удаления транзакции
      */
-    data class ShowDeleteConfirmDialog(val transaction: Transaction) : TransactionEvent()
+    data class ShowDeleteConfirmDialog(
+        val transaction: Transaction,
+    ) : TransactionEvent()
 
     /**
      * Скрыть диалог подтверждения удаления транзакции
@@ -20,7 +22,9 @@ sealed class TransactionEvent {
     /**
      * Показать диалог редактирования транзакции
      */
-    data class ShowEditDialog(val transactionId: String) : TransactionEvent()
+    data class ShowEditDialog(
+        val transactionId: String,
+    ) : TransactionEvent()
 
     /**
      * Скрыть диалог редактирования транзакции
@@ -30,5 +34,7 @@ sealed class TransactionEvent {
     /**
      * Удалить транзакцию
      */
-    data class DeleteTransaction(val transaction: Transaction) : TransactionEvent()
+    data class DeleteTransaction(
+        val transaction: Transaction,
+    ) : TransactionEvent()
 }

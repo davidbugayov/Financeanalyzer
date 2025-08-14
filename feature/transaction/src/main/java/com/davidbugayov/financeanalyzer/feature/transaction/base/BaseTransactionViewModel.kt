@@ -38,7 +38,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected val walletRepository: WalletRepository,
     private val sharedFacade: SharedFacade,
     protected val resources: Resources,
-) : ViewModel(), TransactionScreenViewModel<S, E> {
+) : ViewModel(),
+    TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
     override val wallets: List<Wallet> = emptyList()
@@ -62,9 +63,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     /**
      * Получает экземпляр Application из CategoriesViewModel
      */
-    protected fun getApplication(): Application {
-        return (categoriesViewModel as AndroidViewModel).getApplication()
-    }
+    protected fun getApplication(): Application = (categoriesViewModel as AndroidViewModel).getApplication()
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(
@@ -116,8 +115,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         isExpense: Boolean,
         addToWallet: Boolean,
         selectedWallets: List<String>,
-    ): List<String>? {
-        return if (addToWallet && selectedWallets.isNotEmpty()) {
+    ): List<String>? =
+        if (addToWallet && selectedWallets.isNotEmpty()) {
             if (isExpense) {
                 Timber.d("Сохраняем кошельки для списания: ${selectedWallets.size} шт.")
             } else {
@@ -130,7 +129,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             )
             null
         }
-    }
 
     /**
      * Загружает кошельки
@@ -781,7 +779,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         _state.update { current ->
             if (current.isExpense && current.expenseCategories.isNotEmpty()) {
                 // If a category is already selected and in the list - don't change it
-                if (!force && current.selectedExpenseCategory.isNotBlank() &&
+                if (!force &&
+                    current.selectedExpenseCategory.isNotBlank() &&
                     current.expenseCategories.any { it.name == current.selectedExpenseCategory }
                 ) {
                     copyState(current, category = current.selectedExpenseCategory)
@@ -796,7 +795,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     )
                 }
             } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
-                if (!force && current.selectedIncomeCategory.isNotBlank() &&
+                if (!force &&
+                    current.selectedIncomeCategory.isNotBlank() &&
                     current.incomeCategories.any { it.name == current.selectedIncomeCategory }
                 ) {
                     copyState(current, category = current.selectedIncomeCategory)
@@ -1067,8 +1067,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         // Удаляем "висячий" оператор в конце строки, если он есть
         if (processedExpr.isNotEmpty()) {
             val lastChar = processedExpr.last()
-            if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' ||
-                lastChar == '×' || lastChar == '÷'
+            if (lastChar == '+' ||
+                lastChar == '-' ||
+                lastChar == '*' ||
+                lastChar == '/' ||
+                lastChar == '×' ||
+                lastChar == '÷'
             ) {
                 // Обрабатываем случай, когда оператор в конце
                 processedExpr = processedExpr.dropLast(1)
@@ -1177,7 +1181,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
 
             // Триггер достижения за использование категорий
-            com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onCategoryUsed(categoryName)
+            com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+                .onCategoryUsed(categoryName)
 
             // Проверяем, использованы ли все возможные категории
             val expenseCategories = categoryUsagePreferences.loadExpenseCategoriesUsage()
@@ -1303,12 +1308,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param subcategoryId ID подкатегории
      * @return Название подкатегории или пустая строка, если не найдена
      */
-    protected suspend fun loadSubcategoryById(subcategoryId: Long): String {
-        return try {
+    protected suspend fun loadSubcategoryById(subcategoryId: Long): String =
+        try {
             sharedFacade.getSubcategoryById(subcategoryId)?.name ?: ""
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при загрузке подкатегории по ID: %d", subcategoryId)
             ""
         }
-    }
 }

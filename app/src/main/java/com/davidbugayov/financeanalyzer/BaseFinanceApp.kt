@@ -34,7 +34,10 @@ import timber.log.Timber
  * Инициализирует все необходимые компоненты, включая DI (Koin) и логирование (Timber).
  * Конкретные реализации для разных флейворов должны наследоваться от этого класса.
  */
-abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinComponent {
+abstract class BaseFinanceApp :
+    Application(),
+    DefaultLifecycleObserver,
+    KoinComponent {
     // Получаем компоненты аналитики через Koin
     private val userEventTracker: UserEventTracker by inject()
 
@@ -68,7 +71,8 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         if (!BuildConfig.DEBUG) {
             try {
                 val config =
-                    AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+                    AppMetricaConfig
+                        .newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
                         .withLogs()
                         .withSessionTimeout(60)
                         .withCrashReporting(true)

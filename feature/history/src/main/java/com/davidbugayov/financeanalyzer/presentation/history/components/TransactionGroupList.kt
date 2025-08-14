@@ -88,7 +88,10 @@ fun TransactionGroupList(
     // Проверяем, нужно ли загружать больше данных
     val shouldLoadMore by remember {
         derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val lastVisibleItem =
+                listState.layoutInfo.visibleItemsInfo
+                    .lastOrNull()
+                    ?.index ?: 0
             val totalItemCount = listState.layoutInfo.totalItemsCount
 
             hasMoreData && !isLoading && lastVisibleItem >= totalItemCount - 5
@@ -122,7 +125,11 @@ fun TransactionGroupList(
                         if (!expanded) {
                             coroutineScope.launch {
                                 // Находим индекс текущего заголовка и прокручиваем к нему
-                                val headerIndex = transactionGroups.indexOfFirst { dateFormat.format(it.date) == formattedDate }
+                                val headerIndex =
+                                    transactionGroups.indexOfFirst {
+                                        dateFormat.format(it.date) ==
+                                            formattedDate
+                                    }
                                 if (headerIndex >= 0) {
                                     var currentItemIndex = 0
                                     for (i in 0 until headerIndex) {
@@ -247,8 +254,7 @@ private fun ExpandableGroupHeader(
                 .padding(
                     horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
                     vertical = dimensionResource(id = UiR.dimen.spacing_small),
-                )
-                .clickable { onToggle(!isExpanded) },
+                ).clickable { onToggle(!isExpanded) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         border =
             BorderStroke(

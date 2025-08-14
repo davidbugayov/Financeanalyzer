@@ -74,18 +74,12 @@ object Formatters {
         money: Money,
         useMinimalDecimals: Boolean = false,
         showCurrency: Boolean = true,
-    ): String {
-        return money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
-    }
+    ): String = money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
 }
 
-private fun getDayMonthFormatter(): SimpleDateFormat {
-    return SimpleDateFormat("d MMM", Locale.getDefault())
-}
+private fun getDayMonthFormatter(): SimpleDateFormat = SimpleDateFormat("d MMM", Locale.getDefault())
 
-private fun getDayMonthYearFormatter(): SimpleDateFormat {
-    return SimpleDateFormat("d MMM yyyy", Locale.getDefault())
-}
+private fun getDayMonthYearFormatter(): SimpleDateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
 
 /**
  * Элемент списка транзакций с улучшенным дизайном и интеграцией ViewModel.
@@ -148,7 +142,10 @@ fun TransactionItem(
         ) {
             when {
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                    transaction.category.equals(context.getString(UiR.string.transaction_transfer), ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
+                    transaction.category.equals(
+                        context.getString(UiR.string.transaction_transfer),
+                        ignoreCase = true,
+                    ) -> transferActualColor // Fallback for direct "Перевод" string
                 transaction.isExpense -> expenseColor
                 else -> incomeColor
             }
@@ -281,8 +278,7 @@ fun TransactionItem(
                 .padding(
                     horizontal = dimensionResource(id = UiR.dimen.card_horizontal_padding),
                     vertical = dimensionResource(id = UiR.dimen.card_vertical_padding),
-                )
-                .graphicsLayer {
+                ).graphicsLayer {
                     alpha = animatedAlpha
                     translationY = animatedTranslationY
                 },
@@ -305,8 +301,7 @@ fun TransactionItem(
                         indication = ripple(bounded = true),
                         onClick = { onClick(transaction) },
                         onLongClick = { onTransactionLongClick(transaction) },
-                    )
-                    .padding(dimensionResource(id = UiR.dimen.card_content_padding_medium)),
+                    ).padding(dimensionResource(id = UiR.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar

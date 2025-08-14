@@ -157,16 +157,14 @@ private fun AchievementsScreenContent(
                     selectedCategory?.let { category ->
                         achievement.category == category
                     } ?: true
-                }
-                .filter { achievement ->
+                }.filter { achievement ->
                     // Фильтрация по статусу
                     when (selectedFilter) {
                         AchievementFilter.ALL -> true
                         AchievementFilter.UNLOCKED -> achievement.isUnlocked
                         AchievementFilter.LOCKED -> !achievement.isUnlocked
                     }
-                }
-                .filter { achievement ->
+                }.filter { achievement ->
                     // Скрываем скрытые ачивки если они не разблокированы
                     if (achievement.isHidden && !achievement.isUnlocked) false else true
                 }
@@ -198,9 +196,10 @@ private fun AchievementsScreenContent(
                 // Аналитика: фильтр по категории
                 val categoryFilter = category?.name?.lowercase()
                 val resultCount =
-                    achievements.filter { achievement ->
-                        category?.let { achievement.category == it } ?: true
-                    }.size
+                    achievements
+                        .filter { achievement ->
+                            category?.let { achievement.category == it } ?: true
+                        }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
@@ -221,13 +220,14 @@ private fun AchievementsScreenContent(
                     }
 
                 val resultCount =
-                    achievements.filter { achievement ->
-                        when (filter) {
-                            AchievementFilter.ALL -> true
-                            AchievementFilter.UNLOCKED -> achievement.isUnlocked
-                            AchievementFilter.LOCKED -> !achievement.isUnlocked
-                        }
-                    }.size
+                    achievements
+                        .filter { achievement ->
+                            when (filter) {
+                                AchievementFilter.ALL -> true
+                                AchievementFilter.UNLOCKED -> achievement.isUnlocked
+                                AchievementFilter.LOCKED -> !achievement.isUnlocked
+                            }
+                        }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = filterType,
@@ -606,8 +606,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                                         )
                                     },
                                 shape = CircleShape,
-                            )
-                            .clip(CircleShape),
+                            ).clip(CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -626,8 +625,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                                     .background(
                                         Color.Transparent,
                                         CircleShape,
-                                    )
-                                    .clip(CircleShape),
+                                    ).clip(CircleShape),
                         ) {
                             // Добавим свечение
                         }
@@ -793,8 +791,8 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
 private fun getAchievementIcon(
     achievementId: String,
     category: AchievementCategory,
-): ImageVector {
-    return when (achievementId) {
+): ImageVector =
+    when (achievementId) {
         // Транзакции
         "first_transaction" -> Icons.Filled.FlightTakeoff
         "transaction_master" -> Icons.Filled.MilitaryTech
@@ -836,13 +834,12 @@ private fun getAchievementIcon(
 
         else -> getCategoryIcon(category)
     }
-}
 
 /**
  * Получает иконку для категории
  */
-private fun getCategoryIcon(category: AchievementCategory): ImageVector {
-    return when (category) {
+private fun getCategoryIcon(category: AchievementCategory): ImageVector =
+    when (category) {
         AchievementCategory.TRANSACTIONS -> Icons.Filled.Timeline
         AchievementCategory.BUDGET -> Icons.Filled.Wallet
         AchievementCategory.SAVINGS -> Icons.Filled.Savings
@@ -853,14 +850,13 @@ private fun getCategoryIcon(category: AchievementCategory): ImageVector {
         AchievementCategory.IMPORT -> Icons.Filled.Download
         AchievementCategory.EXPORT -> Icons.Filled.Sync
     }
-}
 
 /**
  * Получает отображаемое имя категории
  */
 @Composable
-private fun getCategoryDisplayName(category: AchievementCategory): String {
-    return when (category) {
+private fun getCategoryDisplayName(category: AchievementCategory): String =
+    when (category) {
         AchievementCategory.TRANSACTIONS -> stringResource(UiR.string.achievements_category_transactions)
         AchievementCategory.BUDGET -> stringResource(UiR.string.achievements_category_budget)
         AchievementCategory.SAVINGS -> stringResource(UiR.string.achievements_category_savings)
@@ -871,20 +867,18 @@ private fun getCategoryDisplayName(category: AchievementCategory): String {
         AchievementCategory.IMPORT -> stringResource(UiR.string.achievements_category_import)
         AchievementCategory.EXPORT -> stringResource(UiR.string.achievements_category_export)
     }
-}
 
 /**
  * Получает отображаемое имя редкости
  */
 @Composable
-private fun getRarityDisplayName(rarity: AchievementRarity): String {
-    return when (rarity) {
+private fun getRarityDisplayName(rarity: AchievementRarity): String =
+    when (rarity) {
         AchievementRarity.COMMON -> stringResource(UiR.string.achievements_rarity_common)
         AchievementRarity.RARE -> stringResource(UiR.string.achievements_rarity_rare)
         AchievementRarity.EPIC -> stringResource(UiR.string.achievements_rarity_epic)
         AchievementRarity.LEGENDARY -> stringResource(UiR.string.achievements_rarity_legendary)
     }
-}
 
 /**
  * Получает уникальный цвет иконки для конкретного достижения.
@@ -897,8 +891,8 @@ private fun getAchievementIconColor(
     achievementId: String,
     category: AchievementCategory,
     isUnlocked: Boolean,
-): Color {
-    return if (!isUnlocked) {
+): Color =
+    if (!isUnlocked) {
         Color.Gray
     } else {
         when (achievementId) {
@@ -958,13 +952,12 @@ private fun getAchievementIconColor(
                 }
         }
     }
-}
 
 /**
  * Получает современные градиенты для редкости
  */
-private fun getRarityGradient(rarity: AchievementRarity): List<Color> {
-    return when (rarity) {
+private fun getRarityGradient(rarity: AchievementRarity): List<Color> =
+    when (rarity) {
         AchievementRarity.COMMON ->
             listOf(
                 Color(0xFF64748B), // Slate
@@ -988,4 +981,3 @@ private fun getRarityGradient(rarity: AchievementRarity): List<Color> {
                 Color(0xFF06B6D4), // Cyan
             )
     }
-}

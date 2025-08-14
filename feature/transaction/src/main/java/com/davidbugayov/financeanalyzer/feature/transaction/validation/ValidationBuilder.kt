@@ -40,13 +40,12 @@ class ValidationBuilder {
      * Строит результат валидации
      * @return ValidationResult с результатами валидации
      */
-    fun build(): ValidationResult {
-        return ValidationResult(
+    fun build(): ValidationResult =
+        ValidationResult(
             isValid = !hasErrors(),
             hasAmountError = hasAmountError,
             hasCategoryError = hasCategoryError,
             hasSourceError = hasSourceError,
             hasWalletError = hasWalletError,
         )
-    }
 }

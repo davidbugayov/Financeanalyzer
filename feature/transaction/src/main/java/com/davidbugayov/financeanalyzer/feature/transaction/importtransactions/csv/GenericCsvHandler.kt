@@ -18,9 +18,7 @@ class GenericCsvHandler(
 ) : AbstractBankHandler(transactionRepository, context) {
     override val bankName: String = "Generic CSV"
 
-    override fun supportsFileType(fileType: FileType): Boolean {
-        return fileType == FileType.CSV
-    }
+    override fun supportsFileType(fileType: FileType): Boolean = fileType == FileType.CSV
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {

@@ -63,8 +63,7 @@ fun ColorPickerDialog(
                                                 Color.Transparent
                                             },
                                         shape = CircleShape,
-                                    )
-                                    .clickable { onColorSelected(argbColor) },
+                                    ).clickable { onColorSelected(argbColor) },
                         )
                     }
                 }

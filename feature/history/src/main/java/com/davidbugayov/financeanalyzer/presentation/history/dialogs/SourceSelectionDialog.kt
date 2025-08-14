@@ -68,8 +68,7 @@ fun SourceSelectionDialog(
                                     } else {
                                         sourceNames
                                     }
-                            }
-                            .padding(
+                            }.padding(
                                 vertical = dimensionResource(UiR.dimen.spacing_small),
                             ),
                     verticalAlignment = Alignment.CenterVertically,

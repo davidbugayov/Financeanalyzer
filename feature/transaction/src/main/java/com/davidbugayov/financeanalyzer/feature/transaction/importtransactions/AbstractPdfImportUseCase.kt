@@ -41,8 +41,8 @@ abstract class AbstractPdfImportUseCase(
         resourceId: Int,
         bankName: String,
         errorMessage: String?,
-    ): String {
-        return try {
+    ): String =
+        try {
             // Список ресурсов строк, которые принимают два параметра
             val twoParamResources =
                 listOf(
@@ -62,7 +62,6 @@ abstract class AbstractPdfImportUseCase(
             Timber.e(e, "Ошибка при форматировании сообщения об ошибке: $resourceId, $bankName, $errorMessage")
             "Ошибка при импорте файла $bankName: ${errorMessage ?: "Неизвестная ошибка"}"
         }
-    }
 
     /**
      * Извлекает текст из PDF-файла по URI

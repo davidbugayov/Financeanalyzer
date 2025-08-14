@@ -170,8 +170,8 @@ object FinancialTipsManager {
     /**
      * Получает общие советы для начинающих
      */
-    fun getGeneralTips(): List<FinancialTip> {
-        return listOf(
+    fun getGeneralTips(): List<FinancialTip> =
+        listOf(
             FinancialTip(
                 titleResId = R.string.tip_basic_tracking_title,
                 descriptionResId = R.string.tip_basic_tracking_desc,
@@ -191,5 +191,4 @@ object FinancialTipsManager {
                 actionResId = R.string.action_start_saving,
             ),
         )
-    }
 }

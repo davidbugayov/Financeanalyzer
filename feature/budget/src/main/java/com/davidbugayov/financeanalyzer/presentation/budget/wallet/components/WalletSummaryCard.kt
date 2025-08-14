@@ -77,7 +77,10 @@ fun WalletSummaryCard(
     // Вычисляем прогресс бюджета
     val rawProgress =
         if (wallet.limit.amount > BigDecimal.ZERO) {
-            val progress = wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN).toFloat()
+            val progress =
+                wallet.spent.amount
+                    .divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
+                    .toFloat()
             // Логируем значения для отладки
             timber.log.Timber.d(
                 "Wallet: ${wallet.name}, Spent: ${wallet.spent.amount}, Limit: ${wallet.limit.amount}, Progress: $progress",

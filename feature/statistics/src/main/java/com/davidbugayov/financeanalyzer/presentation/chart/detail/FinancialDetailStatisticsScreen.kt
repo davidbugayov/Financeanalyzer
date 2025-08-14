@@ -160,13 +160,14 @@ fun FinancialDetailStatisticsScreen(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
                                 // Используем общий компонент PeriodFilterBar для локализованного периода
-                                com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.PeriodFilterBar(
-                                    periodType = com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM,
-                                    startDate = java.util.Date(startDate),
-                                    endDate = java.util.Date(endDate),
-                                    onChangePeriod = { _, _, _ -> },
-                                    modifier = Modifier,
-                                )
+                                com.davidbugayov.financeanalyzer.presentation.chart.statistic.components
+                                    .PeriodFilterBar(
+                                        periodType = com.davidbugayov.financeanalyzer.navigation.model.PeriodType.CUSTOM,
+                                        startDate = java.util.Date(startDate),
+                                        endDate = java.util.Date(endDate),
+                                        onChangePeriod = { _, _, _ -> },
+                                        modifier = Modifier,
+                                    )
                             }
                         }
                     }
@@ -208,15 +209,17 @@ fun FinancialDetailStatisticsScreen(
                                         averageDailyExpense = metrics.averageDailyExpense.format(true),
                                         averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
                                         topIncomeCategory =
-                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                                context,
-                                                metrics.topIncomeCategory,
-                                            ),
+                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+                                                .displayName(
+                                                    context,
+                                                    metrics.topIncomeCategory,
+                                                ),
                                         topExpenseCategory =
-                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization.displayName(
-                                                context,
-                                                metrics.topExpenseCategory,
-                                            ),
+                                            com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+                                                .displayName(
+                                                    context,
+                                                    metrics.topExpenseCategory,
+                                                ),
                                         topExpenseCategories =
                                             metrics.topExpenseCategories.map {
                                                 it.first to
