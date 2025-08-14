@@ -35,8 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.addButton
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.amountField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategorySection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.ColorPickerDialog
@@ -50,6 +48,8 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Subc
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.addButton
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.amountField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -69,7 +69,7 @@ import timber.log.Timber
  * Служит основой для AddTransactionScreen и EditTransactionScreen
  */
 @Composable
-fun <E> BaseTransactionScreen(
+fun <E> baseTransactionScreen(
     viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
     onNavigateBack: () -> Unit,
     screenTitle: String? = null,
@@ -497,8 +497,8 @@ fun <E> BaseTransactionScreen(
                             }
                         },
                         isError = state.categoryError,
-                        // Новые параметры для кнопки подкатегории
-                        onSubcategoryButtonClick =
+                    // Новые параметры для кнопки подкатегории
+                    onSubcategoryButtonClick =
                             if (state.category.isNotBlank()) {
                                 {
                                     viewModel.onEvent(

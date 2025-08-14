@@ -167,9 +167,12 @@ fun amountField(
                     // Форматируем число, удаляем символ валюты (в начале или в конце) и отбрасываем .00
                     val moneyObject = Money(numericValue, currentCurrency)
                     val formattedWithSymbol = moneyObject.format()
-                    timber.log.Timber.d(
-                        "AmountField: Форматирование: numericValue=$numericValue, currency=${currentCurrency.name}, formattedWithSymbol='$formattedWithSymbol'",
-                    )
+                     timber.log.Timber.d(
+                         "AmountField: Форматирование: " +
+                             "numericValue=$numericValue, " +
+                             "currency=${currentCurrency.name}, " +
+                             "formattedWithSymbol='$formattedWithSymbol'",
+                     )
 
                     val withoutSymbol = stripCurrencySymbol(formattedWithSymbol, moneyObject.currency)
                     val sep = moneyObject.currency.decimalSeparator.toString()

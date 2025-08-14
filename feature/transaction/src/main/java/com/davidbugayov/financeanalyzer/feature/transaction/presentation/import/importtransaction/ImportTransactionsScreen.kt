@@ -61,8 +61,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.BankInstructionDialog
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.BanksList
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportProgressSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResults
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResultsSection

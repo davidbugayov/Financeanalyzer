@@ -239,7 +239,7 @@ fun exportImportScreen(
 
             // Export Action Dialog
             if (showExportDialog) {
-                ModernCSVExportDialog(
+                modernCsvExportDialog(
                     onShare = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.SHARE) },
                     onOpen = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.OPEN) },
                     onSave = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.SAVE) },
@@ -251,7 +251,7 @@ fun exportImportScreen(
 }
 
 @Composable
-fun ModernCSVExportDialog(
+fun modernCsvExportDialog(
     onShare: () -> Unit,
     onOpen: () -> Unit,
     onSave: () -> Unit,
@@ -284,7 +284,7 @@ fun ModernCSVExportDialog(
                 )
 
                 // Кнопка "Поделиться"
-                ActionCard(
+                actionCard(
                     icon = Icons.Default.Share,
                     title = stringResource(UiR.string.share),
                     description = stringResource(UiR.string.share_description),
@@ -298,7 +298,7 @@ fun ModernCSVExportDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Кнопка "Открыть"
-                ActionCard(
+                actionCard(
                     icon = Icons.AutoMirrored.Filled.OpenInNew,
                     title = stringResource(UiR.string.open_file),
                     description = stringResource(UiR.string.open_file_description),
@@ -312,7 +312,7 @@ fun ModernCSVExportDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Кнопка "Сохранить"
-                ActionCard(
+                actionCard(
                     icon = Icons.Default.Download,
                     title = stringResource(UiR.string.save),
                     description = stringResource(UiR.string.save_without_actions),
@@ -343,7 +343,7 @@ fun ModernCSVExportDialog(
 }
 
 @Composable
-private fun ActionCard(
+private fun actionCard(
     icon: ImageVector,
     title: String,
     description: String,
