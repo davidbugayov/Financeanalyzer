@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
+package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,8 +32,10 @@ data class ImportResults(
     val importedCount: Int = 0,
     val skippedCount: Int = 0,
     val errorMessage: String? = null,
-    val fileName: String = "", // Имя импортируемого файла
-    val bankName: String? = null, // Название банка
+    // Имя импортируемого файла
+    val fileName: String = "",
+    // Название банка
+    val bankName: String? = null,
 )
 
 /**

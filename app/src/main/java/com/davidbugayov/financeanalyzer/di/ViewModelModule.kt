@@ -14,7 +14,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCatego
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.module.dsl.bind

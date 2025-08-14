@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
+package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

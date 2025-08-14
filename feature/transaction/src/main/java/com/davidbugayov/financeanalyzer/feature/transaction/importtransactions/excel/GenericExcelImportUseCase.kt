@@ -52,11 +52,13 @@ data class ExcelColumnMapping(
     val currencyColumnIndex: Int? = 3,
     val categoryColumnIndex: Int? = null,
     val noteColumnIndex: Int? = null,
-    val isExpenseColumnIndex: Int? = null, // Used if ExpenseDetermination.FROM_COLUMN_VALUE
+    // Used if ExpenseDetermination.FROM_COLUMN_VALUE
+    val isExpenseColumnIndex: Int? = null,
 )
 
 data class DateFormatConfig(
-    val primaryDateFormatString: String = "dd.MM.yyyy", // Common format DataFormatter might output for ru locale
+    // Common format DataFormatter might output for ru locale
+    val primaryDateFormatString: String = "dd.MM.yyyy",
     val fallbackDateFormatStrings: List<String> =
         listOf(
             "MM/dd/yyyy",
@@ -76,11 +78,15 @@ data class DateFormatConfig(
 
 data class AmountParseConfig(
     val decimalSeparator: Char = '.',
-    val groupingSeparator: Char? = null, // e.g., ',' if numbers are "1,234.56"
-    val currencySymbolsToRemove: List<String> = emptyList(), // e.g., listOf("$", "€", "руб")
-    val otherCharsToRemoveRegexPattern: String? = "[^0-9${'$'}{decimalSeparator}-]", // Keep digits, decimal sep, and minus. Adjusted to use decimalSeparator
+    // e.g., ',' if numbers are "1,234.56"
+    val groupingSeparator: Char? = null,
+    // e.g., listOf("$", "€", "руб")
+    val currencySymbolsToRemove: List<String> = emptyList(),
+    // Keep digits, decimal sep, and minus. Adjusted to use decimalSeparator
+    val otherCharsToRemoveRegexPattern: String? = "[^0-9${'$'}{decimalSeparator}-]",
     val howIsExpenseDetermined: ExpenseDetermination = ExpenseDetermination.FROM_AMOUNT_SIGN,
-    val isExpenseTrueValue: String = "EXPENSE", // Value in isExpenseColumnIndex that means it's an expense. Case-insensitive.
+    // Value in isExpenseColumnIndex that means it's an expense. Case-insensitive.
+    val isExpenseTrueValue: String = "EXPENSE",
 )
 
 data class ExcelParseConfig(

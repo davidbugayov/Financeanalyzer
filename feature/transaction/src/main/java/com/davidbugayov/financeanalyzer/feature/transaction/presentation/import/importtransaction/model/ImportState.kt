@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction.model
+package com.davidbugayov.financeanalyzer.presentation.importtransaction.model
 
 /**
  * Состояние для экрана импорта транзакций.

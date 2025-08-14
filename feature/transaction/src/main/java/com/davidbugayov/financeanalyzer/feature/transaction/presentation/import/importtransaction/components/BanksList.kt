@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
+package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background

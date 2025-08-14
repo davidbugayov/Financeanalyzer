@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction
+package com.davidbugayov.financeanalyzer.presentation.importtransaction
 
 import android.Manifest
 import android.app.Activity
@@ -61,12 +61,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BanksList
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportProgressSection
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResults
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.BankInstructionDialog
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.BanksList
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportProgressSection
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResults
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResultsSection
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog

@@ -22,23 +22,40 @@ import timber.log.Timber
  * Позволяет гибко настраивать структуру и правила обработки CSV для разных банков и форматов.
  */
 data class CsvParseConfig(
-    val delimiter: Char = ',', // Разделитель значений (например, ',' или ';')
-    val dateFormatString: String = "yyyy-MM-dd", // Формат даты (например, "dd.MM.yyyy")
-    val locale: Locale = Locale.getDefault(), // Локаль для парсинга дат
-    val hasHeader: Boolean = true, // Есть ли строка заголовка
-    val dateColumnIndex: Int = 0, // Индекс колонки с датой
-    val descriptionColumnIndex: Int = 1, // Индекс колонки с описанием
-    val amountColumnIndex: Int = 2, // Индекс колонки с суммой
-    val currencyColumnIndex: Int? = 3, // Индекс колонки с валютой (опционально)
-    val defaultCurrencyCode: String = "USD", // Валюта по умолчанию
-    val isExpenseColumnIndex: Int? = null, // Индекс колонки, явно указывающей расход (опционально)
-    val isExpenseTrueValue: String = "true", // Значение, означающее расход (если колонка есть)
-    val expectedMinColumnCount: Int = 3, // Минимальное количество колонок для валидной строки
-    val amountDecimalSeparator: Char = '.', // Разделитель дробной части в сумме
-    val amountCharsToRemoveRegexPattern: String? = null, // Регулярка для удаления лишних символов из суммы
-    val statusColumnIndex: Int? = null, // Индекс колонки со статусом транзакции (опционально)
-    val validStatusValues: List<String>? = null, // Список валидных статусов (если колонка есть)
-    val skipTransactionIfStatusInvalid: Boolean = true, // Пропускать ли строки с невалидным статусом
+    // Разделитель значений (например, ',' или ';')
+    val delimiter: Char = ',',
+    // Формат даты (например, "dd.MM.yyyy")
+    val dateFormatString: String = "yyyy-MM-dd",
+    // Локаль для парсинга дат
+    val locale: Locale = Locale.getDefault(),
+    // Есть ли строка заголовка
+    val hasHeader: Boolean = true,
+    // Индекс колонки с датой
+    val dateColumnIndex: Int = 0,
+    // Индекс колонки с описанием
+    val descriptionColumnIndex: Int = 1,
+    // Индекс колонки с суммой
+    val amountColumnIndex: Int = 2,
+    // Индекс колонки с валютой (опционально)
+    val currencyColumnIndex: Int? = 3,
+    // Валюта по умолчанию
+    val defaultCurrencyCode: String = "USD",
+    // Индекс колонки, явно указывающей расход (опционально)
+    val isExpenseColumnIndex: Int? = null,
+    // Значение, означающее расход (если колонка есть)
+    val isExpenseTrueValue: String = "true",
+    // Минимальное количество колонок для валидной строки
+    val expectedMinColumnCount: Int = 3,
+    // Разделитель дробной части в сумме
+    val amountDecimalSeparator: Char = '.',
+    // Регулярка для удаления лишних символов из суммы
+    val amountCharsToRemoveRegexPattern: String? = null,
+    // Индекс колонки со статусом транзакции (опционально)
+    val statusColumnIndex: Int? = null,
+    // Список валидных статусов (если колонка есть)
+    val validStatusValues: List<String>? = null,
+    // Пропускать ли строки с невалидным статусом
+    val skipTransactionIfStatusInvalid: Boolean = true,
 ) {
     // Регулярка для очистки суммы
     val amountCharsToRemoveRegex: Regex? by lazy {
@@ -241,7 +258,8 @@ class GenericCsvImportUseCase(
                     // Пробуем парсить дату с использованием нескольких распространенных форматов
                     val dateFormats =
                         listOf(
-                            config.dateFormat, // Сначала пробуем формат из конфига
+                            // Сначала пробуем формат из конфига
+                            config.dateFormat,
                             SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", config.locale),
                             SimpleDateFormat("yyyy-MM-dd", config.locale),
                             SimpleDateFormat("dd.MM.yyyy", config.locale),

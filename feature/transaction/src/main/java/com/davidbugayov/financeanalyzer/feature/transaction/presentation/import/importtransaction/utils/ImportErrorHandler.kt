@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction.utils
+package com.davidbugayov.financeanalyzer.presentation.importtransaction.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.ui.R as UiR

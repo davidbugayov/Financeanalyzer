@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.import_transaction
+package com.davidbugayov.financeanalyzer.presentation.importtransaction
 
 import android.app.Application
 import android.net.Uri
@@ -13,9 +13,9 @@ import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.utils.ImportErrorHandler
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportState
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.utils.ImportErrorHandler
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedInputStream
 import kotlinx.coroutines.Dispatchers

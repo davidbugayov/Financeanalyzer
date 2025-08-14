@@ -19,7 +19,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.detail.FinancialDetai
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
