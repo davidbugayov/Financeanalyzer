@@ -255,39 +255,60 @@ android {
         // Отключаем ряд проверок (ранее было ignore)
         disable.addAll(
             listOf(
-                "Instantiatable", // Игнорируем проблемы с инстанцированием классов
-                "StringFormatMatches", // Игнорируем проблемы с форматированием строк
-                "InvalidPackage", // Игнорируем проблемы с пакетами в зависимостях
-                "UnusedResources", // Можно включить обратно после очистки неиспользуемых ресурсов
+                // Игнорируем проблемы с инстанцированием классов
+                "Instantiatable",
+                // Игнорируем проблемы с форматированием строк
+                "StringFormatMatches",
+                // Игнорируем проблемы с пакетами в зависимостях
+                "InvalidPackage",
+                // Можно включить обратно после очистки неиспользуемых ресурсов
+                "UnusedResources",
             ),
         )
 
         // Превращаем ошибки в предупреждения для несерьезных проблем
         warning.addAll(
             listOf(
-                "MissingTranslation", // Недостающие переводы - предупреждение
-                "ExtraTranslation", // Лишние переводы - предупреждение
-                "TypographyFractions", // Проблемы с типографикой - предупреждение
-                "TypographyDashes", // Проблемы с дефисами - предупреждение
+                // Недостающие переводы - предупреждение
+                "MissingTranslation",
+                // Лишние переводы - предупреждение
+                "ExtraTranslation",
+                // Проблемы с типографикой - предупреждение
+                "TypographyFractions",
+                // Проблемы с дефисами - предупреждение
+                "TypographyDashes",
             ),
         )
 
         // Отключаем проблемы в зависимостях, которые мы не можем контролировать
         disable.addAll(
             listOf(
-                "ContentDescription", // Отключаем проверку description для изображений
-                "HardcodedText", // Временно отключаем для постепенного перевода строк в ресурсы
-                "IconMissingDensityFolder", // Не критично для векторных иконок
-                "GoogleAppIndexingWarning", // Не используем App Indexing
-                "LogConditional", // Разрешаем использование Log без условий
-                "TrustAllX509TrustManager", // Проблемы в сторонних библиотеках (POI, BouncyCastle)
-                "ObsoleteSdkInt", // Устаревшие версии SDK - не критично
-                "AndroidGradlePluginVersion", // Предупреждения о версиях Gradle - не критично
-                "GradleDependency", // Предупреждения о новых версиях зависимостей
-                "NewerVersionAvailable", // Предупреждения о новых версиях библиотек
-                "TypographyQuotes", // Типографские кавычки - не критично для функциональности
-                "TypographyDashes", // Типографские дефисы - не критично для функциональности
-                "TypographyFractions", // Типографские дроби - не критично для функциональности
+                // Отключаем проверку description для изображений
+                "ContentDescription",
+                // Временно отключаем для постепенного перевода строк в ресурсы
+                "HardcodedText",
+                // Не критично для векторных иконок
+                "IconMissingDensityFolder",
+                // Не используем App Indexing
+                "GoogleAppIndexingWarning",
+                // Разрешаем использование Log без условий
+                "LogConditional",
+                // Проблемы в сторонних библиотеках (POI, BouncyCastle)
+                "TrustAllX509TrustManager",
+                // Устаревшие версии SDK - не критично
+                "ObsoleteSdkInt",
+                // Предупреждения о версиях Gradle - не критично
+                "AndroidGradlePluginVersion",
+                // Предупреждения о новых версиях зависимостей
+                "GradleDependency",
+                // Предупреждения о новых версиях библиотек
+                "NewerVersionAvailable",
+                // Типографские кавычки - не критично для функциональности
+                "TypographyQuotes",
+                // Типографские дефисы - не критично для функциональности
+                "TypographyDashes",
+                // Типографские дроби - не критично для функциональности
+                "TypographyFractions",
             ),
         )
     }

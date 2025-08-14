@@ -32,6 +32,8 @@ subprojects {
     }
     plugins.withId("org.jlleitschuh.gradle.ktlint") {
         extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+            // Используем более свежую версию движка ktlint для совместимости с Kotlin 2.2
+            version.set("1.3.1")
             ignoreFailures.set(true)
         }
     }
