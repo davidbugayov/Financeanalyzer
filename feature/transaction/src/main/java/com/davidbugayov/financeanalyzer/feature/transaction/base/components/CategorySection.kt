@@ -54,7 +54,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateContentColor
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun categorySection(
+fun CategorySection(
     categories: List<UiCategory>,
     selectedCategory: String,
     onCategorySelected: (UiCategory) -> Unit,
@@ -129,7 +129,8 @@ fun categorySection(
                                     .background(
                                         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                                         CircleShape,
-                                    ).padding(horizontal = 8.dp, vertical = 4.dp),
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Row(
@@ -211,7 +212,8 @@ fun categorySection(
                             .combinedClickable(
                                 onClick = { onCategorySelected(category) },
                                 onLongClick = { onCategoryLongClick(category) },
-                            ).padding(
+                            )
+                            .padding(
                                 vertical = dimensionResource(UiR.dimen.category_item_vertical_padding),
                             ),
                 ) {
@@ -225,7 +227,8 @@ fun categorySection(
                                         isError && selectedCategory.isBlank() -> errorBackgroundColor
                                         else -> category.color
                                     },
-                                ).border(
+                                )
+                                .border(
                                     width =
                                         when {
                                             category.name == selectedCategory -> 3.dp
@@ -334,7 +337,7 @@ fun categorySection(
  * Элемент добавления новой категории
  */
 @Composable
-fun addCategoryItem(
+fun AddCategoryItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

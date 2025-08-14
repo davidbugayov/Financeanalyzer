@@ -1,4 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.base
+
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -45,11 +47,11 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Opti
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourcePickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SourceSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.SubcategoryPickerDialog
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.addButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.amountField
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.transactionHeader
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -69,6 +71,7 @@ import timber.log.Timber
  * Служит основой для AddTransactionScreen и EditTransactionScreen
  */
 @Composable
+@SuppressLint("ComposableNaming")
 fun <E> baseTransactionScreen(
     viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
     onNavigateBack: () -> Unit,
@@ -459,7 +462,7 @@ fun <E> baseTransactionScreen(
 
                 // Секция выбора категории - улучшенная с видимыми подкатегориями
                 if (state.isExpense) {
-                    categorySection(
+                    CategorySection(
                         categories = sortedExpenseCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->
@@ -513,7 +516,7 @@ fun <E> baseTransactionScreen(
                         hasAvailableSubcategories = state.availableSubcategories.isNotEmpty(),
                     )
                 } else {
-                    categorySection(
+                    CategorySection(
                         categories = sortedIncomeCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->

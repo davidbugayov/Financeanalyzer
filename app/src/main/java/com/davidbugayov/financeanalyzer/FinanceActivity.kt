@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -20,9 +21,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.compose.rememberNavController
-import com.davidbugayov.financeanalyzer.navigation.appNavHostImpl
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.appNavHostImpl
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -182,6 +183,7 @@ class FinanceActivity :
 }
 
 @Composable
+@SuppressLint("ComposableNaming")
 fun financeAppContent(
     navigationManager: NavigationManager,
     startDestination: String,

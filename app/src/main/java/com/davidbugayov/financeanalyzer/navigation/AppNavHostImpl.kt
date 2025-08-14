@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
@@ -35,6 +36,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
+@SuppressLint("ComposableNaming")
 fun appNavHostImpl(
     navController: NavHostController,
     navigationManager: NavigationManager,
@@ -92,7 +94,7 @@ fun appNavHostImpl(
                 periodTypeStr?.let {
                     try {
                         PeriodType.valueOf(it)
-                    } catch (e: IllegalArgumentException) {
+                    } catch (_: IllegalArgumentException) {
                         null
                     }
                 }
