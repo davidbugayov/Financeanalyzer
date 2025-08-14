@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
+package com.davidbugayov.financeanalyzer.feature.transaction.presentation.import.importtransaction.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.alfaBankInstructions
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.csvInstructions
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ozonInstructions
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.sberbankInstructions
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.tinkoffInstructions
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -69,7 +74,7 @@ fun bankInstructionDialog(
                             .weight(1f, fill = false)
                             .verticalScroll(rememberScrollState()),
                 ) {
-                    BankInstructionsContent(bankName = bankName)
+                    bankInstructionsContent(bankName = bankName)
                 }
 
                 Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.space_medium)))
