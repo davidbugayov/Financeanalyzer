@@ -31,7 +31,7 @@ import timber.log.Timber
  * Улучшенный заголовок с акцентом на дату и типе транзакции
  */
 @Composable
-fun TransactionHeader(
+fun transactionHeader(
     date: Date,
     isExpense: Boolean,
     incomeColor: Color,

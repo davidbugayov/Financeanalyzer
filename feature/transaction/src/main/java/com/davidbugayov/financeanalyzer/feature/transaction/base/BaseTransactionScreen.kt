@@ -375,7 +375,7 @@ fun <E> baseTransactionScreen(
                 }
 
                 // Заголовок с датой и типом транзакции (только сверху)
-                TransactionHeader(
+                transactionHeader(
                     date = state.selectedDate,
                     isExpense = state.isExpense,
                     incomeColor = incomeColor,
