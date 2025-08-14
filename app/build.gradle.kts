@@ -325,25 +325,25 @@ androidComponents {
 
 dependencies {
     // Modules
-    val modules =
-        listOf(
-            ":domain",
-            ":data",
-            ":core",
-            ":navigation",
-            ":utils",
-            ":ui",
-            ":feature",
-            ":feature:home",
-            ":feature:budget",
-            ":feature:onboarding",
-            ":feature:profile",
-            ":feature:history",
-            ":feature:statistics",
-            ":feature:transaction",
-            ":feature:widget",
-            ":feature:security",
-        )
+            val modules =
+                listOf(
+                    ":domain",
+                    ":data",
+                    ":core",
+                    ":navigation",
+                    ":utils",
+                    ":ui",
+                    ":feature",
+                    ":feature:home",
+                    ":feature:budget",
+                    ":feature:onboarding",
+                    ":feature:profile",
+                    ":feature:history",
+                    ":feature:statistics",
+                    ":feature:transaction",
+                    ":feature:widget",
+                    ":feature:security",
+                )
 
     modules.forEach { module ->
         implementation(project(module))
