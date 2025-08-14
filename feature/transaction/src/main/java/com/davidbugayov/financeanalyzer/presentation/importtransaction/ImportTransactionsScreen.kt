@@ -61,18 +61,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importProgressSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResults
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.bankInstructionDialog
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.banksList
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importProgressSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importResultsSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -295,7 +295,7 @@ fun importTransactionsScreen(
                             ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
-                        Column(
+                            Column(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
@@ -367,7 +367,7 @@ fun importTransactionsScreen(
                         }
                     }
 
-                    // Секция результатов импорта или прогресса - перемещена выше секции банков
+                            // Секция результатов импорта или прогресса - перемещена выше секции банков
                     AnimatedVisibility(
                         visible = state.isLoading || state.successCount > 0 || state.error != null,
                         enter = fadeIn() + expandVertically(),
@@ -377,19 +377,20 @@ fun importTransactionsScreen(
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 24.dp),
-                            // Увеличены отступы
+                                    // Увеличены отступы
                             colors =
                                 CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
                                 ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Увеличена тень
+                                    // Увеличена тень
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         ) {
                             Column(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(20.dp),
-                                // Увеличены внутренние отступы
+                                                .padding(20.dp),
+                                        // Увеличены внутренние отступы
                             ) {
                                 // Заголовок с кнопкой закрытия
                                 Row(
@@ -426,7 +427,8 @@ fun importTransactionsScreen(
                                         importProgressSection(
                                             progress = state.progress,
                                             message = state.progressMessage,
-                                            modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
+                                            // Добавлен отступ сверху
+                                            modifier = Modifier.padding(top = 8.dp),
                                             fileName = state.fileName,
                                             bankName = state.bankName,
                                         )
@@ -439,11 +441,13 @@ fun importTransactionsScreen(
                                                 ImportResults(
                                                     importedCount = state.successCount,
                                                     skippedCount = state.skippedCount,
-                                                    errorMessage = null, // Игнорируем ошибку, если есть успешно импортированные транзакции
+                                                    // Игнорируем ошибку, если есть успешно импортированные транзакции
+                                                    errorMessage = null,
                                                     fileName = state.fileName,
                                                     bankName = state.bankName,
                                                 ),
-                                            modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
+                                            // Добавлен отступ сверху
+                                            modifier = Modifier.padding(top = 8.dp),
                                         )
                                     }
                                     // Показываем ошибку только если нет успешно импортированных транзакций
@@ -457,7 +461,8 @@ fun importTransactionsScreen(
                                                     fileName = state.fileName,
                                                     bankName = state.bankName,
                                                 ),
-                                            modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
+                                            // Добавлен отступ сверху
+                                            modifier = Modifier.padding(top = 8.dp),
                                         )
                                     }
                                 }

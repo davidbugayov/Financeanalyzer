@@ -41,7 +41,10 @@ fun editTransactionScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state.transactionToEdit) {
         Timber.d(
-            "ТРАНЗАКЦИЯ-ЭКРАН: editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}, amount=${state.amount}",
+            "ТРАНЗАКЦИЯ-ЭКРАН: editMode=%b, transactionToEdit=%s, amount=%s",
+            state.editMode,
+            state.transactionToEdit?.id,
+            state.amount,
         )
     }
 
