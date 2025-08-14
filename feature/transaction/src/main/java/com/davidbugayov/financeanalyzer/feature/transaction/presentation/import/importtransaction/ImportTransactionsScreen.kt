@@ -61,9 +61,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportProgressSection
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importProgressSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResults
-import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.ImportResultsSection
+import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importResultsSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -421,7 +421,7 @@ fun importTransactionsScreen(
                                 when {
                                     // Приоритет отображения: сначала загрузка, потом результаты
                                     state.isLoading -> {
-                                        ImportProgressSection(
+                                        importProgressSection(
                                             progress = state.progress,
                                             message = state.progressMessage,
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
@@ -432,7 +432,7 @@ fun importTransactionsScreen(
                                     // Если есть успешно импортированные транзакции, показываем результаты успеха
                                     // даже если есть ошибка
                                     state.successCount > 0 -> {
-                                        ImportResultsSection(
+                                        importResultsSection(
                                             importResults =
                                                 ImportResults(
                                                     importedCount = state.successCount,
@@ -446,7 +446,7 @@ fun importTransactionsScreen(
                                     }
                                     // Показываем ошибку только если нет успешно импортированных транзакций
                                     state.error != null -> {
-                                        ImportResultsSection(
+                                        importResultsSection(
                                             importResults =
                                                 ImportResults(
                                                     importedCount = 0,
