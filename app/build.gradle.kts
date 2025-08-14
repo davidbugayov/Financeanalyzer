@@ -77,7 +77,6 @@ android {
             // Суффиксы для Google Play
             versionNameSuffix = ".gp"
             resValue("string", "app_name", "Деньги под Контролем")
-            resValue("string", "app_store", "Google Play")
         }
 
         create("rustore") {
@@ -90,7 +89,6 @@ android {
             // Суффиксы для RuStore
             versionNameSuffix = ".rs"
             resValue("string", "app_name", "Деньги под Контролем")
-            resValue("string", "app_store", "RuStore")
         }
 
         create("fdroid") {
@@ -102,7 +100,6 @@ android {
             // Суффиксы для F-Droid
             versionNameSuffix = ".fd"
             resValue("string", "app_name", "Деньги под Контролем (F-Droid)")
-            resValue("string", "app_store", "F-Droid")
         }
 
         create("huawei") {
@@ -114,7 +111,6 @@ android {
             // Суффиксы для Huawei AppGallery
             versionNameSuffix = ".hw"
             resValue("string", "app_name", "Деньги под Контролем")
-            resValue("string", "app_store", "Huawei AppGallery")
         }
     }
 
