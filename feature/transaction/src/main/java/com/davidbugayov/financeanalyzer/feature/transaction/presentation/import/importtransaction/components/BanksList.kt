@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.BorderStroke
@@ -38,7 +37,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Компонент для отображения списка поддерживаемых банков
  */
 @Composable
-fun BanksList(onBankClick: (String) -> Unit = {}) {
+fun banksList(onBankClick: (String) -> Unit = {}) {
     val sberName = stringResource(UiR.string.bank_sberbank)
     val tinkoffName = stringResource(UiR.string.bank_tinkoff)
     val alfaName = stringResource(UiR.string.bank_alfabank)

@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Диалог с инструкциями по импорту для выбранного банка
  */
 @Composable
-fun BankInstructionDialog(
+fun bankInstructionDialog(
     bankName: String,
     onDismiss: () -> Unit,
 ) {
@@ -90,13 +89,13 @@ fun BankInstructionDialog(
  * Содержимое инструкций для выбранного банка
  */
 @Composable
-fun BankInstructionsContent(bankName: String) {
+fun bankInstructionsContent(bankName: String) {
     when (bankName) {
-        stringResource(UiR.string.bank_sberbank) -> SberbankInstructions()
-        stringResource(UiR.string.bank_tinkoff) -> TinkoffInstructions()
-        stringResource(UiR.string.bank_alfabank) -> AlfaBankInstructions()
-        stringResource(UiR.string.bank_ozon) -> OzonInstructions()
-        stringResource(UiR.string.bank_csv) -> CSVInstructions()
+        stringResource(UiR.string.bank_sberbank) -> sberbankInstructions()
+        stringResource(UiR.string.bank_tinkoff) -> tinkoffInstructions()
+        stringResource(UiR.string.bank_alfabank) -> alfaBankInstructions()
+        stringResource(UiR.string.bank_ozon) -> ozonInstructions()
+        stringResource(UiR.string.bank_csv) -> csvInstructions()
         else -> Text(text = stringResource(UiR.string.unavailable_instructions))
     }
 }

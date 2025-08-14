@@ -35,8 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
-import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.addButton
+import com.davidbugayov.financeanalyzer.feature.transaction.base.components.amountField
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.CategorySection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.ColorPickerDialog
@@ -399,7 +399,7 @@ fun <E> BaseTransactionScreen(
 
                 // ЦЕНТРАЛЬНАЯ ЗОНА - Поле суммы с большим акцентом
                 key(CurrencyProvider.getCurrencyFlow().collectAsState().value) {
-                    AmountField(
+                    amountField(
                         amount = state.amount,
                         onAmountChange = { amount ->
                             viewModel.onEvent(
@@ -600,7 +600,7 @@ fun <E> BaseTransactionScreen(
                 Spacer(Modifier.height(2.dp))
 
                 // Кнопка добавления/сохранения
-                AddButton(
+                addButton(
                     onClick = {
                         Timber.d("UI: Кнопка 'Добавить' нажата")
                         viewModel.onEvent(submitEvent, context)

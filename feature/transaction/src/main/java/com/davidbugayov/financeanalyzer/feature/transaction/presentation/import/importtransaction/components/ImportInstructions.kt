@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColo
  * Компонент с инструкциями по импорту
  */
 @Composable
-fun ImportInstructions() {
+fun importInstructions() {
     Card(
         modifier =
             Modifier

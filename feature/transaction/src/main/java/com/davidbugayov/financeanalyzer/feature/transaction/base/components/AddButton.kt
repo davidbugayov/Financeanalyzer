@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Кнопка добавления транзакции
  */
 @Composable
-fun AddButton(
+fun addButton(
     onClick: () -> Unit,
     color: Color,
     modifier: Modifier = Modifier,

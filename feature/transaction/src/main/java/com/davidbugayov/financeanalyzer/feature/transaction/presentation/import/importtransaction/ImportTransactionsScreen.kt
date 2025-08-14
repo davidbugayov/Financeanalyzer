@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction
 
 import android.Manifest
@@ -505,7 +504,7 @@ fun importTransactionsScreen(
                                                 ),
                                         ),
                             ) {
-                                BanksList(
+                                banksList(
                                     onBankClick = { bank ->
                                         selectedBank = bank
                                         showBankInstructionDialog = true
@@ -519,7 +518,7 @@ fun importTransactionsScreen(
 
             // Диалог с инструкциями по получению выписки из банка
             if (showBankInstructionDialog) {
-                BankInstructionDialog(
+                bankInstructionDialog(
                     bankName = selectedBank,
                     onDismiss = { showBankInstructionDialog = false },
                 )

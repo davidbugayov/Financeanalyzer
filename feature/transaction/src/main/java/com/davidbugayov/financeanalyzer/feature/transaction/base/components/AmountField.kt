@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.feature.transaction.base.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -95,7 +94,7 @@ private fun stripCurrencySymbol(
  * Поле ввода суммы транзакции с улучшенным дизайном и акцентом
  */
 @Composable
-fun AmountField(
+fun amountField(
     amount: String,
     onAmountChange: (String) -> Unit,
     isError: Boolean,

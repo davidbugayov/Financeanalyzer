@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,7 @@ data class ImportResults(
  * Компонент для отображения результатов импорта
  */
 @Composable
-fun ImportResultsSection(
+fun importResultsSection(
     importResults: ImportResults?,
     modifier: Modifier = Modifier,
 ) {

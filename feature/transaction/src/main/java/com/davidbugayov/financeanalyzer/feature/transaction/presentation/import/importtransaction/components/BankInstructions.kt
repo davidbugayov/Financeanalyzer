@@ -15,7 +15,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Инструкции для Сбербанка
  */
 @Composable
-fun SberbankInstructions() {
+fun sberbankInstructions() {
     Column {
         Text(
             buildAnnotatedString {
@@ -38,7 +38,7 @@ fun SberbankInstructions() {
  * Инструкции для Тинькофф
  */
 @Composable
-fun TinkoffInstructions() {
+fun tinkoffInstructions() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -53,7 +53,7 @@ fun TinkoffInstructions() {
  * Инструкции для Альфа-Банка
  */
 @Composable
-fun AlfaBankInstructions() {
+fun alfaBankInstructions() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -84,7 +84,7 @@ fun AlfaBankInstructions() {
  * Инструкции для Озон
  */
 @Composable
-fun OzonInstructions() {
+fun ozonInstructions() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -99,7 +99,7 @@ fun OzonInstructions() {
  * Инструкции по формату CSV
  */
 @Composable
-fun CSVInstructions() {
+fun csvInstructions() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {

@@ -1,4 +1,3 @@
-@file:Suppress("FunctionName")
 package com.davidbugayov.financeanalyzer.presentation.importtransaction.components
 
 import androidx.compose.animation.core.LinearEasing
@@ -40,7 +39,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
  * Компонент для отображения прогресса импорта
  */
 @Composable
-fun ImportProgressSection(
+fun importProgressSection(
     progress: Int,
     message: String,
     modifier: Modifier = Modifier,
@@ -134,7 +133,7 @@ fun ImportProgressSection(
                     modifier = Modifier.padding(bottom = dimensionResource(UiR.dimen.space_small)),
                 )
 
-                // Прогресс-бар в красивой карточке
+                // Прогресс-бар в карточке
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors =
@@ -167,7 +166,7 @@ fun ImportProgressSection(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            // Вращающаяся иконка синхронизации
+                            // Иконка синхронизации
                             Icon(
                                 imageVector = Icons.Rounded.Sync,
                                 contentDescription = null,
