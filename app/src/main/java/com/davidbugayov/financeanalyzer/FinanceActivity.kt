@@ -182,7 +182,7 @@ class FinanceActivity :
 }
 
 @Composable
-fun FinanceAppContent(
+fun financeAppContent(
     navigationManager: NavigationManager,
     startDestination: String,
     onFirstLaunchCompleted: () -> Unit,
@@ -198,7 +198,7 @@ fun FinanceAppContent(
                 color = MaterialTheme.colorScheme.background,
             ) {
                 val navController = rememberNavController()
-                AppNavHostImpl(
+                appNavHostImpl(
                     navController = navController,
                     navigationManager = navigationManager,
                     startDestination = startDestination,

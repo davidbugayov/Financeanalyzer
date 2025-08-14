@@ -7,7 +7,7 @@ import com.davidbugayov.financeanalyzer.feature.onboarding.OnboardingScreen
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.feature.security.AuthScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionScreen
-import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.ExportImportScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.exportImportScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
@@ -35,7 +35,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun AppNavHostImpl(
+fun appNavHostImpl(
     navController: NavHostController,
     navigationManager: NavigationManager,
     startDestination: String = Screen.Home.route,
