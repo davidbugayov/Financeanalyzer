@@ -13,6 +13,14 @@ trim_trailing_whitespace = true
 ij_kotlin_imports_layout=*
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_code_style = ktlint_official
+# Отключаем правила, создающие некорректируемые предупреждения в проекте
+ktlint_standard_max-line-length = disabled
+ktlint_standard_function-naming = disabled
+ktlint_standard_property-naming = disabled
+ktlint_standard_package-naming = disabled
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_discouraged-comment-location = disabled
 
 [*.{yml,yaml}]
 indent_size = 2

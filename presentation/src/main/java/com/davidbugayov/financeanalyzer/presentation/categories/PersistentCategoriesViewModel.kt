@@ -49,8 +49,10 @@ class PersistentCategoriesViewModel(
                     isExpense = true,
                     icon = CategoryProvider.getIconByName(customCategory.iconName),
                     color =
-                        customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
-                            ?: CategoryProvider.generateCategoryColorFromPalette(true),
+                        CategoryProvider.ensureNonBlackWhite(
+                            customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
+                                ?: CategoryProvider.generateCategoryColorFromPalette(true),
+                        ),
                 )
             }
 
@@ -61,8 +63,10 @@ class PersistentCategoriesViewModel(
                     isExpense = false,
                     icon = CategoryProvider.getIconByName(customCategory.iconName),
                     color =
-                        customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
-                            ?: CategoryProvider.generateCategoryColorFromPalette(false),
+                        CategoryProvider.ensureNonBlackWhite(
+                            customCategory.colorHex?.let { hex -> CategoryProvider.parseColorFromHex(hex) }
+                                ?: CategoryProvider.generateCategoryColorFromPalette(false),
+                        ),
                 )
             }
 

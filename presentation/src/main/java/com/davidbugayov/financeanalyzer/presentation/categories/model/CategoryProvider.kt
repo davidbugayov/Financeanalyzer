@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.ui.theme.CategoryRandomPalette
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
-import com.davidbugayov.financeanalyzer.ui.theme.CategoryRandomPalette
 import com.davidbugayov.financeanalyzer.ui.theme.expenseCategoryColorsMap
 import com.davidbugayov.financeanalyzer.ui.theme.incomeCategoryColorsMap
+import com.davidbugayov.financeanalyzer.ui.theme.toHexString
 
 object CategoryProvider {
     data class CategoryMeta(
@@ -129,12 +130,13 @@ object CategoryProvider {
      * исключая чисто белый и чисто черный.
      */
     fun generateRandomCategoryColor(): Color {
-        val filtered = CategoryRandomPalette.filter { color ->
-            val r = (color.red * 255).toInt()
-            val g = (color.green * 255).toInt()
-            val b = (color.blue * 255).toInt()
-            !((r == 0 && g == 0 && b == 0) || (r == 255 && g == 255 && b == 255))
-        }
+        val filtered =
+            CategoryRandomPalette.filter { color ->
+                val r = (color.red * 255).toInt()
+                val g = (color.green * 255).toInt()
+                val b = (color.blue * 255).toInt()
+                !((r == 0 && g == 0 && b == 0) || (r == 255 && g == 255 && b == 255))
+            }
         return filtered.ifEmpty { listOf(DefaultCategoryColor) }.random()
     }
 
@@ -169,6 +171,18 @@ object CategoryProvider {
      * Конвертирует цвет в hex строку
      */
     fun colorToHex(color: Color): String {
-        return String.format("#%06X", (0xFFFFFF and color.value.toInt()))
+        return color.toHexString()
+    }
+
+    /**
+     * Возвращает безопасный цвет категории: если чёрный/белый — подменяем на дефолтный.
+     */
+    fun ensureNonBlackWhite(color: Color): Color {
+        val r = (color.red * 255).toInt()
+        val g = (color.green * 255).toInt()
+        val b = (color.blue * 255).toInt()
+        val isBlack = r == 0 && g == 0 && b == 0
+        val isWhite = r == 255 && g == 255 && b == 255
+        return if (isBlack || isWhite) DefaultCategoryColor else color
     }
 }

@@ -83,10 +83,23 @@ fun EnhancedCategoryPieChart(
     showExpenses: Boolean = true,
     onShowExpensesChange: (Boolean) -> Unit = {},
 ) {
+    // Нормализуем цвета (исключаем чисто чёрный/белый у ранее созданных категорий)
+    val normalizedItems =
+        remember(items) {
+            items.map { item ->
+                item.copy(
+                    color =
+                        com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider.ensureNonBlackWhite(
+                            item.color,
+                        ),
+                )
+            }
+        }
+
     // Filter out items with zero or negative percentages
     val filteredData =
-        remember(items, showExpenses) {
-            items.filter { it.percentage > 0f }
+        remember(normalizedItems, showExpenses) {
+            normalizedItems.filter { it.percentage > 0f }
         }
 
     if (filteredData.isEmpty()) {

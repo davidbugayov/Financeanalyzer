@@ -38,7 +38,7 @@ class AppCategoriesViewModel(
                 name = name,
                 isExpense = isExpense,
                 icon = icon,
-                color = CategoryProvider.generateRandomCategoryColor(),
+                color = CategoryProvider.ensureNonBlackWhite(CategoryProvider.generateRandomCategoryColor()),
             )
         if (isExpense) {
             _expenseCategories.update { it + newCategory }
