@@ -67,12 +67,12 @@ import com.davidbugayov.financeanalyzer.presentation.importtransaction.component
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importProgressSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.components.importResultsSection
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -295,7 +295,7 @@ fun importTransactionsScreen(
                             ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
-                            Column(
+                        Column(
                             modifier =
                                 Modifier
                                     .fillMaxWidth()
@@ -367,7 +367,7 @@ fun importTransactionsScreen(
                         }
                     }
 
-                            // Секция результатов импорта или прогресса - перемещена выше секции банков
+                    // Секция результатов импорта или прогресса - перемещена выше секции банков
                     AnimatedVisibility(
                         visible = state.isLoading || state.successCount > 0 || state.error != null,
                         enter = fadeIn() + expandVertically(),
@@ -377,20 +377,20 @@ fun importTransactionsScreen(
                                 Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 24.dp),
-                                    // Увеличены отступы
+                            // Увеличены отступы
                             colors =
                                 CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
                                 ),
-                                    // Увеличена тень
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            // Увеличена тень
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         ) {
                             Column(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                                .padding(20.dp),
-                                        // Увеличены внутренние отступы
+                                        .padding(20.dp),
+                                // Увеличены внутренние отступы
                             ) {
                                 // Заголовок с кнопкой закрытия
                                 Row(

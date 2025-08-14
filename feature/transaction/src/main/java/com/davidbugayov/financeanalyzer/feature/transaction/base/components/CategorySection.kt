@@ -54,7 +54,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateContentColor
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CategorySection(
+fun categorySection(
     categories: List<UiCategory>,
     selectedCategory: String,
     onCategorySelected: (UiCategory) -> Unit,
@@ -334,7 +334,7 @@ fun CategorySection(
  * Элемент добавления новой категории
  */
 @Composable
-fun AddCategoryItem(
+fun addCategoryItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

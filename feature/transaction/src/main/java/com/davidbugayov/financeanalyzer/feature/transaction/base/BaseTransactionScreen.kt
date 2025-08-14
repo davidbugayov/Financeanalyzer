@@ -459,7 +459,7 @@ fun <E> baseTransactionScreen(
 
                 // Секция выбора категории - улучшенная с видимыми подкатегориями
                 if (state.isExpense) {
-                    CategorySection(
+                    categorySection(
                         categories = sortedExpenseCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->
@@ -497,8 +497,8 @@ fun <E> baseTransactionScreen(
                             }
                         },
                         isError = state.categoryError,
-                    // Новые параметры для кнопки подкатегории
-                    onSubcategoryButtonClick =
+                        // Новые параметры для кнопки подкатегории
+                        onSubcategoryButtonClick =
                             if (state.category.isNotBlank()) {
                                 {
                                     viewModel.onEvent(
@@ -513,7 +513,7 @@ fun <E> baseTransactionScreen(
                         hasAvailableSubcategories = state.availableSubcategories.isNotEmpty(),
                     )
                 } else {
-                    CategorySection(
+                    categorySection(
                         categories = sortedIncomeCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->
