@@ -48,59 +48,106 @@ import kotlinx.datetime.LocalDate
 /**
  * Простой фасад KMP для вызова из iOS/Android.
  */
-class SharedFacade(
-    private val transactionRepository: TransactionRepository? = null,
-    private val walletRepository: WalletRepository? = null,
-    private val subcategoryRepository: SubcategoryRepository? = null,
-    private val achievementsRepository: AchievementsRepository? = null,
-    private val appScope: kotlinx.coroutines.CoroutineScope? = null,
-) {
-    private val calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
-    private val calculateCategoryStatsUseCase = CalculateCategoryStatsUseCase()
-    private val getCategoriesWithAmountUseCase = GetCategoriesWithAmountUseCase()
-    private val calculateExpenseDisciplineIndex = CalculateExpenseDisciplineIndexUseCase()
-    private val calculatePeerComparison = CalculatePeerComparisonUseCase()
-    private val predictFutureExpenses = PredictFutureExpensesUseCase()
-    private val calculateRetirementForecast = CalculateRetirementForecastUseCase()
-    private val calculateFinancialHealthScore = CalculateFinancialHealthScoreUseCase()
-    private val calculateEnhancedFinancialMetrics = CalculateEnhancedFinancialMetricsUseCase(
-        calculateFinancialHealthScore,
-        calculateExpenseDisciplineIndex,
-        calculateRetirementForecast,
-        calculatePeerComparison,
-    )
-    private val getSmartExpenseTips = GetSmartExpenseTipsUseCase()
-    private val getProfileAnalytics = GetProfileAnalyticsUseCase()
-    private val filterTransactionsUseCase = FilterTransactionsUseCase()
-    private val groupTransactionsUseCase = GroupTransactionsUseCase()
-    private val validateTransactionUseCase = ValidateTransactionUseCase()
-    private val exportTransactionsToCSVUseCase = ExportTransactionsToCSVUseCase()
-    private val getTransactionByIdUseCase = GetTransactionByIdUseCase()
-    private val loadTransactions: LoadTransactionsUseCase? = transactionRepository?.let { LoadTransactionsUseCase(it) }
-    private val goalProgressUseCase = GoalProgressUseCase()
-    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase? =
-        walletRepository?.let { UpdateWalletBalancesUseCase(it) }
-    private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase? =
-        subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
-    private val addTransactionUseCase: AddTransactionUseCase? = transactionRepository?.let { AddTransactionUseCase(it) }
-    private val updateTransactionUseCase: UpdateTransactionUseCase? = transactionRepository?.let { UpdateTransactionUseCase(it) }
-    private val deleteTransactionUseCase: DeleteTransactionUseCase? = transactionRepository?.let { DeleteTransactionUseCase(it) }
-    private val getTransactionsForPeriodFlow: GetTransactionsForPeriodFlowUseCase? = transactionRepository?.let { GetTransactionsForPeriodFlowUseCase(it) }
-    private val achievementEngine: AchievementEngine? = if (achievementsRepository != null && appScope != null) AchievementEngine(achievementsRepository, appScope) else null
-    private val getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
-    private val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase? =
-        subcategoryRepository?.let { GetSubcategoryByIdUseCase(it) }
-    private val deleteSubcategoryUseCase: DeleteSubcategoryUseCase? =
-        subcategoryRepository?.let { DeleteSubcategoryUseCase(it) }
-    private val addSubcategoryUseCase: AddSubcategoryUseCase? = subcategoryRepository?.let { AddSubcategoryUseCase(it) }
-    private val allocateIncomeUseCase: AllocateIncomeUseCase? = walletRepository?.let { AllocateIncomeUseCase(it) }
-    private val getPagedTransactionsUseCase: GetPagedTransactionsUseCase? =
-        transactionRepository?.let { GetPagedTransactionsUseCase(it) }
-    private val getTransactionsForPeriodUseCaseKmp: GetTransactionsForPeriodUseCase? =
-        transactionRepository?.let { GetTransactionsForPeriodUseCase(it) }
-    private val getRecentTransactionsUseCase: GetRecentTransactionsUseCase? =
-        transactionRepository?.let { GetRecentTransactionsUseCase(it) }
-    private val updateWidgets = UpdateWidgetsUseCase()
+class SharedFacade {
+
+    private val transactionRepository: TransactionRepository?
+    private val walletRepository: WalletRepository?
+    private val subcategoryRepository: SubcategoryRepository?
+    private val achievementsRepository: AchievementsRepository?
+    private val appScope: kotlinx.coroutines.CoroutineScope?
+
+    constructor(
+        transactionRepository: TransactionRepository? = null,
+        walletRepository: WalletRepository? = null,
+        subcategoryRepository: SubcategoryRepository? = null,
+        achievementsRepository: AchievementsRepository? = null,
+        appScope: kotlinx.coroutines.CoroutineScope? = null
+    ) {
+        this.transactionRepository = transactionRepository
+        this.walletRepository = walletRepository
+        this.subcategoryRepository = subcategoryRepository
+        this.achievementsRepository = achievementsRepository
+        this.appScope = appScope
+        this.calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
+        this.calculateCategoryStatsUseCase = CalculateCategoryStatsUseCase()
+        this.getCategoriesWithAmountUseCase = GetCategoriesWithAmountUseCase()
+        this.calculateExpenseDisciplineIndex = CalculateExpenseDisciplineIndexUseCase()
+        this.calculatePeerComparison = CalculatePeerComparisonUseCase()
+        this.predictFutureExpenses = PredictFutureExpensesUseCase()
+        this.calculateRetirementForecast = CalculateRetirementForecastUseCase()
+        this.calculateFinancialHealthScore = CalculateFinancialHealthScoreUseCase()
+        this.calculateEnhancedFinancialMetrics = CalculateEnhancedFinancialMetricsUseCase(
+            calculateFinancialHealthScore,
+            calculateExpenseDisciplineIndex,
+            calculateRetirementForecast,
+            calculatePeerComparison,
+        )
+        this.getSmartExpenseTips = GetSmartExpenseTipsUseCase()
+        this.getProfileAnalytics = GetProfileAnalyticsUseCase()
+        this.filterTransactionsUseCase = FilterTransactionsUseCase()
+        this.groupTransactionsUseCase = GroupTransactionsUseCase()
+        this.validateTransactionUseCase = ValidateTransactionUseCase()
+        this.exportTransactionsToCSVUseCase = ExportTransactionsToCSVUseCase()
+        this.getTransactionByIdUseCase = GetTransactionByIdUseCase()
+        this.loadTransactions = transactionRepository?.let { LoadTransactionsUseCase(it) }
+        this.goalProgressUseCase = GoalProgressUseCase()
+        this.updateWalletBalancesUseCase = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
+        this.getSubcategoriesByCategoryIdUseCase =
+            subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
+        this.addTransactionUseCase = transactionRepository?.let { AddTransactionUseCase(it) }
+        this.updateTransactionUseCase = transactionRepository?.let { UpdateTransactionUseCase(it) }
+        this.deleteTransactionUseCase = transactionRepository?.let { DeleteTransactionUseCase(it) }
+        this.getTransactionsForPeriodFlow = transactionRepository?.let { GetTransactionsForPeriodFlowUseCase(it) }
+        this.achievementEngine =
+            if (achievementsRepository != null && appScope != null) AchievementEngine(
+                achievementsRepository,
+                appScope
+            ) else null
+        this.getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
+        this.getSubcategoryByIdUseCase = subcategoryRepository?.let { GetSubcategoryByIdUseCase(it) }
+        this.deleteSubcategoryUseCase = subcategoryRepository?.let { DeleteSubcategoryUseCase(it) }
+        this.addSubcategoryUseCase = subcategoryRepository?.let { AddSubcategoryUseCase(it) }
+        this.allocateIncomeUseCase = walletRepository?.let { AllocateIncomeUseCase(it) }
+        this.getPagedTransactionsUseCase = transactionRepository?.let { GetPagedTransactionsUseCase(it) }
+        this.getTransactionsForPeriodUseCaseKmp = transactionRepository?.let { GetTransactionsForPeriodUseCase(it) }
+        this.getRecentTransactionsUseCase = transactionRepository?.let { GetRecentTransactionsUseCase(it) }
+        this.updateWidgets = UpdateWidgetsUseCase()
+    }
+
+    private val calculateBalanceMetrics: CalculateBalanceMetricsUseCase
+    private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase
+    private val getCategoriesWithAmountUseCase: GetCategoriesWithAmountUseCase
+    private val calculateExpenseDisciplineIndex: CalculateExpenseDisciplineIndexUseCase
+    private val calculatePeerComparison: CalculatePeerComparisonUseCase
+    private val predictFutureExpenses: PredictFutureExpensesUseCase
+    private val calculateRetirementForecast: CalculateRetirementForecastUseCase
+    private val calculateFinancialHealthScore: CalculateFinancialHealthScoreUseCase
+    private val calculateEnhancedFinancialMetrics: CalculateEnhancedFinancialMetricsUseCase
+    private val getSmartExpenseTips: GetSmartExpenseTipsUseCase
+    private val getProfileAnalytics: GetProfileAnalyticsUseCase
+    private val filterTransactionsUseCase: FilterTransactionsUseCase
+    private val groupTransactionsUseCase: GroupTransactionsUseCase
+    private val validateTransactionUseCase: ValidateTransactionUseCase
+    private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase
+    private val getTransactionByIdUseCase: GetTransactionByIdUseCase
+    private val loadTransactions: LoadTransactionsUseCase?
+    private val goalProgressUseCase: GoalProgressUseCase
+    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase?
+    private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase?
+    private val addTransactionUseCase: AddTransactionUseCase?
+    private val updateTransactionUseCase: UpdateTransactionUseCase?
+    private val deleteTransactionUseCase: DeleteTransactionUseCase?
+    private val getTransactionsForPeriodFlow: GetTransactionsForPeriodFlowUseCase?
+    private val achievementEngine: AchievementEngine?
+    private val getExpenseOptimizationRecommendations: GetExpenseOptimizationRecommendationsUseCase
+    private val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase?
+    private val deleteSubcategoryUseCase: DeleteSubcategoryUseCase?
+    private val addSubcategoryUseCase: AddSubcategoryUseCase?
+    private val allocateIncomeUseCase: AllocateIncomeUseCase?
+    private val getPagedTransactionsUseCase: GetPagedTransactionsUseCase?
+    private val getTransactionsForPeriodUseCaseKmp: GetTransactionsForPeriodUseCase?
+    private val getRecentTransactionsUseCase: GetRecentTransactionsUseCase?
+    private val updateWidgets: UpdateWidgetsUseCase
 
     /**
      * Считает метрики по списку транзакций.
@@ -114,49 +161,7 @@ class SharedFacade(
         val currency = Currency.fromCode(currencyCode)
         return calculateBalanceMetrics(transactions, currency, start, end)
     }
-
-    fun calculateCategoryStats(transactions: List<Transaction>): Triple<List<com.davidbugayov.financeanalyzer.shared.model.CategoryStats>, Money, Money> =
-        calculateCategoryStatsUseCase(transactions)
-
-    fun getCategoriesWithAmount(transactions: List<Transaction>, isExpense: Boolean): List<com.davidbugayov.financeanalyzer.shared.model.CategoryWithAmount> =
-        getCategoriesWithAmountUseCase(transactions, isExpense)
-
-    fun expenseDisciplineIndex(transactions: List<Transaction>, periodMonths: Int = 6): Double =
-        calculateExpenseDisciplineIndex(transactions, periodMonths)
-
-    fun peerComparison(transactions: List<Transaction>, healthScore: Double): com.davidbugayov.financeanalyzer.shared.model.PeerComparison =
-        calculatePeerComparison(transactions, healthScore)
-
-    fun predictExpenses(transactions: List<Transaction>, months: Int = 1): Money =
-        predictFutureExpenses(transactions, months)
-
-    fun retirementForecast(
-        transactions: List<Transaction>,
-        currentAge: Int = 30,
-        retirementAge: Int = 65,
-        currentSavings: Money = Money.zero(),
-        desiredMonthlyPension: Money? = null,
-    ): com.davidbugayov.financeanalyzer.shared.model.RetirementForecast =
-        calculateRetirementForecast(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
-
-    /**
-     * Возвращает коэффициент финансового здоровья и декомпозицию компонентов.
-     */
-    fun financialHealthScore(transactions: List<Transaction>, periodMonths: Int = 6): Pair<Double, com.davidbugayov.financeanalyzer.shared.model.HealthScoreBreakdown> =
-        calculateFinancialHealthScore(transactions, periodMonths)
-
-    /**
-     * Композитный расчет метрик и рекомендаций.
-     */
-    fun enhancedFinancialMetrics(
-        transactions: List<Transaction>,
-        currentAge: Int = 30,
-        retirementAge: Int = 65,
-        currentSavings: Money = Money.zero(),
-        desiredMonthlyPension: Money? = null,
-    ): com.davidbugayov.financeanalyzer.shared.model.FinancialHealthMetrics =
-        calculateEnhancedFinancialMetrics(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
-
+    
     /**
      * Коды советов по экономии.
      */

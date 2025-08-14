@@ -96,8 +96,10 @@ data class ExcelParseConfig(
     val defaultCurrencyCode: String = "RUB",
     val dateFormatConfig: DateFormatConfig = DateFormatConfig(),
     val amountParseConfig: AmountParseConfig = AmountParseConfig(),
-    val skipEmptyRows: Boolean = true, // Rows where all mapped cells are empty
-    val expectedMinValuesPerRow: Int = 2, // e.g., at least date and amount must be present
+    // Rows where all mapped cells are empty
+    val skipEmptyRows: Boolean = true,
+    // e.g., at least date and amount must be present
+    val expectedMinValuesPerRow: Int = 2,
 )
 
 /**
@@ -108,9 +110,12 @@ data class ExcelParseConfig(
 class GenericExcelImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository,
-    private var config: ExcelParseConfig = ExcelParseConfig(), // теперь var
-    private val transactionSource: String? = null, // Опциональный источник транзакций
-    private val debugEnabled: Boolean = false, // Включение режима отладки с подробным логированием
+    // Var to allow auto-detected config override
+    private var config: ExcelParseConfig = ExcelParseConfig(),
+    // Опциональный источник транзакций
+    private val transactionSource: String? = null,
+    // Включение режима отладки с подробным логированием
+    private val debugEnabled: Boolean = false,
 ) : BankImportUseCase(transactionRepository, context) {
     // Переменная для хранения обнаруженного типа банка
     private var detectedBankName: String = "Generic Excel (POI)"
