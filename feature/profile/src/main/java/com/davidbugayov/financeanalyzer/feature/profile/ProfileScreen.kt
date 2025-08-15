@@ -131,10 +131,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         // Логируем использование функции профиля
         userEventTracker.trackFeatureUsage("profile_view")
 
-        // Отправляем данные о состоянии пользователя в аналитику
-        AnalyticsUtils.setUserProperty("has_transactions", "false") // Убрано из профиля
-        AnalyticsUtils.setUserProperty("has_categories", "false") // Убрано из профиля
-        AnalyticsUtils.setUserProperty("savings_rate", "0.0") // Убрано из профиля
+        
 
         // Запрос оценки через 2 сек, если экран не закрыт (в других флейворах вызов no-op)
         (context as? Activity)?.let { activity ->
