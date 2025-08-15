@@ -31,7 +31,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.R as UiR

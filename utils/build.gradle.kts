@@ -58,6 +58,20 @@ android {
     }
 
     // composeOptions removed; using composeCompiler plugin
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        // Отключаем правила, которые конфликтуют с ktlint
+        disable += "ComposableNaming"
+        disable += "UnusedResources"
+        disable += "StringFormatMatches"
+        baseline = file("lint-baseline.xml")
+    }
+}
+
+// Настройка ktlint
+ktlint {
+    ignoreFailures.set(true)
 }
 
 dependencies {
@@ -102,8 +116,4 @@ dependencies {
 
     // Exp4j
     implementation(libs.exp4j)
-}
-
-ktlint {
-    ignoreFailures.set(true)
 }

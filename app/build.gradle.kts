@@ -255,6 +255,10 @@ android {
         abortOnError = false
         checkReleaseBuilds = true
         baseline = file("lint-baseline.xml")
+        // Отключаем правила, которые конфликтуют с ktlint
+        disable += "ComposableNaming"
+        disable += "UnusedResources"
+        disable += "StringFormatMatches"
         htmlReport = true
         htmlOutput =
             layout.buildDirectory

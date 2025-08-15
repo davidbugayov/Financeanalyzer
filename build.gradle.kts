@@ -33,6 +33,19 @@ subprojects {
     plugins.withId("org.jlleitschuh.gradle.ktlint") {
         extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
             ignoreFailures.set(true)
+            // Настройки для совместимости с Android Lint
+            android.set(true)
+            verbose.set(true)
+            outputToConsole.set(true)
+            enableExperimentalRules.set(true)
+            // Отключаем правила, которые конфликтуют с Android Lint
+            filter {
+                exclude { element -> element.file.path.contains("generated/") }
+                include("**/src/main/**/*.kt")
+                include("**/src/google/**/*.kt")
+                include("**/src/fdroid/**/*.kt")
+                include("**/src/huawei/**/*.kt")
+            }
         }
     }
 }

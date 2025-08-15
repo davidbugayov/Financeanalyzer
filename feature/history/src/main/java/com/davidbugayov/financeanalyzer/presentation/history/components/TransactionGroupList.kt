@@ -40,7 +40,7 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.presentation.components.transactionItem
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor

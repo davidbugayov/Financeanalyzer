@@ -43,7 +43,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategor
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog

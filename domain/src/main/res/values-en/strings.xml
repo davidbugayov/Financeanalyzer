@@ -104,7 +104,7 @@
     <string name="recommendation_increase_savings_rate">recommendation_increase_savings_rate</string>
     <string name="recommendation_increase_savings_rate_desc">Your savings rate for __ph_0 __ %% below the average in your income group.Try to automatically postpone 10 %% from income.</string>
     <string name="recommendation_large_expenses">Large one-time expenses detected. Plan ahead and consider alternatives.</string>
-    <string name="recommendation_no_savings">You do not save regularly. Save at least 10% every month.</string>
+    <string name="recommendation_no_savings">You do not save regularly. Save at least 10%% every month.</string>
     <string name="recommendation_save_on_cafe">Save on eating out</string>
     <string name="recommendation_save_on_cafe_desc">You spend a lot on cafes and restaurants. Try cooking at home.</string>
     <string name="recommendation_small_expenses">Many small expenses. Track and cut unnecessary ones.</string>

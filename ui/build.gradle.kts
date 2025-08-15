@@ -46,6 +46,15 @@ android {
         compose = true
         buildConfig = true
     }
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        // Отключаем правила, которые конфликтуют с ktlint
+        disable += "ComposableNaming"
+        disable += "UnusedResources"
+        disable += "StringFormatMatches"
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 dependencies {

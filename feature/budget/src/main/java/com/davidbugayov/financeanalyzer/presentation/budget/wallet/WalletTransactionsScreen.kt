@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.presentation.components.transactionItem
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
