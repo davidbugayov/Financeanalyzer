@@ -131,7 +131,7 @@ private fun HomeBottomBar(
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
 ) {
-    com.davidbugayov.financeanalyzer.presentation.components.animatedBottomNavigationBar(
+    AnimatedBottomNavigationBar(
         visible = true,
         onChartClick = {
             // Отслеживаем действие пользователя
