@@ -190,7 +190,7 @@ fun WalletTransactionsScreen(
                         modifier = Modifier.fillMaxSize(),
                     ) {
                         items(state.transactions) { transaction ->
-                            TransactionItem(
+                            com.davidbugayov.financeanalyzer.presentation.components.transactionItem(
                                 transaction = transaction,
                                 categoriesViewModel = categoriesViewModel,
                                 onClick = {},

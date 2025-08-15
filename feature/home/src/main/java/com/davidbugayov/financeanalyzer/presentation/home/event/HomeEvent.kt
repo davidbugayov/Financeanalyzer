@@ -42,6 +42,8 @@ sealed class HomeEvent {
 
     data object NavigateToAddTransaction : HomeEvent()
 
+    data object NavigateToDebts : HomeEvent()
+
     data class EditTransaction(
         val transaction: Transaction,
     ) : HomeEvent()

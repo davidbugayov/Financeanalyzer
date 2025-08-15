@@ -73,6 +73,7 @@ private fun HomeTopBar(
     profileIconModifier: Modifier = Modifier,
     onGenerateTestData: () -> Unit,
     onNavigateToProfile: () -> Unit,
+    onNavigateToDebts: () -> Unit,
 ) {
     AppTopBar(
         title = stringResource(UiR.string.financial_analyzer),
@@ -114,6 +115,12 @@ private fun HomeTopBar(
                     contentDescription = stringResource(UiR.string.profile),
                 )
             }
+            IconButton(onClick = onNavigateToDebts) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(UiR.string.debt_title),
+                )
+            }
         },
     )
 }
@@ -124,7 +131,7 @@ private fun HomeBottomBar(
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
 ) {
-    AnimatedBottomNavigationBar(
+    com.davidbugayov.financeanalyzer.presentation.components.animatedBottomNavigationBar(
         visible = true,
         onChartClick = {
             // Отслеживаем действие пользователя
@@ -478,6 +485,7 @@ fun HomeScreen(
                         showFeedback = true
                     },
                     onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
+                    onNavigateToDebts = { viewModel.onEvent(HomeEvent.NavigateToDebts) },
                     profileIconModifier = Modifier,
                 )
             },

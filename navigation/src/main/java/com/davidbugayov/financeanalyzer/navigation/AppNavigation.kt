@@ -28,6 +28,8 @@ class AppNavigation {
         onHomeScreen: @Composable () -> Unit,
         onHistoryScreen: @Composable () -> Unit,
         onBudgetScreen: @Composable () -> Unit,
+        onDebtsScreen: @Composable () -> Unit = {},
+        onAddDebtScreen: @Composable () -> Unit = {},
         onFinancialStatisticsScreen: @Composable (
             startDate: Long,
             endDate: Long,
@@ -81,6 +83,25 @@ class AppNavigation {
             popExitTransition = defaultExitRight(),
         ) {
             onBudgetScreen()
+        }
+        composable(
+            route = Screen.Debts.route,
+            enterTransition = defaultEnterLeft(),
+            exitTransition = defaultExitRight(),
+            popEnterTransition = defaultEnterLeft(),
+            popExitTransition = defaultExitRight(),
+        ) {
+            onDebtsScreen()
+        }
+
+        composable(
+            route = Screen.AddDebt.route,
+            enterTransition = defaultEnterUp(),
+            exitTransition = defaultExitDown(),
+            popEnterTransition = defaultEnterUp(),
+            popExitTransition = defaultExitDown(),
+        ) {
+            onAddDebtScreen()
         }
         composable(
             route = Screen.FinancialStatistics.route,

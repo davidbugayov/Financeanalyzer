@@ -28,7 +28,7 @@ import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
 
 @Composable
-fun TransactionPagingList(
+fun transactionPagingList(
     items: LazyPagingItems<TransactionListItem>,
     categoriesViewModel: CategoriesViewModel,
     onTransactionClick: (Transaction) -> Unit,
@@ -68,7 +68,7 @@ fun TransactionPagingList(
                 }
                 is TransactionListItem.Item -> {
                     val tx = model.transaction
-                    TransactionItem(
+                    transactionItem(
                         transaction = tx,
                         categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(tx) },

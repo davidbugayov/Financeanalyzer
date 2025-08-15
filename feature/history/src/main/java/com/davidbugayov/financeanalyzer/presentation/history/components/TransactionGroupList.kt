@@ -155,7 +155,7 @@ fun TransactionGroupList(
                     items = group.transactions,
                     key = { transaction -> "transaction_${groupIndex}_${transaction.id}" },
                 ) { transaction ->
-                    TransactionItem(
+                    com.davidbugayov.financeanalyzer.presentation.components.transactionItem(
                         transaction = transaction,
                         categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(transaction) },

@@ -34,7 +34,7 @@ import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
  * @param groups Map<key, List<Transaction>> – уже сгруппированные транзакции (ключ отображается как title)
  */
 @Composable
-fun GroupedTransactionList(
+fun groupedTransactionList(
     groups: Map<String, List<Transaction>>, // ключ -> список
     categoriesViewModel: CategoriesViewModel,
     onTransactionClick: (Transaction) -> Unit,
@@ -95,7 +95,7 @@ fun GroupedTransactionList(
 
             if (expanded) {
                 items(list) { tx ->
-                    TransactionItem(
+                    transactionItem(
                         transaction = tx,
                         categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(tx) },

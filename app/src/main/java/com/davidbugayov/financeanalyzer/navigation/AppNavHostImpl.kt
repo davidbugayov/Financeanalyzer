@@ -88,6 +88,12 @@ fun appNavHostImpl(
         onBudgetScreen = {
             BudgetScreen()
         },
+        onDebtsScreen = {
+            com.davidbugayov.financeanalyzer.presentation.debt.debtsScreen(
+                onAddDebt = { navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddDebt.route)) },
+                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+            )
+        },
         onFinancialStatisticsScreen = { startDate, endDate, periodTypeStr ->
             // Преобразуем строковое представление PeriodType в enum
             val periodType =
@@ -193,6 +199,11 @@ fun appNavHostImpl(
                     )
                 },
                 viewModel = koinViewModel(),
+            )
+        },
+        onAddDebtScreen = {
+            com.davidbugayov.financeanalyzer.presentation.debt.addDebtScreen(
+                onSaved = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
             )
         },
         startDestination = startDestination,

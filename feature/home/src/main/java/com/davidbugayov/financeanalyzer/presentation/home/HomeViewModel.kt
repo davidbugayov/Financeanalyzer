@@ -215,6 +215,11 @@ class HomeViewModel(
                     NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)),
                 )
             }
+            is HomeEvent.NavigateToDebts -> {
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(Screen.Debts.route),
+                )
+            }
             is HomeEvent.EditTransaction -> {
                 navigationManager.navigate(
                     NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)),

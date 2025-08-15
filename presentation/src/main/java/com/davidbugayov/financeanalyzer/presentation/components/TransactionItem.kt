@@ -93,7 +93,7 @@ private fun getDayMonthYearFormatter(): SimpleDateFormat = SimpleDateFormat("d M
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TransactionItem(
+fun transactionItem(
     transaction: Transaction,
     categoriesViewModel: CategoriesViewModel,
     animated: Boolean = true,

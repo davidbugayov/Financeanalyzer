@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
  * TODO: Implement actual behavior.
  */
 @Composable
-fun AnimatedBottomNavigationBar(
+fun animatedBottomNavigationBar(
     visible: Boolean,
     onChartClick: () -> Unit,
     onHistoryClick: () -> Unit,

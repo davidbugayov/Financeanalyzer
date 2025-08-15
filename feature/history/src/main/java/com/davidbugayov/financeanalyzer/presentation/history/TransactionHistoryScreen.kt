@@ -543,7 +543,7 @@ fun TransactionHistoryScreen(
                         else -> {
                             if (state.groupedTransactions.isNotEmpty()) {
                                 // новый аккордеон-список
-                                com.davidbugayov.financeanalyzer.presentation.components.GroupedTransactionList(
+                                com.davidbugayov.financeanalyzer.presentation.components.groupedTransactionList(
                                     groups = state.groupedTransactions,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { tx ->
@@ -556,7 +556,7 @@ fun TransactionHistoryScreen(
                                     },
                                 )
                             } else {
-                                TransactionPagingList(
+                                com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
                                     items = pagingItems,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { transaction ->

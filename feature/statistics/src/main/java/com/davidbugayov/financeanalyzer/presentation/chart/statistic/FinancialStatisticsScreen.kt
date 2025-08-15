@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
@@ -105,6 +107,7 @@ fun FinancialStatisticsScreen(
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = koinViewModel()
+    val koinComponent = remember { object : KoinComponent {} }
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
@@ -770,7 +773,7 @@ fun FinancialStatisticsScreen(
                                     }
 
                                     // Оставляем предсказания
-                                    val predictExpensesUseCase = remember { PredictFutureExpensesUseCase() }
+                                    val predictExpensesUseCase = koinComponent.get<PredictFutureExpensesUseCase>()
                                     val predictedExpenses =
                                         remember(state.transactions) { predictExpensesUseCase(state.transactions) }
 

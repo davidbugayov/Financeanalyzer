@@ -6,6 +6,10 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateExpens
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateFinancialHealthScoreUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculatePeerComparisonUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateRetirementForecastUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.CreateDebtUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.GetDebtsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.RepayDebtUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
@@ -33,12 +37,18 @@ val useCaseModule =
         // Subcategories
         single { GetSubcategoryByIdUseCase(get()) }
 
+        // Debts
+        single { CreateDebtUseCase(get()) }
+        single { GetDebtsUseCase(get()) }
+        single { RepayDebtUseCase(get()) }
+
         // Analytics
         single { CalculateBalanceMetricsUseCase() }
         single { CalculateFinancialHealthScoreUseCase() }
         single { CalculateExpenseDisciplineIndexUseCase() }
         single { CalculateRetirementForecastUseCase() }
         single { CalculatePeerComparisonUseCase() }
+        single { PredictFutureExpensesUseCase() }
         single {
             CalculateEnhancedFinancialMetricsUseCase(
                 calculateFinancialHealthScoreUseCase = get(),

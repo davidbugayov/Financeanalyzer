@@ -13,9 +13,11 @@ import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.MoneyConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter
 import com.davidbugayov.financeanalyzer.data.local.dao.SubcategoryDao
+import com.davidbugayov.financeanalyzer.data.local.dao.DebtDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.SubcategoryEntity
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
+import com.davidbugayov.financeanalyzer.data.local.entity.DebtEntity
  
 import timber.log.Timber
 
@@ -27,8 +29,9 @@ import timber.log.Timber
     entities = [
         TransactionEntity::class,
         SubcategoryEntity::class,
+        DebtEntity::class,
     ],
-    version = 18,
+    version = 19,
     exportSchema = true,
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class, StringListConverter::class)
@@ -43,6 +46,11 @@ abstract class AppDatabase : RoomDatabase() {
      * Предоставляет доступ к DAO для работы с подкатегориями
      */
     abstract fun subcategoryDao(): SubcategoryDao
+
+    /**
+     * DAO для работы с долгами
+     */
+    abstract fun debtDao(): DebtDao
 
     companion object {
 
@@ -561,6 +569,35 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 18 на версию 19
+         * Создает таблицу debts для учета долгов
+         */
+        private val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS debts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        id_string TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        counterparty TEXT NOT NULL,
+                        type TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        principal TEXT NOT NULL,
+                        remaining TEXT NOT NULL,
+                        created_at INTEGER NOT NULL,
+                        due_at INTEGER,
+                        note TEXT
+                    )
+                    """,
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS index_debts_id_string ON debts (id_string)",
+                )
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -598,6 +635,7 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_16_15,
                         MIGRATION_16_17,
                         MIGRATION_17_18,
+                        MIGRATION_18_19,
                     )
                     .fallbackToDestructiveMigration(true)
                     .addCallback(
@@ -647,6 +685,28 @@ abstract class AppDatabase : RoomDatabase() {
                                 // Создаем индекс для category_id
                                 db.execSQL(
                                     "CREATE INDEX IF NOT EXISTS index_subcategories_category_id ON subcategories (category_id)",
+                                )
+
+                                // Создаем таблицу долгов
+                                db.execSQL(
+                                    """
+                                    CREATE TABLE IF NOT EXISTS debts (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                        id_string TEXT NOT NULL,
+                                        title TEXT NOT NULL,
+                                        counterparty TEXT NOT NULL,
+                                        type TEXT NOT NULL,
+                                        status TEXT NOT NULL,
+                                        principal TEXT NOT NULL,
+                                        remaining TEXT NOT NULL,
+                                        created_at INTEGER NOT NULL,
+                                        due_at INTEGER,
+                                        note TEXT
+                                    )
+                                    """,
+                                )
+                                db.execSQL(
+                                    "CREATE UNIQUE INDEX IF NOT EXISTS index_debts_id_string ON debts (id_string)",
                                 )
                             }
                         },

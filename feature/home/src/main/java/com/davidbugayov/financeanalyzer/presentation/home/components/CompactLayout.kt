@@ -239,7 +239,7 @@ fun CompactLayout(
                     }
                 }
 
-                TransactionPagingList(
+                com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
                     items = itemsToDisplay,
                     categoriesViewModel = categoriesViewModel,
                     onTransactionClick = onTransactionClick,

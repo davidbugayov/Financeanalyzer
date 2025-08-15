@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
+import com.davidbugayov.financeanalyzer.data.repository.DebtRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.SubcategoryMapper
 import com.davidbugayov.financeanalyzer.data.repository.SubcategoryRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.TransactionMapper
@@ -7,6 +8,7 @@ import com.davidbugayov.financeanalyzer.data.repository.UnifiedTransactionReposi
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepositoryImpl
+import com.davidbugayov.financeanalyzer.domain.repository.DebtRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.SubcategoryRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -35,6 +37,7 @@ val repositoryModule =
 
         // Другие репозитории
         single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
+        single<DebtRepository> { DebtRepositoryImpl(get()) }
 
         // Репозиторий подкатегорий
         single<SubcategoryRepository> { SubcategoryRepositoryImpl(get()) }
