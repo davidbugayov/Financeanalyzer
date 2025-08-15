@@ -326,8 +326,12 @@ class ProfileViewModel(
             _state.update { it.copy(isLoading = true, error = null) }
 
             try {
+                Timber.d("[ProfileViewModel] Loading transactions for analytics")
+                val transactions = sharedFacade.loadTransactions()
+                Timber.d("[ProfileViewModel] Loaded ${transactions.size} transactions")
+                
                 Timber.d("[ProfileViewModel] Calling sharedFacade.getProfileAnalytics")
-                val analytics = sharedFacade.profileAnalytics(emptyList(), _state.value.selectedCurrency.name)
+                val analytics = sharedFacade.profileAnalytics(transactions, _state.value.selectedCurrency.name)
 
                 Timber.d(
                     "[ProfileViewModel] Success! Analytics data: income=${analytics.totalIncome}, expense=${analytics.totalExpense}, balance=${analytics.balance}, savingsRate=${analytics.savingsRate}",
