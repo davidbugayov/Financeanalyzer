@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateExpenseDisciplineIndexUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateFinancialHealthScoreUseCase
@@ -44,6 +45,7 @@ val useCaseModule =
 
         // Analytics
         single { CalculateBalanceMetricsUseCase() }
+        single { CalculateCategoryStatsUseCase() }
         single { CalculateFinancialHealthScoreUseCase() }
         single { CalculateExpenseDisciplineIndexUseCase() }
         single { CalculateRetirementForecastUseCase() }
