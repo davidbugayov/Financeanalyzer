@@ -96,6 +96,7 @@
     <string name="analysis_tip_forecast">Predict changes, including loans and investments.</string>
     <string name="analysis_tip_sync">Synchronize data with bank accounts for relevance.</string>
     <string name="analytics_title">Analytics</string>
+    <string name="profile_analytics_subtitle">Detailed financial statistics</string>
     <string name="app_name">Finance Analyzer</string>
     <string name="append_loading">Download additional data</string>
     <string name="apply">Apply</string>

@@ -96,6 +96,7 @@
     <string name="analysis_tip_forecast">预测变化，包括贷款和投资。</string>
     <string name="analysis_tip_sync">将数据与银行帐户同步有关。</string>
     <string name="analytics_title">分析</string>
+    <string name="profile_analytics_subtitle">详细财务统计</string>
     <string name="app_name">金钱在掌控中</string>
     <string name="append_loading">下载其他数据</string>
     <string name="apply">应用</string>
