@@ -142,10 +142,7 @@ sealed class ProfileEvent {
         val pinCode: String,
     ) : ProfileEvent()
 
-    /**
-     * Событие загрузки финансовой аналитики.
-     */
-    data object LoadFinancialAnalytics : ProfileEvent()
+
 
     /**
      * Событие навигации к экрану библиотек.

@@ -32,17 +32,7 @@ data class ProfileState(
     val isTransactionReminderEnabled: Boolean = false,
     val transactionReminderTime: Time? = null,
     val isEditingNotifications: Boolean = false,
-    // Финансовая аналитика
-    val totalIncome: Money = Money.zero(),
-    val totalExpense: Money = Money.zero(),
-    val balance: Money = Money.zero(),
-    val savingsRate: Double = 0.0,
-    val totalTransactions: Int = 0,
-    val totalExpenseCategories: Int = 0,
-    val totalIncomeCategories: Int = 0,
-    val averageExpense: String = "0 ₽",
-    val totalSourcesUsed: Int = 0,
-    val dateRange: String = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time),
+
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,

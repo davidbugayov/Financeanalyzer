@@ -51,8 +51,6 @@ class ProfileViewModel(
         syncNotificationState()
         syncSecurityState()
 
-        loadFinancialAnalytics()
-
         val langLabel =
             when (preferencesManager.getAppLanguage()) {
                 "en" -> GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_en)
@@ -76,7 +74,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
                 _state.update { it.copy(selectedCurrency = newCurrency) }
-                loadFinancialAnalytics()
             }
         }
     }
@@ -238,9 +235,7 @@ class ProfileViewModel(
                     syncSecurityState()
                 }
             }
-            is ProfileEvent.LoadFinancialAnalytics -> {
-                loadFinancialAnalytics()
-            }
+
             is ProfileEvent.NavigateToFinancialStatistics -> {
                 navigationManager.navigate(
                     NavigationManager.Command.Navigate(
@@ -320,99 +315,7 @@ class ProfileViewModel(
         }
     }
 
-    private fun loadFinancialAnalytics() {
-        viewModelScope.launch {
-            Timber.d("[ProfileViewModel] Starting loadFinancialAnalytics")
-            _state.update { it.copy(isLoading = true, error = null) }
 
-            try {
-                Timber.d("[ProfileViewModel] Loading transactions for analytics")
-                val transactions = sharedFacade.loadTransactions()
-                Timber.d("[ProfileViewModel] Loaded ${transactions.size} transactions")
-                
-                Timber.d("[ProfileViewModel] Calling sharedFacade.getProfileAnalytics")
-                val analytics = sharedFacade.profileAnalytics(transactions, _state.value.selectedCurrency.name)
-
-                Timber.d(
-                    "[ProfileViewModel] Success! Analytics data: income=${analytics.totalIncome}, expense=${analytics.totalExpense}, balance=${analytics.balance}, savingsRate=${analytics.savingsRate}",
-                )
-                Timber.d(
-                    "[ProfileViewModel] More analytics: transactions=${analytics.totalTransactions}, expenseCategories=${analytics.totalExpenseCategories}, incomeCategories=${analytics.totalIncomeCategories}",
-                )
-
-                // Форматируем dateRange в строку
-                val dateRange = analytics.dateRange
-                val dateRangeStr =
-                    if (dateRange != null) {
-                        val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-                        val startStr =
-                            dateFormat.format(java.util.Date(dateRange.first.toEpochDays() * 24L * 60L * 60L * 1000L))
-                        val endStr =
-                            dateFormat.format(java.util.Date(dateRange.second.toEpochDays() * 24L * 60L * 60L * 1000L))
-                        "$startStr - $endStr"
-                    } else {
-                        GlobalContext.get().get<ResourceProvider>().getString(UiR.string.period_all_time)
-                    }
-
-                // Форматируем averageExpense в строку
-                val averageExpenseStr =
-                    com.davidbugayov.financeanalyzer.core.model
-                        .Money(
-                            java.math.BigDecimal.valueOf(analytics.averageExpense.toMajorDouble()),
-                            _state.value.selectedCurrency,
-                        ).formatForDisplay(useMinimalDecimals = true)
-
-                Timber.d(
-                    "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
-                )
-
-                val newState =
-                    _state.value.copy(
-                        isLoading = false,
-                        totalIncome =
-                            com.davidbugayov.financeanalyzer.core.model.Money(
-                                java.math.BigDecimal.valueOf(analytics.totalIncome.toMajorDouble()),
-                                _state.value.selectedCurrency,
-                            ),
-                        totalExpense =
-                            com.davidbugayov.financeanalyzer.core.model.Money(
-                                java.math.BigDecimal.valueOf(analytics.totalExpense.toMajorDouble()),
-                                _state.value.selectedCurrency,
-                            ),
-                        balance =
-                            com.davidbugayov.financeanalyzer.core.model.Money(
-                                java.math.BigDecimal.valueOf(analytics.balance.toMajorDouble()),
-                                _state.value.selectedCurrency,
-                            ),
-                        savingsRate = analytics.savingsRate,
-                        totalTransactions = analytics.totalTransactions,
-                        totalExpenseCategories = analytics.totalExpenseCategories,
-                        totalIncomeCategories = analytics.totalIncomeCategories,
-                        averageExpense = averageExpenseStr,
-                        totalSourcesUsed = analytics.totalSourcesUsed,
-                        dateRange = dateRangeStr,
-                        error = null,
-                    )
-
-                _state.update { newState }
-
-                Timber.d(
-                    "[ProfileViewModel] State updated with analytics data. New state: income=${newState.totalIncome.amount}, expense=${newState.totalExpense.amount}, balance=${newState.balance.amount}",
-                )
-            } catch (exception: Exception) {
-                Timber.e(exception, "[ProfileViewModel] Exception in loadFinancialAnalytics")
-                _state.update { currentState ->
-                    currentState.copy(
-                        isLoading = false,
-                        error =
-                            exception.message
-                                ?: GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_unknown),
-                    )
-                }
-                throw exception
-            }
-        }
-    }
 
     private fun syncNotificationState() {
         val isEnabled = preferencesManager.isTransactionReminderEnabled()

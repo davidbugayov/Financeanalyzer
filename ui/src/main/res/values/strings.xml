@@ -87,6 +87,7 @@
     <string name="analysis_tip_forecast">Прогнозируйте изменения, включая кредиты и инвестиции.</string>
     <string name="analysis_tip_sync">Синхронизируйте данные с банковскими счетами для актуальности.</string>
     <string name="analytics_title">Аналитика</string>
+    <string name="profile_analytics_subtitle">Подробная финансовая статистика</string>
     <string name="app_name">Finance Analyzer</string>
     <string name="append_loading">Загрузка дополнительных данных</string>
     <string name="apply">Применить</string>

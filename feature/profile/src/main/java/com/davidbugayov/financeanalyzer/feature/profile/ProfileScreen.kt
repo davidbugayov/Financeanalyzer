@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -51,7 +52,7 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
-import com.davidbugayov.financeanalyzer.feature.profile.components.AnalyticsSection
+
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.CurrencySelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.LanguageSelectionDialog
@@ -130,12 +131,9 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         userEventTracker.trackFeatureUsage("profile_view")
 
         // Отправляем данные о состоянии пользователя в аналитику
-        AnalyticsUtils.setUserProperty("has_transactions", (state.totalTransactions > 0).toString())
-        AnalyticsUtils.setUserProperty(
-            "has_categories",
-            (state.totalExpenseCategories > 0 || state.totalIncomeCategories > 0).toString(),
-        )
-        AnalyticsUtils.setUserProperty("savings_rate", state.savingsRate.toString())
+        AnalyticsUtils.setUserProperty("has_transactions", "false") // Убрано из профиля
+        AnalyticsUtils.setUserProperty("has_categories", "false") // Убрано из профиля
+        AnalyticsUtils.setUserProperty("savings_rate", "0.0") // Убрано из профиля
 
         // Запрос оценки через 2 сек, если экран не закрыт (в других флейворах вызов no-op)
         (context as? Activity)?.let { activity ->
@@ -188,12 +186,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     }
 
     LaunchedEffect(state) {
-        Timber.d(
-            "[ProfileScreen] Current state: income=${state.totalIncome.amount}, expense=${state.totalExpense.amount}, balance=${state.balance.amount}",
-        )
-        Timber.d(
-            "[ProfileScreen] More state: transactions=${state.totalTransactions}, expenseCategories=${state.totalExpenseCategories}, incomeCategories=${state.totalIncomeCategories}",
-        )
+        Timber.d("[ProfileScreen] Current state updated")
     }
 
     LaunchedEffect(Unit) {
@@ -250,44 +243,28 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         .padding(paddingValues)
                         .verticalScroll(rememberScrollState()),
             ) {
-                AnalyticsSection(
-                    totalIncome = state.totalIncome,
-                    totalExpense = state.totalExpense,
-                    balance = state.balance,
-                    savingsRate = state.savingsRate,
-                    totalTransactions = state.totalTransactions,
-                    totalExpenseCategories = state.totalExpenseCategories,
-                    totalIncomeCategories = state.totalIncomeCategories,
-                    averageExpense = state.averageExpense,
-                    totalSourcesUsed = state.totalSourcesUsed,
-                    dateRange = state.dateRange,
-                    onSavingsRateClick = {
+                ProfileActionCard(
+                    icon = Icons.Filled.Analytics,
+                    iconBackground = MaterialTheme.colorScheme.primary,
+                    title = stringResource(UiR.string.analytics_title),
+                    subtitle = stringResource(UiR.string.profile_analytics_subtitle),
+                    onClick = {
                         // Логируем действие пользователя
                         userEventTracker.trackUserAction(
                             PerformanceMetrics.Actions.BUTTON_CLICK,
                             mapOf(
-                                "section" to "analytics",
-                                "target" to "financial_statistics",
+                                "section" to "profile",
+                                "target" to "analytics",
                             ),
                         )
 
                         viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
                     },
                     modifier =
-                        Modifier
-                            .padding(horizontal = dimensionResource(UiR.dimen.profile_section_padding)),
-                    onSectionClick = {
-                        // Логируем действие пользователя
-                        userEventTracker.trackUserAction(
-                            PerformanceMetrics.Actions.BUTTON_CLICK,
-                            mapOf(
-                                "section" to "analytics",
-                                "target" to "financial_statistics",
-                            ),
-                        )
-
-                        viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
-                    },
+                        Modifier.padding(
+                            horizontal = dimensionResource(UiR.dimen.profile_section_padding),
+                            vertical = 4.dp,
+                        ),
                 )
 
                 Spacer(
