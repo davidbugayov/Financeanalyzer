@@ -128,10 +128,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         // Отслеживаем открытие экрана для аналитики пользовательских событий
         userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.PROFILE)
 
-        // Логируем использование функции профиля
-        userEventTracker.trackFeatureUsage("profile_view")
 
-        
 
         // Запрос оценки через 2 сек, если экран не закрыт (в других флейворах вызов no-op)
         (context as? Activity)?.let { activity ->

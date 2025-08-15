@@ -68,8 +68,7 @@ fun addTransactionScreen(
         // Отслеживаем открытие экрана для аналитики пользовательских событий
         userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.ADD_TRANSACTION)
 
-        // Логируем использование функции
-        userEventTracker.trackFeatureUsage("add_transaction_view")
+
 
         try {
             // Инициализация экрана
@@ -118,7 +117,6 @@ fun addTransactionScreen(
     // Обработчик успешного добавления транзакции
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-            userEventTracker.trackFeatureUsage("transaction_added", AnalyticsConstants.Values.RESULT_SUCCESS)
 
             AnalyticsUtils.logEvent(
                 AnalyticsConstants.Events.TRANSACTION_ADDED,

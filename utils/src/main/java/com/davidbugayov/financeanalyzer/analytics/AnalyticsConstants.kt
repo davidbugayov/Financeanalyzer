@@ -64,32 +64,7 @@ object AnalyticsConstants {
         // События функций
         const val FEATURE_USED = "feature_used"
         
-        // Основные пользовательские действия (Product Analytics)
-        const val SCREEN_STATISTICS_VIEWED = "screen_statistics_viewed"
-        const val SCREEN_HISTORY_VIEWED = "screen_history_viewed"
-        const val SCREEN_PROFILE_VIEWED = "screen_profile_viewed"
-        const val SCREEN_ADD_TRANSACTION_VIEWED = "screen_add_transaction_viewed"
-        const val SCREEN_EDIT_TRANSACTION_VIEWED = "screen_edit_transaction_viewed"
-        
-        // Действия с транзакциями
-        const val TRANSACTION_ADD_STARTED = "transaction_add_started"
-        const val TRANSACTION_ADD_COMPLETED = "transaction_add_completed"
-        const val TRANSACTION_ADD_CANCELLED = "transaction_add_cancelled"
-        const val TRANSACTION_EDIT_STARTED = "transaction_edit_started"
-        const val TRANSACTION_EDIT_COMPLETED = "transaction_edit_completed"
-        const val TRANSACTION_EDIT_CANCELLED = "transaction_edit_cancelled"
-        
-        // Навигация между экранами
-        const val NAVIGATION_TO_STATISTICS = "navigation_to_statistics"
-        const val NAVIGATION_TO_HISTORY = "navigation_to_history"
-        const val NAVIGATION_TO_PROFILE = "navigation_to_profile"
-        const val NAVIGATION_TO_ADD_TRANSACTION = "navigation_to_add_transaction"
-        
-        // Взаимодействие с элементами UI
-        const val BUTTON_CLICKED = "button_clicked"
-        const val CARD_CLICKED = "card_clicked"
-        const val FILTER_APPLIED = "filter_applied"
-        const val SEARCH_PERFORMED = "search_performed"
+
 
         // События пользователя
         const val USER_ENGAGEMENT = "user_engagement"
@@ -188,21 +163,7 @@ object AnalyticsConstants {
         const val FEATURE_RESULT = "feature_result"
         const val FEATURE_USAGE_COUNT = "feature_usage_count"
         
-        // Параметры основных действий (Product Analytics)
-        const val ACTION_TYPE = "action_type"
-        const val ELEMENT_NAME = "element_name"
-        const val ELEMENT_TYPE = "element_type"
-        const val NAVIGATION_SOURCE = "navigation_source"
-        const val NAVIGATION_DESTINATION = "navigation_destination"
-        const val SESSION_DURATION = "session_duration"
-        const val TIME_SPENT_ON_SCREEN = "time_spent_on_screen"
-        
-        // Параметры транзакций для аналитики
-        const val TRANSACTION_AMOUNT_RANGE = "transaction_amount_range"
-        const val TRANSACTION_CATEGORY_TYPE = "transaction_category_type"
-        const val TRANSACTION_HAS_NOTE = "transaction_has_note"
-        const val TRANSACTION_SOURCE = "transaction_source"
-        const val TRANSACTION_EDIT_REASON = "transaction_edit_reason"
+
 
         // Параметры пользователя
         const val USER_ENGAGEMENT_TIME = "user_engagement_time"
@@ -241,39 +202,7 @@ object AnalyticsConstants {
         const val TRANSACTION_TYPE_EXPENSE = "expense"
         const val TRANSACTION_TYPE_INCOME = "income"
         
-        // Основные экраны приложения
-        const val SCREEN_HOME = "home"
-        const val SCREEN_STATISTICS = "statistics"
-        const val SCREEN_HISTORY = "history"
-        const val SCREEN_PROFILE = "profile"
-        const val SCREEN_ADD_TRANSACTION = "add_transaction"
-        const val SCREEN_EDIT_TRANSACTION = "edit_transaction"
-        
-        // Типы действий
-        const val ACTION_VIEW = "view"
-        const val ACTION_CLICK = "click"
-        const val ACTION_NAVIGATE = "navigate"
-        const val ACTION_ADD = "add"
-        const val ACTION_EDIT = "edit"
-        const val ACTION_DELETE = "delete"
-        const val ACTION_CANCEL = "cancel"
-        
-        // Типы элементов UI
-        const val ELEMENT_BUTTON = "button"
-        const val ELEMENT_CARD = "card"
-        const val ELEMENT_FILTER = "filter"
-        const val ELEMENT_SEARCH = "search"
-        const val ELEMENT_NAVIGATION = "navigation"
-        
-        // Диапазоны сумм транзакций
-        const val AMOUNT_RANGE_SMALL = "small" // 0-1000
-        const val AMOUNT_RANGE_MEDIUM = "medium" // 1000-10000
-        const val AMOUNT_RANGE_LARGE = "large" // 10000+
-        
-        // Источники транзакций
-        const val SOURCE_MANUAL = "manual"
-        const val SOURCE_IMPORT = "import"
-        const val SOURCE_QUICK_ADD = "quick_add"
+
 
         // Типы категорий
         const val CATEGORY_TYPE_EXPENSE = "expense"

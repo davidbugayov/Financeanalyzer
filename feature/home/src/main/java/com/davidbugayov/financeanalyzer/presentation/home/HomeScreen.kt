@@ -165,8 +165,7 @@ private fun HomeBottomBar(
                     "source" to "home_screen",
                 ),
             )
-            // Отслеживаем использование функции
-            UserEventTracker.trackFeatureUsage("add_transaction")
+
             // Триггер ачивки - добавление транзакции
             AchievementTrigger.onTransactionAdded()
             onNavigateToAdd()
@@ -344,8 +343,7 @@ fun HomeScreen(
         // Отслеживаем открытие экрана для аналитики пользовательских событий
         userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.HOME)
 
-        // Логируем использование функции
-        userEventTracker.trackFeatureUsage("home_view")
+
 
         try {
             // Загружаем данные для экрана
@@ -457,7 +455,7 @@ fun HomeScreen(
                 "filter" to filter.toString(),
             ),
         )
-        userEventTracker.trackFeatureUsage("transaction_filter")
+
         // Persist selected filter so it can be restored later
         sharedPreferences.edit { putString("current_filter", filter.name) }
         viewModel.onEvent(HomeEvent.SetFilter(filter))
@@ -565,7 +563,7 @@ fun HomeScreen(
                         "transaction_id" to transaction.id,
                     ),
                 )
-                userEventTracker.trackFeatureUsage("edit_transaction")
+
                 viewModel.onEvent(HomeEvent.EditTransaction(transaction))
                 showActionsDialog = false
                 selectedTransactionForActions = null
