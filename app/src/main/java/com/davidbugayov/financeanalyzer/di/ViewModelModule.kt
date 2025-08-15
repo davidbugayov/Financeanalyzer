@@ -59,11 +59,11 @@ val viewModelModule =
 
         viewModel { parameters ->
             FinancialDetailStatisticsViewModel(
-                parameters.get(),
-                parameters.get(),
-                get(),
-                get(),
-                get(),
+                startDate = parameters.get(),
+                endDate = parameters.get(),
+                transactionRepository = get(),
+                calculateCategoryStatsUseCase = get(),
+                calculateEnhancedFinancialMetricsUseCase = get(),
             )
         }
 
