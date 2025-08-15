@@ -132,19 +132,6 @@ fun addTransactionScreen(
     baseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = {
-            userEventTracker.trackUserAction(
-                "navigate_back",
-                mapOf(
-                    "screen" to "add_transaction",
-                    "has_unsaved_changes" to
-                        (
-                            state.amount.isNotBlank() ||
-                                state.title.isNotBlank() ||
-                                state.category.isNotBlank() ||
-                                state.note.isNotBlank()
-                        ).toString(),
-                ),
-            )
             viewModel.onNavigateBack()
         },
         screenTitle = stringResource(UiR.string.new_transaction_title),

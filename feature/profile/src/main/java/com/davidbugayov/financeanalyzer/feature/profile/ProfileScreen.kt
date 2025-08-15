@@ -217,15 +217,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         Scaffold(
             topBar = {
                 ProfileTopBar(onNavigateBack = {
-                    // Логируем действие пользователя
-                    userEventTracker.trackUserAction(
-                        PerformanceMetrics.Actions.NAVIGATION,
-                        mapOf(
-                            "from" to "profile_screen",
-                            "action" to "back",
-                        ),
-                    )
-
                     viewModel.onEvent(ProfileEvent.NavigateBack)
                 })
             },
@@ -244,15 +235,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     title = stringResource(UiR.string.analytics_title),
                     subtitle = stringResource(UiR.string.profile_analytics_subtitle),
                     onClick = {
-                        // Логируем действие пользователя
-                        userEventTracker.trackUserAction(
-                            PerformanceMetrics.Actions.BUTTON_CLICK,
-                            mapOf(
-                                "section" to "profile",
-                                "target" to "analytics",
-                            ),
-                        )
-
                         viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
                     },
                     modifier =
@@ -271,15 +253,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     title = stringResource(UiR.string.budget),
                     subtitle = stringResource(UiR.string.profile_budget_subtitle),
                     onClick = {
-                        // Логируем действие пользователя
-                        userEventTracker.trackUserAction(
-                            PerformanceMetrics.Actions.BUTTON_CLICK,
-                            mapOf(
-                                "section" to "profile",
-                                "target" to "budget",
-                            ),
-                        )
-
                         viewModel.onEvent(ProfileEvent.NavigateToBudget)
                     },
                     modifier =
@@ -297,15 +270,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     title = stringResource(UiR.string.export_import),
                     subtitle = stringResource(UiR.string.profile_export_import_subtitle),
                     onClick = {
-                        // Логируем действие пользователя
-                        userEventTracker.trackUserAction(
-                            PerformanceMetrics.Actions.BUTTON_CLICK,
-                            mapOf(
-                                "section" to "profile",
-                                "target" to "export_import",
-                            ),
-                        )
-
                         viewModel.onEvent(ProfileEvent.NavigateToExportImport)
                     },
                     modifier =
@@ -324,15 +288,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     title = stringResource(UiR.string.achievements),
                     subtitle = stringResource(UiR.string.profile_achievements_subtitle),
                     onClick = {
-                        // Логируем действие пользователя
-                        userEventTracker.trackUserAction(
-                            PerformanceMetrics.Actions.BUTTON_CLICK,
-                            mapOf(
-                                "section" to "profile",
-                                "target" to "achievements",
-                            ),
-                        )
-
                         viewModel.onEvent(ProfileEvent.NavigateToAchievements)
                     },
                     modifier =

@@ -81,13 +81,6 @@ private fun HomeTopBar(
             if (BuildConfig.DEBUG) {
                 IconButton(
                     onClick = {
-                        // Отслеживаем действие пользователя
-                        UserEventTracker.trackUserAction(
-                            "generate_test_data",
-                            mapOf(
-                                "source" to "home_screen",
-                            ),
-                        )
                         onGenerateTestData()
                     },
                 ) {
@@ -100,13 +93,6 @@ private fun HomeTopBar(
             IconButton(
                 modifier = profileIconModifier,
                 onClick = {
-                    // Отслеживаем действие пользователя
-                    UserEventTracker.trackUserAction(
-                        "navigate_to_profile",
-                        mapOf(
-                            "source" to "home_screen",
-                        ),
-                    )
                     onNavigateToProfile()
                 },
             ) {
@@ -134,38 +120,16 @@ private fun HomeBottomBar(
     AnimatedBottomNavigationBar(
         visible = true,
         onChartClick = {
-            // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction(
-                "navigate_to_chart",
-                mapOf(
-                    "source" to "home_screen",
-                ),
-            )
             // Триггер ачивки - посещение раздела
             AchievementTrigger.onAppSectionVisited("Statistics")
             onNavigateToChart()
         },
         onHistoryClick = {
-            // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction(
-                "navigate_to_history",
-                mapOf(
-                    "source" to "home_screen",
-                ),
-            )
             // Триггер ачивки - посещение раздела
             AchievementTrigger.onAppSectionVisited("History")
             onNavigateToHistory()
         },
         onAddClick = {
-            // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction(
-                "navigate_to_add",
-                mapOf(
-                    "source" to "home_screen",
-                ),
-            )
-
             // Триггер ачивки - добавление транзакции
             AchievementTrigger.onTransactionAdded()
             onNavigateToAdd()
@@ -421,23 +385,10 @@ fun HomeScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val onTransactionClick = { transaction: Transaction ->
-        userEventTracker.trackUserAction(
-            "transaction_click",
-            mapOf(
-                "transaction_id" to transaction.id,
-                "transaction_amount" to transaction.amount.amount.toString(),
-            ),
-        )
         selectedTransactionForDetail = transaction
         showDetailDialog = true
     }
     val onTransactionLongClick = { transaction: Transaction ->
-        userEventTracker.trackUserAction(
-            "transaction_long_click",
-            mapOf(
-                "transaction_id" to transaction.id,
-            ),
-        )
         selectedTransactionForActions = transaction
         showActionsDialog = true
     }
@@ -449,13 +400,6 @@ fun HomeScreen(
             }
         }
     val onFilterSelected = { filter: TransactionFilter ->
-        userEventTracker.trackUserAction(
-            "filter_selected",
-            mapOf(
-                "filter" to filter.toString(),
-            ),
-        )
-
         // Persist selected filter so it can be restored later
         sharedPreferences.edit { putString("current_filter", filter.name) }
         viewModel.onEvent(HomeEvent.SetFilter(filter))
@@ -544,26 +488,12 @@ fun HomeScreen(
                 selectedTransactionForActions = null
             },
             onDeleteTransaction = { transaction ->
-                userEventTracker.trackUserAction(
-                    "delete_transaction",
-                    mapOf(
-                        "transaction_id" to transaction.id,
-                        "transaction_amount" to transaction.amount.amount.toString(),
-                    ),
-                )
                 // Показываем диалог подтверждения вместо прямого удаления
                 viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
                 showActionsDialog = false
                 selectedTransactionForActions = null
             },
             onEditTransaction = { transaction ->
-                userEventTracker.trackUserAction(
-                    "edit_transaction",
-                    mapOf(
-                        "transaction_id" to transaction.id,
-                    ),
-                )
-
                 viewModel.onEvent(HomeEvent.EditTransaction(transaction))
                 showActionsDialog = false
                 selectedTransactionForActions = null
@@ -571,13 +501,6 @@ fun HomeScreen(
             transactionToDelete = state.transactionToDelete,
             onConfirmDelete = {
                 state.transactionToDelete?.let { transactionToDelete ->
-                    userEventTracker.trackUserAction(
-                        "delete_transaction",
-                        mapOf(
-                            "transaction_id" to transactionToDelete.id,
-                            "transaction_amount" to transactionToDelete.amount.amount.toString(),
-                        ),
-                    )
                     viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
                     feedbackMessage = transactionDeletedMsg
                     feedbackType = FeedbackType.SUCCESS
