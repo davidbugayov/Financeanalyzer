@@ -115,12 +115,12 @@ private fun HomeTopBar(
                     contentDescription = stringResource(UiR.string.profile),
                 )
             }
-            IconButton(onClick = onNavigateToDebts) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(UiR.string.debt_title),
-                )
-            }
+            // IconButton(onClick = onNavigateToDebts) {
+            //     Icon(
+            //         imageVector = Icons.Default.Add,
+            //         contentDescription = stringResource(UiR.string.debt_title),
+            //     )
+            // }
         },
     )
 }
