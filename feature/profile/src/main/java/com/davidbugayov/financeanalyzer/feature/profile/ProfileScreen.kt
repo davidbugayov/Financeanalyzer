@@ -232,12 +232,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     modifier =
                         Modifier.padding(
                             horizontal = dimensionResource(UiR.dimen.profile_section_padding),
-                            vertical = 4.dp,
                         ),
-                )
-
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
@@ -250,11 +245,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     modifier =
                         Modifier.padding(
                             horizontal = dimensionResource(UiR.dimen.profile_section_padding),
-                            vertical = 4.dp,
                         ),
-                )
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
@@ -267,11 +258,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     modifier =
                         Modifier.padding(
                             horizontal = dimensionResource(UiR.dimen.profile_section_padding),
-                            vertical = 4.dp,
                         ),
-                )
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 ProfileActionCard(
@@ -285,11 +272,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     modifier =
                         Modifier.padding(
                             horizontal = dimensionResource(UiR.dimen.profile_section_padding),
-                            vertical = 4.dp,
                         ),
-                )
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 SettingsSection(
@@ -313,10 +296,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         ),
                 )
 
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
-                )
-
                 // Секция безопасности
                 SecuritySettingsSection(
                     isAppLockEnabled = state.isAppLockEnabled,
@@ -338,10 +317,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         ),
                 )
 
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
-                )
-
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
@@ -350,10 +325,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         Modifier.padding(
                             horizontal = dimensionResource(UiR.dimen.profile_section_padding),
                         ),
-                )
-
-                Spacer(
-                    modifier = Modifier.height(dimensionResource(UiR.dimen.profile_section_spacing)),
                 )
 
                 ShowDialogs(state, viewModel)
@@ -475,19 +446,21 @@ fun ProfileActionCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(20.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier =
                     Modifier
-                        .size(48.dp)
+                        .size(40.dp)
                         .background(iconBackground, shape = CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
@@ -495,22 +468,23 @@ fun ProfileActionCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                if (subtitle.isNotEmpty()) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
