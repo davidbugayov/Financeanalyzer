@@ -60,6 +60,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":core"))
+    implementation(project(":shared"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)

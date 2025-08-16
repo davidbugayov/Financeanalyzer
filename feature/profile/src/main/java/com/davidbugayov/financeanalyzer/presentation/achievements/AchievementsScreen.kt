@@ -137,8 +137,7 @@ private fun AchievementsScreenContent(
         // Отправляем аналитику в AnalyticsUtils
         AnalyticsUtils.logAchievementsScreenViewed()
 
-        // Также уведомляем AchievementEngine о посещении экрана
-        AchievementEngineProvider.get()?.onAchievementsScreenViewed()
+        // TODO: Добавить уведомление AchievementEngine о посещении экрана
     }
 
     var selectedCategory by remember { mutableStateOf<AchievementCategory?>(null) }

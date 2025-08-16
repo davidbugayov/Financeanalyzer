@@ -7,8 +7,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.Achievement
-import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
+import com.davidbugayov.financeanalyzer.shared.model.Achievement
+import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -45,7 +45,7 @@ fun AchievementNotificationManager(
             AchievementNotification(
                 title = achievement.title,
                 description = achievement.description,
-                rewardCoins = achievement.rewardCoins,
+                rewardCoins = 0, // Пока используем 0, так как в shared модели нет этого поля
                 isVisible = showNotification,
                 onDismiss = {
                     showNotification = false

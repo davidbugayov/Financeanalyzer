@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
@@ -1181,7 +1182,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
 
             // Триггер достижения за использование категорий
-            com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+            com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
                 .onCategoryUsed(categoryName)
 
             // Проверяем, использованы ли все возможные категории
@@ -1190,9 +1191,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             val totalUniqueCategories = (expenseCategories.keys + incomeCategories.keys).distinct().size
 
             if (totalUniqueCategories >= 10) { // Если использовано 10+ разных категорий
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "all_categories_used",
-                )
+                // TODO: Добавить триггер достижения
             }
         }
     }

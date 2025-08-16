@@ -19,6 +19,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.validation.Validatio
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
@@ -212,8 +213,7 @@ class AddTransactionViewModel(
                     updateWidgetsUseCase()
 
                     // Триггер достижения за добавление транзакции
-                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
-                        .onTransactionAdded()
+                    AchievementTrigger.onTransactionAdded()
 
                     // Запрос отзыва (только RuStore). Реализация предоставляется в app-модуле.
                     // Для независимой компиляции feature-модуля просто пропускаем вызов здесь.

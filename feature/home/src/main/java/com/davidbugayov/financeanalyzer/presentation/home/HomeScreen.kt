@@ -32,7 +32,7 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
@@ -121,12 +121,12 @@ private fun HomeBottomBar(
         visible = true,
         onChartClick = {
             // Триггер ачивки - посещение раздела
-            AchievementTrigger.onAppSectionVisited("Statistics")
+            AchievementTrigger.onSectionVisited("Statistics")
             onNavigateToChart()
         },
         onHistoryClick = {
             // Триггер ачивки - посещение раздела
-            AchievementTrigger.onAppSectionVisited("History")
+            AchievementTrigger.onSectionVisited("History")
             onNavigateToHistory()
         },
         onAddClick = {

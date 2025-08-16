@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 /**
  * ViewModel для экрана импорта транзакций.
@@ -575,43 +576,29 @@ class ImportTransactionsViewModel(
      * Триггеры достижений за импорт из банков
      */
     private fun triggerBankImportAchievements(bankName: String?) {
-        when (bankName?.lowercase()) {
-            "тинькофф", "тинь", "tinkoff", "tbank", "тинькофф банк (pdf)", "тинькофф pdf" -> {
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "tinkoff_importer",
-                )
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "multi_bank_importer",
-                )
-            }
-            "сбербанк", "сбер", "sberbank", "сберbank", "sber", "pao сбербанк", "пао сбербанк", "sberbank pdf", "сбербанк pdf", "сбербанк (pdf)", "сбербанк pdf" -> {
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "sberbank_importer",
-                )
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "multi_bank_importer",
-                )
-            }
-            "альфа-банк", "альфа", "alfa", "alpha" -> {
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "alfabank_importer",
-                )
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "multi_bank_importer",
-                )
-            }
-            "озон банк", "озон", "ozon", "ozон банк (pdf)", "ozon pdf" -> {
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "ozon_importer",
-                )
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "multi_bank_importer",
-                )
-            }
-            "csv-выписка", "generic csv", "generic csv (configurable)" -> {
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                    "csv_importer",
-                )
+        // Триггеры достижений за импорт из банков
+        AchievementTrigger.onMilestoneReached("bank_import_master")
+        AchievementTrigger.onMilestoneReached("data_import_enthusiast")
+        AchievementTrigger.onMilestoneReached("multi_bank_user")
+        
+        // Специфичные триггеры для банков
+        bankName?.let { bank ->
+            when {
+                bank.contains("Тинькофф", ignoreCase = true) -> {
+                    AchievementTrigger.onMilestoneReached("tinkoff_importer")
+                }
+                bank.contains("Сбербанк", ignoreCase = true) -> {
+                    AchievementTrigger.onMilestoneReached("sberbank_importer")
+                }
+                bank.contains("Альфа", ignoreCase = true) -> {
+                    AchievementTrigger.onMilestoneReached("alfabank_importer")
+                }
+                bank.contains("OZON", ignoreCase = true) -> {
+                    AchievementTrigger.onMilestoneReached("ozon_importer")
+                }
+                bank.contains("CSV", ignoreCase = true) -> {
+                    AchievementTrigger.onMilestoneReached("csv_importer")
+                }
             }
         }
     }

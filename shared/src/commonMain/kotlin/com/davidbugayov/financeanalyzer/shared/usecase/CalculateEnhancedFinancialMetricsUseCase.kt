@@ -6,10 +6,12 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import kotlin.math.max
 
 /**
- * Композитный расчет продвинутых метрик и рекомендаций.
- * Локализация строк вынесена на уровень UI: здесь только коды и параметры.
+ * Главный UseCase для расчета продвинутых метрик финансового здоровья.
+ * Объединяет все компоненты: коэффициент здоровья, индекс дисциплины, 
+ * прогноз пенсии и сравнение с пирами.
  */
 class CalculateEnhancedFinancialMetricsUseCase(
     private val calculateFinancialHealthScore: CalculateFinancialHealthScoreUseCase,
@@ -17,123 +19,172 @@ class CalculateEnhancedFinancialMetricsUseCase(
     private val calculateRetirementForecast: CalculateRetirementForecastUseCase,
     private val calculatePeerComparison: CalculatePeerComparisonUseCase,
 ) {
-    operator fun invoke(
+    
+    suspend operator fun invoke(
         transactions: List<Transaction>,
         currentAge: Int = 30,
         retirementAge: Int = 65,
         currentSavings: Money = Money.zero(),
         desiredMonthlyPension: Money? = null,
     ): FinancialHealthMetrics {
-        val (healthScore, breakdown) = calculateFinancialHealthScore(transactions)
-        val discipline = calculateExpenseDisciplineIndex(transactions)
-        val forecast = calculateRetirementForecast(transactions, currentAge, retirementAge, currentSavings, desiredMonthlyPension)
-        val peers = calculatePeerComparison(transactions, healthScore)
-
-        val recommendations = buildRecommendations(
-            healthScore = healthScore,
-            expenseDisciplineIndex = discipline,
-            forecast = forecast,
-            peerComparison = peers,
+        
+        // Рассчитываем коэффициент финансового здоровья
+        val (healthScore, healthBreakdown) = calculateFinancialHealthScore(transactions)
+        
+        // Рассчитываем индекс расходной дисциплины
+        val expenseDisciplineIndex = calculateExpenseDisciplineIndex(transactions)
+        
+        // Рассчитываем прогноз пенсионных накоплений
+        val retirementForecast = calculateRetirementForecast(
             transactions = transactions,
+            currentAge = currentAge,
+            retirementAge = retirementAge,
+            currentSavings = currentSavings,
+            desiredMonthlyPension = desiredMonthlyPension
         )
-
+        
+        // Рассчитываем сравнение с пирами
+        val peerComparison = calculatePeerComparison(transactions, healthScore)
+        
+        // Генерируем рекомендации
+        val recommendations = generateRecommendations(
+            healthScore = healthScore,
+            expenseDisciplineIndex = expenseDisciplineIndex,
+            retirementForecast = retirementForecast,
+            peerComparison = peerComparison,
+            transactions = transactions
+        )
+        
         return FinancialHealthMetrics(
             financialHealthScore = healthScore,
-            expenseDisciplineIndex = discipline,
-            retirementForecast = forecast,
-            peerComparison = peers,
-            healthScoreBreakdown = breakdown,
-            recommendations = recommendations,
+            expenseDisciplineIndex = expenseDisciplineIndex,
+            retirementForecast = retirementForecast,
+            peerComparison = peerComparison,
+            healthScoreBreakdown = healthBreakdown,
+            recommendations = recommendations
         )
     }
 
-    private fun buildRecommendations(
+    /**
+     * Генерирует персонализированные рекомендации по улучшению финансового здоровья
+     */
+    private suspend fun generateRecommendations(
         healthScore: Double,
         expenseDisciplineIndex: Double,
-        forecast: com.davidbugayov.financeanalyzer.shared.model.RetirementForecast,
+        retirementForecast: com.davidbugayov.financeanalyzer.shared.model.RetirementForecast,
         peerComparison: com.davidbugayov.financeanalyzer.shared.model.PeerComparison,
-        transactions: List<Transaction>,
+        transactions: List<Transaction>
     ): List<FinancialRecommendation> {
-        val items = mutableListOf<FinancialRecommendation>()
-
+        
+        val recommendations = mutableListOf<FinancialRecommendation>()
+        
+        // Рекомендации по коэффициенту финансового здоровья
         if (healthScore < 50) {
-            items += FinancialRecommendation(
-                code = "recommendation_improve_financial_health",
-                priority = RecommendationPriority.HIGH,
-                category = RecommendationCategory.SAVINGS,
-                params = mapOf("score" to healthScore.toInt().toString()),
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_improve_financial_health",
+                    priority = RecommendationPriority.HIGH,
+                    category = RecommendationCategory.SAVINGS,
+                    params = mapOf("score" to healthScore.toInt().toString())
+                )
+            )
+        } else if (healthScore < 70) {
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_maintain_financial_health",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.SAVINGS,
+                    params = mapOf("score" to healthScore.toInt().toString())
+                )
             )
         }
-
+        
+        // Рекомендации по индексу расходной дисциплины
         if (expenseDisciplineIndex < 60) {
-            items += FinancialRecommendation(
-                code = "recommendation_improve_expense_control",
-                priority = RecommendationPriority.HIGH,
-                category = RecommendationCategory.EXPENSES,
-                params = mapOf("index" to expenseDisciplineIndex.toInt().toString()),
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_improve_expense_control",
+                    priority = RecommendationPriority.HIGH,
+                    category = RecommendationCategory.EXPENSES,
+                    params = mapOf("index" to expenseDisciplineIndex.toInt().toString())
+                )
+            )
+        } else if (expenseDisciplineIndex < 80) {
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_optimize_expenses",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.EXPENSES,
+                    params = mapOf("index" to expenseDisciplineIndex.toInt().toString())
+                )
             )
         }
-
-        if (forecast.retirementGoalProgress < 50) {
-            items += FinancialRecommendation(
-                code = "recommendation_increase_retirement_savings",
-                priority = RecommendationPriority.MEDIUM,
-                category = RecommendationCategory.RETIREMENT,
-                params = mapOf(
-                    "progress" to forecast.retirementGoalProgress.toInt().toString(),
-                    "requiredMonthly" to forecast.requiredMonthlySavings.toPlainString(),
-                ),
+        
+        // Рекомендации по пенсионным накоплениям
+        if (retirementForecast.retirementGoalProgress < 50) {
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_increase_retirement_savings",
+                    priority = RecommendationPriority.HIGH,
+                    category = RecommendationCategory.RETIREMENT,
+                    params = mapOf(
+                        "progress" to retirementForecast.retirementGoalProgress.toInt().toString(),
+                        "requiredMonthly" to retirementForecast.requiredMonthlySavings.toPlainString()
+                    )
+                )
+            )
+        } else if (retirementForecast.retirementGoalProgress < 75) {
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_optimize_retirement_plan",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.RETIREMENT,
+                    params = mapOf("progress" to retirementForecast.retirementGoalProgress.toInt().toString())
+                )
             )
         }
-
+        
+        // Рекомендации по сравнению с пирами
         if (peerComparison.savingsRateVsPeers < -5) {
-            items += FinancialRecommendation(
-                code = "recommendation_increase_savings_rate",
-                priority = RecommendationPriority.MEDIUM,
-                category = RecommendationCategory.SAVINGS,
-                params = mapOf("gap" to (-peerComparison.savingsRateVsPeers).toInt().toString()),
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_increase_savings_rate",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.SAVINGS,
+                    params = mapOf("gap" to (-peerComparison.savingsRateVsPeers).toInt().toString())
+                )
             )
         }
-
+        
+        // Рекомендации по диверсификации доходов
         val incomeSources = transactions.filter { !it.isExpense }.map { it.source }.distinct().size
         if (incomeSources < 2) {
-            items += FinancialRecommendation(
-                code = "recommendation_diversify_income",
-                priority = RecommendationPriority.LOW,
-                category = RecommendationCategory.INCOME,
-                params = mapOf("sources" to incomeSources.toString()),
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_diversify_income",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.INCOME,
+                    params = mapOf("sources" to incomeSources.toString())
+                )
             )
         }
-
-        // Резерв: экстренный фонд (просчет на основе грубой оценки)
-        val months = estimateEmergencyFundMonths(transactions)
-        if (months < 3.0) {
-            items += FinancialRecommendation(
-                code = "recommendation_create_emergency_fund",
-                priority = RecommendationPriority.HIGH,
-                category = RecommendationCategory.EMERGENCY_FUND,
-                params = mapOf("months" to months.toInt().toString()),
+        
+        // Рекомендации по чрезмерным расходам
+        val highExpenseTransactions = transactions.filter { 
+            it.isExpense && it.amount.toMajorDouble() > 10000.0
+        }
+        if (highExpenseTransactions.size > 3) {
+            recommendations.add(
+                FinancialRecommendation(
+                    code = "recommendation_reduce_large_expenses",
+                    priority = RecommendationPriority.HIGH,
+                    category = RecommendationCategory.EXPENSES,
+                    params = mapOf("count" to highExpenseTransactions.size.toString())
+                )
             )
         }
-
-        return items.sortedWith(
-            compareByDescending<FinancialRecommendation> {
-                when (it.priority) {
-                    RecommendationPriority.HIGH -> 3
-                    RecommendationPriority.MEDIUM -> 2
-                    RecommendationPriority.LOW -> 1
-                }
-            }.thenByDescending { it.code }
-        )
-    }
-
-    private fun estimateEmergencyFundMonths(transactions: List<Transaction>): Double {
-        val months = transactions.groupBy { "${it.date.year}-${it.date.month}" }
-        if (months.isEmpty()) return 0.0
-        val avgIncome = months.values.map { it.filter { !it.isExpense }.sumOf { it.amount.toMajorDouble() } }.average()
-        val avgExpense = months.values.map { it.filter { it.isExpense }.sumOf { it.amount.toMajorDouble() } }.average()
-        val monthlySavings = (avgIncome - avgExpense).coerceAtLeast(0.0)
-        return if (avgExpense > 0.0) monthlySavings / avgExpense * 12.0 else 0.0
+        
+        return recommendations.sortedBy { it.priority.ordinal }
     }
 }
 

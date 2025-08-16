@@ -19,6 +19,8 @@ import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -279,12 +281,9 @@ class ProfileViewModel(
                     }
 
                     // Триггеры достижений за экспорт
-                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                        "export_master",
-                    )
-                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                        "backup_enthusiast",
-                    )
+                    AchievementTrigger.onTransactionExported()
+                    AchievementTrigger.onMilestoneReached("export_master")
+                    AchievementTrigger.onMilestoneReached("backup_enthusiast")
                 } else {
                     _state.update { currentState ->
                         currentState.copy(

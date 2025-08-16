@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.io.File
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,13 +55,10 @@ class ExportImportViewModel(
                         val file = result.data
                         Timber.d("[ExportImportViewModel] Экспорт успешен: ${file.absolutePath}")
 
-                        // Триггеры достижений за экспорт
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                            "export_master",
-                        )
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
-                            "backup_enthusiast",
-                        )
+                                // Триггеры достижений за экспорт
+        AchievementTrigger.onTransactionExported()
+        AchievementTrigger.onMilestoneReached("export_master")
+        AchievementTrigger.onMilestoneReached("backup_enthusiast")
 
                         // Выполняем выбранное действие
                         when (action) {

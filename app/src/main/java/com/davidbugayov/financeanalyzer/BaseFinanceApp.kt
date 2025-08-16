@@ -10,8 +10,8 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
-import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
@@ -258,16 +258,25 @@ abstract class BaseFinanceApp :
                 putLong("last_open_time", currentTime)
             }
 
-            // Проверяем недельную активность (7 дней)
+            // Проверка недельной и месячной активности
             val weekInMillis = 7 * 24 * 60 * 60 * 1000L
             if (currentTime - firstOpenTime >= weekInMillis) {
-                AchievementTrigger.onMilestoneReached("week_streak")
+                AchievementTrigger.onMilestoneReached("weekly_active_user")
+                AchievementTrigger.onMilestoneReached("app_explorer")
             }
 
-            // Проверяем месячную активность (30 дней)
+            // Проверка месячной активности
             val monthInMillis = 30 * 24 * 60 * 60 * 1000L
             if (currentTime - firstOpenTime >= monthInMillis) {
-                AchievementTrigger.onMilestoneReached("month_active")
+                AchievementTrigger.onMilestoneReached("monthly_active_user")
+                AchievementTrigger.onMilestoneReached("month_user")
+            }
+            
+            // Проверка ежедневной активности
+            val dayInMillis = 24 * 60 * 60 * 1000L
+            val lastOpenTime = prefs.getLong("last_open_time", 0)
+            if (currentTime - lastOpenTime >= dayInMillis) {
+                AchievementTrigger.onMilestoneReached("daily_tracker")
             }
         } catch (e: Exception) {
             Timber.e(e, getString(UiR.string.user_activity_check_error))

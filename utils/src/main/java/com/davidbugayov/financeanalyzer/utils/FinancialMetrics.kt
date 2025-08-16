@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import kotlinx.coroutines.CoroutineScope
@@ -114,17 +114,26 @@ class FinancialMetrics private constructor() : KoinComponent {
                 _totalExpense.value = expense
                 _balance.value = balance
 
-                // Триггер достижения накоплений при изменении баланса
-                val balanceInKopecks = (balance.amount.toDouble() * 100).toLong()
-                AchievementTrigger.onSavingsChanged(balanceInKopecks)
-
                 // Логгируем результаты для диагностики
                 val formattedExpenses = totalExpense.value.formatted
                 val formattedIncome = totalIncome.value.formatted
                 val formattedBalance = balance.formatted
                 Timber.d(
-                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance, триггер накоплений: $balanceInKopecks копеек",
+                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
                 )
+                
+                // Триггер ачивки за изменение сбережений
+                AchievementTrigger.onSavingsChanged(balance.amount)
+                
+                // Триггер ачивки за первый доход
+                if (income.amount > java.math.BigDecimal.ZERO && _totalIncome.value.amount == java.math.BigDecimal.ZERO) {
+                    AchievementTrigger.onMilestoneReached("first_income")
+                }
+                
+                // Триггер ачивки за первую транзакцию
+                if (visibleTransactions.isNotEmpty() && _balance.value.amount == java.math.BigDecimal.ZERO) {
+                    AchievementTrigger.onMilestoneReached("first_transaction")
+                }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчёте метрик")
             }

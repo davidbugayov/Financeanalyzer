@@ -6,11 +6,12 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -267,7 +268,33 @@ class FinancialDetailStatisticsViewModel(
                 ?.key ?: ""
 
         // Рассчитываем продвинутые метрики финансового здоровья (если UseCase доступен)
-        val healthMetrics = calculateEnhancedFinancialMetricsUseCase?.invoke(transactions)
+        val healthMetrics = calculateEnhancedFinancialMetricsUseCase?.invoke(transactions.toShared())?.let { sharedMetrics ->
+            com.davidbugayov.financeanalyzer.domain.model.FinancialHealthMetrics(
+                financialHealthScore = sharedMetrics.financialHealthScore,
+                recommendations = sharedMetrics.recommendations.map { sharedRec ->
+                    com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation(
+                        title = sharedRec.code,
+                        description = sharedRec.code,
+                        priority = when (sharedRec.priority) {
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.HIGH -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.HIGH
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.MEDIUM -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.MEDIUM
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.LOW -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.LOW
+                        },
+                        category = when (sharedRec.category) {
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.SAVINGS -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.SAVINGS
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EXPENSES -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.EXPENSES
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.INCOME -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.INCOME
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EMERGENCY_FUND -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.SAVINGS
+                            com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.RETIREMENT -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.INVESTMENT
+                        },
+                        potentialImpact = 0.0
+                    )
+                },
+                retirementForecast = com.davidbugayov.financeanalyzer.domain.model.RetirementForecast(),
+                peerComparison = com.davidbugayov.financeanalyzer.domain.model.PeerComparison(),
+                healthScoreBreakdown = com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown()
+            )
+        }
 
         // Обновляем метрики
         Timber.d("ViewModel: Сохраняем метрики - savingsRate=$savingsRate, monthsOfSavings=$monthsOfSavings")
