@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.feature.profile
+
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -38,7 +39,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,11 +49,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
-
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.CurrencySelectionDialog
 import com.davidbugayov.financeanalyzer.feature.profile.components.LanguageSelectionDialog
@@ -65,6 +63,7 @@ import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
@@ -93,7 +92,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     val scope = rememberCoroutineScope()
 
     // Получаем компоненты аналитики из ViewModel
-    val userEventTracker = viewModel.userEventTracker
+    viewModel.userEventTracker
     // val errorTracker = viewModel.errorTracker
     CrashLoggerProvider.crashLogger
 
@@ -158,7 +157,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            
+
 
             // Отслеживаем использование памяти
             try {
@@ -236,7 +235,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 )
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
-                    iconBackground = MaterialTheme.colorScheme.primary,
+                    iconBackground = MaterialTheme.colorScheme.secondary,
                     title = stringResource(UiR.string.budget),
                     subtitle = stringResource(UiR.string.profile_budget_subtitle),
                     onClick = {
@@ -249,7 +248,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 )
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
-                    iconBackground = MaterialTheme.colorScheme.primary,
+                    iconBackground = MaterialTheme.colorScheme.tertiary,
                     title = stringResource(UiR.string.export_import),
                     subtitle = stringResource(UiR.string.profile_export_import_subtitle),
                     onClick = {
