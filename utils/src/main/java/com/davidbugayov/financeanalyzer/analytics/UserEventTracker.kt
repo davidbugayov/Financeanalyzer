@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.analytics
 
 import android.os.Bundle
 import android.os.SystemClock
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import java.util.concurrent.ConcurrentHashMap
 import timber.log.Timber
 

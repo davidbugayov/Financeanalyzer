@@ -79,6 +79,7 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":utils"))
     implementation(project(":navigation"))
+    implementation(project(":shared"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)

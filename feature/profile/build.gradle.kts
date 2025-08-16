@@ -63,6 +63,7 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":navigation"))
     implementation(project(":utils"))
+    implementation(project(":shared"))
     implementation(project(":feature"))
     implementation(project(":feature:security"))
     implementation(project(":shared"))

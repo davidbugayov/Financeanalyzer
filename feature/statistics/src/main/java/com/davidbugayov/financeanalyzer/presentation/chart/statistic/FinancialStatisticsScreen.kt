@@ -166,10 +166,10 @@ fun FinancialStatisticsScreen(
                     com.davidbugayov.financeanalyzer.utils.RuStoreUtils
                         .requestReview(activity)
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logEvent(
-                        com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Events.USER_RATING,
+                        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants.Events.USER_RATING,
                         android.os.Bundle().apply {
-                            putString(
-                                com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants.Params.SOURCE,
+                                                          putString(
+                                  com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants.Params.SOURCE,
                                 "rustore",
                             )
                             putString("request_location", "statistics_screen")
