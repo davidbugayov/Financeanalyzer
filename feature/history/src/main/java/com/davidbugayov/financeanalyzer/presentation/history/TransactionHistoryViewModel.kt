@@ -230,9 +230,9 @@ class TransactionHistoryViewModel(
 
                     // Логируем событие в аналитику
                     AnalyticsUtils.logTransactionDeleted(
-                        amount = transaction.amount.abs(),
+                        transactionType = if (transaction.isExpense) "EXPENSE" else "INCOME",
+                        amount = transaction.amount.abs().toString(),
                         category = transaction.category,
-                        isExpense = transaction.isExpense,
                     )
                 } else {
                     Timber.e("Failed to delete transaction")

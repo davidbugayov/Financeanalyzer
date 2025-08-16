@@ -103,11 +103,7 @@ fun AuthScreen(
         val biometricSupported = state.canUseBiometric
         val biometricEnrolled = state.canUseBiometric && preferencesManager.isBiometricEnabled()
 
-        AnalyticsUtils.logSecurityAuthScreenViewed(
-            hasPinCode = hasPinCode,
-            biometricSupported = biometricSupported,
-            biometricEnrolled = biometricEnrolled,
-        )
+        AnalyticsUtils.logSecurityAuthScreenViewed()
     }
 
     // Автоматически пробуем биометрическую аутентификацию при запуске, если она включена

@@ -331,9 +331,9 @@ class EditTransactionViewModel(
 
                     // Логируем событие в аналитику
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionEdited(
-                        amount = transactionToSave.amount.abs(),
+                        transactionType = if (transactionToSave.isExpense) "EXPENSE" else "INCOME",
+                        amount = transactionToSave.amount.abs().toString(),
                         category = transactionToSave.category,
-                        isExpense = transactionToSave.isExpense,
                     )
 
                     // Показываем успешное обновление

@@ -135,12 +135,7 @@ private fun AchievementsScreenContent(
         val totalCoinsEarned = achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
 
         // Отправляем аналитику в AnalyticsUtils
-        AnalyticsUtils.logAchievementsScreenViewed(
-            totalCount = achievements.size,
-            unlockedCount = unlockedCount,
-            lockedCount = lockedCount,
-            totalCoinsEarned = totalCoinsEarned,
-        )
+        AnalyticsUtils.logAchievementsScreenViewed()
 
         // Также уведомляем AchievementEngine о посещении экрана
         AchievementEngineProvider.get()?.onAchievementsScreenViewed()
@@ -202,9 +197,7 @@ private fun AchievementsScreenContent(
                         }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
-                    filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
-                    categoryFilter = categoryFilter,
-                    resultCount = resultCount,
+                    filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL
                 )
             },
             selectedFilter = selectedFilter,
@@ -230,9 +223,7 @@ private fun AchievementsScreenContent(
                         }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
-                    filterType = filterType,
-                    categoryFilter = selectedCategory?.name?.lowercase(),
-                    resultCount = resultCount,
+                    filterType = filterType
                 )
             },
         )

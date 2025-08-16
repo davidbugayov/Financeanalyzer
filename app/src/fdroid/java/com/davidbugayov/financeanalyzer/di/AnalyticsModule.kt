@@ -16,7 +16,6 @@ val analyticsModule =
             val composite = CompositeAnalytics()
             // AppMetrica only
             composite.addAnalytics(AppMetricaAnalyticsAdapter())
-            AnalyticsUtils.init(composite)
             composite
         }
 

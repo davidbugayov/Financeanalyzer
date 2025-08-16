@@ -60,13 +60,7 @@ fun addTransactionScreen(
             "AddTransactionScreen: Screen opened",
         )
 
-        AnalyticsUtils.logScreenView(
-            screenName = "add_transaction",
-            screenClass = "AddTransactionScreen",
-        )
 
-        // Отслеживаем открытие экрана для аналитики пользовательских событий
-        userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.ADD_TRANSACTION)
 
 
 
@@ -109,8 +103,7 @@ fun addTransactionScreen(
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            // Отслеживаем закрытие экрана
-            userEventTracker.trackScreenClose(PerformanceMetrics.Screens.ADD_TRANSACTION)
+            
         }
     }
 

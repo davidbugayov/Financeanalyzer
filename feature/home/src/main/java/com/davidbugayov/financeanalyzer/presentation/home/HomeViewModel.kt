@@ -246,9 +246,9 @@ class HomeViewModel(
 
                     // Логируем событие в аналитику
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
-                        amount = transaction.amount.abs(),
+                        transactionType = if (transaction.isExpense) "EXPENSE" else "INCOME",
+                        amount = transaction.amount.abs().toString(),
                         category = transaction.category,
-                        isExpense = transaction.isExpense,
                     )
 
                     context?.let { ctx ->

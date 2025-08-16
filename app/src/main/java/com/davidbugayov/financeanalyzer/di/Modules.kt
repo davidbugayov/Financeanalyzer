@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
-import com.davidbugayov.financeanalyzer.analytics.di.analyticsUtilsModule
+
 import com.davidbugayov.financeanalyzer.feature.security.di.securityModule
 import com.davidbugayov.financeanalyzer.feature.statistics.di.statisticsModule
 import com.davidbugayov.financeanalyzer.feature.transaction.di.transactionModule
@@ -20,7 +20,6 @@ val allModules =
         viewModelModule,
         transactionModule,
         analyticsModule,
-        analyticsUtilsModule,
         securityModule,
         statisticsModule,
     )

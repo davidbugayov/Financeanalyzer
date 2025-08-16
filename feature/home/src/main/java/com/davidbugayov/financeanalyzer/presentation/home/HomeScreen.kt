@@ -298,14 +298,7 @@ fun HomeScreen(
         // Отмечаем начало загрузки экрана
         PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.HOME)
 
-        // Логируем просмотр экрана
-        AnalyticsUtils.logScreenView(
-            screenName = "home",
-            screenClass = "HomeScreen",
-        )
 
-        // Отслеживаем открытие экрана для аналитики пользовательских событий
-        userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.HOME)
 
 
 
@@ -336,8 +329,7 @@ fun HomeScreen(
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            // Отслеживаем закрытие экрана
-            userEventTracker.trackScreenClose(PerformanceMetrics.Screens.HOME)
+            
         }
     }
 

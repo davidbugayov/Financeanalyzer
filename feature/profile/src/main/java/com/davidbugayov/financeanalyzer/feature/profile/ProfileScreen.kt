@@ -119,14 +119,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         // Отмечаем начало загрузки экрана
         PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.PROFILE)
 
-        // Логируем просмотр экрана
-        AnalyticsUtils.logScreenView(
-            screenName = "profile",
-            screenClass = "ProfileScreen",
-        )
 
-        // Отслеживаем открытие экрана для аналитики пользовательских событий
-        userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.PROFILE)
 
 
 
@@ -165,8 +158,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            // Отслеживаем закрытие экрана
-            userEventTracker.trackScreenClose(PerformanceMetrics.Screens.PROFILE)
+            
 
             // Отслеживаем использование памяти
             try {

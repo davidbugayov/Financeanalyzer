@@ -76,8 +76,7 @@ val analyticsModule =
                 Timber.e(e, "Error initializing AppMetrica Analytics")
             }
 
-            // Initialize AnalyticsUtils
-            AnalyticsUtils.init(composite)
+
 
             composite
         }

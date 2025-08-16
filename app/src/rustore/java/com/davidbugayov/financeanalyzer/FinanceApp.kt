@@ -46,8 +46,7 @@ class FinanceApp : BaseFinanceApp() {
         // Инициализация Firebase
         initFirebase()
 
-        // Устанавливаем составной адаптер аналитики в AnalyticsUtils
-        AnalyticsUtils.init(compositeAnalytics)
+
     }
 
     /**
