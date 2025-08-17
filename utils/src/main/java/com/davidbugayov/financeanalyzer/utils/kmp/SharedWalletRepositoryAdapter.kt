@@ -22,23 +22,15 @@ private fun DomainWallet.toShared(): SharedWallet =
     SharedWallet(
         id = this.id,
         name = this.name,
-        balance = this.balance.toSharedMoney(),
-        limit = this.limit.toSharedMoney(),
+        balance = this.balance,
+        limit = this.limit,
     )
-
-private fun com.davidbugayov.financeanalyzer.core.model.Money.toSharedMoney(): com.davidbugayov.financeanalyzer.shared.model.Money {
-    val currency =
-        com.davidbugayov.financeanalyzer.shared.model.Currency
-            .fromCode(this.currency.code)
-    return com.davidbugayov.financeanalyzer.shared.model.Money
-        .fromMajor(this.amount.toDouble(), currency)
-}
 
 private fun SharedWallet.toDomain(): DomainWallet =
     DomainWallet(
         id = this.id,
         name = this.name,
-        balance = this.balance.toCore(),
-        limit = this.limit.toCore(),
-        spent = this.balance.toCore(), // заглушка для spent
+        balance = this.balance,
+        limit = this.limit,
+        spent = this.balance, // заглушка для spent
     )

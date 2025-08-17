@@ -65,6 +65,8 @@ dependencies {
     implementation(project(":ui"))
     implementation(project(":navigation"))
     implementation(project(":utils"))
+    implementation(project(":shared"))
+    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

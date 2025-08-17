@@ -1,18 +1,20 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.importtransactions.csv
 
 import android.content.Context
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import kotlin.math.abs
 import org.koin.core.context.GlobalContext
 import timber.log.Timber
@@ -331,18 +333,16 @@ class GenericCsvImportUseCase(
                 }
             val absAmount = abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
-            val money = Money(absAmount, currency)
+            val money = Money.fromMajor(absAmount, currency)
             val category = TransactionCategoryDetector.detect(description)
             return Transaction(
+                id = UUID.randomUUID().toString(),
                 amount = money,
                 category = category,
-                date = transactionDate,
+                date = transactionDate.toLocalDateKmp(),
                 isExpense = isExpense,
                 note = context.getString(UiR.string.csv_imported_note),
                 source = bankName,
-                sourceColor = 0,
-                categoryId = "",
-                title = description,
             )
         } catch (e: Exception) {
             Timber.e(

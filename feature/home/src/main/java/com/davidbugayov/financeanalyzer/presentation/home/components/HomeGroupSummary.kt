@@ -26,10 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryDivider
@@ -37,6 +37,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryExpense
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryIncome
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextPrimary
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextSecondary
+import java.math.BigDecimal
 
 /**
  * Компонент для отображения сводки по группам транзакций и категориям.
@@ -63,7 +64,7 @@ fun HomeGroupSummary(
     val dividerColor = LocalSummaryDivider.current
 
     val calculatedBalance = balance ?: totalIncome.minus(totalExpense)
-    val balanceColor = if (calculatedBalance.amount.signum() >= 0) incomeColor else expenseColor
+    val balanceColor = if (calculatedBalance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
     var showExpenses by rememberSaveable { mutableStateOf(true) }
 

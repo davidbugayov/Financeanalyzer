@@ -2,13 +2,13 @@ package com.davidbugayov.financeanalyzer.presentation.budget.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -96,7 +96,7 @@ class WalletSetupViewModel(
                             s.copy(error = resourceProvider.getString(UiR.string.error_target_amount_positive))
                         return
                     }
-                    Money(amount)
+                    Money.fromMajor(amount)
                 } catch (_: Exception) {
                     _state.value = s.copy(error = resourceProvider.getString(UiR.string.error_enter_valid_amount))
                     return
@@ -112,10 +112,10 @@ class WalletSetupViewModel(
                 val wallet =
                     Wallet(
                         name = s.name.trim(),
-                        limit = Money(0.0),
-                        spent = Money(0.0),
+                        limit = Money.zero(),
+                        spent = Money.zero(),
                         id = UUID.randomUUID().toString(),
-                        balance = Money(0.0),
+                        balance = Money.zero(),
                         type = s.type,
                         goalAmount = goalAmount,
                         goalDate = s.goalDateMillis,

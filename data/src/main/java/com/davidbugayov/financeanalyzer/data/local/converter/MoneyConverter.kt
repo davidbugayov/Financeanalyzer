@@ -1,20 +1,17 @@
 package com.davidbugayov.financeanalyzer.data.local.converter
 
 import androidx.room.TypeConverter
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
+import java.math.BigDecimal
 
 class MoneyConverter {
     @TypeConverter
     fun fromMoney(money: Money?): String? {
         return money?.let {
-            require(it.amount.scale() <= it.currency.decimalPlaces) {
-                "Amount scale (${it.amount.scale()}) exceeds currency decimal places (${it.currency.decimalPlaces})"
-            }
-            "${it.amount},${it.currency.code}"
+            "${it.amount.toPlainString()},${it.currency.code}"
         }
     }
 

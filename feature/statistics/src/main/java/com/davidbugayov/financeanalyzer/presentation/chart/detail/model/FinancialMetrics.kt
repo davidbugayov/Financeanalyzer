@@ -1,8 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.CategoryStats
 import com.davidbugayov.financeanalyzer.domain.model.FinancialHealthMetrics
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import java.math.BigDecimal
 import java.math.RoundingMode
 

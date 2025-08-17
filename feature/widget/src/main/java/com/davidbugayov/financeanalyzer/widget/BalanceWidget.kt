@@ -7,10 +7,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +79,7 @@ class BalanceWidget :
                         transactions.filter { it.isExpense }.fold(
                             Money.zero(currency),
                         ) { acc, t -> acc + t.amount }
-                    val negativeExpense = Money(expense.amount.negate(), expense.currency)
+                    val negativeExpense = expense.negate()
                     val firstExpense = transactions.firstOrNull { it.isExpense }
                     val balance =
                         if (firstExpense != null && firstExpense.amount.isNegative()) {

@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.statistics.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 
 data class FinancialMetrics(
     val totalTransactions: Int = 0,

@@ -17,6 +17,18 @@ enum class Currency(val code: String, val symbol: String, val fractionDigits: In
     companion object {
         fun fromCode(code: String): Currency = entries.find { it.code == code } ?: RUB
     }
+    
+    // Для обратной совместимости
+    val decimalPlaces: Int get() = fractionDigits
+    val decimalSeparator: Char get() = '.'
+    val symbolPosition: SymbolPosition get() = SymbolPosition.AFTER
+    
+    // Методы для обратной совместимости
+    fun format(amount: Double): String = "$symbol${amount}"
 }
 
+enum class SymbolPosition {
+    BEFORE,
+    AFTER,
+}
 

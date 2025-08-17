@@ -69,18 +69,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -263,11 +262,11 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             onClick = {
                                 if (categoryName.isNotBlank() && categoryLimit.isNotBlank()) {
                                     try {
-                                        val limit = categoryLimit.toBigDecimal()
+                                        val limit = categoryLimit.toDoubleOrNull() ?: 0.0
                                         viewModel.onEvent(
                                             BudgetEvent.AddCategory(
                                                 name = categoryName,
-                                                limit = Money(limit),
+                                                limit = Money.fromMajor(limit),
                                             ),
                                         )
                                         categoryName = ""
@@ -327,7 +326,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             onClick = {
                                 val amount = incomeAmount.toDoubleOrNull() ?: 0.0
                                 if (amount > 0) {
-                                    viewModel.onEvent(BudgetEvent.DistributeIncome(Money(amount)))
+                                    viewModel.onEvent(BudgetEvent.DistributeIncome(Money.fromMajor(amount)))
                                     incomeAmount = ""
                                     showDistributeIncomeDialog = false
                                 }
@@ -364,10 +363,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             Text(
                                 text =
                                     stringResource(UiR.string.wallet_balance) + ": " +
-                                        selectedWallet!!.balance.formatForDisplay(
-                                            showCurrency = true,
-                                            useMinimalDecimals = true,
-                                        ),
+                                        selectedWallet!!.balance.toPlainString(),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
@@ -395,12 +391,12 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 // Ensure selectedWallet is not null again for safety, though checked in outer if
                                 selectedWallet?.let { sw ->
                                     if (amount > 0 &&
-                                        walletAmount.toBigDecimalOrNull()?.let { it <= sw.balance.amount } == true
+                                        amount <= sw.balance.amount.toDouble()
                                     ) {
                                         viewModel.onEvent(
                                             BudgetEvent.SpendFromWallet(
                                                 sw.id, // Corrected: pass ID
-                                                Money(amount),
+                                                Money.fromMajor(amount),
                                             ),
                                         )
                                         walletAmount = ""
@@ -410,9 +406,9 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             },
                             enabled =
                                 selectedWallet?.let { sw ->
-                                    walletAmount.toBigDecimalOrNull()?.let {
-                                        it > BigDecimal.ZERO &&
-                                            it <= sw.balance.amount
+                                    walletAmount.toDoubleOrNull()?.let {
+                                        it > 0.0 &&
+                                            it <= sw.balance.amount.toDouble()
                                     } ==
                                         true
                                 } == true,
@@ -445,10 +441,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             Text(
                                 text =
                                     stringResource(UiR.string.wallet_balance) + ": " +
-                                        selectedFromWallet!!.balance.formatForDisplay(
-                                            showCurrency = true,
-                                            useMinimalDecimals = true,
-                                        ),
+                                        selectedFromWallet!!.balance.toPlainString(),
                                 style = MaterialTheme.typography.bodySmall,
                             )
 
@@ -515,17 +508,13 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 // Ensure selectedFromWallet and selectedToWallet are not null again for safety
                                 if (selectedFromWallet != null && selectedToWallet != null) {
                                     if (amount > 0 &&
-                                        transferAmount.toBigDecimalOrNull()?.let {
-                                            it <=
-                                                selectedFromWallet!!.balance.amount
-                                        } ==
-                                        true
+                                        amount <= selectedFromWallet!!.balance.amount.toDouble()
                                     ) {
                                         viewModel.onEvent(
                                             BudgetEvent.TransferBetweenWallets(
                                                 selectedFromWallet!!.id, // Corrected: pass ID
                                                 selectedToWallet!!.id, // Corrected: pass ID
-                                                Money(amount),
+                                                Money.fromMajor(amount),
                                             ),
                                         )
                                         transferAmount = ""
@@ -538,8 +527,8 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                                 selectedFromWallet?.let { sfw ->
                                     selectedToWallet != null &&
                                         transferAmount
-                                            .toBigDecimalOrNull()
-                                            ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
+                                            .toDoubleOrNull()
+                                            ?.let { it > 0.0 && it <= sfw.balance.amount.toDouble() } == true
                                 } == true,
                         ) {
                             Text(stringResource(UiR.string.transfer))
@@ -833,7 +822,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                             val updatedWallet =
                                 currentSelectedWallet.copy(
                                     name = editWalletName,
-                                    limit = Money(newLimit),
+                                    limit = Money.fromMajor(newLimit),
                                     periodStartDate = newStartDate,
                                 )
                             viewModel.onEvent(BudgetEvent.UpdateCategory(updatedWallet))
@@ -959,12 +948,7 @@ fun WalletCard(
                 100,
             )
         } else if (wallet.limit.amount > BigDecimal.ZERO) {
-            (
-                wallet.spent.amount
-                    .divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
-                    .multiply(BigDecimal(100))
-            ).setScale(0, RoundingMode.FLOOR)
-                .toInt()
+            ((wallet.spent.amount.toDouble() / wallet.limit.amount.toDouble()) * 100).toInt()
                 .coerceIn(0, 100)
         } else {
             0
@@ -1045,18 +1029,12 @@ fun WalletCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "Потрачено: ${wallet.spent.formatForDisplay(
-                        showCurrency = true,
-                        useMinimalDecimals = true,
-                    )}",
+                    text = "Потрачено: ${wallet.spent.toPlainString()}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor,
                 )
                 Text(
-                    text = "Лимит: ${wallet.limit.formatForDisplay(
-                        showCurrency = true,
-                        useMinimalDecimals = true,
-                    )}",
+                    text = "Лимит: ${wallet.limit.toPlainString()}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor,
                 )

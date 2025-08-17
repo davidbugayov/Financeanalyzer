@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.utils.kmp
 
-import com.davidbugayov.financeanalyzer.core.model.Money as CoreMoney
 import com.davidbugayov.financeanalyzer.domain.model.Transaction as DomainTransaction
 import com.davidbugayov.financeanalyzer.shared.model.Currency as SharedCurrency
 import com.davidbugayov.financeanalyzer.shared.model.Money as SharedMoney
@@ -12,7 +11,7 @@ import kotlinx.datetime.LocalDate
 fun DomainTransaction.toShared(): SharedTransaction {
     val localDate = Instant.ofEpochMilli(date.time).atZone(ZoneId.systemDefault()).toLocalDate()
     val currency = SharedCurrency.fromCode(this.amount.currency.code)
-    val sharedMoney = SharedMoney.fromMajor(this.amount.amount.toDouble(), currency)
+    val sharedMoney = SharedMoney.fromMajor(this.amount.toMajorDouble(), currency)
     return SharedTransaction(
         id = id,
         amount = sharedMoney,
@@ -26,12 +25,19 @@ fun DomainTransaction.toShared(): SharedTransaction {
 
 fun List<DomainTransaction>.toShared(): List<SharedTransaction> = map { it.toShared() }
 
-fun SharedMoney.toCore(): CoreMoney =
-    CoreMoney(
-        this.toMajorDouble(),
-        com.davidbugayov.financeanalyzer.core.model.Currency
-            .fromCode(this.currency.code),
-    )
+/**
+ * Конвертирует SharedTransaction в DomainTransaction.
+ *
+ * @return DomainTransaction с преобразованными данными.
+ */
+fun SharedTransaction.toCore(): DomainTransaction = toDomain()
+
+/**
+ * Конвертирует список SharedTransaction в список DomainTransaction.
+ *
+ * @return Список DomainTransaction с преобразованными данными.
+ */
+fun List<SharedTransaction>.toCore(): List<DomainTransaction> = map { it.toCore() }
 
 fun SharedTransaction.toDomain(): DomainTransaction {
     val dateJava =
@@ -41,13 +47,9 @@ fun SharedTransaction.toDomain(): DomainTransaction {
                 .atStartOfDay(java.time.ZoneId.systemDefault())
                 .toInstant(),
         )
-    val coreCurrency =
-        com.davidbugayov.financeanalyzer.core.model.Currency
-            .fromCode(this.amount.currency.code)
-    val coreMoney = CoreMoney(this.amount.toMajorDouble(), coreCurrency)
     return DomainTransaction(
         id = this.id,
-        amount = coreMoney,
+        amount = this.amount,
         category = this.category,
         date = dateJava,
         isExpense = this.isExpense,
@@ -64,16 +66,32 @@ fun java.util.Date.toLocalDateKmp(): kotlinx.datetime.LocalDate {
     return LocalDate(ld.year, ld.monthValue, ld.dayOfMonth)
 }
 
-fun com.davidbugayov.financeanalyzer.core.model.Money.toShared(): com.davidbugayov.financeanalyzer.shared.model.Money {
-    val currency =
-        com.davidbugayov.financeanalyzer.shared.model.Currency
-            .fromCode(this.currency.code)
-    return com.davidbugayov.financeanalyzer.shared.model.Money
-        .fromMajor(this.amount.toDouble(), currency)
+/**
+ * Расширение для BigDecimal для установки масштаба.
+ *
+ * @param scale Количество знаков после запятой.
+ * @param roundingMode Режим округления.
+ * @return BigDecimal с установленным масштабом.
+ */
+fun java.math.BigDecimal.setScale(
+    scale: Int,
+    roundingMode: java.math.RoundingMode,
+): java.math.BigDecimal {
+    return this.setScale(scale, roundingMode)
 }
 
-fun com.davidbugayov.financeanalyzer.core.model.Currency.toShared(): com.davidbugayov.financeanalyzer.shared.model.Currency {
-    return com.davidbugayov.financeanalyzer.shared.model.Currency.fromCode(this.code)
+/**
+ * Расширение для Double для установки масштаба.
+ *
+ * @param scale Количество знаков после запятой.
+ * @param roundingMode Режим округления.
+ * @return BigDecimal с установленным масштабом.
+ */
+fun Double.setScale(
+    scale: Int,
+    roundingMode: java.math.RoundingMode,
+): java.math.BigDecimal {
+    return java.math.BigDecimal.valueOf(this).setScale(scale, roundingMode)
 }
 
 fun com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation.toDomain(): com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation {
@@ -95,5 +113,15 @@ fun com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation.toDoma
                 com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.RETIREMENT -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.RETIREMENT
             },
         potentialImpact = 0.0,
+    )
+}
+
+fun com.davidbugayov.financeanalyzer.shared.model.CategoryStats.toDomain(): com.davidbugayov.financeanalyzer.domain.model.CategoryStats {
+    return com.davidbugayov.financeanalyzer.domain.model.CategoryStats(
+        category = this.category,
+        amount = this.amount,
+        percentage = java.math.BigDecimal.valueOf(this.percentage),
+        count = this.count,
+        isExpense = this.isExpense,
     )
 }

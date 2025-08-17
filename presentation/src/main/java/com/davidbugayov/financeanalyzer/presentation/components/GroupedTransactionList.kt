@@ -22,10 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
@@ -53,7 +53,7 @@ fun groupedTransactionList(
             val list = groups[key].orEmpty()
             val total: Money =
                 list.fold(Money.zero(currentCurrency)) { acc, tx ->
-                    val convertedAmount = Money(tx.amount.amount, currentCurrency)
+                    val convertedAmount = Money.fromMajor(tx.amount.toMajorDouble(), currentCurrency)
                     acc + convertedAmount
                 }
             val expanded = expandedMap.getOrPut(key) { true }
@@ -68,7 +68,7 @@ fun groupedTransactionList(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val tintColor =
-                        if (total.amount.signum() < 0) {
+                        if (total.isNegative()) {
                             colorResource(id = UiR.color.expense_primary)
                         } else {
                             colorResource(id = UiR.color.income_primary)

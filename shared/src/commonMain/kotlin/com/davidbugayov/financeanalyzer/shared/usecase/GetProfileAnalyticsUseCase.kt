@@ -1,67 +1,36 @@
 package com.davidbugayov.financeanalyzer.shared.usecase
 
-import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.ProfileAnalytics
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
-import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.minus
+import java.math.BigDecimal
 
-/**
- * Собирает профильную аналитику по переданному списку транзакций.
- * Источники/кошельки не подтягиваем — totalWallets передаётся параметром при необходимости.
- */
 class GetProfileAnalyticsUseCase {
-    operator fun invoke(
-        transactions: List<Transaction>,
-        currency: Currency,
-        totalWallets: Int = 0,
-    ): ProfileAnalytics {
-        var totalIncome = Money.zero(currency)
-        var totalExpense = Money.zero(currency)
+    operator fun invoke(transactions: List<Transaction>): ProfileAnalytics {
+        if (transactions.isEmpty()) return ProfileAnalytics()
 
-        val incomeCategories = mutableSetOf<String>()
-        val expenseCategories = mutableSetOf<String>()
-        val sources = mutableSetOf<String>()
+        val totalIncome = transactions.filter { !it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }
+        val totalExpense = transactions.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }
+        val netWorth = totalIncome.subtract(totalExpense)
 
-        transactions.forEach { tx ->
-            if (!tx.isExpense) {
-                totalIncome = totalIncome + Money(tx.amount.minor, currency)
-                incomeCategories.add(tx.category)
-            } else {
-                totalExpense = totalExpense + tx.amount.abs()
-                expenseCategories.add(tx.category)
-            }
-            sources.add(tx.source)
-        }
+        val averageTransactionAmount = transactions.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.divide(BigDecimal.valueOf(transactions.size.toDouble()), 10, java.math.RoundingMode.HALF_EVEN)
 
-        val balance = totalIncome - totalExpense
-        val savingsRate = if (!totalIncome.isZero()) {
-            balance.toMajorDouble() / totalIncome.toMajorDouble() * 100.0
+        val savingsRate = if (totalIncome > BigDecimal.ZERO) {
+            ((netWorth.toDouble() / totalIncome.toDouble()) * 100.0).coerceAtLeast(0.0)
         } else 0.0
 
-        val averageExpense = if (expenseCategories.isNotEmpty()) {
-            // Грубая средняя по категориям
-            Money((totalExpense.minor / expenseCategories.size.toLong()), currency)
-        } else Money.zero(currency)
-
-        val maxDate: LocalDate? = transactions.maxByOrNull { it.date }?.date
-        val today: LocalDate? = maxDate
-        val yearAgo: LocalDate? = today?.minus(DatePeriod(years = 1))
+        val expenseToIncomeRatio = if (totalIncome > BigDecimal.ZERO) {
+            (totalExpense.toDouble() / totalIncome.toDouble()) * 100.0
+        } else 0.0
 
         return ProfileAnalytics(
-            totalIncome = totalIncome,
-            totalExpense = totalExpense,
-            balance = balance,
+            totalIncome = Money(totalIncome),
+            totalExpense = Money(totalExpense),
+            netWorth = Money(netWorth),
+            averageTransactionAmount = Money(averageTransactionAmount),
             savingsRate = savingsRate,
+            expenseToIncomeRatio = expenseToIncomeRatio,
             totalTransactions = transactions.size,
-            totalExpenseCategories = expenseCategories.size,
-            totalIncomeCategories = incomeCategories.size,
-            averageExpense = averageExpense,
-            totalSourcesUsed = sources.size,
-            dateRange = if (today != null && yearAgo != null) yearAgo to today else null,
-            totalWallets = totalWallets,
         )
     }
 }

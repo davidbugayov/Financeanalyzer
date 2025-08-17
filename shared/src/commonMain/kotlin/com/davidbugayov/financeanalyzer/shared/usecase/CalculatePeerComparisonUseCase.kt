@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.shared.usecase
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.PeerComparison
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import java.math.BigDecimal
 
 class CalculatePeerComparisonUseCase {
     operator fun invoke(transactions: List<Transaction>, healthScore: Double): PeerComparison {
@@ -30,28 +31,28 @@ class CalculatePeerComparisonUseCase {
     private fun calculateAverageMonthlyIncome(transactions: List<Transaction>): Money {
         val monthly = transactions.filter { !it.isExpense }
             .groupBy { t -> "${t.date.year}-${t.date.month}" }
-            .mapValues { (_, txs) -> txs.sumOf { it.amount.minor } }
+            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) } }
         if (monthly.isEmpty()) return Money.zero()
-        val avg = monthly.values.sum() / monthly.size
+        val avg = monthly.values.fold(BigDecimal.ZERO) { acc, amount -> acc.add(amount) }.divide(BigDecimal.valueOf(monthly.size.toDouble()), 10, java.math.RoundingMode.HALF_EVEN)
         return Money(avg)
     }
 
     private fun determineIncomeRange(monthlyIncome: Money): String = when {
-        monthlyIncome.minor < 30_000_00L -> "< 30k"
-        monthlyIncome.minor < 50_000_00L -> "30-50k"
-        monthlyIncome.minor < 75_000_00L -> "50-75k"
-        monthlyIncome.minor < 100_000_00L -> "75-100k"
-        monthlyIncome.minor < 150_000_00L -> "100-150k"
-        monthlyIncome.minor < 200_000_00L -> "150-200k"
-        monthlyIncome.minor < 300_000_00L -> "200-300k"
+        monthlyIncome.amount < BigDecimal.valueOf(30_000_00.0) -> "< 30k"
+        monthlyIncome.amount < BigDecimal.valueOf(50_000_00.0) -> "30-50k"
+        monthlyIncome.amount < BigDecimal.valueOf(75_000_00.0) -> "50-75k"
+        monthlyIncome.amount < BigDecimal.valueOf(100_000_00.0) -> "75-100k"
+        monthlyIncome.amount < BigDecimal.valueOf(150_000_00.0) -> "100-150k"
+        monthlyIncome.amount < BigDecimal.valueOf(200_000_00.0) -> "150-200k"
+        monthlyIncome.amount < BigDecimal.valueOf(300_000_00.0) -> "200-300k"
         else -> "300k+"
     }
 
     private fun calculateSavingsRate(transactions: List<Transaction>): Double {
         val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val rates = byMonth.values.map { monthTxs ->
-            val income = monthTxs.filter { !it.isExpense }.sumOf { it.amount.minor }.toDouble()
-            val expense = monthTxs.filter { it.isExpense }.sumOf { it.amount.minor }.toDouble()
+            val income = monthTxs.filter { !it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
+            val expense = monthTxs.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
             if (income > 0.0) (income - expense) / income else 0.0
         }
         return if (rates.isNotEmpty()) rates.average() else 0.0
@@ -60,10 +61,10 @@ class CalculatePeerComparisonUseCase {
     private fun calculateExpenseBreakdown(transactions: List<Transaction>): Map<String, Double> {
         val expenses = transactions.filter { it.isExpense }
         if (expenses.isEmpty()) return emptyMap()
-        val total = expenses.sumOf { it.amount.minor }.toDouble()
+        val total = expenses.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
         if (total == 0.0) return emptyMap()
         return expenses.groupBy { it.category }
-            .mapValues { (_, txs) -> txs.sumOf { it.amount.minor }.toDouble() / total }
+            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble() / total }
     }
 
     private fun getIncomeRangeBenchmarks(incomeRange: String): IncomeBenchmarks {

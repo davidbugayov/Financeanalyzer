@@ -1,9 +1,10 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,7 +96,7 @@ class FinancialMetrics private constructor() : KoinComponent {
                     visibleTransactions
                         .filter { !it.isExpense }
                         .fold(Money.zero(currentCurrency)) { acc, t ->
-                            val convertedAmount = Money(t.amount.amount, currentCurrency)
+                            val convertedAmount = Money.fromMajor(t.amount.toMajorDouble(), currentCurrency)
                             acc + convertedAmount
                         }
 
@@ -103,7 +104,7 @@ class FinancialMetrics private constructor() : KoinComponent {
                     visibleTransactions
                         .filter { it.isExpense }
                         .fold(Money.zero(currentCurrency)) { acc, t ->
-                            val convertedAmount = Money(t.amount.amount, currentCurrency)
+                            val convertedAmount = Money.fromMajor(t.amount.toMajorDouble(), currentCurrency)
                             acc + convertedAmount.abs()
                         }
 
@@ -115,23 +116,23 @@ class FinancialMetrics private constructor() : KoinComponent {
                 _balance.value = balance
 
                 // Логгируем результаты для диагностики
-                val formattedExpenses = totalExpense.value.formatted
-                val formattedIncome = totalIncome.value.formatted
-                val formattedBalance = balance.formatted
+                val formattedExpenses = totalExpense.value.formatForDisplay()
+                val formattedIncome = totalIncome.value.formatForDisplay()
+                val formattedBalance = balance.formatForDisplay()
                 Timber.d(
                     "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
                 )
 
                 // Триггер ачивки за изменение сбережений
-                AchievementTrigger.onSavingsChanged(balance.amount)
+                AchievementTrigger.onSavingsChanged(balance.toMajorDouble())
 
                 // Триггер ачивки за первый доход
-                if (income.amount > java.math.BigDecimal.ZERO && _totalIncome.value.amount == java.math.BigDecimal.ZERO) {
+                if (income.isPositive() && _totalIncome.value.isZero()) {
                     AchievementTrigger.onMilestoneReached("first_income")
                 }
 
                 // Триггер ачивки за первую транзакцию
-                if (visibleTransactions.isNotEmpty() && _balance.value.amount == java.math.BigDecimal.ZERO) {
+                if (visibleTransactions.isNotEmpty() && _balance.value.isZero()) {
                     AchievementTrigger.onMilestoneReached("first_transaction")
                 }
             } catch (e: Exception) {

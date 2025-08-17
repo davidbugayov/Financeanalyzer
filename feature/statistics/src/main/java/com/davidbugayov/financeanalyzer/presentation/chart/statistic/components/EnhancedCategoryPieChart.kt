@@ -50,10 +50,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -122,7 +122,7 @@ fun EnhancedCategoryPieChart(
         remember(filteredData) {
             val currency = filteredData.firstOrNull()?.money?.currency ?: Currency.RUB
             val sum = filteredData.sumOf { it.money.amount }
-            Money(sum.setScale(currency.decimalPlaces, java.math.RoundingMode.HALF_EVEN), currency)
+            Money(sum, currency)
         }
 
     // State for selected indices - сбрасываем при смене типа (доходы/расходы)

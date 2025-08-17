@@ -7,7 +7,9 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.BufferedReader
@@ -226,16 +228,16 @@ abstract class AbstractPdfImportUseCase(
                     var savedCount = 0
                     transactions.forEach { transaction ->
                         try {
-                            transactionRepository.addTransaction(transaction)
+                            transactionRepository.addTransaction(transaction.toDomain())
                             savedCount++
                         } catch (e: Exception) {
                             Timber.e(
                                 e,
-                                "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}",
+                                "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.id}",
                             )
                             CrashLoggerProvider.crashLogger.logDatabaseError(
                                 "importTransactions",
-                                "Ошибка при сохранении транзакции: ${transaction.title}",
+                                "Ошибка при сохранении транзакции: ${transaction.id}",
                                 e,
                             )
                         }
@@ -281,7 +283,7 @@ abstract class AbstractPdfImportUseCase(
         reader: BufferedReader,
         progressCallback: ImportProgressCallback,
         rawText: String,
-    ): List<com.davidbugayov.financeanalyzer.domain.model.Transaction>
+    ): List<com.davidbugayov.financeanalyzer.shared.model.Transaction>
 
     override fun isValidFormat(reader: BufferedReader): Boolean {
         val headerLines = mutableListOf<String>()

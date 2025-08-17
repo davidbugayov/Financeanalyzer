@@ -10,11 +10,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 class GoalProgressUseCase {
     fun invoke(wallet: Wallet): Int {
         val goal = wallet.goalAmount ?: return 0
-        if (goal.amount <= java.math.BigDecimal.ZERO) return 0
-        val percent = wallet.balance.amount.divide(goal.amount, 4, java.math.RoundingMode.HALF_EVEN)
-            .multiply(java.math.BigDecimal(100))
-            .setScale(0, java.math.RoundingMode.FLOOR)
-            .toInt()
+        if (goal.isZero()) return 0
+        val percent = (wallet.balance.toMajorDouble() / goal.toMajorDouble() * 100).toInt()
         return percent.coerceIn(0, 100)
     }
 } 

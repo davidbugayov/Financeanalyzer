@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
-import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.shared.model.Money
 
 data class BalanceMetrics(
     val income: Money,
@@ -9,5 +8,5 @@ data class BalanceMetrics(
     val balance: Money,
     val savingsRate: Double = 0.0,
     val monthsOfSavings: Double = 0.0,
-    val averageDailyExpense: Money = Money(BigDecimal.ZERO),
+    val averageDailyExpense: Money = Money.zero(),
 )

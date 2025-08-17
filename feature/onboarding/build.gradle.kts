@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":utils"))
     implementation(project(":feature"))
     implementation(project(":presentation"))
+    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

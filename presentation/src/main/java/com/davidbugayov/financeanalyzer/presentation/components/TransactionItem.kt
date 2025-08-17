@@ -46,12 +46,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
@@ -212,7 +212,7 @@ fun transactionItem(
             transferCategoryString,
             currentCurrency,
         ) {
-            val moneyAmount = Money(transaction.amount.amount, currentCurrency)
+            val moneyAmount = Money.fromMajor(transaction.amount.toMajorDouble(), currentCurrency)
 
             val isTransfer =
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||

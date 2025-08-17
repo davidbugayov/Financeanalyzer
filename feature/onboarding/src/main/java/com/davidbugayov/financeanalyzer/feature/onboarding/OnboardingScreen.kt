@@ -50,8 +50,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.androidx.compose.koinViewModel

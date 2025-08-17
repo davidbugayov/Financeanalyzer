@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail.state
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.model.Money
 
 object FinancialDetailStatisticsContract {
     // Состояние экрана финансовой статистики

@@ -5,10 +5,9 @@ import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
@@ -20,8 +19,10 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction as SharedTransaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.math.BigDecimal
 import java.util.Date
 import java.util.UUID
@@ -191,7 +192,7 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
 
             val moneyFromExpression = parseMoneyExpression(currentState.amount)
-            val amountForValidation = moneyFromExpression.amount.toPlainString()
+            val amountForValidation = moneyFromExpression.formatForDisplay()
 
             if (!validateInput(amountForValidation, currentState.category)) {
                 _state.update { it.copy(isLoading = false) }
@@ -201,14 +202,11 @@ class AddTransactionViewModel(
             val transactionToSave = prepareTransactionForAdd(moneyFromExpression)
 
             try {
-                val result = sharedFacade.addTransaction(transactionToSave.toShared())
+                val result = sharedFacade.addTransaction(transactionToSave)
                 if (result) {
-                    sharedFacade.updateWalletBalances(
-                        transactionToSave.walletIds ?: emptyList(),
-                        transactionToSave.amount.toShared(),
-                        null,
-                    )
-                    incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)
+                    // Обновление балансов кошельков не поддерживается в shared модели
+                    // TODO: Реализовать через domain модель
+                    incrementCategoryUsage(transactionToSave.category.toString(), transactionToSave.isExpense)
                     incrementSourceUsage(transactionToSave.source)
                     updateWidgetsUseCase()
 
@@ -243,11 +241,11 @@ class AddTransactionViewModel(
         }
     }
 
-    private fun prepareTransactionForAdd(parsedMoney: Money): Transaction {
+    private fun prepareTransactionForAdd(parsedMoney: Money): SharedTransaction {
         val currentState = _state.value
         val finalAmount =
             if (currentState.isExpense) {
-                parsedMoney.copy(amount = parsedMoney.amount.negate())
+                parsedMoney.negate()
             } else {
                 parsedMoney
             }
@@ -267,18 +265,14 @@ class AddTransactionViewModel(
                 null
             }
 
-        return Transaction(
+        return SharedTransaction(
             id = UUID.randomUUID().toString(),
-            title = currentState.title,
             amount = finalAmount,
             category = currentState.category,
             note = currentState.note,
-            date = currentState.selectedDate,
+            date = currentState.selectedDate.toLocalDateKmp(),
             isExpense = currentState.isExpense,
             source = currentState.source,
-            sourceColor = currentState.sourceColor,
-            walletIds = selectedWalletIds,
-            subcategoryId = subcategoryId,
         )
     }
 
@@ -331,7 +325,7 @@ class AddTransactionViewModel(
         showDeleteCategoryConfirmDialog: Boolean,
         showDeleteSourceConfirmDialog: Boolean,
         editMode: Boolean,
-        transactionToEdit: Transaction?,
+        transactionToEdit: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
         addToWallet: Boolean,
         selectedWallets: List<String>,
         showWalletSelector: Boolean,

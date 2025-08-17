@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.wallet
 
 import com.davidbugayov.financeanalyzer.core.model.AppException
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository

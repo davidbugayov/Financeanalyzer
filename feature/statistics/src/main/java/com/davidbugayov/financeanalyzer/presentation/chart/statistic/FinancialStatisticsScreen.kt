@@ -51,7 +51,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
@@ -63,6 +62,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.Enhan
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.EnhancedFinanceChartViewModel
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
@@ -73,8 +73,6 @@ import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
 import com.davidbugayov.financeanalyzer.ui.components.tips.InvestmentTipsCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
 import com.davidbugayov.financeanalyzer.utils.DateUtils
-import com.davidbugayov.financeanalyzer.utils.kmp.toCore
-import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -484,7 +482,7 @@ fun FinancialStatisticsScreen(
                     ) {
                         FinancialHealthMetricsCard(
                             savingsRate = state.savingsRate,
-                            averageDailyExpense = state.averageDailyExpense.toCore(),
+                            averageDailyExpense = state.averageDailyExpense,
                             monthsOfSavings = state.monthsOfSavings,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -779,7 +777,7 @@ fun FinancialStatisticsScreen(
                                     val predictedExpenses =
                                         remember(
                                             state.transactions,
-                                        ) { predictExpensesUseCase(state.transactions.toDomain()) }
+                                        ) { predictExpensesUseCase(state.transactions) }
 
                                     // В UI, добавляем карточку предсказаний (тональная)
                                     Card(
@@ -833,7 +831,7 @@ fun FinancialStatisticsScreen(
                                                 java.text.NumberFormat
                                                     .getNumberInstance(
                                                         Locale("ru", "RU"),
-                                                    ).format(predictedExpenses.amount.toDouble()) +
+                                                    ).format(predictedExpenses.toMajorDouble()) +
                                                     " " +
                                                     currency
 

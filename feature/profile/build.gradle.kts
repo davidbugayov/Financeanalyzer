@@ -66,7 +66,6 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":feature"))
     implementation(project(":feature:security"))
-    implementation(project(":shared"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

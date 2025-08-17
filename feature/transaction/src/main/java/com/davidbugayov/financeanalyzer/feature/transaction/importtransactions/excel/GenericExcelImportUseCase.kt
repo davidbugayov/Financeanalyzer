@@ -3,19 +3,21 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel
 // Apache POI imports
 import android.content.Context
 import android.net.Uri
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.io.BufferedReader
 import java.io.StringReader
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -738,7 +740,7 @@ class GenericExcelImportUseCase(
                     Currency.fromCode(config.defaultCurrencyCode)
                 }
 
-            val money = Money(absAmount, currency)
+            val money = Money.fromMajor(absAmount, currency)
 
             // --- Категория ---
             val rawCategory =
@@ -755,15 +757,13 @@ class GenericExcelImportUseCase(
             // --- Формируем объект транзакции ---
             val transaction =
                 Transaction(
+                    id = UUID.randomUUID().toString(),
                     amount = money,
                     category = category,
-                    date = transactionDate,
+                    date = transactionDate.toLocalDateKmp(),
                     isExpense = isExpense,
                     note = note,
                     source = transactionSource ?: detectedBankName,
-                    sourceColor = 0, // Можно сделать настраиваемым через config
-                    categoryId = "",
-                    title = "", // Описание не дублируется, если нужно — можно подставить note
                 )
 
             if (debugEnabled) {

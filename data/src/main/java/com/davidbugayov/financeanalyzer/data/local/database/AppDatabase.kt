@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.MoneyConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter

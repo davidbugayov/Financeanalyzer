@@ -17,7 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R
 
 /**
@@ -34,7 +35,7 @@ private fun BalanceCardTitle(
     expenseColor: androidx.compose.ui.graphics.Color,
 ) {
     val titleColor =
-        if (balance.amount.signum() >= 0) {
+        if (balance.isPositive()) {
             incomeColor.copy(alpha = 0.7f)
         } else {
             expenseColor.copy(alpha = 0.7f)
@@ -55,11 +56,11 @@ private fun BalanceCardAmount(
     expenseColor: androidx.compose.ui.graphics.Color,
 ) {
     Text(
-        text = balance.format(true),
+        text = balance.formatForDisplay(true),
         style = MaterialTheme.typography.headlineMedium,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
-        color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
+        color = if (balance.isPositive()) incomeColor else expenseColor,
     )
 }
 
@@ -79,7 +80,7 @@ fun BalanceCard(
     modifier: Modifier = Modifier,
 ) {
     val cardColor = MaterialTheme.colorScheme.background
-    val balanceTextColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+    val balanceTextColor = if (balance.isPositive()) incomeColor else expenseColor
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),

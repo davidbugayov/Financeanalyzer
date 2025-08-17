@@ -37,7 +37,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
@@ -78,7 +80,7 @@ private fun validateMoneyInput(input: String): String {
  */
 private fun stripCurrencySymbol(
     formatted: String,
-    currency: com.davidbugayov.financeanalyzer.core.model.Currency,
+    currency: com.davidbugayov.financeanalyzer.shared.model.Currency,
 ): String {
     val symbol = currency.symbol
     val escaped = Regex.escape(symbol)
@@ -109,8 +111,16 @@ fun amountField(
     // TextFieldValue для отображения в OutlinedTextField
     var textFieldValueForDisplay by remember(currentCurrency) {
         val numericAmount = amount.toDoubleOrNull()
-        val initialFormatted = if (numericAmount != null) Money(numericAmount, currentCurrency).format() else amount
-        val money = Money(numericAmount ?: 0.0, currentCurrency)
+        val initialFormatted =
+            if (numericAmount != null) {
+                Money.fromMajor(
+                    numericAmount,
+                    currentCurrency,
+                ).formatForDisplay()
+            } else {
+                amount
+            }
+        val money = Money.fromMajor(numericAmount ?: 0.0, currentCurrency)
         val withoutSymbol =
             if (numericAmount != null) stripCurrencySymbol(initialFormatted, money.currency) else initialFormatted
         val sep = money.currency.decimalSeparator.toString()
@@ -127,8 +137,8 @@ fun amountField(
         // Принудительно обновляем TextFieldValue при смене валюты
         val numericValue = internalRawAmount.toDoubleOrNull()
         if (numericValue != null) {
-            val moneyObject = Money(numericValue, currentCurrency)
-            val formattedWithSymbol = moneyObject.format()
+            val moneyObject = Money.fromMajor(numericValue, currentCurrency)
+            val formattedWithSymbol = moneyObject.formatForDisplay()
             val withoutSymbol = stripCurrencySymbol(formattedWithSymbol, moneyObject.currency)
             val sep = moneyObject.currency.decimalSeparator.toString()
             val zeroSuffix = sep + "0".repeat(moneyObject.currency.decimalPlaces)
@@ -142,9 +152,9 @@ fun amountField(
 
     // Логируем создание Money объекта для отладки
     LaunchedEffect(currentCurrency) {
-        val testMoney = Money(100.0, currentCurrency)
+        val testMoney = Money.fromMajor(100.0, currentCurrency)
         timber.log.Timber.d(
-            "AmountField: Тестовый Money объект: ${testMoney.format()}, валюта: ${testMoney.currency.name}",
+            "AmountField: Тестовый Money объект: ${testMoney.formatForDisplay()}, валюта: ${testMoney.currency.name}",
         )
     }
 
@@ -165,8 +175,8 @@ fun amountField(
                 val numericValue = internalRawAmount.toDoubleOrNull()
                 if (numericValue != null) {
                     // Форматируем число, удаляем символ валюты (в начале или в конце) и отбрасываем .00
-                    val moneyObject = Money(numericValue, currentCurrency)
-                    val formattedWithSymbol = moneyObject.format()
+                    val moneyObject = Money.fromMajor(numericValue, currentCurrency)
+                    val formattedWithSymbol = moneyObject.formatForDisplay()
                     timber.log.Timber.d(
                         "AmountField: Форматирование: " +
                             "numericValue=$numericValue, " +

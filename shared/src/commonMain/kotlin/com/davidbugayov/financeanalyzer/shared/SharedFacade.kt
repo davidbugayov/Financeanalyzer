@@ -91,7 +91,7 @@ class SharedFacade {
         this.getTransactionByIdUseCase = GetTransactionByIdUseCase()
         this.loadTransactions = transactionRepository?.let { LoadTransactionsUseCase(it) }
         this.goalProgressUseCase = GoalProgressUseCase()
-        this.updateWalletBalancesUseCase = walletRepository?.let { UpdateWalletBalancesUseCase(it) }
+        this.updateWalletBalancesUseCase = UpdateWalletBalancesUseCase()
         this.getSubcategoriesByCategoryIdUseCase =
             subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
         this.addTransactionUseCase = transactionRepository?.let { AddTransactionUseCase(it) }
@@ -132,7 +132,7 @@ class SharedFacade {
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase
     private val loadTransactions: LoadTransactionsUseCase?
     private val goalProgressUseCase: GoalProgressUseCase
-    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase?
+    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
     private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase?
     private val addTransactionUseCase: AddTransactionUseCase?
     private val updateTransactionUseCase: UpdateTransactionUseCase?
@@ -173,11 +173,8 @@ class SharedFacade {
      */
     fun profileAnalytics(
         transactions: List<Transaction>,
-        currencyCode: String,
-        totalWallets: Int = 0,
     ): com.davidbugayov.financeanalyzer.shared.model.ProfileAnalytics {
-        val currency = Currency.fromCode(currencyCode)
-        return getProfileAnalytics(transactions, currency, totalWallets)
+        return getProfileAnalytics(transactions)
     }
 
     /**

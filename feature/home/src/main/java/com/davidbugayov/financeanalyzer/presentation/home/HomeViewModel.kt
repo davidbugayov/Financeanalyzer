@@ -7,7 +7,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -18,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
@@ -401,11 +401,18 @@ class HomeViewModel(
                         .mapValues { (_, txs) ->
                             // Суммируем расходы по категории с использованием Money
                             txs.fold(Money.zero(currentCurrency)) { acc, transaction ->
-                                val convertedAmount = Money(transaction.amount.amount, currentCurrency)
+                                val convertedAmount =
+                                    Money.fromMajor(
+                                        transaction.amount.toMajorDouble(),
+                                        currentCurrency,
+                                    )
                                 acc + convertedAmount
                             }
                         }.toList()
-                        .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
+                        .sortedByDescending {
+                                (_, amount) ->
+                            kotlin.math.abs(amount.toMajorDouble())
+                        } // Сортируем по убыванию сумм
                         .take(3) // Берем только топ-3 категории
                         .toMap()
 
@@ -528,8 +535,8 @@ class HomeViewModel(
                 startDate.toLocalDateKmp(),
                 endDate.toLocalDateKmp(),
             )
-        val income = Money(java.math.BigDecimal.valueOf(metrics.income.toMajorDouble()), currentCurrency)
-        val expense = Money(java.math.BigDecimal.valueOf(metrics.expense.toMajorDouble()), currentCurrency)
+        val income = Money.fromMajor(metrics.income.toMajorDouble(), currentCurrency)
+        val expense = Money.fromMajor(metrics.expense.toMajorDouble(), currentCurrency)
         val balance = income - expense
 
         val result = Triple(income, expense, balance)

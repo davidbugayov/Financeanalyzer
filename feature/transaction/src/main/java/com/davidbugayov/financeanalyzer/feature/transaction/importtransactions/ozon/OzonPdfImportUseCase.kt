@@ -3,15 +3,17 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.io.BufferedReader
@@ -19,6 +21,7 @@ import java.io.StringReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -270,7 +273,7 @@ class OzonPdfImportUseCase(
         try {
             transactions.forEach { transaction ->
                 try {
-                    transactionRepository.addTransaction(transaction)
+                    transactionRepository.addTransaction(transaction.toDomain())
                     savedCount++
                 } catch (e: Exception) {
                     Timber.e(e, "Ошибка при сохранении транзакции: ${e.message}")
@@ -835,17 +838,16 @@ class OzonPdfImportUseCase(
 
                 // Создаем объект Transaction
                 return Transaction(
+                    id = UUID.randomUUID().toString(),
                     amount =
-                        Money(
+                        Money.fromMajor(
                             finalAmount,
                             Currency.valueOf("RUB"),
                         ),
                     category = category,
-                    date = date,
+                    date = date.toLocalDateKmp(),
                     isExpense = isExpense,
                     source = transactionSource,
-                    sourceColor = 0,
-                    title = description,
                     note = "Импортировано автоматически из Озон Банка (документ $documentNumber)",
                 )
             } catch (e: Exception) {
@@ -1004,17 +1006,16 @@ class OzonPdfImportUseCase(
         )
 
         return Transaction(
+            id = UUID.randomUUID().toString(),
             amount =
-                Money(
+                Money.fromMajor(
                     state.amount!!,
                     Currency.valueOf(state.currency),
                 ),
             category = category,
-            date = state.date!!,
+            date = state.date!!.toLocalDateKmp(),
             isExpense = state.isExpense,
             source = transactionSource,
-            sourceColor = 0,
-            title = description,
             note = "Импортировано автоматически из Справки о движении средств (документ ${state.documentNumber})",
         )
     }

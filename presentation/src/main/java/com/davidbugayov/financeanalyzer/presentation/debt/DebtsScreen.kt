@@ -39,6 +39,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Debt
 import com.davidbugayov.financeanalyzer.domain.model.DebtStatus
 import com.davidbugayov.financeanalyzer.domain.model.DebtType
@@ -183,7 +184,7 @@ private fun debtCard(
                     stringResource(id = UiR.string.debt_due_date_short, date)
                 } ?: stringResource(id = UiR.string.debt_due_not_set)
 
-            Text(text = stringResource(id = UiR.string.debt_remaining) + ": " + debt.remaining.formatted)
+            Text(text = stringResource(id = UiR.string.debt_remaining) + ": " + debt.remaining.formatForDisplay())
             Spacer(modifier = androidx.compose.ui.Modifier.height(4.dp))
             Text(text = dueText, style = MaterialTheme.typography.bodySmall)
 
@@ -227,8 +228,8 @@ private fun statusChip(debt: Debt) {
 
 @Composable
 private fun debtProgress(debt: Debt) {
-    val principal = debt.principal.toDouble()
-    val remaining = debt.remaining.toDouble()
+    val principal = debt.principal.toMajorDouble()
+    val remaining = debt.remaining.toMajorDouble()
     val progress = if (principal > 0.0) (((principal - remaining) / principal).coerceIn(0.0, 1.0)).toFloat() else 0f
 
     Column(modifier = Modifier.fillMaxWidth()) {

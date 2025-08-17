@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 
 /**
  * Дата-класс для хранения всех аналитических данных, необходимых для экрана профиля.

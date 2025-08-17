@@ -5,7 +5,6 @@ import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -19,6 +18,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.validation.Validatio
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
@@ -250,7 +250,7 @@ class EditTransactionViewModel(
             // Сначала обрабатываем выражение суммы, удаляем висячий оператор
             val moneyFromExpression = parseMoneyExpression(currentState.amount)
             // Для валидации используем строковое представление уже обработанной суммы
-            val amountForValidation = moneyFromExpression.amount.toPlainString()
+            val amountForValidation = moneyFromExpression.formatForDisplay()
             Timber.d(
                 "ТРАНЗАКЦИЯ: submit - moneyFromExpression: %s, amountForValidation: '%s'",
                 moneyFromExpression,
@@ -411,27 +411,20 @@ class EditTransactionViewModel(
 
         // Загружаем сабкатегорию из транзакции, если она есть
         var subcategory = ""
-        transaction.subcategoryId?.let { subcategoryId ->
-            viewModelScope.launch {
-                subcategory = loadSubcategoryByIdAsync(subcategoryId)
-                // Обновляем состояние с загруженной подкатегорией
-                _state.update { currentState ->
-                    currentState.copy(subcategory = subcategory)
-                }
-            }
-        }
+        // В shared модели нет subcategoryId
+        // TODO: Реализовать через domain модель
 
         _state.update {
             it.copy(
                 transactionToEdit = transaction,
-                title = transaction.title,
+                title = transaction.category, // В shared модели нет title, используем category
                 amount = formattedAmount,
                 category = transaction.category,
                 note = transaction.note ?: "",
                 selectedDate = transaction.date,
                 isExpense = transaction.isExpense,
                 source = transaction.source,
-                sourceColor = transaction.sourceColor,
+                sourceColor = 0, // В shared модели нет sourceColor
                 editMode = true,
                 selectedExpenseCategory = selectedExpenseCategory,
                 selectedIncomeCategory = selectedIncomeCategory,
@@ -589,9 +582,7 @@ class EditTransactionViewModel(
         }
         val finalAmount =
             if (currentState.isExpense) {
-                parsedMoney.copy(
-                    amount = parsedMoney.amount.negate(),
-                )
+                parsedMoney.negate()
             } else {
                 parsedMoney
             }

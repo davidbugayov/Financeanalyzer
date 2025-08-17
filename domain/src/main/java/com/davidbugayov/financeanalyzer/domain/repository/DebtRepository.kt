@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Debt
 import com.davidbugayov.financeanalyzer.domain.model.DebtStatus
 import com.davidbugayov.financeanalyzer.domain.model.DebtType

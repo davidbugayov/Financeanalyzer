@@ -62,6 +62,9 @@ android {
 }
 
 dependencies {
+    // Modules
+    implementation(project(":shared"))
+
     // Kotlin
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)

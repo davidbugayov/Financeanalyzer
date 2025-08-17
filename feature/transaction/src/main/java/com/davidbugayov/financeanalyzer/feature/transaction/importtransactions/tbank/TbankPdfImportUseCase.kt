@@ -1,20 +1,22 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank
 
 import android.content.Context
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.AbstractPdfImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.io.BufferedReader
 import java.math.BigDecimal
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 import timber.log.Timber
 
 class TbankPdfImportUseCase(
@@ -315,14 +317,13 @@ class TbankPdfImportUseCase(
             }
         val category = TransactionCategoryDetector.detect(description)
         return Transaction(
-            date = ptx.date!!,
-            title = description,
-            amount = Money(ptx.amount!!, ptx.currency),
-            isExpense = ptx.isExpense!!,
-            source = transactionSource,
-            sourceColor = 0,
+            id = UUID.randomUUID().toString(),
+            amount = Money.fromMajor(ptx.amount!!, ptx.currency),
             category = category,
+            date = ptx.date!!.toLocalDateKmp(),
+            isExpense = ptx.isExpense!!,
             note = if (ptx.documentNumber != null) "Время: ${ptx.documentNumber}" else "",
+            source = transactionSource,
         )
     }
 

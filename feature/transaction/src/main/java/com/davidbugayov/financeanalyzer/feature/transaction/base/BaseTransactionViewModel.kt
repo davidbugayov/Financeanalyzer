@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
@@ -20,9 +18,10 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIc
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
-import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,11 +92,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             try {
                 sharedFacade.updateWalletBalances(
                     walletIdsToUpdate = walletIds,
-                    amountForWallets = amount.toShared(),
-                    originalTransaction =
-                        originalTransaction?.let {
-                            it.toShared()
-                        },
+                    amountForWallets = amount,
+                    originalTransaction = originalTransaction?.toShared(),
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении баланса кошельков через SharedFacade")
@@ -1052,7 +1048,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         // Если входная строка пустая, сразу возвращаем 0
         if (expr.isBlank()) {
             Timber.d("parseMoneyExpression: исходное выражение пустое, возвращаем 0")
-            return Money(BigDecimal.ZERO, currency)
+            return Money.zero(currency)
         }
 
         // Удаляем все пробелы из строки
@@ -1090,21 +1086,21 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         // или некорректна, вернем 0
         if (processedExpr.isBlank() || processedExpr == ".") {
             Timber.d("parseMoneyExpression: выражение пустое или только точка, возвращаем 0")
-            return Money(BigDecimal.ZERO, currency)
+            return Money.zero(currency)
         }
 
         // Проверяем, содержит ли строка только числа и десятичную точку (без операторов)
         val isSimpleNumber = processedExpr.matches(Regex("^-?\\d+(\\.\\d+)?$"))
         if (isSimpleNumber) {
             try {
-                val simpleNumber = BigDecimal(processedExpr)
-                val result = Money(simpleNumber, currency)
+                val simpleNumber = processedExpr.toDouble()
+                val result = Money.fromMajor(simpleNumber, currency)
                 Timber.d("parseMoneyExpression: обработано как простое число: $result")
                 return result
             } catch (e: NumberFormatException) {
                 Timber.e(e, "parseMoneyExpression: ошибка при парсинге простого числа: '$processedExpr'")
                 // Если не удалось обработать как простое число, вернем 0
-                return Money(BigDecimal.ZERO, currency)
+                return Money.zero(currency)
             }
         }
 
@@ -1128,12 +1124,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
 
                 val resNum = ExpressionBuilder(processedExpr).build().evaluate()
-                val result = Money(BigDecimal.valueOf(resNum), currency)
+                val result = Money.fromMajor(resNum, currency)
                 Timber.d("parseMoneyExpression: успешно вычислено как выражение, результат: $result")
                 return result
             } catch (e: Exception) {
                 Timber.e(e, "parseMoneyExpression: ошибка вычисления выражения '$processedExpr', возвращаем 0")
-                return Money(BigDecimal.ZERO, currency)
+                return Money.zero(currency)
             }
         }
 
@@ -1141,7 +1137,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         Timber.e(
             "parseMoneyExpression: не удалось распознать ни как число, ни как выражение: '$processedExpr', возвращаем 0",
         )
-        return Money(BigDecimal.ZERO, currency)
+        return Money.zero(currency)
     }
 
     /**

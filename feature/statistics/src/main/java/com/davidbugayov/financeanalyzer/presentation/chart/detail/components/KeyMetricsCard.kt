@@ -26,7 +26,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 @Composable
@@ -96,7 +97,7 @@ fun KeyMetricsCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = income.format(true),
+                        text = income.formatForDisplay(true),
                         style = MaterialTheme.typography.titleMedium,
                         color = colorResource(UiR.color.financial_statistics_progress_good),
                         fontWeight = FontWeight.Bold,
@@ -109,7 +110,7 @@ fun KeyMetricsCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = expense.format(true),
+                        text = expense.formatForDisplay(true),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Bold,

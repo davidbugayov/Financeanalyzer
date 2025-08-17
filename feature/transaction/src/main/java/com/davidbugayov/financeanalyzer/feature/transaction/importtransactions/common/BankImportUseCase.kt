@@ -3,8 +3,9 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.commo
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlinx.coroutines.Dispatchers
@@ -187,7 +188,7 @@ abstract class BankImportUseCase(
                                 Timber.i(
                                     "[ИМПОРТ-ОТЛАДКА] ⚠️ ПЕРЕД вызовом transactionRepository.addTransaction для ID=${transaction.id}",
                                 )
-                                val result = transactionRepository.addTransaction(transaction)
+                                val result = transactionRepository.addTransaction(transaction.toDomain())
                                 Timber.i(
                                     "[ИМПОРТ-ОТЛАДКА] ✅ ПОСЛЕ вызова transactionRepository.addTransaction для ID=${transaction.id}, результат=$result",
                                 )
@@ -201,7 +202,7 @@ abstract class BankImportUseCase(
                                     "[ИМПОРТ] ❌ Ошибка при сохранении транзакции ID=${transaction.id}: ${ex.message}",
                                 )
                                 Timber.e(
-                                    "[ИМПОРТ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}",
+                                    "[ИМПОРТ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}",
                                 )
                                 Timber.e("[ИМПОРТ-ОТЛАДКА] 🔍 Стек вызовов: ${ex.stackTraceToString()}")
                                 CrashLoggerProvider.crashLogger.logDatabaseError(

@@ -122,6 +122,9 @@ dependencies {
 
     // Kotlin Flow
 
+    // Kotlin DateTime
+    implementation(libs.kotlinx.datetime)
+
     // Testing
     testImplementation(libs.junit)
 

@@ -2,41 +2,26 @@ package com.davidbugayov.financeanalyzer.shared.usecase
 
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import java.math.BigDecimal
 
 class PredictFutureExpensesUseCase {
-    operator fun invoke(transactions: List<Transaction>, months: Int = 1): Money {
+    operator fun invoke(transactions: List<Transaction>, months: Int = 3): Money {
         if (transactions.isEmpty()) return Money.zero()
 
-        val cleaned = transactions.asSequence()
-            .filter { it.isExpense }
-            .filter { tx ->
-                val label = (tx.category + " " + (tx.note ?: "") + " " + tx.source).lowercase()
-                val isTransfer = label.contains("перевод") || label.contains("transfer")
-                val isRefund = label.contains("возврат") || label.contains("refund")
-                val isZero = tx.amount.minor == 0L
-                !(isTransfer || isRefund || isZero)
-            }.toList()
+        val expenses = transactions.filter { it.isExpense }
+        if (expenses.isEmpty()) return Money.zero()
 
-        if (cleaned.isEmpty()) return Money.zero()
-
-        val monthlyExpenses = cleaned.groupBy { tx -> "${tx.date.year}-${tx.date.month}" }
-            .mapValues { entry -> entry.value.sumOf { it.amount.minor } }
+        val monthlyExpenses = expenses
+            .groupBy { t -> "${t.date.year}-${t.date.month}" }
+            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) } }
 
         if (monthlyExpenses.isEmpty()) return Money.zero()
 
-        val sorted = monthlyExpenses.toList().sortedBy { it.first }.takeLast(6).map { it.second }
+        val averageMonthlyExpense = monthlyExpenses.values.fold(BigDecimal.ZERO) { acc, amount -> acc.add(amount) }.divide(BigDecimal.valueOf(monthlyExpenses.size.toDouble()), 10, java.math.RoundingMode.HALF_EVEN)
 
-        val trimmed = if (sorted.size >= 3) {
-            val values = sorted.sorted()
-            val p10 = values[(values.lastIndex * 0.10).toInt()]
-            val p90 = values[(values.lastIndex * 0.90).toInt()]
-            values.map { it.coerceIn(p10, p90) }
-        } else sorted
+        val predictedAmount = averageMonthlyExpense.multiply(BigDecimal.valueOf(months.toDouble()))
 
-        val sum = trimmed.sum()
-        val avg = if (trimmed.isNotEmpty()) sum / trimmed.size else 0L
-        val total = avg * months
-        return Money(total)
+        return Money(predictedAmount)
     }
 }
 

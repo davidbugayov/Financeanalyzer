@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.profile.model
 
-import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
 

@@ -5,6 +5,7 @@ import com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority
+import java.math.BigDecimal
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import kotlin.math.max
 
@@ -37,10 +38,8 @@ class CalculateEnhancedFinancialMetricsUseCase(
         // Рассчитываем прогноз пенсионных накоплений
         val retirementForecast = calculateRetirementForecast(
             transactions = transactions,
-            currentAge = currentAge,
-            retirementAge = retirementAge,
-            currentSavings = currentSavings,
-            desiredMonthlyPension = desiredMonthlyPension
+            targetRetirementAge = retirementAge,
+            currentAge = currentAge
         )
         
         // Рассчитываем сравнение с пирами
@@ -121,25 +120,25 @@ class CalculateEnhancedFinancialMetricsUseCase(
         }
         
         // Рекомендации по пенсионным накоплениям
-        if (retirementForecast.retirementGoalProgress < 50) {
+        if (retirementForecast.savingsGap.amount > BigDecimal.ZERO) {
             recommendations.add(
                 FinancialRecommendation(
                     code = "recommendation_increase_retirement_savings",
                     priority = RecommendationPriority.HIGH,
                     category = RecommendationCategory.RETIREMENT,
                     params = mapOf(
-                        "progress" to retirementForecast.retirementGoalProgress.toInt().toString(),
-                        "requiredMonthly" to retirementForecast.requiredMonthlySavings.toPlainString()
+                        "gap" to retirementForecast.savingsGap.toPlainString(),
+                        "requiredMonthly" to retirementForecast.monthlySavingsNeeded.toPlainString()
                     )
                 )
             )
-        } else if (retirementForecast.retirementGoalProgress < 75) {
+        } else if (retirementForecast.riskLevel == "HIGH") {
             recommendations.add(
                 FinancialRecommendation(
                     code = "recommendation_optimize_retirement_plan",
                     priority = RecommendationPriority.MEDIUM,
                     category = RecommendationCategory.RETIREMENT,
-                    params = mapOf("progress" to retirementForecast.retirementGoalProgress.toInt().toString())
+                    params = mapOf("risk" to retirementForecast.riskLevel)
                 )
             )
         }

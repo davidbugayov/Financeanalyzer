@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -10,7 +9,8 @@ import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -181,14 +181,14 @@ class BudgetViewModel(
         val wallets = _state.value.categories
 
         // Используем методы Money для суммирования вместо преобразования в Double
-        val totalLimit = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.limit) }
-        val totalSpent = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.spent) }
-        val totalWalletBalance = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.balance) }
+        val totalLimit = wallets.fold(Money.zero()) { acc, wallet -> acc.plus(wallet.limit) }
+        val totalSpent = wallets.fold(Money.zero()) { acc, wallet -> acc.plus(wallet.spent) }
+        val totalWalletBalance = wallets.fold(Money.zero()) { acc, wallet -> acc.plus(wallet.balance) }
 
         // Находим кошельки с превышением лимита
         val overBudgetWallets =
             wallets
-                .filter { it.limit.amount > java.math.BigDecimal.ZERO && it.spent.amount > it.limit.amount }
+                .filter { it.limit.amount > BigDecimal.ZERO && it.spent.amount > it.limit.amount }
                 .map { it.name }
 
         _state.update {
@@ -213,9 +213,9 @@ class BudgetViewModel(
                     Wallet(
                         name = name,
                         limit = limit,
-                        spent = Money(0.0),
+                        spent = Money.zero(),
                         id = UUID.randomUUID().toString(),
-                        balance = Money(0.0),
+                        balance = Money.zero(),
                     )
 
                 // Добавляем кошелек в репозиторий
@@ -292,7 +292,7 @@ class BudgetViewModel(
      */
     private fun distributeIncome(amount: Money) {
         viewModelScope.launch {
-            val success = sharedFacade.allocateIncome(amount.toShared())
+            val success = sharedFacade.allocateIncome(amount)
             if (success) {
                 loadBudgetCategories()
                 Timber.d("Доход успешно распределен через SharedFacade")
@@ -494,7 +494,7 @@ class BudgetViewModel(
                 val updatedWallet =
                     wallet.copy(
                         periodStartDate = System.currentTimeMillis(),
-                        spent = Money(0.0),
+                        spent = Money.zero(),
                         linkedCategories = wallet.linkedCategories,
                     )
 
@@ -530,7 +530,7 @@ class BudgetViewModel(
                     val updatedWallet =
                         wallet.copy(
                             periodStartDate = System.currentTimeMillis(),
-                            spent = Money(0.0),
+                            spent = Money.zero(),
                             linkedCategories = wallet.linkedCategories,
                         )
                     walletRepository.updateWallet(updatedWallet)
@@ -588,5 +588,5 @@ class BudgetViewModel(
     fun goalProgress(
         current: Money,
         target: Money,
-    ): Double = sharedFacade.goalProgress(current.toShared(), target.toShared())
+    ): Double = sharedFacade.goalProgress(current, target)
 }

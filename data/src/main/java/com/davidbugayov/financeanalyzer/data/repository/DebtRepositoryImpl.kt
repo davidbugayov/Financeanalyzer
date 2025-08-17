@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.data.local.dao.DebtDao
 import com.davidbugayov.financeanalyzer.data.local.entity.DebtEntity
 import com.davidbugayov.financeanalyzer.domain.model.Debt
@@ -42,8 +42,8 @@ class DebtRepositoryImpl(
     override suspend fun repayPart(id: String, amount: Money): Money {
         val existing = dao.getById(id) ?: return Money.zero(amount.currency)
         val newRemaining = existing.remaining - amount
-        val clamped = if (newRemaining.amount < java.math.BigDecimal.ZERO) Money.zero(newRemaining.currency) else newRemaining
-        val newStatus = if (clamped.amount.compareTo(java.math.BigDecimal.ZERO) == 0) DebtStatus.PAID.name else existing.status
+        val clamped = if (newRemaining.isNegative()) Money.zero(newRemaining.currency) else newRemaining
+        val newStatus = if (clamped.isZero()) DebtStatus.PAID.name else existing.status
         dao.update(existing.copy(remaining = clamped, status = newStatus))
         return clamped
     }

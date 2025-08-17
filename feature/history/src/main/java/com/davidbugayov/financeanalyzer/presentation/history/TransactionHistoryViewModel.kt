@@ -7,7 +7,6 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
 import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
@@ -21,6 +20,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.DateUtils
@@ -547,13 +547,27 @@ class TransactionHistoryViewModel(
                     }
 
                 // Вычисляем суммы для текущего и предыдущего периодов
-                val currentTotal = currentPeriodTransactions.sumOf { it.amount.amount }
-                val previousTotal = previousPeriodTransactions.sumOf { it.amount.amount }
+                val currentTotal =
+                    currentPeriodTransactions.fold(
+                        BigDecimal.ZERO,
+                    ) { acc, transaction -> acc.add(transaction.amount.amount) }
+                val previousTotal =
+                    previousPeriodTransactions.fold(
+                        BigDecimal.ZERO,
+                    ) { acc, transaction -> acc.add(transaction.amount.amount) }
 
                 // Вычисляем процентное изменение
                 val percentageChange =
                     if (previousTotal != BigDecimal.ZERO) {
-                        ((currentTotal - previousTotal) * BigDecimal(100)) / previousTotal
+                        (
+                            (
+                                currentTotal.subtract(
+                                    previousTotal,
+                                )
+                            ).multiply(
+                                BigDecimal.valueOf(100.0),
+                            )
+                        ).divide(previousTotal, 10, java.math.RoundingMode.HALF_EVEN)
                     } else {
                         null
                     }

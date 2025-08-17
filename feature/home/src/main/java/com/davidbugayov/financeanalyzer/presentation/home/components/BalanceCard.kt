@@ -29,11 +29,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import java.math.BigDecimal
 
 /**
  * Компонент для отображения текущего баланса пользователя.
@@ -45,7 +45,7 @@ private fun BalanceCardTitle(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val titleColor =
-        if (balance.amount.signum() >= 0) {
+        if (balance.amount >= BigDecimal.ZERO) {
             incomeColor.copy(alpha = 0.7f)
         } else {
             expenseColor.copy(alpha = 0.7f)
@@ -63,14 +63,14 @@ private fun BalanceCardAmount(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     Text(
-        text = balance.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
+        text = balance.toPlainString(),
         style = MaterialTheme.typography.headlineMedium,
         fontSize =
             dimensionResource(
                 UiR.dimen.enhanced_summary_card_balance_font_size,
             ).value.sp,
         fontWeight = FontWeight.Bold,
-        color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
+        color = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
     )
 }
 
@@ -84,7 +84,7 @@ fun BalanceCard(
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val cardColor = MaterialTheme.colorScheme.background
-    val balanceTextColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -128,7 +128,7 @@ fun BalanceCard(
             ) {
                 AmountPill(
                     labelRes = UiR.string.income,
-                    amountText = income.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
+                    amountText = income.toPlainString(),
                     icon = Icons.Filled.ArrowUpward,
                     color = incomeColor,
                     modifier = Modifier.weight(1f),
@@ -143,7 +143,7 @@ fun BalanceCard(
                 )
                 AmountPill(
                     labelRes = UiR.string.expenses,
-                    amountText = expense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
+                    amountText = expense.toPlainString(),
                     icon = Icons.Filled.ArrowDownward,
                     color = expenseColor,
                     modifier = Modifier.weight(1f),

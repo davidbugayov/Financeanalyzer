@@ -1,8 +1,8 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import androidx.compose.ui.graphics.toArgb
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 import java.util.Calendar
@@ -103,7 +103,7 @@ object TestDataGenerator {
                 Transaction(
                     id = i.toString(),
                     amount =
-                        Money(
+                        Money.fromMajor(
                             amount,
                             // Учитываем выбранную пользователем валюту
                             CurrencyProvider.getCurrency(),

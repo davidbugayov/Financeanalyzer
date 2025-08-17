@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import java.util.Date
 import java.util.UUID
 

@@ -1,13 +1,11 @@
 package com.davidbugayov.financeanalyzer.shared.model
 
 import kotlin.math.abs
+import java.math.BigDecimal
+import java.math.RoundingMode
 
-/**
- * Упрощённая KMP-версия Money без BigDecimal.
- * Хранит сумму в минимальных единицах (cents) для точности.
- */
 data class Money(
-    val minor: Long,
+    val amount: BigDecimal,
     val currency: Currency = Currency.RUB,
 ) : Comparable<Money> {
 
@@ -16,55 +14,62 @@ data class Money(
     }
 
     companion object {
-        fun zero(currency: Currency = Currency.RUB): Money = Money(0, currency)
+        fun zero(currency: Currency = Currency.RUB): Money = Money(BigDecimal.ZERO, currency)
         fun fromMajor(major: Double, currency: Currency = Currency.RUB): Money {
-            val factor = 10.0.powInt(currency.fractionDigits)
-            return Money((major * factor).toLong(), currency)
+            return Money(BigDecimal.valueOf(major), currency)
+        }
+        fun fromMajor(major: BigDecimal, currency: Currency = Currency.RUB): Money {
+            return Money(major, currency)
         }
     }
 
     operator fun plus(other: Money): Money {
         require(currency == other.currency) { "Different currencies" }
-        return Money(minor + other.minor, currency)
+        return Money(amount.add(other.amount), currency)
     }
 
     operator fun minus(other: Money): Money {
         require(currency == other.currency) { "Different currencies" }
-        return Money(minor - other.minor, currency)
+        return Money(amount.subtract(other.amount), currency)
     }
 
-    operator fun times(multiplier: Int): Money = Money(minor * multiplier, currency)
+    operator fun times(multiplier: Int): Money = Money(amount.multiply(BigDecimal.valueOf(multiplier.toLong())), currency)
+    operator fun times(multiplier: Double): Money = Money(amount.multiply(BigDecimal.valueOf(multiplier)), currency)
+    operator fun times(multiplier: BigDecimal): Money = Money(amount.multiply(multiplier), currency)
 
-    operator fun div(divisor: Int): Money = Money(minor / divisor, currency)
+    operator fun div(divisor: Int): Money = Money(amount.divide(BigDecimal.valueOf(divisor.toLong()), 10, RoundingMode.HALF_EVEN), currency)
+    operator fun div(divisor: Double): Money = Money(amount.divide(BigDecimal.valueOf(divisor), 10, RoundingMode.HALF_EVEN), currency)
+    operator fun div(divisor: BigDecimal): Money = Money(amount.divide(divisor, 10, RoundingMode.HALF_EVEN), currency)
 
     override fun compareTo(other: Money): Int {
         require(currency == other.currency) { "Different currencies" }
-        return minor.compareTo(other.minor)
+        return amount.compareTo(other.amount)
     }
 
-    fun abs(): Money = if (minor < 0) Money(abs(minor), currency) else this
+    fun abs(): Money = if (amount < BigDecimal.ZERO) Money(amount.abs(), currency) else this
+    fun negate(): Money = Money(amount.negate(), currency)
 
-    fun isPositive(): Boolean = minor > 0
-    fun isNegative(): Boolean = minor < 0
-    fun isZero(): Boolean = minor == 0L
+    fun isPositive(): Boolean = amount > BigDecimal.ZERO
+    fun isNegative(): Boolean = amount < BigDecimal.ZERO
+    fun isZero(): Boolean = amount == BigDecimal.ZERO
 
-    fun toMajorDouble(): Double = minor.toDouble() / 10.0.powInt(currency.fractionDigits)
-    fun toPlainString(): String {
-        val frac = currency.fractionDigits
-        if (frac == 0) return minor.toString()
-        val base = 10.0.powInt(frac).toLong()
-        val sign = if (minor < 0) "-" else ""
-        val absMinor = kotlin.math.abs(minor)
-        val intPart = absMinor / base
-        val fracPart = (absMinor % base).toString().padStart(frac, '0')
-        return "$sign$intPart.$fracPart"
-    }
+    fun toMajorDouble(): Double = amount.toDouble()
+    fun toPlainString(): String = amount.toPlainString()
+    
+    // Для обратной совместимости
+    val formatted: String get() = toPlainString()
+    
+    // Методы для обратной совместимости
+    fun toDouble(): Double = toMajorDouble()
+    fun toInt(): Int = toMajorDouble().toInt()
+    fun toLong(): Long = toMajorDouble().toLong()
+    
+    // Методы для работы с BigDecimal
+    fun multiply(multiplier: Double): Money = this * multiplier
+    fun divide(divisor: Double): Money = this / divisor
+    fun multiply(multiplier: BigDecimal): Money = this * multiplier
+    fun divide(divisor: BigDecimal): Money = this / divisor
+    fun subtract(other: BigDecimal): Money = this - Money.fromMajor(other, currency)
+    fun setScale(scale: Int, roundingMode: RoundingMode): Money = Money(amount.setScale(scale, roundingMode), currency)
+    fun compareTo(other: BigDecimal): Int = amount.compareTo(other)
 }
-
-private fun Double.powInt(exp: Int): Double {
-    var result = 1.0
-    repeat(exp) { result *= 10.0 }
-    return result
-}
-
-

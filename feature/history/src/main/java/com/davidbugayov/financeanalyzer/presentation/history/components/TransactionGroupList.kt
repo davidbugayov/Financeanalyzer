@@ -35,12 +35,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.transactionItem
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -292,7 +291,7 @@ private fun ExpandableGroupHeader(
             )
 
             Text(
-                text = Money(balance).formatForDisplay(showCurrency = false, useMinimalDecimals = true),
+                text = Money.fromMajor(balance).toPlainString(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = balanceTextColor,
                 fontWeight = FontWeight.Bold,

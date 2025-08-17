@@ -1,18 +1,20 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank
 
 import android.content.Context
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.AbstractPdfImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 /**
  * Класс для импорта транзакций из PDF-выписок Сбербанка
@@ -234,7 +236,7 @@ class SberbankPdfImportUseCase(
                         )
                 }
             val absAmount = kotlin.math.abs(amount)
-            val money = Money(absAmount, Currency.RUB)
+            val money = Money.fromMajor(absAmount, Currency.RUB)
             val noteParts = mutableListOf<String>()
             if (partial.time != null) {
                 noteParts.add(
@@ -280,15 +282,13 @@ class SberbankPdfImportUseCase(
                 }
 
             return Transaction(
+                id = UUID.randomUUID().toString(),
                 amount = money,
                 category = detectedCategory,
-                date = transactionDate,
+                date = transactionDate.toLocalDateKmp(),
                 isExpense = isExpense,
                 note = noteParts.joinToString("; ").ifBlank { null },
                 source = transactionSource,
-                sourceColor = 0,
-                categoryId = "",
-                title = title,
             )
         } catch (_: Exception) {
             return null

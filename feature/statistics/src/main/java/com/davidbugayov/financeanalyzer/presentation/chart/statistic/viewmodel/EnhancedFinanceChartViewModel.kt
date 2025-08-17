@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -19,10 +18,9 @@ import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
-import com.davidbugayov.financeanalyzer.utils.kmp.toCore
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -38,7 +36,6 @@ import org.koin.core.component.inject
 class EnhancedFinanceChartViewModel :
     ViewModel(),
     KoinComponent {
-    private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val calculateEnhancedFinancialMetricsUseCase: CalculateEnhancedFinancialMetricsUseCase by inject()
     private val sharedFacade: SharedFacade by inject()
@@ -126,7 +123,7 @@ class EnhancedFinanceChartViewModel :
             val filteredTransactions = (flow?.first() ?: emptyList())
             allTransactions = filteredTransactions
 
-            val currentCurrency = CurrencyProvider.getCurrency().toShared()
+            val currentCurrency = CurrencyProvider.getCurrency()
             val metrics =
                 calculateBalanceMetricsUseCase(
                     filteredTransactions,
@@ -146,9 +143,9 @@ class EnhancedFinanceChartViewModel :
                     .filter { it.isExpense }
                     .groupBy { it.category.ifBlank { "Без категории" } }
                     .mapValues { (_, transactions) ->
-                        transactions.fold(Money(0L, currentCurrency)) { acc, transaction ->
+                        transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                             // Приводим каждую транзакцию к текущей валюте
-                            val convertedAmount = Money(transaction.amount.minor, currentCurrency)
+                            val convertedAmount = Money(transaction.amount.amount, currentCurrency)
                             acc + convertedAmount.abs()
                         }
                     }
@@ -157,9 +154,9 @@ class EnhancedFinanceChartViewModel :
                     .filter { !it.isExpense }
                     .groupBy { it.category.ifBlank { "Без категории" } }
                     .mapValues { (_, transactions) ->
-                        transactions.fold(Money(0L, currentCurrency)) { acc, transaction ->
+                        transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                             // Приводим каждую транзакцию к текущей валюте
-                            val convertedAmount = Money(transaction.amount.minor, currentCurrency)
+                            val convertedAmount = Money(transaction.amount.amount, currentCurrency)
                             acc + convertedAmount
                         }
                     }
@@ -219,7 +216,7 @@ class EnhancedFinanceChartViewModel :
             }
         if (filteredTransactions.isEmpty()) return emptyList()
 
-        val currentCurrency = CurrencyProvider.getCurrency().toShared()
+        val currentCurrency = CurrencyProvider.getCurrency()
 
         // Группируем по дате (без времени)
         val aggregatedData =
@@ -227,9 +224,9 @@ class EnhancedFinanceChartViewModel :
                 .groupBy {
                     it.date
                 }.mapValues { (_, transactions) ->
-                    transactions.fold(Money(0L, currentCurrency)) { acc, transaction ->
+                    transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                         // Приводим транзакцию к текущей валюте
-                        val convertedAmount = Money(transaction.amount.minor, currentCurrency)
+                        val convertedAmount = Money(transaction.amount.amount, currentCurrency)
                         val value = if (isIncome) convertedAmount else convertedAmount.abs()
                         acc + value
                     }
@@ -257,10 +254,10 @@ class EnhancedFinanceChartViewModel :
     ): List<UiCategory> {
         val filteredData =
             if (showExpenses) {
-                data.filter { it.value.minor != 0L }
+                data.filter { it.value.amount != BigDecimal.ZERO }
             } else {
                 // Для доходов фильтруем только положительные суммы
-                data.filter { it.value.minor > 0L }
+                data.filter { it.value.amount > BigDecimal.ZERO }
             }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val palette = if (showExpenses) ExpenseChartPalette else IncomeChartPalette
@@ -279,7 +276,7 @@ class EnhancedFinanceChartViewModel :
                     isExpense = showExpenses,
                     isCustom = category?.isCustom == true,
                     count = 0,
-                    money = moneyValue.toCore(),
+                    money = moneyValue,
                     percentage = 0f,
                     transactions = emptyList(),
                     original = category?.original,

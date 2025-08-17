@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsState
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,7 +76,7 @@ class WalletTransactionsViewModel(
                     // Период истек, сбрасываем потраченную сумму
                     val updatedWallet =
                         wallet.copy(
-                            spent = wallet.spent.copy(amount = java.math.BigDecimal.ZERO),
+                            spent = Money.zero(),
                             periodStartDate = now,
                             linkedCategories = wallet.linkedCategories,
                         )

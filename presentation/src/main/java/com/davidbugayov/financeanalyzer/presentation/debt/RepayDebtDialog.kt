@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -37,7 +37,7 @@ fun repayDebtDialog(
             TextButton(onClick = {
                 val amount = amountStr.value.replace(',', '.').toDoubleOrNull() ?: 0.0
                 if (amount > 0) {
-                    onConfirm(Money(amount, Currency.RUB))
+                    onConfirm(Money.fromMajor(amount, Currency.RUB))
                 }
             }) { Text(text = stringResource(id = UiR.string.confirm)) }
         },

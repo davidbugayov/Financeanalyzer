@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+
 /**
  * Движок для обработки логики достижений
  */
@@ -77,18 +78,17 @@ class AchievementEngine(
             updateAchievementProgress("transaction_master", transactionCount)
             
             // Проверяем время для специальных ачивок
-            val currentTimeMillis = System.currentTimeMillis()
-            val calendar = java.util.Calendar.getInstance()
-            calendar.timeInMillis = currentTimeMillis
-            val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+            // TODO: Реализовать платформо-специфичную логику времени
+            // val currentTimeMillis = Clock.System.now().toEpochMilliseconds()
+            // val hour = (currentTimeMillis / (1000 * 60 * 60)) % 24
             
             // Ранняя пташка: до 7 утра (0-6 часов)
-            val isEarlyBird = hour < 7
-            checkAndUnlockAchievement("early_bird") { isEarlyBird }
+            // val isEarlyBird = hour < 7
+            // checkAndUnlockAchievement("early_bird") { isEarlyBird }
             
             // Ночная сова: после 23:00 (23 час и позже)
-            val isNightOwl = hour >= 23
-            checkAndUnlockAchievement("night_owl") { isNightOwl }
+            // val isNightOwl = hour >= 23
+            // checkAndUnlockAchievement("night_owl") { isNightOwl }
         }
     }
 
@@ -138,10 +138,10 @@ class AchievementEngine(
     /**
      * Вызывается при изменении сбережений
      */
-    fun onSavingsChanged(balanceInKopecks: java.math.BigDecimal) {
+    fun onSavingsChanged(balanceInKopecks: Double) {
         scope.launch {
             // Триггер достижения за сбережения
-            if (balanceInKopecks > java.math.BigDecimal.ZERO) {
+            if (balanceInKopecks > 0.0) {
                 checkAndUnlockAchievement("first_savings") { true }
             }
         }
@@ -189,7 +189,7 @@ class AchievementEngine(
                 val updated = achievement.copy(
                     isUnlocked = true,
                     currentProgress = achievement.targetProgress,
-                    dateUnlocked = System.currentTimeMillis()
+                    dateUnlocked = 0L // TODO: Реализовать платформо-специфичное время
                 )
                 achievementsRepository.updateAchievement(updated)
                 _newAchievements.emit(updated)
@@ -208,7 +208,7 @@ class AchievementEngine(
             val updated = achievement.copy(
                 currentProgress = updatedProgress,
                 isUnlocked = shouldUnlock,
-                dateUnlocked = if (shouldUnlock) System.currentTimeMillis() else achievement.dateUnlocked,
+                dateUnlocked = if (shouldUnlock) 0L else achievement.dateUnlocked, // TODO: Реализовать платформо-специфичное время
             )
             achievementsRepository.updateAchievement(updated)
             if (shouldUnlock && !achievement.isUnlocked) {

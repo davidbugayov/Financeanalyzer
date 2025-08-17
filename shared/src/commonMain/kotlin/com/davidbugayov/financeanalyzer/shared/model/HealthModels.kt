@@ -16,13 +16,14 @@ data class PeerComparison(
 )
 
 data class RetirementForecast(
-    val retirementAge: Int = 65,
-    val currentSavings: Money = Money.zero(),
-    val recommendedRetirementAmount: Money = Money.zero(),
-    val projectedRetirementAmount: Money = Money.zero(),
-    val retirementGoalProgress: Double = 0.0,
-    val requiredMonthlySavings: Money = Money.zero(),
-    val yearsToGoal: Double = Double.POSITIVE_INFINITY,
+    val requiredSavings: Money = Money.zero(),
+    val projectedSavings: Money = Money.zero(),
+    val savingsGap: Money = Money.zero(),
+    val monthlySavingsNeeded: Money = Money.zero(),
+    val riskLevel: String = "MEDIUM",
+    val recommendations: List<String> = emptyList(),
+    val yearsToRetirement: Int = 35,
+    val retirementYears: Int = 20,
 )
 
 

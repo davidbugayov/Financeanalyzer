@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import java.util.Locale

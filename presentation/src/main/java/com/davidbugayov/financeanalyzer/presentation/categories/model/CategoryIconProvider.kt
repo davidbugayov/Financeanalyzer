@@ -313,7 +313,7 @@ import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material.icons.rounded.Straighten
 import androidx.compose.material.icons.rounded.WorkOutline
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Money
 
 object CategoryIconProvider {
     fun getIconByName(name: String): ImageVector =

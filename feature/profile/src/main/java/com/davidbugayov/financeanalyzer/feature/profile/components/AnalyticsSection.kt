@@ -51,14 +51,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalWarningColor
-import java.math.BigDecimal
 import java.util.Locale
 import kotlinx.coroutines.delay
 
@@ -97,7 +96,7 @@ fun AnalyticsSection(
     // Цвета для финансовых показателей
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    val balanceColor = if (balance.isPositive()) incomeColor else expenseColor
 
     // Расчет норм сбережений - используем переданное значение вместо расчета
     val calculatedSavingsRate = savingsRate

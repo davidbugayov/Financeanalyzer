@@ -3,20 +3,23 @@ package com.davidbugayov.financeanalyzer.shared.usecase
 import com.davidbugayov.financeanalyzer.shared.model.CategoryWithAmount
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import java.math.BigDecimal
 
 class GetCategoriesWithAmountUseCase {
-    operator fun invoke(transactions: List<Transaction>, isExpense: Boolean): List<CategoryWithAmount> {
+    operator fun invoke(transactions: List<Transaction>): List<CategoryWithAmount> {
+        val total = transactions.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }
+        if (total == BigDecimal.ZERO) return emptyList()
+
         return transactions
-            .filter { it.isExpense == isExpense && it.category.isNotBlank() }
             .groupBy { it.category }
             .map { (category, txs) ->
-                val minor = txs.sumOf { it.amount.minor }
+                val amount = txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }
                 CategoryWithAmount(
                     category = category,
-                    amount = Money(minor, txs.first().amount.currency),
+                    amount = Money(amount, txs.first().amount.currency),
                 )
             }
-            .sortedByDescending { it.amount.minor }
+            .sortedByDescending { it.amount.amount }
     }
 }
 

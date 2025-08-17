@@ -1,14 +1,12 @@
 package com.davidbugayov.financeanalyzer.core.util
 
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.model.SymbolPosition
-import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
 /**
- * Extension functions for Money class
+ * Extension functions for shared Money class
  */
 
 /**
@@ -37,35 +35,26 @@ fun Money.format(
     val symbols =
         DecimalFormatSymbols(Locale.getDefault()).apply {
             groupingSeparator = ' '
-            // Respect currency-specific decimal separator
-            decimalSeparator = this@format.currency.decimalSeparator
+            decimalSeparator = '.'
         }
 
-    // Check if the amount is a whole number or zero
-    val isWholeNumber = amount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0
-    val isZero = amount.compareTo(BigDecimal.ZERO) == 0
+    val majorAmount = toMajorDouble()
+    val isWholeNumber = majorAmount % 1 == 0.0
+    val isZero = majorAmount == 0.0
 
-    // Choose pattern based on whether we should show decimals
     val pattern =
         if (useMinimalDecimals && (isWholeNumber || isZero)) {
             "#,##0"
         } else {
-            // Keep two decimals for currencies that have 2 decimal places; fallback to generic
-            if (this.currency.decimalPlaces == 0) "#,##0" else "#,##0.00"
+            if (currency.fractionDigits == 0) "#,##0" else "#,##0.00"
         }
 
     val formatter = DecimalFormat(pattern, symbols)
+    val formattedAmount = formatter.format(majorAmount)
 
-    val formattedAmount = formatter.format(amount)
-    val result =
-        if (showCurrency) {
-            when (currency.symbolPosition) {
-                SymbolPosition.BEFORE -> "${currency.symbol}$formattedAmount"
-                SymbolPosition.AFTER -> "$formattedAmount ${currency.symbol}"
-            }
-        } else {
-            formattedAmount
-        }
-
-    return result
+    return if (showCurrency) {
+        "${currency.symbol}$formattedAmount"
+    } else {
+        formattedAmount
+    }
 }

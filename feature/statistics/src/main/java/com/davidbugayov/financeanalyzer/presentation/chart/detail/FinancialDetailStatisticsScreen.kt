@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -206,8 +207,8 @@ fun FinancialDetailStatisticsScreen(
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 val expenseAnalysis =
                                     FinancialDataMapper.createExpenseAnalysis(
-                                        averageDailyExpense = metrics.averageDailyExpense.format(true),
-                                        averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
+                                        averageDailyExpense = metrics.averageDailyExpense.formatForDisplay(true),
+                                        averageMonthlyExpense = metrics.averageMonthlyExpense.formatForDisplay(true),
                                         topIncomeCategory =
                                             com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
                                                 .displayName(
@@ -223,7 +224,7 @@ fun FinancialDetailStatisticsScreen(
                                         topExpenseCategories =
                                             metrics.topExpenseCategories.map {
                                                 it.first to
-                                                    it.second.format(
+                                                    it.second.formatForDisplay(
                                                         true,
                                                     )
                                             },
@@ -246,13 +247,16 @@ fun FinancialDetailStatisticsScreen(
                                         totalTransactions = metrics.totalTransactions,
                                         incomeTransactionsCount = metrics.incomeTransactionsCount,
                                         expenseTransactionsCount = metrics.expenseTransactionsCount,
-                                        averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
-                                        averageExpensePerTransaction =
-                                            metrics.averageExpensePerTransaction.format(
+                                        averageIncomePerTransaction =
+                                            metrics.averageIncomePerTransaction.formatForDisplay(
                                                 true,
                                             ),
-                                        maxIncome = metrics.maxIncome.format(true),
-                                        maxExpense = metrics.maxExpense.format(true),
+                                        averageExpensePerTransaction =
+                                            metrics.averageExpensePerTransaction.formatForDisplay(
+                                                true,
+                                            ),
+                                        maxIncome = metrics.maxIncome.formatForDisplay(true),
+                                        maxExpense = metrics.maxExpense.formatForDisplay(true),
                                         savingsRate = metrics.savingsRate,
                                         monthsOfSavings = metrics.monthsOfSavings,
                                     )

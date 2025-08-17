@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

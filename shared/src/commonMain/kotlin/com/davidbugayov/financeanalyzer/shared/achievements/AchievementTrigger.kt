@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.shared.achievements
 
 import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 
+
 /**
  * Статический триггер для запуска достижений из разных частей приложения
  * Делегирует работу глобальному экземпляру AchievementEngine
@@ -56,7 +57,7 @@ object AchievementTrigger {
     /**
      * Вызывается при изменении сбережений
      */
-    fun onSavingsChanged(balanceInKopecks: java.math.BigDecimal) {
+    fun onSavingsChanged(balanceInKopecks: Double) {
         engine?.onSavingsChanged(balanceInKopecks)
     }
     

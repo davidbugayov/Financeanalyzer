@@ -24,9 +24,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.DebtType
+import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import java.util.Calendar
@@ -140,7 +140,7 @@ fun addDebtScreen(
                         title = title.value,
                         counterparty = counterparty.value,
                         type = if (isBorrowed.value) DebtType.BORROWED else DebtType.LENT,
-                        amount = Money(amountValue, Currency.RUB),
+                        amount = Money.fromMajor(amountValue, Currency.RUB),
                         dueAt = dueAt.value,
                         note = null,
                     )
