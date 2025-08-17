@@ -71,3 +71,29 @@ fun com.davidbugayov.financeanalyzer.core.model.Money.toShared(): com.davidbugay
     return com.davidbugayov.financeanalyzer.shared.model.Money
         .fromMajor(this.amount.toDouble(), currency)
 }
+
+fun com.davidbugayov.financeanalyzer.core.model.Currency.toShared(): com.davidbugayov.financeanalyzer.shared.model.Currency {
+    return com.davidbugayov.financeanalyzer.shared.model.Currency.fromCode(this.code)
+}
+
+fun com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation.toDomain(): com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation {
+    return com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation(
+        title = this.code,
+        description = this.code,
+        priority =
+            when (this.priority) {
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.HIGH -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.HIGH
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.MEDIUM -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.MEDIUM
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.LOW -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.LOW
+            },
+        category =
+            when (this.category) {
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.SAVINGS -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.SAVINGS
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EXPENSES -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.EXPENSES
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.INCOME -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.INCOME
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EMERGENCY_FUND -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.EMERGENCY_FUND
+                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.RETIREMENT -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.RETIREMENT
+            },
+        potentialImpact = 0.0,
+    )
+}

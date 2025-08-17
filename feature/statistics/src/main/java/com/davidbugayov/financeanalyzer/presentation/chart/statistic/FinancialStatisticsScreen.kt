@@ -51,10 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.PredictFutureExpensesUseCase
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
@@ -65,6 +62,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineC
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.EnhancedFinanceChartViewModel
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
@@ -75,6 +73,8 @@ import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
 import com.davidbugayov.financeanalyzer.ui.components.tips.InvestmentTipsCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.RecommendationsPanel
 import com.davidbugayov.financeanalyzer.utils.DateUtils
+import com.davidbugayov.financeanalyzer.utils.kmp.toCore
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -83,6 +83,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -126,8 +128,8 @@ fun FinancialStatisticsScreen(
             // Рассчитываем рост расходов на основе данных линейного графика
             val expenseGrowth = calculateExpenseGrowth(state.expenseLineChartData)
 
-            val totalIncome = state.income?.amount?.toDouble() ?: 0.0
-            state.expense?.amount?.toDouble() ?: 0.0
+            val totalIncome = state.income?.toMajorDouble() ?: 0.0
+            val totalExpense = state.expense?.toMajorDouble() ?: 0.0
 
             FinancialTipsManager.getPersonalizedTips(
                 savingsRate = state.savingsRate,
@@ -168,8 +170,8 @@ fun FinancialStatisticsScreen(
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logEvent(
                         com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants.Events.USER_RATING,
                         android.os.Bundle().apply {
-                                                          putString(
-                                  com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants.Params.SOURCE,
+                            putString(
+                                com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants.Params.SOURCE,
                                 "rustore",
                             )
                             putString("request_location", "statistics_screen")
@@ -482,7 +484,7 @@ fun FinancialStatisticsScreen(
                     ) {
                         FinancialHealthMetricsCard(
                             savingsRate = state.savingsRate,
-                            averageDailyExpense = state.averageDailyExpense,
+                            averageDailyExpense = state.averageDailyExpense.toCore(),
                             monthsOfSavings = state.monthsOfSavings,
                             modifier = Modifier.fillMaxWidth(),
                         )
@@ -775,7 +777,9 @@ fun FinancialStatisticsScreen(
                                     // Оставляем предсказания
                                     val predictExpensesUseCase = koinComponent.get<PredictFutureExpensesUseCase>()
                                     val predictedExpenses =
-                                        remember(state.transactions) { predictExpensesUseCase(state.transactions) }
+                                        remember(
+                                            state.transactions,
+                                        ) { predictExpensesUseCase(state.transactions.toDomain()) }
 
                                     // В UI, добавляем карточку предсказаний (тональная)
                                     Card(
@@ -892,13 +896,11 @@ private fun calculateExpenseGrowth(
     val firstValue =
         recentPoints
             .first()
-            .value.amount
-            .toDouble()
+            .value.toMajorDouble()
     val lastValue =
         recentPoints
             .last()
-            .value.amount
-            .toDouble()
+            .value.toMajorDouble()
 
     // Избегаем деления на ноль
     if (firstValue <= 0.0) return 0.0

@@ -10,9 +10,9 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
+import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
-import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.utils.AppLocale
@@ -271,7 +271,7 @@ abstract class BaseFinanceApp :
                 AchievementTrigger.onMilestoneReached("monthly_active_user")
                 AchievementTrigger.onMilestoneReached("month_user")
             }
-            
+
             // Проверка ежедневной активности
             val dayInMillis = 24 * 60 * 60 * 1000L
             val lastOpenTime = prefs.getLong("last_open_time", 0)

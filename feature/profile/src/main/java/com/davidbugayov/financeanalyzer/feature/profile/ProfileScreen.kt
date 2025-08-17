@@ -118,10 +118,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
         // Отмечаем начало загрузки экрана
         PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.PROFILE)
 
-
-
-
-
         // Запрос оценки через 2 сек, если экран не закрыт (в других флейворах вызов no-op)
         (context as? Activity)?.let { activity ->
             delay(2000)
@@ -157,8 +153,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-
-
             // Отслеживаем использование памяти
             try {
                 (context as? Activity)?.let {
@@ -445,9 +439,10 @@ fun ProfileActionCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 0.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 0.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

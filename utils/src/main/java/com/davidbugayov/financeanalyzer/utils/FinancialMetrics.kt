@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -121,15 +121,15 @@ class FinancialMetrics private constructor() : KoinComponent {
                 Timber.d(
                     "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
                 )
-                
+
                 // Триггер ачивки за изменение сбережений
                 AchievementTrigger.onSavingsChanged(balance.amount)
-                
+
                 // Триггер ачивки за первый доход
                 if (income.amount > java.math.BigDecimal.ZERO && _totalIncome.value.amount == java.math.BigDecimal.ZERO) {
                     AchievementTrigger.onMilestoneReached("first_income")
                 }
-                
+
                 // Триггер ачивки за первую транзакцию
                 if (visibleTransactions.isNotEmpty() && _balance.value.amount == java.math.BigDecimal.ZERO) {
                     AchievementTrigger.onMilestoneReached("first_transaction")

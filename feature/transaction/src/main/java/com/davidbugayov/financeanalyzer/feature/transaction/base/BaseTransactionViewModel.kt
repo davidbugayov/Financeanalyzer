@@ -19,6 +19,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiSubcategory
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.math.BigDecimal
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,

@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.di
 
-
 import com.davidbugayov.financeanalyzer.feature.security.di.securityModule
 import com.davidbugayov.financeanalyzer.feature.statistics.di.statisticsModule
 import com.davidbugayov.financeanalyzer.feature.transaction.di.transactionModule

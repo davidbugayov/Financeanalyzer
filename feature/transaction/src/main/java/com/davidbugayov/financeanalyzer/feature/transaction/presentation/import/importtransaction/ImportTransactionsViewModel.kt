@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.utils.ImportErrorHandler
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.io.BufferedInputStream
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 /**
  * ViewModel для экрана импорта транзакций.
@@ -580,7 +580,7 @@ class ImportTransactionsViewModel(
         AchievementTrigger.onMilestoneReached("bank_import_master")
         AchievementTrigger.onMilestoneReached("data_import_enthusiast")
         AchievementTrigger.onMilestoneReached("multi_bank_user")
-        
+
         // Специфичные триггеры для банков
         bankName?.let { bank ->
             when {

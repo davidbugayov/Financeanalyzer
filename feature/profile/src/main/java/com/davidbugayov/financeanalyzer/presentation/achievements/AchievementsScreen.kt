@@ -83,11 +83,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
@@ -196,7 +196,7 @@ private fun AchievementsScreenContent(
                         }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
-                    filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL
+                    filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
                 )
             },
             selectedFilter = selectedFilter,
@@ -222,7 +222,7 @@ private fun AchievementsScreenContent(
                         }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
-                    filterType = filterType
+                    filterType = filterType,
                 )
             },
         )

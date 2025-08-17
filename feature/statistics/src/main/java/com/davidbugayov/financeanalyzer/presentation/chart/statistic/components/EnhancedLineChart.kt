@@ -172,16 +172,16 @@ fun EnhancedLineChart(
             val maxIncomeValue =
                 if (hasIncomeData) {
                     incomeData.maxOfOrNull {
-                        it.value.amount
-                    } ?: BigDecimal.ZERO
+                        it.value.toMajorDouble()
+                    }?.let { BigDecimal.valueOf(it) } ?: BigDecimal.ZERO
                 } else {
                     BigDecimal.ZERO
                 }
             val maxExpenseValue =
                 if (hasExpenseData) {
                     expenseData.maxOfOrNull {
-                        it.value.amount
-                    } ?: BigDecimal.ZERO
+                        it.value.toMajorDouble()
+                    }?.let { BigDecimal.valueOf(it) } ?: BigDecimal.ZERO
                 } else {
                     BigDecimal.ZERO
                 }
@@ -203,8 +203,8 @@ fun EnhancedLineChart(
             if (allPoints.isEmpty()) {
                 System.currentTimeMillis() to System.currentTimeMillis()
             } else {
-                val minTime = allPoints.minOf { it.date.time }
-                val maxTime = allPoints.maxOf { it.date.time }
+                val minTime = allPoints.minOf { it.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 }
+                val maxTime = allPoints.maxOf { it.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 }
                 if (minTime == maxTime) {
                     // Для одной точки создаем диапазон +/- 1 день
                     val calendar = Calendar.getInstance().apply { timeInMillis = minTime }
@@ -315,7 +315,7 @@ fun EnhancedLineChart(
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
-                        text = selectedPoint.value.format(true),
+                        text = selectedPoint.value.toPlainString(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = if (selectedPoint == selectedIncomePoint) currentIncomeColor else currentExpenseColor,
@@ -659,8 +659,8 @@ private fun calculateDistance(
     animatedProgress: Float,
 ): Float {
     if (endDate <= startDate || maxValue <= minValue) return Float.MAX_VALUE // Avoid division by zero
-    val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-    val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
+    val normalizedX = (point.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+    val normalizedY = 1f - (point.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
 
     if (!normalizedX.isFinite() || !normalizedY.isFinite()) return Float.MAX_VALUE // Check for NaN/Infinity
 

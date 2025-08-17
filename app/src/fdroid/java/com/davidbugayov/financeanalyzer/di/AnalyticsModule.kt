@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.di
 
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.IAnalytics

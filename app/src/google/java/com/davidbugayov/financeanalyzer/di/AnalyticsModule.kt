@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.di
 
 import android.app.Application
 import com.davidbugayov.financeanalyzer.BuildConfig
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
@@ -58,8 +57,6 @@ val analyticsModule =
             } catch (e: Exception) {
                 Timber.e(e, "Error initializing AppMetrica Analytics")
             }
-
-
 
             composite
         }

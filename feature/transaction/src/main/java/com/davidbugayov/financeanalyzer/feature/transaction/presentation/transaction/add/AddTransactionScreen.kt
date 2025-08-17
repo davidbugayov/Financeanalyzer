@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
@@ -19,6 +18,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionVi
 import com.davidbugayov.financeanalyzer.feature.transaction.base.baseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -60,10 +60,6 @@ fun addTransactionScreen(
             "AddTransactionScreen: Screen opened",
         )
 
-
-
-
-
         try {
             // Инициализация экрана
             viewModel.initializeScreen()
@@ -103,14 +99,12 @@ fun addTransactionScreen(
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            
         }
     }
 
     // Обработчик успешного добавления транзакции
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
-
             AnalyticsUtils.logEvent(
                 AnalyticsConstants.Events.TRANSACTION_ADDED,
                 Bundle().apply {

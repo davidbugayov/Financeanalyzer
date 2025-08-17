@@ -89,10 +89,10 @@ fun DrawScope.drawLineChart(
     // Логируем точки для отладки
     Timber.d("drawLineChart: рисуем график с ${points.size} точками, цвет: $lineColor")
     Timber.d(
-        "drawLineChart: первая точка: дата=${points.first().date}, значение=${points.first().value.amount}",
+        "drawLineChart: первая точка: дата=${points.first().date}, значение=${points.first().value.toMajorDouble()}",
     )
     Timber.d(
-        "drawLineChart: последняя точка: дата=${points.last().date}, значение=${points.last().value.amount}",
+        "drawLineChart: последняя точка: дата=${points.last().date}, значение=${points.last().value.toMajorDouble()}",
     )
 
     // Логируем метки времени для сравнения
@@ -102,8 +102,8 @@ fun DrawScope.drawLineChart(
 
     // Отладочная информация: показываем первую точку в виде координат для проверки масштабирования
     val firstPoint = points.first()
-    val firstNormalizedX = (firstPoint.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-    val firstNormalizedY = 1f - (firstPoint.value.amount.toFloat() - minValue) / (maxValue - minValue)
+    val firstNormalizedX = (firstPoint.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+    val firstNormalizedY = 1f - (firstPoint.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
     val firstX = firstNormalizedX * size.width * animatedProgress
     val firstY = firstNormalizedY * size.height
     Timber.d(
@@ -131,8 +131,8 @@ fun DrawScope.drawLineChart(
     // Подготавливаем координаты всех точек
     points.forEachIndexed { index, point ->
         // Нормализуем координаты точки
-        val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-        val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
+        val normalizedX = (point.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+        val normalizedY = 1f - (point.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
 
         // Масштабируем согласно анимации и размеру холста
         pointsX[index] = normalizedX * width * animatedProgress
@@ -215,8 +215,8 @@ fun DrawScope.drawLineChart(
 
     // Рисуем точки на линии с улучшенной визуализацией
     points.forEachIndexed { index, point ->
-        val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-        val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
+        val normalizedX = (point.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+        val normalizedY = 1f - (point.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
 
         val x = normalizedX * width * animatedProgress
         val y = normalizedY * height
@@ -227,7 +227,7 @@ fun DrawScope.drawLineChart(
         )
 
         // Проверяем, является ли текущая точка выбранной
-        val isSelected = selectedPoint?.date?.time == point.date.time
+        val isSelected = selectedPoint?.date?.toEpochDays() == point.date.toEpochDays()
 
         if (isSelected) {
             // Рисуем эффект свечения для выделенной точки
@@ -355,8 +355,8 @@ object LineChartUtils {
         var minDistance = Float.MAX_VALUE
 
         points.forEachIndexed { index, point ->
-            val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-            val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
+            val normalizedX = (point.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+            val normalizedY = 1f - (point.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
 
             val x = normalizedX * chartWidth * animatedProgress
             val y = normalizedY * chartHeight

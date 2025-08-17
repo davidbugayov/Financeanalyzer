@@ -45,8 +45,6 @@ class FinanceApp : BaseFinanceApp() {
 
         // Инициализация Firebase
         initFirebase()
-
-
     }
 
     /**

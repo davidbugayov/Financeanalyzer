@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic.model
 
-import com.davidbugayov.financeanalyzer.core.model.Money
-import java.util.Date
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import kotlinx.datetime.LocalDate
 
 /**
  * Точка данных для линейного графика
@@ -11,7 +11,7 @@ import java.util.Date
  * @param description Опциональное описание точки
  */
 data class LineChartPoint(
-    val date: Date,
+    val date: LocalDate,
     val value: Money,
     val description: String = "",
 )

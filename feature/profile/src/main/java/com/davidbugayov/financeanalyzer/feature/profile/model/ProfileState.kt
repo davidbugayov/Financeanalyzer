@@ -1,12 +1,8 @@
 package com.davidbugayov.financeanalyzer.feature.profile.model
 
 import com.davidbugayov.financeanalyzer.core.model.Currency
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.Time
-import org.koin.core.context.GlobalContext
 
 /**
  * Состояние экрана профиля.
@@ -32,7 +28,6 @@ data class ProfileState(
     val isTransactionReminderEnabled: Boolean = false,
     val transactionReminderTime: Time? = null,
     val isEditingNotifications: Boolean = false,
-
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,

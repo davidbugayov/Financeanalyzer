@@ -27,12 +27,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
@@ -43,6 +41,8 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.Notificatio
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
@@ -298,10 +298,6 @@ fun HomeScreen(
         // Отмечаем начало загрузки экрана
         PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.HOME)
 
-
-
-
-
         try {
             // Загружаем данные для экрана
             viewModel.onEvent(HomeEvent.LoadTransactions)
@@ -329,7 +325,6 @@ fun HomeScreen(
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
-            
         }
     }
 

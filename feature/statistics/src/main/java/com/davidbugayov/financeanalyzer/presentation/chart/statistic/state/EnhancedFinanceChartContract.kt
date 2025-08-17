@@ -1,12 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic.state
-import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import java.util.Calendar
 import java.util.Date
 import kotlin.collections.emptyList

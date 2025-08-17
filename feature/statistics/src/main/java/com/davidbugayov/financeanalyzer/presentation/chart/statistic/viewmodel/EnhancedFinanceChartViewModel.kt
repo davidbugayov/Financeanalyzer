@@ -2,11 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.shared.model.Money
-import com.davidbugayov.financeanalyzer.shared.model.Transaction
-import com.davidbugayov.financeanalyzer.shared.model.Currency
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -16,13 +11,18 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.Enhan
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
-import com.davidbugayov.financeanalyzer.utils.kmp.toShared
+import com.davidbugayov.financeanalyzer.utils.kmp.toCore
+import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
-import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -126,16 +126,16 @@ class EnhancedFinanceChartViewModel :
             val filteredTransactions = (flow?.first() ?: emptyList())
             allTransactions = filteredTransactions
 
-            val currentCurrency = CurrencyProvider.getCurrency()
+            val currentCurrency = CurrencyProvider.getCurrency().toShared()
             val metrics =
                 calculateBalanceMetricsUseCase(
-                    filteredTransactions.map { it.toDomain() },
+                    filteredTransactions,
                     currentCurrency,
-                    _state.value.startDate,
-                    _state.value.endDate,
+                    _state.value.startDate.toLocalDateKmp(),
+                    _state.value.endDate.toLocalDateKmp(),
                 )
-            val income = metrics.income.toShared()
-            val expense = metrics.expense.toShared()
+            val income = metrics.income
+            val expense = metrics.expense
             val savingsRate = metrics.savingsRate
             val averageDailyExpense = metrics.averageDailyExpense
             val monthsOfSavings = metrics.monthsOfSavings
@@ -202,7 +202,7 @@ class EnhancedFinanceChartViewModel :
                     averageDailyExpense = averageDailyExpense,
                     monthsOfSavings = monthsOfSavings,
                     pieChartData = pieChartData,
-                    recommendations = recommendations,
+                    recommendations = recommendations.map { it.toDomain() },
                 )
             }
         }
@@ -260,7 +260,7 @@ class EnhancedFinanceChartViewModel :
                 data.filter { it.value.minor != 0L }
             } else {
                 // Для доходов фильтруем только положительные суммы
-                data.filter { it.value.minor > 0 }
+                data.filter { it.value.minor > 0L }
             }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val palette = if (showExpenses) ExpenseChartPalette else IncomeChartPalette
@@ -279,7 +279,7 @@ class EnhancedFinanceChartViewModel :
                     isExpense = showExpenses,
                     isCustom = category?.isCustom == true,
                     count = 0,
-                    money = moneyValue,
+                    money = moneyValue.toCore(),
                     percentage = 0f,
                     transactions = emptyList(),
                     original = category?.original,
@@ -289,20 +289,20 @@ class EnhancedFinanceChartViewModel :
             }
         val totalMoney =
             if (showExpenses) {
-                pieChartDataList.fold(0L) { acc, item -> acc + item.money.minor }
+                pieChartDataList.fold(0.0) { acc, item -> acc + item.money.amount.toDouble() }
             } else {
-                // Для доходов считаем сумму только по положительным значениям
-                pieChartDataList.fold(0L) { acc, item ->
-                    acc + maxOf(item.money.minor, 0L)
+                // Для доходов считаем сумму только по положительных значениям
+                pieChartDataList.fold(0.0) { acc, item ->
+                    acc + maxOf(item.money.amount.toDouble(), 0.0)
                 }
             }
-        return if (pieChartDataList.isNotEmpty() && totalMoney != 0L) {
+        return if (pieChartDataList.isNotEmpty() && totalMoney != 0.0) {
             pieChartDataList.map { item ->
                 val percent =
                     if (showExpenses) {
-                        (item.money.minor.toFloat() / totalMoney.toFloat()) * 100f
+                        (item.money.amount.toFloat() / totalMoney.toFloat()) * 100f
                     } else {
-                        (maxOf(item.money.minor, 0L).toFloat() / totalMoney.toFloat()) * 100f
+                        (maxOf(item.money.amount.toDouble(), 0.0).toFloat() / totalMoney.toFloat()) * 100f
                     }
                 item.copy(percentage = percent)
             }

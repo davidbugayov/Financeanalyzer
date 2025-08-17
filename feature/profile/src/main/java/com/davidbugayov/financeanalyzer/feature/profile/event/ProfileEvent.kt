@@ -142,8 +142,6 @@ sealed class ProfileEvent {
         val pinCode: String,
     ) : ProfileEvent()
 
-
-
     /**
      * Событие навигации к экрану библиотек.
      */

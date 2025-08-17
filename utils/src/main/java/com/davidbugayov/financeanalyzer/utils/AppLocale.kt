@@ -19,10 +19,10 @@ object AppLocale {
                 else -> Locale.ENGLISH.toLanguageTag()
             }
         Timber.tag("LANG").d("AppLocale.apply: lang=%s normalized=%s tag=%s", lang, normalized, tag)
-        
+
         // Применяем локаль
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
-        
+
         // Проверяем что локаль применилась
         val current = AppCompatDelegate.getApplicationLocales().toLanguageTags()
         Timber.tag("LANG").d(
@@ -30,7 +30,7 @@ object AppLocale {
             current,
             Locale.getDefault().toLanguageTag(),
         )
-        
+
         // Дополнительная проверка для релизной сборки
         if (current != tag) {
             Timber.tag("LANG").w("AppLocale.apply: locale not applied correctly, retrying...")

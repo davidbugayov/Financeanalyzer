@@ -3,10 +3,10 @@ package com.davidbugayov.financeanalyzer.utils
 import android.app.Application
 import android.os.Build
 import com.davidbugayov.financeanalyzer.BuildConfig
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.CrashLogger
 import com.davidbugayov.financeanalyzer.analytics.CrashlyticsUtils
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import io.appmetrica.analytics.AppMetrica
 import java.io.PrintWriter
 import java.io.StringWriter
