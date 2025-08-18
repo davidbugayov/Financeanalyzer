@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +51,7 @@ fun TransactionActionsDialog(
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit,
     subcategoryName: String = "",
+    categoryIcon: ImageVector? = null,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -118,6 +120,7 @@ fun TransactionActionsDialog(
                 TransactionDetailContent(
                     transaction = transaction,
                     subcategoryName = subcategoryName,
+                    categoryIcon = categoryIcon,
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))

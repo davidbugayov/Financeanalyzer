@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -56,6 +57,7 @@ import java.util.Locale
 fun TransactionDetailContent(
     transaction: Transaction,
     subcategoryName: String = "",
+    categoryIcon: ImageVector? = null,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val incomeColor = LocalIncomeColor.current
@@ -84,7 +86,7 @@ fun TransactionDetailContent(
                 modifier = Modifier.padding(28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // Иконка в круге
+                // Иконка в круге (иконка категории, если передана)
                 Box(
                     modifier =
                         Modifier
@@ -94,7 +96,7 @@ fun TransactionDetailContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Payments,
+                        imageVector = categoryIcon ?: Icons.Default.Payments,
                         contentDescription = null,
                         tint = valueColor,
                         modifier = Modifier.size(28.dp),

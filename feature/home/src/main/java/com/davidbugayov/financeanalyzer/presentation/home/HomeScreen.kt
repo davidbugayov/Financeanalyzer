@@ -372,12 +372,11 @@ fun HomeScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val onTransactionClick = { transaction: Transaction ->
-        selectedTransactionForDetail = transaction
-        showDetailDialog = true
-    }
-    val onTransactionLongClick = { transaction: Transaction ->
         selectedTransactionForActions = transaction
         showActionsDialog = true
+    }
+    val onTransactionLongClick = { _: Transaction ->
+        // long tap отключён
     }
     val onToggleGroupSummary =
         remember<(Boolean) -> Unit> {
@@ -501,17 +500,7 @@ fun HomeScreen(
             subcategoryNameForActions = subcategoryNameForActions,
         )
 
-        // Диалог детальной информации о транзакции
-        if (showDetailDialog && selectedTransactionForDetail != null) {
-            TransactionDetailDialog(
-                transaction = selectedTransactionForDetail!!,
-                onDismiss = {
-                    showDetailDialog = false
-                    selectedTransactionForDetail = null
-                },
-                subcategoryName = subcategoryNameForDetail,
-            )
-        }
+        // Диалог детальной информации удалён. Используем только диалог действий
 
         // Диалог разрешения на уведомления
         if (showNotificationPermissionDialog) {

@@ -546,12 +546,11 @@ fun TransactionHistoryScreen(
                                     groups = state.groupedTransactions,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { tx ->
-                                        selectedTransactionForDetail = tx
-                                        showDetailDialog = true
-                                    },
-                                    onTransactionLongClick = { tx ->
                                         selectedTransaction = tx
                                         showActionsDialog = true
+                                    },
+                                    onTransactionLongClick = { _ ->
+                                        // long tap отключён
                                     },
                                 )
                             } else {
@@ -559,12 +558,11 @@ fun TransactionHistoryScreen(
                                     items = pagingItems,
                                     categoriesViewModel = viewModel.categoriesViewModel,
                                     onTransactionClick = { transaction ->
-                                        selectedTransactionForDetail = transaction
-                                        showDetailDialog = true
-                                    },
-                                    onTransactionLongClick = { transaction ->
                                         selectedTransaction = transaction
                                         showActionsDialog = true
+                                    },
+                                    onTransactionLongClick = { _ ->
+                                        // long tap отключён
                                     },
                                 )
                             }

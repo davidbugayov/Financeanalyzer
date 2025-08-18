@@ -99,7 +99,7 @@ fun groupedTransactionList(
                         transaction = tx,
                         categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(tx) },
-                        onTransactionLongClick = { onTransactionLongClick(tx) },
+                        onTransactionLongClick = { /* long tap убран */ },
                         animated = false,
                         animationDelay = 0L,
                     )

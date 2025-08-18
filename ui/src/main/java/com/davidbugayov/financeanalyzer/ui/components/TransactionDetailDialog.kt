@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +46,7 @@ fun TransactionDetailDialog(
     transaction: Transaction,
     onDismiss: () -> Unit,
     subcategoryName: String = "",
+    categoryIcon: ImageVector? = null,
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -113,6 +115,7 @@ fun TransactionDetailDialog(
                 TransactionDetailContent(
                     transaction = transaction,
                     subcategoryName = subcategoryName,
+                    categoryIcon = categoryIcon,
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))

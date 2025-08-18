@@ -72,7 +72,7 @@ fun transactionPagingList(
                         transaction = tx,
                         categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(tx) },
-                        onTransactionLongClick = { onTransactionLongClick(tx) },
+                        onTransactionLongClick = { /* long tap убран */ },
                         animationDelay = 0L,
                         animated = false,
                     )
