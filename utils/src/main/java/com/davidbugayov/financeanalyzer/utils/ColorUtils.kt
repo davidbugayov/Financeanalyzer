@@ -79,23 +79,21 @@ object ColorUtils {
      */
     fun getEffectiveSourceColor(
         sourceName: String,
-        sourceColorHex: String?, // Ожидаем HEX-строку или null
+        sourceColorHex: String?,
         isExpense: Boolean,
-        isDarkTheme: Boolean, // Нужно передавать состояние темы
+        isDarkTheme: Boolean,
     ): Color {
         // Пытаемся получить цвет из sourceColorHex, если он есть
         sourceColorHex?.let { hex ->
             try {
                 if (hex.isNotBlank()) return Color(hex.toColorInt())
             } catch (_: IllegalArgumentException) {
-                // Log error or handle invalid hex
             }
         }
         // Затем пытаемся получить по имени источника
         getSourceColorByName(sourceName)?.let { return it }
 
         // В крайнем случае, цвет по умолчанию в зависимости от типа транзакции и темы
-        // Эту логику лучше вынести в Composable, используя LocalIncomeColor/LocalExpenseColor
         return when {
             isExpense && isDarkTheme -> ExpenseColorDark
             isExpense && !isDarkTheme -> ExpenseColorLight

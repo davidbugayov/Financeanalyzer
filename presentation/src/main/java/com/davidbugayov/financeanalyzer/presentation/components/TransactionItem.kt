@@ -51,7 +51,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
-import com.davidbugayov.financeanalyzer.ui.utils.SourceLocalization
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -61,6 +60,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorDark
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorDark
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorLight
+import com.davidbugayov.financeanalyzer.ui.utils.SourceLocalization
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.text.SimpleDateFormat

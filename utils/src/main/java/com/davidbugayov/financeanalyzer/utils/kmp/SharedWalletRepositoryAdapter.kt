@@ -32,5 +32,5 @@ private fun SharedWallet.toDomain(): DomainWallet =
         name = this.name,
         balance = this.balance,
         limit = this.limit,
-        spent = this.balance, // заглушка для spent
+        spent = this.balance,
     )

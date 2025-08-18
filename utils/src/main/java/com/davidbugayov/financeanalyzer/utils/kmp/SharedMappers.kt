@@ -1,8 +1,16 @@
 package com.davidbugayov.financeanalyzer.utils.kmp
 
+import com.davidbugayov.financeanalyzer.domain.model.CategoryStats as DomainCategoryStats
+import com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation as DomainFinancialRecommendation
+import com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory as DomainRecommendationCategory
+import com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority as DomainRecommendationPriority
 import com.davidbugayov.financeanalyzer.domain.model.Transaction as DomainTransaction
+import com.davidbugayov.financeanalyzer.shared.model.CategoryStats as SharedCategoryStats
 import com.davidbugayov.financeanalyzer.shared.model.Currency as SharedCurrency
+import com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation as SharedFinancialRecommendation
 import com.davidbugayov.financeanalyzer.shared.model.Money as SharedMoney
+import com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory as SharedRecommendationCategory
+import com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority as SharedRecommendationPriority
 import com.davidbugayov.financeanalyzer.shared.model.Transaction as SharedTransaction
 import java.time.Instant
 import java.time.ZoneId
@@ -96,30 +104,30 @@ fun Double.setScale(
     return java.math.BigDecimal.valueOf(this).setScale(scale, roundingMode)
 }
 
-fun com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation.toDomain(): com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation {
-    return com.davidbugayov.financeanalyzer.domain.model.FinancialRecommendation(
+fun SharedFinancialRecommendation.toDomain(): DomainFinancialRecommendation {
+    return DomainFinancialRecommendation(
         title = this.code,
         description = this.code,
         priority =
             when (this.priority) {
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.HIGH -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.HIGH
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.MEDIUM -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.MEDIUM
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority.LOW -> com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority.LOW
+                SharedRecommendationPriority.HIGH -> DomainRecommendationPriority.HIGH
+                SharedRecommendationPriority.MEDIUM -> DomainRecommendationPriority.MEDIUM
+                SharedRecommendationPriority.LOW -> DomainRecommendationPriority.LOW
             },
         category =
             when (this.category) {
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.SAVINGS -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.SAVINGS
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EXPENSES -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.EXPENSES
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.INCOME -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.INCOME
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.EMERGENCY_FUND -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.EMERGENCY_FUND
-                com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory.RETIREMENT -> com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory.RETIREMENT
+                SharedRecommendationCategory.SAVINGS -> DomainRecommendationCategory.SAVINGS
+                SharedRecommendationCategory.EXPENSES -> DomainRecommendationCategory.EXPENSES
+                SharedRecommendationCategory.INCOME -> DomainRecommendationCategory.INCOME
+                SharedRecommendationCategory.EMERGENCY_FUND -> DomainRecommendationCategory.EMERGENCY_FUND
+                SharedRecommendationCategory.RETIREMENT -> DomainRecommendationCategory.RETIREMENT
             },
         potentialImpact = 0.0,
     )
 }
 
-fun com.davidbugayov.financeanalyzer.shared.model.CategoryStats.toDomain(): com.davidbugayov.financeanalyzer.domain.model.CategoryStats {
-    return com.davidbugayov.financeanalyzer.domain.model.CategoryStats(
+fun SharedCategoryStats.toDomain(): DomainCategoryStats {
+    return DomainCategoryStats(
         category = this.category,
         amount = this.amount,
         percentage = java.math.BigDecimal.valueOf(this.percentage),

@@ -137,7 +137,10 @@ object PerformanceMetrics {
         // Логируем предупреждение, если загрузка экрана заняла слишком много времени
         if (durationMs > SCREEN_LOAD_WARNING_THRESHOLD) {
             Timber.w(
-                "Screen $screenName loaded in $durationMs ms, which exceeds the warning threshold of $SCREEN_LOAD_WARNING_THRESHOLD ms",
+                "Screen %s loaded in %d ms, threshold %d ms",
+                screenName,
+                durationMs,
+                SCREEN_LOAD_WARNING_THRESHOLD,
             )
         }
 
@@ -201,7 +204,10 @@ object PerformanceMetrics {
         // Логируем предупреждение, если операция с БД заняла слишком много времени
         if (duration > DB_OPERATION_WARNING_THRESHOLD) {
             Timber.w(
-                "DB operation $operationName took $duration ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms",
+                "DB op %s took %d ms, threshold %d ms",
+                operationName,
+                duration,
+                DB_OPERATION_WARNING_THRESHOLD,
             )
         }
 
@@ -228,7 +234,10 @@ object PerformanceMetrics {
         // Логируем предупреждение, если операция с БД заняла слишком много времени
         if (durationMs > DB_OPERATION_WARNING_THRESHOLD) {
             Timber.w(
-                "DB operation $operationName took $durationMs ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms",
+                "DB op %s took %d ms, threshold %d ms",
+                operationName,
+                durationMs,
+                DB_OPERATION_WARNING_THRESHOLD,
             )
         }
 
@@ -290,7 +299,10 @@ object PerformanceMetrics {
         // Логируем предупреждение, если сетевой запрос занял слишком много времени
         if (duration > NETWORK_CALL_WARNING_THRESHOLD) {
             Timber.w(
-                "Network call to $url took $duration ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms",
+                "Network call to %s took %d ms, threshold %d ms",
+                url,
+                duration,
+                NETWORK_CALL_WARNING_THRESHOLD,
             )
         }
 
@@ -320,7 +332,10 @@ object PerformanceMetrics {
         // Логируем предупреждение, если сетевой запрос занял слишком много времени
         if (durationMs > NETWORK_CALL_WARNING_THRESHOLD) {
             Timber.w(
-                "Network call to $url took $durationMs ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms",
+                "Network call to %s took %d ms, threshold %d ms",
+                url,
+                durationMs,
+                NETWORK_CALL_WARNING_THRESHOLD,
             )
         }
 

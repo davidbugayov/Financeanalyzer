@@ -15,15 +15,17 @@ import timber.log.Timber
  */
 class NotificationScheduler(
     private val applicationContext: Context,
-    private val preferencesManager: PreferencesManager, // Добавляем PreferencesManager как зависимость
+    private val preferencesManager: PreferencesManager,
 ) : INotificationScheduler {
-    private val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
-    private val TRANSACTION_REMINDER_REQUEST_CODE = 1001
+    companion object {
+        private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
+        private const val TRANSACTION_REMINDER_REQUEST_CODE = 1001
+    }
 
     /**
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
      */
-    private fun createNotificationChannel() { // Убираем context из параметра
+    private fun createNotificationChannel() {
         val name = applicationContext.getString(R.string.notification_channel_name)
         val description = applicationContext.getString(R.string.notification_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -46,7 +48,7 @@ class NotificationScheduler(
     internal fun scheduleTransactionReminder(
         hour: Int,
         minute: Int,
-    ) { // Убираем context из параметра
+    ) {
         // Создаем канал уведомлений
         createNotificationChannel()
 

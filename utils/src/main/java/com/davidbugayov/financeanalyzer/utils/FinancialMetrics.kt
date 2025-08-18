@@ -50,7 +50,8 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             try {
                 // Приводим к UnifiedTransactionRepository для доступа к dataChangeEvents
-                val unifiedRepo = repository as? com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
+                val unifiedRepo =
+                    repository as? com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
                 unifiedRepo?.dataChangeEvents?.collect { event ->
                     when (event) {
                         is DataChangeEvent.TransactionChanged -> {
@@ -72,7 +73,8 @@ class FinancialMetrics private constructor() : KoinComponent {
             try {
                 CurrencyProvider.getCurrencyFlow().collect { newCurrency ->
                     Timber.d(
-                        "FinancialMetrics: Получено событие изменения валюты на ${newCurrency.name}, пересчитываем метрики",
+                        "FinancialMetrics: Получено событие изменения валюты на %s, пересчитываем метрики",
+                        newCurrency.name,
                     )
                     recalculateStats()
                 }
@@ -120,7 +122,10 @@ class FinancialMetrics private constructor() : KoinComponent {
                 val formattedIncome = totalIncome.value.formatForDisplay()
                 val formattedBalance = balance.formatForDisplay()
                 Timber.d(
-                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
+                    "Метрики обновлены: доход=%s, расход=%s, баланс=%s",
+                    formattedIncome,
+                    formattedExpenses,
+                    formattedBalance,
                 )
 
                 // Триггер ачивки за изменение сбережений

@@ -81,7 +81,8 @@ class PermissionManager(
 
                 PermissionEvent.DENY_PERMISSION -> {
                     when (currentState) {
-                        NotificationPermissionState.PERMISSION_REQUESTED -> NotificationPermissionState.PERMISSION_DENIED
+                        NotificationPermissionState.PERMISSION_REQUESTED ->
+                            NotificationPermissionState.PERMISSION_DENIED
                         NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
                         else -> currentState
                     }
@@ -89,8 +90,10 @@ class PermissionManager(
 
                 PermissionEvent.DISMISS_DIALOG -> {
                     when (currentState) {
-                        NotificationPermissionState.ONBOARDING_COMPLETED -> NotificationPermissionState.PERMANENTLY_DENIED
-                        NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
+                        NotificationPermissionState.ONBOARDING_COMPLETED ->
+                            NotificationPermissionState.PERMANENTLY_DENIED
+                        NotificationPermissionState.PERMISSION_DENIED ->
+                            NotificationPermissionState.PERMANENTLY_DENIED
                         else -> currentState
                     }
                 }

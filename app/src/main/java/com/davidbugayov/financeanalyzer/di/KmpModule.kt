@@ -1,9 +1,11 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository as KmpAchievementsRepository
 import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository as KmpSubcategoryRepository
 import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository as KmpTransactionRepository
 import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository as KmpWalletRepository
+import com.davidbugayov.financeanalyzer.utils.kmp.SharedAchievementsRepositoryAdapter
 import com.davidbugayov.financeanalyzer.utils.kmp.SharedSubcategoryRepositoryAdapter
 import com.davidbugayov.financeanalyzer.utils.kmp.SharedTransactionRepositoryAdapter
 import com.davidbugayov.financeanalyzer.utils.kmp.SharedWalletRepositoryAdapter
@@ -18,6 +20,7 @@ val kmpModule =
         single<KmpTransactionRepository> { SharedTransactionRepositoryAdapter(get()) }
         single<KmpSubcategoryRepository> { SharedSubcategoryRepositoryAdapter(get()) }
         single<KmpWalletRepository> { SharedWalletRepositoryAdapter(get()) }
+        single<KmpAchievementsRepository> { SharedAchievementsRepositoryAdapter(get()) }
 
         // SharedFacade с подключенными репозиториями и appScope
         single {
@@ -25,7 +28,7 @@ val kmpModule =
                 transactionRepository = get<KmpTransactionRepository>(),
                 walletRepository = get<KmpWalletRepository>(),
                 subcategoryRepository = get<KmpSubcategoryRepository>(),
-                achievementsRepository = null,
+                achievementsRepository = get<KmpAchievementsRepository>(),
                 appScope = get(),
             )
         }

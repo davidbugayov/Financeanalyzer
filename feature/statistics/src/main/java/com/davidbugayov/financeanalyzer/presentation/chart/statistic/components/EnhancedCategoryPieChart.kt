@@ -54,11 +54,11 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.util.PercentRounding
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.math.BigDecimal
-import com.davidbugayov.financeanalyzer.shared.util.PercentRounding
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -310,11 +310,12 @@ fun EnhancedCategoryPieChart(
             val sortedItems = filteredData.sortedByDescending { it.money.amount }
 
             // Рассчитываем целочисленные проценты, сумма которых равна 100
-            val roundedPercents: Map<Long, Int> = remember(sortedItems) {
-                val list = sortedItems.map { it.percentage.toDouble() }
-                val ints = PercentRounding.roundToHundred(list)
-                sortedItems.mapIndexed { index, ui -> ui.id to ints[index] }.toMap()
-            }
+            val roundedPercents: Map<Long, Int> =
+                remember(sortedItems) {
+                    val list = sortedItems.map { it.percentage.toDouble() }
+                    val ints = PercentRounding.roundToHundred(list)
+                    sortedItems.mapIndexed { index, ui -> ui.id to ints[index] }.toMap()
+                }
 
             // Use constants for legend height calculation
             val legendItemHeight =
