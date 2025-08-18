@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.core.util
 
 import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.SymbolPosition
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -53,7 +54,11 @@ fun Money.format(
     val formattedAmount = formatter.format(majorAmount)
 
     return if (showCurrency) {
-        "${currency.symbol}$formattedAmount"
+        if (currency.symbolPosition == SymbolPosition.BEFORE) {
+            "${currency.symbol}$formattedAmount"
+        } else {
+            "$formattedAmount ${currency.symbol}"
+        }
     } else {
         formattedAmount
     }

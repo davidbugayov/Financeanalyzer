@@ -56,7 +56,7 @@ private fun BalanceCardAmount(
     expenseColor: androidx.compose.ui.graphics.Color,
 ) {
     Text(
-        text = balance.formatForDisplay(true),
+        text = balance.formatForDisplay(showCurrency = true),
         style = MaterialTheme.typography.headlineMedium,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,

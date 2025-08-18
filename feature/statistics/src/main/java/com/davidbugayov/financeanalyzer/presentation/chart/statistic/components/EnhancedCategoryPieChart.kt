@@ -58,6 +58,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.shared.util.PercentRounding
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -308,6 +309,13 @@ fun EnhancedCategoryPieChart(
             // Сортируем элементы по сумме (от большей к меньшей)
             val sortedItems = filteredData.sortedByDescending { it.money.amount }
 
+            // Рассчитываем целочисленные проценты, сумма которых равна 100
+            val roundedPercents: Map<Long, Int> = remember(sortedItems) {
+                val list = sortedItems.map { it.percentage.toDouble() }
+                val ints = PercentRounding.roundToHundred(list)
+                sortedItems.mapIndexed { index, ui -> ui.id to ints[index] }.toMap()
+            }
+
             // Use constants for legend height calculation
             val legendItemHeight =
                 dimensionResource(
@@ -459,7 +467,7 @@ fun EnhancedCategoryPieChart(
                         // Процент с цветом категории для выделенного элемента
                         Text(
                             text =
-                                "${item.percentage}%",
+                                "${roundedPercents[item.id] ?: 0}%",
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(45.dp),
