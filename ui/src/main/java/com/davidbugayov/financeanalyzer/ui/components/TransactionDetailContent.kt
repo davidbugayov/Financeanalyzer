@@ -44,6 +44,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.utils.DefaultCategoryLocalization
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -150,7 +151,7 @@ fun TransactionDetailContent(
                 // Категория
                 DetailRow(
                     label = stringResource(R.string.category),
-                    value = transaction.category,
+                    value = DefaultCategoryLocalization.displayName(LocalContext.current, transaction.category),
                     icon = {
                         val icon = Icons.Default.Category // универсальная иконка категории
                         Icon(
