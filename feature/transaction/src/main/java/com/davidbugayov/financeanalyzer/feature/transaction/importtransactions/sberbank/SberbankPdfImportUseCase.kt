@@ -269,7 +269,7 @@ class SberbankPdfImportUseCase(
 
             // Если категория не обнаружена по исходной категории банка, проверяем по описанию
             val detectedCategory =
-                if (detectedCategoryFromBankCategory != "Без категории") {
+                if (detectedCategoryFromBankCategory != com.davidbugayov.financeanalyzer.ui.R.string.no_category.let { "Без категории" }) {
                     detectedCategoryFromBankCategory
                 } else {
                     // Используем все доступные данные для определения категории

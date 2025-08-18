@@ -64,6 +64,8 @@ import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsHandler
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -90,6 +92,8 @@ fun TransactionHistoryScreen(
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
+    var categoryIconForActions by remember { mutableStateOf<ImageVector?>(null) }
+    var categoryColorForActions by remember { mutableStateOf<androidx.compose.ui.graphics.Color?>(null) }
 
     // Состояние для подкатегории
     val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
@@ -172,6 +176,22 @@ fun TransactionHistoryScreen(
     // Получаем список всех категорий из CategoriesViewModel
     val expenseCategories by viewModel.categoriesViewModel.expenseCategories.collectAsState()
     val incomeCategories by viewModel.categoriesViewModel.incomeCategories.collectAsState()
+
+    // Подбор иконки при смене выбранной транзакции
+    LaunchedEffect(selectedTransaction?.category, expenseCategories, incomeCategories) {
+        val rawName = selectedTransaction?.category
+        if (rawName.isNullOrBlank()) {
+            categoryIconForActions = null
+            categoryColorForActions = null
+        } else {
+            val key = CategoryLocalization.keyFor(rawName) ?: rawName.trim().lowercase()
+            val match =
+                expenseCategories.firstOrNull { (CategoryLocalization.keyFor(it.name) ?: it.name.lowercase()) == key }
+                    ?: incomeCategories.firstOrNull { (CategoryLocalization.keyFor(it.name) ?: it.name.lowercase()) == key }
+            categoryIconForActions = match?.icon
+            categoryColorForActions = match?.color
+        }
+    }
 
     // Преобразуем категории в списки строк для отображения
     val expenseCategoryNames =
@@ -304,6 +324,8 @@ fun TransactionHistoryScreen(
                 handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
             },
             subcategoryName = subcategoryNameForActions,
+            categoryIcon = categoryIconForActions,
+            categoryColor = categoryColorForActions,
         )
     }
 

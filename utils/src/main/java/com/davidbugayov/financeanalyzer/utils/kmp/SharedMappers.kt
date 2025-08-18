@@ -20,6 +20,7 @@ fun DomainTransaction.toShared(): SharedTransaction {
         isExpense = isExpense,
         note = note,
         source = source,
+        subcategoryId = subcategoryId,
     )
 }
 
@@ -56,6 +57,7 @@ fun SharedTransaction.toDomain(): DomainTransaction {
         note = this.note,
         source = this.source,
         sourceColor = 0,
+        subcategoryId = this.subcategoryId,
     )
 }
 

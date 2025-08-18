@@ -18,6 +18,9 @@ import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
+import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
+import org.koin.core.context.GlobalContext
+import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import java.math.BigDecimal
@@ -138,10 +141,11 @@ class EnhancedFinanceChartViewModel :
             val monthsOfSavings = metrics.monthsOfSavings
 
             // Агрегируем по категориям
+            val noCategory = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.no_category)
             val expensesByCategory =
                 filteredTransactions
                     .filter { it.isExpense }
-                    .groupBy { it.category.ifBlank { "Без категории" } }
+                    .groupBy { it.category.ifBlank { noCategory } }
                     .mapValues { (_, transactions) ->
                         transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                             // Приводим каждую транзакцию к текущей валюте
@@ -152,7 +156,7 @@ class EnhancedFinanceChartViewModel :
             val incomeByCategory =
                 filteredTransactions
                     .filter { !it.isExpense }
-                    .groupBy { it.category.ifBlank { "Без категории" } }
+                    .groupBy { it.category.ifBlank { noCategory } }
                     .mapValues { (_, transactions) ->
                         transactions.fold(Money.zero(currentCurrency)) { acc, transaction ->
                             // Приводим каждую транзакцию к текущей валюте

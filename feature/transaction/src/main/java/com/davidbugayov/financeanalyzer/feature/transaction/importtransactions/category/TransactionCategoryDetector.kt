@@ -134,6 +134,6 @@ object TransactionCategoryDetector {
         for ((category, keywords) in rules) {
             if (keywords.any { lower.contains(it) }) return category
         }
-        return "Без категории"
+        return com.davidbugayov.financeanalyzer.ui.R.string.no_category.let { "Без категории" }
     }
 }

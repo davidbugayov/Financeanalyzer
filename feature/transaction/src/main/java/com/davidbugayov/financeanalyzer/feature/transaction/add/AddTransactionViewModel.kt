@@ -101,7 +101,7 @@ class AddTransactionViewModel(
     }
 
     private fun validateInput(
-        amount: String,
+        amount: Money,
         categoryId: String,
     ): Boolean {
         Timber.d(
@@ -117,44 +117,16 @@ class AddTransactionViewModel(
             )
         }
 
-        if (amount.isBlank()) {
+        // Используем уже распарсенный Money: ошибка, если сумма <= 0
+        if (amount.amount <= BigDecimal.ZERO) {
             validationBuilder.addAmountError()
             Timber.d(
-                GlobalContext.get().get<ResourceProvider>().getString(UiR.string.log_transaction_empty_amount_error),
+                GlobalContext.get().get<ResourceProvider>().getString(
+                    UiR.string.log_transaction_zero_amount_error,
+                    amount.amount.toFloat(),
+                ),
             )
-            CrashLoggerProvider.crashLogger.logException(
-                Exception(GlobalContext.get().get<ResourceProvider>().getString(UiR.string.error_empty_amount)),
-            )
-        } else {
-            try {
-                val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
-                if (amountValue <= BigDecimal.ZERO) {
-                    validationBuilder.addAmountError()
-                    Timber.d(
-                        GlobalContext.get().get<ResourceProvider>().getString(
-                            UiR.string.log_transaction_zero_amount_error,
-                            amountValue.toFloat(),
-                        ),
-                    )
-                    CrashLoggerProvider.crashLogger.logException(
-                        Exception(
-                            GlobalContext.get().get<ResourceProvider>().getString(
-                                UiR.string.error_zero_amount,
-                                amountValue.toString(),
-                            ),
-                        ),
-                    )
-                }
-            } catch (e: Exception) {
-                validationBuilder.addAmountError()
-                Timber.e(
-                    GlobalContext.get().get<ResourceProvider>().getString(
-                        UiR.string.log_transaction_parse_amount_error,
-                        e.message ?: "",
-                    ),
-                )
-                CrashLoggerProvider.crashLogger.logException(e)
-            }
+            // Не шлем исключение в CrashReporter для ожидаемой пользовательской ошибки
         }
 
         if (categoryId.isBlank()) {
@@ -192,9 +164,7 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
 
             val moneyFromExpression = parseMoneyExpression(currentState.amount)
-            val amountForValidation = moneyFromExpression.formatForDisplay()
-
-            if (!validateInput(amountForValidation, currentState.category)) {
+            if (!validateInput(moneyFromExpression, currentState.category)) {
                 _state.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -273,6 +243,7 @@ class AddTransactionViewModel(
             date = currentState.selectedDate.toLocalDateKmp(),
             isExpense = currentState.isExpense,
             source = currentState.source,
+            subcategoryId = subcategoryId,
         )
     }
 

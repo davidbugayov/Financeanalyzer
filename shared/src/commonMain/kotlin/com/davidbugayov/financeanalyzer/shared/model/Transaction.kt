@@ -13,6 +13,7 @@ data class Transaction(
     val isExpense: Boolean,
     val note: String? = null,
     val source: String,
+    val subcategoryId: Long? = null,
 )
 
 

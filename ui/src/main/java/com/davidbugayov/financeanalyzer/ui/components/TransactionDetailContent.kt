@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +46,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.ui.utils.DefaultCategoryLocalization
+import com.davidbugayov.financeanalyzer.ui.utils.SourceLocalization
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -59,11 +61,13 @@ fun TransactionDetailContent(
     transaction: Transaction,
     subcategoryName: String = "",
     categoryIcon: ImageVector? = null,
+    categoryColor: Color? = null,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val valueColor = if (transaction.isExpense) expenseColor else incomeColor
+    val categoryTint = categoryColor ?: MaterialTheme.colorScheme.primary
 
     Column(
         modifier = Modifier.padding(vertical = 16.dp),
@@ -153,15 +157,15 @@ fun TransactionDetailContent(
                     label = stringResource(R.string.category),
                     value = DefaultCategoryLocalization.displayName(LocalContext.current, transaction.category),
                     icon = {
-                        val icon = Icons.Default.Category // универсальная иконка категории
+                        val icon = categoryIcon ?: Icons.Default.Category
                         Icon(
                             imageVector = icon,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = categoryTint,
                             modifier = Modifier.size(24.dp),
                         )
                     },
-                    valueColor = null,
+                    valueColor = categoryTint,
                 )
 
                 // Подкатегория (если есть)
@@ -213,10 +217,25 @@ fun TransactionDetailContent(
                 )
 
                 // Источник
-                val effectiveSourceColor = rememberSourceColor(transaction, isDarkTheme)
+                // Цвет источника: используем явный цвет из transaction.sourceColor если есть,
+                // иначе пытаемся подобрать по имени через ColorUtils.getSourceColorByName
+                val effectiveSourceColor =
+                    remember(transaction.sourceColor, transaction.source, isDarkTheme, transaction.isExpense) {
+                        if (transaction.sourceColor != 0) {
+                            Color(transaction.sourceColor)
+                        } else {
+                            // В ui-модуле есть только ColorUtils из ui.utils
+                            ColorUtils.getEffectiveSourceColor(
+                                sourceName = transaction.source,
+                                sourceColorHex = null,
+                                isExpense = transaction.isExpense,
+                                isDarkTheme = isDarkTheme,
+                            )
+                        }
+                    }
                 DetailRow(
                     label = stringResource(R.string.source),
-                    value = transaction.source,
+                    value = SourceLocalization.displayName(LocalContext.current, transaction.source),
                     icon = {
                         Box(
                             modifier =

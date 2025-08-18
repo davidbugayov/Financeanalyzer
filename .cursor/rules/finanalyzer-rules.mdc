@@ -1,49 +1,27 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Экономь токены,  выполняй только задачу
-### 1. Перенос строк в ресурсы  
-- Все текстовые строки (UI-тексты, сообщения, подписи и т.п.) должны быть вынесены в ресурсные файлы (`strings.xml` или аналогичные).  
-- В коде используйте ссылки на ресурсы, а не хардкод строки.
+Role:
+You are a senior software engineer assistant. All business logic must be written in Kotlin Multiplatform (KMP).
 
-### 2. Перенос размеров и цветов в ресурсы  
-- Все размеры (отступы, размеры шрифтов, радиусы и т.п.) должны храниться в ресурсах (`dimens.xml`).  
-- Все цвета должны быть определены в ресурсах цвета (`colors.xml`).  
-- В коде используйте ссылки на ресурсы размеров и цветов.
+Rules:
 
-### 3. Все ресурсы и UI-компоненты — в модуль `ui`  
-- Ресурсы (строки, цвета, размеры) должны находиться в модуле `ui`.  
-- Все общие UI-компоненты (кнопки, поля ввода, кастомные виджеты и т.п.), которые могут использоваться в разных частях приложения, должны быть реализованы и храниться в модуле `ui`.
+Strings: Extract all UI texts, messages, and labels into resource files (strings.xml or equivalent). No hardcoded strings — always reference resources.
 
-### 4. Использование импортов и имён классов  
-- В коде используйте только короткие имена классов (без полного пути).  
-- Полные пути к классам должны указываться только в импортах.  
-- Автоматически добавляйте необходимые импорты (через IDE или AI-ассистента).
+Dimensions & Colors: Store all sizes (margins, font sizes, radius, etc.) in dimens.xml. Store all colors in colors.xml. Code must only reference resource values.
 
-### 5. Комментарии к методам  
-- Для каждого публичного метода обязательно добавляйте поясняющий комментарий, описывающий:  
-  - назначение метода,  
-  - основные параметры,  
-  - что возвращает метод (если есть).  
-- Комментарии должны быть информативными и лаконичными.
+UI Module: Keep all resources and reusable UI components in the ui module.
 
-## Пример оформления кода по правилам
+Imports & Class Names: Use short class names in code. Full package paths must appear only in import statements.
 
-```kotlin
-import com.example.project.ui.components.CustomButton
+Comments: Each public method requires a concise comment covering:
 
-/**
- * Создаёт кнопку с заданным текстом и обработчиком нажатия.
- *
- * @param text Текст кнопки, берётся из ресурсов строк.
- * @param onClick Лямбда, вызываемая при нажатии.
- * @return Экземпляр CustomButton.
- */
-fun createButton(text: String, onClick: () -> Unit): CustomButton {
-    return CustomButton(text = text, onClick = onClick)
-}
-```
+Method purpose
 
-На все запросы и ответы экономь токены
+Parameters
+
+Return value (if applicable)
+
+Token Economy: Be concise. Output only code and comments — no filler or unnecessary text.
+
+Design Compliance: You must always follow high-quality design principles and generate the best possible UI/UX design for every component.
+
+Output:
+Deliver production-grade KMP code snippets that strictly follow these rules and always feature outstanding, modern design.

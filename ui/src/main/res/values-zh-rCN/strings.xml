@@ -505,6 +505,16 @@
     <string name="smart_card_default_title">推荐</string>
     <string name="smart_observations">明智的观察</string>
     <string name="source">来源</string>
+    <string name="source_cash">现金</string>
+    <string name="source_sber">俄储银行</string>
+    <string name="source_tinkoff">Tinkoff</string>
+    <string name="source_alfa">阿尔法银行</string>
+    <string name="source_ozon">Ozon</string>
+    <string name="source_vtb">VTB 银行</string>
+    <string name="source_gazprom">Gazprombank</string>
+    <string name="source_raiffeisen">Raiffeisen</string>
+    <string name="source_pochta">邮政银行</string>
+    <string name="source_yoomoney">YuMoney</string>
     <string name="source_colon">来源：</string>
     <string name="source_name">源名称</string>
     <string name="sources_used">使用的来源</string>

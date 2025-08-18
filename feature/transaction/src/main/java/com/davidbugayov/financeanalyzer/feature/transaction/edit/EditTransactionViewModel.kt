@@ -150,10 +150,10 @@ class EditTransactionViewModel(
     }
 
     private fun validateInput(
-        amount: String,
+        amount: Money,
         categoryId: String,
     ): Boolean {
-        Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount)
+        Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount.amount)
         val validationBuilder = ValidationBuilder()
 
         // Reset errors
@@ -165,27 +165,14 @@ class EditTransactionViewModel(
             )
         }
 
-        // Check amount
-        if (amount.isBlank()) {
+        // Check amount using parsed Money
+        if (amount.amount <= BigDecimal.ZERO) {
             validationBuilder.addAmountError()
-            Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма")
-            CrashLoggerProvider.crashLogger.logException(Exception("Пустая сумма"))
-        } else {
-            try {
-                val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
-                if (amountValue <= BigDecimal.ZERO) {
-                    validationBuilder.addAmountError()
-                    Timber.d(
-                        "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
-                        amountValue,
-                    )
-                    CrashLoggerProvider.crashLogger.logException(Exception("Сумма меньше или равна нулю: $amountValue"))
-                }
-            } catch (e: Exception) {
-                validationBuilder.addAmountError()
-                Timber.e("ТРАНЗАКЦИЯ: Ошибка валидации при парсинге суммы: %s", e.message)
-                CrashLoggerProvider.crashLogger.logException(e)
-            }
+            Timber.d(
+                "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
+                amount.amount,
+            )
+            // Ожидаемая пользовательская ошибка: без CrashReporter
         }
 
         // Check category
@@ -247,14 +234,11 @@ class EditTransactionViewModel(
                 }
             }
 
-            // Сначала обрабатываем выражение суммы, удаляем висячий оператор
+            // Сначала обрабатываем выражение суммы
             val moneyFromExpression = parseMoneyExpression(currentState.amount)
-            // Для валидации используем строковое представление уже обработанной суммы
-            val amountForValidation = moneyFromExpression.formatForDisplay()
             Timber.d(
-                "ТРАНЗАКЦИЯ: submit - moneyFromExpression: %s, amountForValidation: '%s'",
+                "ТРАНЗАКЦИЯ: submit - moneyFromExpression: %s",
                 moneyFromExpression,
-                amountForValidation,
             )
 
             val transactionToSave =
@@ -271,16 +255,13 @@ class EditTransactionViewModel(
 
             val isValid =
                 validateInput(
-                    amount = amountForValidation, // Используем очищенную/вычисленную сумму для валидации
+                    amount = moneyFromExpression,
                     categoryId = currentState.category,
                 )
 
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
-                Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла для суммы: $amountForValidation")
-                CrashLoggerProvider.crashLogger.logException(
-                    Exception("Валидация не прошла для суммы: $amountForValidation"),
-                )
+                Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла для суммы: ${moneyFromExpression.amount}")
                 return@launch
             }
 

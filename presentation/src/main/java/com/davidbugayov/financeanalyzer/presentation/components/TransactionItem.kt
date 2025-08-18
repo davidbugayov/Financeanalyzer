@@ -51,6 +51,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+import com.davidbugayov.financeanalyzer.ui.utils.SourceLocalization
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -370,7 +371,7 @@ fun transactionItem(
 
                 if (transaction.source.isNotBlank()) {
                     Text(
-                        text = transaction.source,
+                        text = SourceLocalization.displayName(context, transaction.source),
                         style = MaterialTheme.typography.bodySmall,
                         color = sourceActualColor,
                         maxLines = 1,

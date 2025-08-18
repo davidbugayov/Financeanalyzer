@@ -496,6 +496,16 @@
     <string name="smart_card_default_title">Рекомендация</string>
     <string name="smart_observations">Умные наблюдения</string>
     <string name="source">Источник</string>
+    <string name="source_cash">Наличные</string>
+    <string name="source_sber">Сбербанк</string>
+    <string name="source_tinkoff">Тинькофф</string>
+    <string name="source_alfa">Альфа-Банк</string>
+    <string name="source_ozon">Ozon</string>
+    <string name="source_vtb">ВТБ</string>
+    <string name="source_gazprom">Газпромбанк</string>
+    <string name="source_raiffeisen">Райффайзенбанк</string>
+    <string name="source_pochta">Почта Банк</string>
+    <string name="source_yoomoney">ЮMoney</string>
     <string name="source_colon">Источник:</string>
     <string name="source_name">Название источника</string>
     <string name="sources_used">Используемые источники</string>

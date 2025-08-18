@@ -4,6 +4,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 
 object ColorUtils {
+    private fun getSourceColorByName(sourceName: String): Color? {
+        val name = sourceName.lowercase()
+        return when {
+            name.contains("сбер") || name.contains("sber") || name.contains("sberbank") -> com.davidbugayov.financeanalyzer.ui.theme.BankSber
+            name.contains("тинькофф") || name.contains("t-банк") || name.contains("tinkoff") || name.contains("t-bank") -> com.davidbugayov.financeanalyzer.ui.theme.BankTinkoff
+            name.contains("альфа") || name.contains("alfa") || name.contains("alfabank") -> com.davidbugayov.financeanalyzer.ui.theme.BankAlfa
+            name.contains("озон") || name.contains("ozon") -> com.davidbugayov.financeanalyzer.ui.theme.BankOzon
+            name.contains("втб") || name.contains("vtb") -> com.davidbugayov.financeanalyzer.ui.theme.BankVTB
+            name.contains("газпромбанк") || name.contains("gazprombank") -> com.davidbugayov.financeanalyzer.ui.theme.BankGazprom
+            name.contains("райффайзен") || name.contains("raiffeisen") -> com.davidbugayov.financeanalyzer.ui.theme.BankRaiffeisen
+            name.contains("почта банк") || name.contains("post bank") || name.contains("postbank") -> com.davidbugayov.financeanalyzer.ui.theme.BankPochta
+            name.contains("юмани") || name.contains("yoomoney") || name.contains("yumoney") -> com.davidbugayov.financeanalyzer.ui.theme.BankYoomoney
+            name.contains("наличные") || name.contains("cash") -> com.davidbugayov.financeanalyzer.ui.theme.CashColor
+            else -> null
+        }
+    }
     /**
      * Получает эффективный цвет источника для транзакции.
      * ВАЖНО: Эта функция возвращает Color, а не Int.
@@ -30,6 +46,9 @@ object ColorUtils {
                 // Log error or handle invalid hex
             }
         }
+
+        // Затем пытаемся получить по имени источника
+        getSourceColorByName(sourceName)?.let { return it }
 
         // В крайнем случае, цвет по умолчанию в зависимости от типа транзакции и темы
         return when {

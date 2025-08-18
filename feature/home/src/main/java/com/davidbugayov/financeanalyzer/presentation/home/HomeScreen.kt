@@ -41,6 +41,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.Notificatio
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
@@ -62,6 +63,7 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Главный экран приложения.
@@ -188,6 +190,8 @@ private fun HomeDialogs(
     onConfirmDelete: () -> Unit,
     onDismissDelete: () -> Unit,
     subcategoryNameForActions: String,
+    categoryIconForActions: ImageVector?,
+    categoryColorForActions: androidx.compose.ui.graphics.Color?,
 ) {
     if (showActionsDialog && selectedTransaction != null) {
         TransactionActionsDialog(
@@ -196,6 +200,8 @@ private fun HomeDialogs(
             onDelete = onDeleteTransaction,
             onEdit = onEditTransaction,
             subcategoryName = subcategoryNameForActions,
+            categoryIcon = categoryIconForActions,
+            categoryColor = categoryColorForActions,
         )
     }
     transactionToDelete?.let { transaction ->
@@ -248,10 +254,15 @@ fun HomeScreen(
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
     var showDetailDialog by remember { mutableStateOf(false) }
 
-    // Состояние для подкатегории
+    // Состояние для подкатегории и иконки категории
     val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
     var subcategoryNameForActions by remember { mutableStateOf("") }
     var subcategoryNameForDetail by remember { mutableStateOf("") }
+    var categoryIconForActions by remember { mutableStateOf<ImageVector?>(null) }
+    var categoryColorForActions by remember { mutableStateOf<androidx.compose.ui.graphics.Color?>(null) }
+
+    val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
+    val incomeCategories by categoriesViewModel.incomeCategories.collectAsState()
 
     // Загрузка подкатегории для диалога действий
     LaunchedEffect(selectedTransactionForActions?.subcategoryId) {
@@ -264,6 +275,22 @@ fun HomeScreen(
             }
         } ?: run {
             subcategoryNameForActions = ""
+        }
+    }
+
+    // Вычисляем иконку категории для диалога действий при смене транзакции или списков категорий
+    LaunchedEffect(selectedTransactionForActions?.category, expenseCategories, incomeCategories) {
+        val raw = selectedTransactionForActions?.category
+        if (raw.isNullOrBlank()) {
+            categoryIconForActions = null
+            categoryColorForActions = null
+        } else {
+            val key = CategoryLocalization.keyFor(raw) ?: raw.trim().lowercase()
+            val match =
+                expenseCategories.firstOrNull { (CategoryLocalization.keyFor(it.name) ?: it.name.lowercase()) == key }
+                    ?: incomeCategories.firstOrNull { (CategoryLocalization.keyFor(it.name) ?: it.name.lowercase()) == key }
+            categoryIconForActions = match?.icon
+            categoryColorForActions = match?.color
         }
     }
 
@@ -498,6 +525,8 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
             },
             subcategoryNameForActions = subcategoryNameForActions,
+            categoryIconForActions = categoryIconForActions,
+            categoryColorForActions = categoryColorForActions,
         )
 
         // Диалог детальной информации удалён. Используем только диалог действий

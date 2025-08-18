@@ -505,6 +505,16 @@
     <string name="smart_card_default_title">Recommendation</string>
     <string name="smart_observations">Smart observations</string>
     <string name="source">Source</string>
+    <string name="source_cash">Cash</string>
+    <string name="source_sber">Sberbank</string>
+    <string name="source_tinkoff">Tinkoff</string>
+    <string name="source_alfa">Alfa-Bank</string>
+    <string name="source_ozon">Ozon</string>
+    <string name="source_vtb">VTB</string>
+    <string name="source_gazprom">Gazprombank</string>
+    <string name="source_raiffeisen">Raiffeisenbank</string>
+    <string name="source_pochta">Post Bank</string>
+    <string name="source_yoomoney">YuMoney</string>
     <string name="source_colon">Source:</string>
     <string name="source_name">Source name</string>
     <string name="sources_used">Sources used</string>
