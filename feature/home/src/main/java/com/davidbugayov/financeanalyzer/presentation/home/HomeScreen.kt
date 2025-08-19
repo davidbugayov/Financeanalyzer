@@ -440,7 +440,7 @@ fun HomeScreen(
                     },
                     onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
                     onNavigateToDebts = { viewModel.onEvent(HomeEvent.NavigateToDebts) },
-                    profileIconModifier = Modifier,
+                    modifier = Modifier,
                 )
             },
             bottomBar = {

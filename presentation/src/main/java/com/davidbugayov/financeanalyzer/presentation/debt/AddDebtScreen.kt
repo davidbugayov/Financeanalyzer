@@ -30,6 +30,7 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import java.util.Calendar
+import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 
 /**
