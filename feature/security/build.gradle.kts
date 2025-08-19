@@ -95,7 +95,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     // Biometric authentication
-    implementation("androidx.biometric:biometric:1.1.0")
+    implementation(libs.androidx.biometric)
 
     // Compose
     implementation(platform(libs.compose.bom))

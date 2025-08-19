@@ -1350,4 +1350,71 @@
     <string name="achievement_retirement_planner_desc">Plan retirement with %1$s</string>
     <string name="achievement_tax_optimizer_desc">Optimize taxes by %1$s</string>
     <string name="achievement_insurance_protector_desc">Get insurance coverage of %1$s</string>
+    <string name="achievement_first_steps">Первые шаги</string>
+    <string name="achievement_transaction_master">Мастер транзакций</string>
+    <string name="achievement_savings_champion">Чемпион сбережений</string>
+    <string name="achievement_savings_champion_desc">Сохраните 100,000 рублей</string>
+    <string name="achievement_budget_expert">Эксперт бюджета</string>
+    <string name="achievement_budget_expert_desc">Соблюдайте бюджет 3 месяца подряд</string>
+    <string name="achievement_category_explorer">Исследователь категорий</string>
+    <string name="achievement_category_explorer_desc">Используйте 10 различных категорий</string>
+    <string name="achievement_import_master">Мастер импорта</string>
+    <string name="achievement_export_master">Мастер экспорта</string>
+    <string name="achievement_security_guard">Охранник безопасности</string>
+    <string name="achievement_analytics_expert">Эксперт аналитики</string>
+    <string name="achievement_goal_setter">Постановщик целей</string>
+    <string name="achievement_debt_free">Без долгов</string>
+    <string name="achievement_investment_starter">Начинающий инвестор</string>
+    <string name="achievement_budget_sticker">Соблюдающий бюджет</string>
+    <string name="achievement_income_diversifier">Диверсификатор дохода</string>
+    <string name="achievement_expense_tracker">Отслеживающий расходы</string>
+    <string name="achievement_savings_rate_improver">Улучшающий сбережения</string>
+    <string name="achievement_financial_educator">Финансовый педагог</string>
+    <string name="achievement_retirement_planner">Планировщик пенсии</string>
+    <string name="achievement_tax_optimizer">Оптимизатор налогов</string>
+    <string name="achievement_insurance_protector">Защитник страховки</string>
+    <plurals name="transaction_count">
+        <item quantity="one">%d транзакция</item>
+        <item quantity="other">%d транзакций</item>
+    </plurals>
+    <plurals name="category_count">
+        <item quantity="one">%d категория</item>
+        <item quantity="other">%d категорий</item>
+    </plurals>
+    <plurals name="goal_count">
+        <item quantity="one">%d цель</item>
+        <item quantity="other">%d целей</item>
+    </plurals>
+    <plurals name="achievement_count">
+        <item quantity="one">%d достижение</item>
+        <item quantity="other">%d достижений</item>
+    </plurals>
+    <plurals name="source_count">
+        <item quantity="one">%d источник</item>
+        <item quantity="other">%d источников</item>
+    </plurals>
+    <plurals name="tip_count">
+        <item quantity="one">%d совет</item>
+        <item quantity="other">%d советов</item>
+    </plurals>
+    <plurals name="debt_count">
+        <item quantity="one">%d долг</item>
+        <item quantity="other">%d долгов</item>
+    </plurals>
+    <plurals name="wallet_count">
+        <item quantity="one">%d кошелек</item>
+        <item quantity="other">%d кошельков</item>
+    </plurals>
+    <plurals name="budget_count">
+        <item quantity="one">%d бюджет</item>
+        <item quantity="other">%d бюджетов</item>
+    </plurals>
+    <plurals name="export_count">
+        <item quantity="one">%d экспорт</item>
+        <item quantity="other">%d экспортов</item>
+    </plurals>
+    <plurals name="import_count">
+        <item quantity="one">%d импорт</item>
+        <item quantity="other">%d импортов</item>
+    </plurals>
 </resources>

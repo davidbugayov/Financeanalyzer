@@ -58,6 +58,9 @@ poi = "5.4.1"
 apacheCommonsCsv = "1.14.0"
 commonsIo = "2.19.0"
 
+# Biometric
+biometric = "1.1.0"
+
 # RuStore SDK версия (только для Google flavor)
 rustore = "8.0.0"
 
@@ -143,6 +146,9 @@ poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" 
 # Apache Commons
 apache-commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "apacheCommonsCsv" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
+
+# Biometric
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
