@@ -287,7 +287,7 @@
     <string name="insight_expense_concentration_desc">按类别分析成本的分配</string>
     <string name="insight_expense_concentration_good">良好的分布</string>
     <string name="insight_expense_concentration_high">高浓度</string>
-    <string name="insight_expense_concentration_metric">％s %%%一类</string>
+    <string name="insight_expense_concentration_metric">％s %%一类</string>
     <string name="insight_expense_frequency">费用的频率</string>
     <string name="insight_expense_frequency_desc">该期间的％D交易</string>
     <string name="insight_expense_frequency_metric">％D交易</string>
@@ -299,7 +299,7 @@
     <string name="insight_financial_health_excellent">出色的</string>
     <string name="insight_financial_health_good">好的</string>
     <string name="insight_financial_health_low">低的</string>
-    <string name="insight_financial_health_metric">储蓄率：％d %%%</string>
+    <string name="insight_financial_health_metric">储蓄率：％d %%</string>
     <string name="insight_financial_health_ok">令人满意</string>
     <string name="insight_financial_protection">财务保护</string>
     <string name="insight_financial_protection_excellent">出色的</string>
@@ -644,7 +644,7 @@
     <string name="tip_automate_savings_title">自动节省</string>
     <string name="tip_basic_tracking_desc">写下所有费用 - 这是金融知识的基础</string>
     <string name="tip_basic_tracking_title">保留收入和费用的记录</string>
-    <string name="tip_control_expense_growth_desc">成本增加了__p_0 __ %%%。检查订阅和大型类别</string>
+    <string name="tip_control_expense_growth_desc">成本增加了__p_0 __ %%。检查订阅和大型类别</string>
     <string name="tip_control_expense_growth_title">专家成长：该怎么办</string>
     <string name="tip_create_emergency_fund_desc">您只有在%1$d月份的积累。建议有3-6个月的费用</string>
     <string name="tip_create_emergency_fund_title">创建储备金</string>
@@ -652,7 +652,7 @@
     <string name="tip_easy_savings_title">最多可节省10％</string>
     <string name="tip_increase_income_desc">考虑自由职业者/零件 - 时间工作或技能的货币化</string>
     <string name="tip_increase_income_title">将收入增加5-10％</string>
-    <string name="tip_increase_savings_desc">您推迟了%1$s%%%收入。目标至少为10–20 %%%</string>
+    <string name="tip_increase_savings_desc">您推迟了%1$s%%收入。目标至少为10–20 %%</string>
     <string name="tip_increase_savings_title">增加储蓄的规范</string>
     <string name="tip_rule_50_30_20_desc">50％的需求，欲望的30％，储蓄和投资的20％</string>
     <string name="tip_rule_50_30_20_title">遵循规则50/30/20</string>
@@ -810,7 +810,7 @@
     <string name="log_achievement_statistics_viewed">🏆触发器：查看的统计信息</string>
     <string name="log_achievement_section_visited">🏆触发器：访问部分%1$s</string>
     <string name="log_achievement_savings_changed">trigger：累积已经改变：%1$s</string>
-    <string name="log_achievement_budget_progress">🏆触发器：预算进度：__p_0 __ %%%</string>
+    <string name="log_achievement_budget_progress">🏆触发器：预算进度：__p_0 __ %%</string>
     <string name="log_achievement_category_used">🏆触发器：二手类别%1$s</string>
     <string name="log_achievement_milestone_reached">trigger：符合的里程碑%1$s</string>
     <string name="achievement_explorer">研究员</string>
@@ -864,8 +864,8 @@
     <string name="recommendation_improve_expense_control">提高费用</string>
     <string name="recommendation_improve_expense_control_desc">您的支出纪律（%1$s/100）表示需要更好的支出。尝试保留预算并避免冲动购买。</string>
     <string name="recommendation_increase_retirement_savings">增加养老金节省</string>
-    <string name="recommendation_increase_retirement_savings_desc">为了实现养老金目标，请将每月积累增加%1$s。当前进度：__p_1 __ %%%</string>
-    <string name="recommendation_increase_savings_rate_desc">您对收入组平均水平低的__p_0 __ %%%的储蓄率。尝试从收入自动推迟10 %%%。</string>
+    <string name="recommendation_increase_retirement_savings_desc">为了实现养老金目标，请将每月积累增加%1$s。当前进度：__p_1 __ %%</string>
+    <string name="recommendation_increase_savings_rate_desc">您对收入组平均水平低的__p_0 __ %%的储蓄率。尝试从收入自动推迟10 %%。</string>
     <string name="recommendation_diversify_income">多元化收入来源</string>
     <string name="recommendation_diversify_income_desc">您只有%1$d收入来源。考虑增加额外收入或被动收入以提高财务稳定的可能性。</string>
     <string name="recommendation_create_emergency_fund_desc">建议将储备金保留3-6个月的费用。现在，您有大约%1$d月的资金。</string>
@@ -895,8 +895,8 @@
     <string name="achievement_first_steps_desc">创建第一个交易</string>
     <string name="current_period">当前时期</string>
     <string name="previous_period">上一个时期</string>
-    <string name="increase_by_percent">增加__p_0 __ %%%</string>
-    <string name="decrease_by_percent">减少__p_0 __ %%%</string>
+    <string name="increase_by_percent">增加__p_0 __ %%</string>
+    <string name="decrease_by_percent">减少__p_0 __ %%</string>
     <string name="no_changes">不变</string>
     <string name="select_sources">选择来源</string>
     <string name="all_categories">所有类别</string>
@@ -1267,7 +1267,7 @@
     <string name="ozon_instructions_title">通过Ozon银行申请：</string>
     <string name="proceed_to_import">去导入</string>
     <string name="profile_export_import_subtitle">导出或导入您的数据</string>
-    <string name="progress_percentage">%d%%%</string>
+    <string name="progress_percentage">%d%%</string>
     <string name="sberbank_card_pattern">^（？：地图|卡）\ s+\*{4}（\ d {4}）$</string>
     <string name="sberbank_category">类别</string>
     <string name="sberbank_date_operation">操作日期</string>
@@ -1369,43 +1369,35 @@
 
     <!-- Plurals -->
     <plurals name="transactions_count">
-        <item quantity="one">%d transaction</item>
-        <item quantity="other">%d transactions</item>
+        <item quantity="other">%d 笔交易</item>
     </plurals>
     
     <plurals name="important_count">
-        <item quantity="one">%d important</item>
-        <item quantity="other">%d important</item>
+        <item quantity="other">%d 重要</item>
     </plurals>
     
     <plurals name="large_count">
-        <item quantity="one">%d large</item>
-        <item quantity="other">%d large</item>
+        <item quantity="other">%d 大</item>
     </plurals>
     
     <plurals name="small_count">
-        <item quantity="one">%d small</item>
-        <item quantity="other">%d small</item>
+        <item quantity="other">%d 小</item>
     </plurals>
     
     <plurals name="month_count">
-        <item quantity="one">%d month</item>
-        <item quantity="other">%d months</item>
+        <item quantity="other">%d 个月</item>
     </plurals>
     
     <plurals name="day_count">
-        <item quantity="one">%d day</item>
-        <item quantity="other">%d days</item>
+        <item quantity="other">%d 天</item>
     </plurals>
     
     <plurals name="week_count">
-        <item quantity="one">%d week</item>
-        <item quantity="other">%d weeks</item>
+        <item quantity="other">%d 周</item>
     </plurals>
     
     <plurals name="year_count">
-        <item quantity="one">%d year</item>
-        <item quantity="other">%d years</item>
+        <item quantity="other">%d 年</item>
     </plurals>
 
     <string name="achievement_category_master_desc">使用%1$s个不同类别</string>

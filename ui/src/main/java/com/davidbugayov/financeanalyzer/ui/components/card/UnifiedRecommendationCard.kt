@@ -38,11 +38,11 @@ import com.davidbugayov.financeanalyzer.ui.R
  */
 @Composable
 fun UnifiedRecommendationCard(
+    modifier: Modifier = Modifier,
     recommendations: List<UnifiedRecommendation>,
     title: String = stringResource(R.string.recommendations_title),
     titleIcon: ImageVector = Icons.Filled.Lightbulb,
     emptyStateText: String = stringResource(R.string.empty_state_text),
-    modifier: Modifier = Modifier,
     cardStyle: RecommendationCardStyle = RecommendationCardStyle.DETAILED,
     onRecommendationClick: ((UnifiedRecommendation) -> Unit)? = null,
 ) {

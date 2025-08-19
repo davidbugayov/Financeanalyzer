@@ -1063,4 +1063,21 @@
         <item quantity="other">%d years</item>
     </plurals>
 
+    <string name="achievement_category_master_desc">Используйте %1$s различных категорий</string>
+    <string name="achievement_transaction_counter_desc">Добавьте %1$d транзакций</string>
+    <string name="achievement_savings_milestone_desc">Сохраните %1$s в общей сложности</string>
+    <string name="achievement_import_master_desc">Импортируйте данные %1$d раз</string>
+    <string name="achievement_security_guard_desc">Включите функции безопасности</string>
+    <string name="achievement_analytics_expert_desc">Просматривайте статистику %1$d раз</string>
+    <string name="achievement_goal_setter_desc">Установите и достигните %1$d финансовых целей</string>
+    <string name="achievement_debt_free_desc">Погасите %1$s долга</string>
+    <string name="achievement_investment_starter_desc">Начните инвестировать %1$s</string>
+    <string name="achievement_budget_sticker_desc">Соблюдайте бюджет в течение %1$d месяцев</string>
+    <string name="achievement_income_diversifier_desc">Имейте %1$d источников дохода</string>
+    <string name="achievement_expense_tracker_desc">Отслеживайте расходы в течение %1$d дней</string>
+    <string name="achievement_savings_rate_improver_desc">Улучшите норму сбережений на %1$s%%</string>
+    <string name="achievement_financial_educator_desc">Прочитайте %1$d финансовых советов</string>
+    <string name="achievement_retirement_planner_desc">Планируйте пенсию с %1$s</string>
+    <string name="achievement_tax_optimizer_desc">Оптимизируйте налоги на %1$s</string>
+    <string name="achievement_insurance_protector_desc">Получите страховое покрытие на %1$s</string>
 </resources>
