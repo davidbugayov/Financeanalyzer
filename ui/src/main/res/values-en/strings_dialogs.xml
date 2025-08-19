@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Confirmation dialogs -->
+    <string name="dialog_delete_title">Delete</string>
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_apply">Apply</string>
+    <string name="dialog_close">Close</string>
+    
+    <!-- Category deletion dialog -->
+    <string name="dialog_delete_category_message_default">Are you sure you want to delete the category \"%1$s\"? All transactions in this category will be moved to the \"Other\" category.</string>
+    <string name="dialog_delete_category_message_irreversible">Are you sure you want to delete the category \"%1$s\"? This action cannot be undone.</string>
+    
+    <!-- Period selection dialog -->
+    <string name="dialog_select_period_title">Select period</string>
+    <string name="period_start_date">Start date</string>
+    <string name="period_end_date">End date</string>
+    
+    <!-- Category selection dialog -->
+    <string name="dialog_select_all">Select all</string>
+    <string name="dialog_collapse">Collapse</string>
+    <string name="dialog_expand">Expand</string>
+</resources>
+

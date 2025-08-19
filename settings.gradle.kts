@@ -46,9 +46,7 @@ buildCache {
     }
 }
 
-// Enable modern Gradle features
-@Suppress("UnstableApiUsage")
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+// Type-safe project accessors disabled to avoid incubating feature warnings
 
 // Set project name
 rootProject.name = "FinanceAnalyzer"

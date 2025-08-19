@@ -287,7 +287,7 @@
     <string name="insight_expense_concentration_desc">按类别分析成本的分配</string>
     <string name="insight_expense_concentration_good">良好的分布</string>
     <string name="insight_expense_concentration_high">高浓度</string>
-    <string name="insight_expense_concentration_metric">％s %%%%%%%%一类</string>
+    <string name="insight_expense_concentration_metric">％s %%%一类</string>
     <string name="insight_expense_frequency">费用的频率</string>
     <string name="insight_expense_frequency_desc">该期间的％D交易</string>
     <string name="insight_expense_frequency_metric">％D交易</string>
@@ -299,7 +299,7 @@
     <string name="insight_financial_health_excellent">出色的</string>
     <string name="insight_financial_health_good">好的</string>
     <string name="insight_financial_health_low">低的</string>
-    <string name="insight_financial_health_metric">储蓄率：％d %%%%%%%%</string>
+    <string name="insight_financial_health_metric">储蓄率：％d %%%</string>
     <string name="insight_financial_health_ok">令人满意</string>
     <string name="insight_financial_protection">财务保护</string>
     <string name="insight_financial_protection_excellent">出色的</string>
@@ -395,15 +395,15 @@
     <string name="optimize_category_title">优化类别的成本S</string>
     <string name="path_copied">路径被复制</string>
     <string name="period_all_time">一直</string>
-    <string name="period_custom">%1$s - %2$s</string>
+    <string name="period_custom">%1$s - %1$s</string>
     <string name="period_day">%1$s</string>
     <string name="period_duration_description">在几天内设置持续时间</string>
-    <string name="period_month">%1$s - %2$s</string>
+    <string name="period_month">%1$s - %1$s</string>
   <string name="period_quarter">季度</string>
     <string name="period_settings">期间的设置</string>
     <string name="period_settings_title">期间的设置</string>
-    <string name="period_week">%1$s - %2$s</string>
-    <string name="period_year">%1$s - %2$s</string>
+    <string name="period_week">%1$s - %1$s</string>
+    <string name="period_year">%1$s - %1$s</string>
     <string name="permission_rationale">对于申请的申请，需要许可。</string>
     <string name="permission_required">需要权限</string>
     <string name="permission_settings_rationale">对于申请的申请，需要许可。转到设置。</string>
@@ -644,7 +644,7 @@
     <string name="tip_automate_savings_title">自动节省</string>
     <string name="tip_basic_tracking_desc">写下所有费用 - 这是金融知识的基础</string>
     <string name="tip_basic_tracking_title">保留收入和费用的记录</string>
-    <string name="tip_control_expense_growth_desc">成本增加了__p_0 __ %%%%%%%%。检查订阅和大型类别</string>
+    <string name="tip_control_expense_growth_desc">成本增加了__p_0 __ %%%。检查订阅和大型类别</string>
     <string name="tip_control_expense_growth_title">专家成长：该怎么办</string>
     <string name="tip_create_emergency_fund_desc">您只有在%1$d月份的积累。建议有3-6个月的费用</string>
     <string name="tip_create_emergency_fund_title">创建储备金</string>
@@ -652,7 +652,7 @@
     <string name="tip_easy_savings_title">最多可节省10％</string>
     <string name="tip_increase_income_desc">考虑自由职业者/零件 - 时间工作或技能的货币化</string>
     <string name="tip_increase_income_title">将收入增加5-10％</string>
-    <string name="tip_increase_savings_desc">您推迟了%1$s %%%%%%%%收入。目标至少为10–20 %%%%%%%%</string>
+    <string name="tip_increase_savings_desc">您推迟了%1$s%%%收入。目标至少为10–20 %%%</string>
     <string name="tip_increase_savings_title">增加储蓄的规范</string>
     <string name="tip_rule_50_30_20_desc">50％的需求，欲望的30％，储蓄和投资的20％</string>
     <string name="tip_rule_50_30_20_title">遵循规则50/30/20</string>
@@ -810,7 +810,7 @@
     <string name="log_achievement_statistics_viewed">🏆触发器：查看的统计信息</string>
     <string name="log_achievement_section_visited">🏆触发器：访问部分%1$s</string>
     <string name="log_achievement_savings_changed">trigger：累积已经改变：%1$s</string>
-    <string name="log_achievement_budget_progress">🏆触发器：预算进度：__p_0 __ %%%%%%%%</string>
+    <string name="log_achievement_budget_progress">🏆触发器：预算进度：__p_0 __ %%%</string>
     <string name="log_achievement_category_used">🏆触发器：二手类别%1$s</string>
     <string name="log_achievement_milestone_reached">trigger：符合的里程碑%1$s</string>
     <string name="achievement_explorer">研究员</string>
@@ -864,8 +864,8 @@
     <string name="recommendation_improve_expense_control">提高费用</string>
     <string name="recommendation_improve_expense_control_desc">您的支出纪律（%1$s/100）表示需要更好的支出。尝试保留预算并避免冲动购买。</string>
     <string name="recommendation_increase_retirement_savings">增加养老金节省</string>
-    <string name="recommendation_increase_retirement_savings_desc">为了实现养老金目标，请将每月积累增加%1$s。当前进度：__p_1 __ %%%%%%%%</string>
-    <string name="recommendation_increase_savings_rate_desc">您对收入组平均水平低的__p_0 __ %%%%%%%%的储蓄率。尝试从收入自动推迟10 %%%%%%%%。</string>
+    <string name="recommendation_increase_retirement_savings_desc">为了实现养老金目标，请将每月积累增加%1$s。当前进度：__p_1 __ %%%</string>
+    <string name="recommendation_increase_savings_rate_desc">您对收入组平均水平低的__p_0 __ %%%的储蓄率。尝试从收入自动推迟10 %%%。</string>
     <string name="recommendation_diversify_income">多元化收入来源</string>
     <string name="recommendation_diversify_income_desc">您只有%1$d收入来源。考虑增加额外收入或被动收入以提高财务稳定的可能性。</string>
     <string name="recommendation_create_emergency_fund_desc">建议将储备金保留3-6个月的费用。现在，您有大约%1$d月的资金。</string>
@@ -879,7 +879,7 @@
     <string name="recommendation_save_on_cafe_desc">您经常花在咖啡馆和餐馆上。尝试在家做饭以保存。</string>
     <string name="export_filename">财务_%1$s。 CSV</string>
     <string name="export_csv_header">ID，日期，类别，总和，类型，注释，来源</string>
-    <string name="log_csv_file_created">创建的CSV文件：%1$s，大小：%2$s byte</string>
+    <string name="log_csv_file_created">创建的CSV文件：%1$s，大小：%1$s byte</string>
     <string name="log_export_error">在CSV中导出交易时出错</string>
     <string name="log_export_unexpected_error">导出交易时无法预料的错误</string>
     <string name="log_file_created">创建的文件：%1$s</string>
@@ -895,8 +895,8 @@
     <string name="achievement_first_steps_desc">创建第一个交易</string>
     <string name="current_period">当前时期</string>
     <string name="previous_period">上一个时期</string>
-    <string name="increase_by_percent">增加__p_0 __ %%%%%%%%</string>
-    <string name="decrease_by_percent">减少__p_0 __ %%%%%%%%</string>
+    <string name="increase_by_percent">增加__p_0 __ %%%</string>
+    <string name="decrease_by_percent">减少__p_0 __ %%%</string>
     <string name="no_changes">不变</string>
     <string name="select_sources">选择来源</string>
     <string name="all_categories">所有类别</string>
@@ -910,7 +910,7 @@
     <string name="custom_period">任意时期</string>
     <string name="categories_selected">类别：%1$s</string>
     <string name="sources_selected">资料来源：%1$s</string>
-    <string name="week_format">周%1$s，%2$s</string>
+    <string name="week_format">周%1$s，%1$s</string>
     <string name="deleteSourceConfirmationMessage">您确定要删除源吗？</string>
     <string name="add_first_transaction">添加第一个交易</string>
     <string name="empty_transaction_id_error">交易ID不能为空</string>
@@ -1099,17 +1099,17 @@
     <string name="bank_sberbank_pdf">Sberbank PDF</string>
     <string name="choose_file_button">选择一个文件以导入</string>
     <string name="comment">评论</string>
-    <string name="csv_amount_not_found">找不到%1$s索引的数量。线：%2$s</string>
-    <string name="csv_amount_parse_error">不可能发酵金额：\'%1$s \'（清洁后）。线：%2$s</string>
-    <string name="csv_amount_parse_exception">解析总和的错误：\'%1$s \'。 %2$s</string>
+    <string name="csv_amount_not_found">找不到%1$s索引的数量。线：%1$s</string>
+    <string name="csv_amount_parse_error">不可能发酵金额：\'%1$s \'（清洁后）。线：%1$s</string>
+    <string name="csv_amount_parse_exception">解析总和的错误：\'%1$s \'。 %1$s</string>
     <string name="csv_date_format">yyyy-MM-dd</string>
-    <string name="csv_date_not_found">找不到%1$s索引上的日期。线：%2$s</string>
-    <string name="csv_date_parse_error">无法使用\'%2$s \'格式发布日期：\'%1$s \'。线：%3$s</string>
+    <string name="csv_date_not_found">找不到%1$s索引上的日期。线：%1$s</string>
+    <string name="csv_date_parse_error">无法使用\'%1$s \'格式发布日期：\'%1$s \'。线：%1$s</string>
     <string name="csv_example">5,2025-03-26_06-37-11，薪金，50 545₽，收入，交易注释，现金
 48,2025-03-26_05-42-11，产品，3 149₽，消费，交易注释，现金</string>
     <string name="csv_example_title">文件内容的一个示例：</string>
     <string name="csv_file_empty">CSV文件为空。</string>
-    <string name="csv_format_check">CSV格式检查。第一行：%1$s。分离器：\'%2$s \'。有效：%3$s</string>
+    <string name="csv_format_check">CSV格式检查。第一行：%1$s。分离器：\'%1$s \'。有效：%1$s</string>
     <string name="csv_format_instructions">1。第一行可能包含列标题
 2。CSV文件的结构应包含以下列：
     - 第1列：ID或操作号码
@@ -1124,17 +1124,17 @@
     <string name="csv_instructions_title">导入的CSV文件格式：</string>
     <string name="csv_no_description">N/A</string>
     <string name="csv_no_header">没有标题（根据配置）</string>
-    <string name="csv_not_enough_columns">没有足够的列。至少可以预期%1$s收到%2$s。线：%3$s</string>
+    <string name="csv_not_enough_columns">没有足够的列。至少可以预期%1$s收到%1$s。线：%1$s</string>
     <string name="csv_note">确保日期格式对应于指定的YYYY-MM-DD_HH-MM-SS模板。列分离器是逗号。</string>
     <string name="csv_note_title">笔记：</string>
-    <string name="csv_parse_line_error">解析行的错误：%1$s。配置：%2$s</string>
+    <string name="csv_parse_line_error">解析行的错误：%1$s。配置：%1$s</string>
     <string name="csv_parsing_line">线解析：%1$s</string>
     <string name="csv_requirements">•列：日期，总和类别
 •部门：逗号或逗号点
 •编码：UTF-8
 •示例：01.01.2023.1000，产品</string>
     <string name="csv_requirements_title">CSV文件的要求：</string>
-    <string name="csv_skip_invalid_status">通过通用状态引起的交易：\'%1$s \'。有效：%2$s。线：%3$s</string>
+    <string name="csv_skip_invalid_status">通过通用状态引起的交易：\'%1$s \'。有效：%1$s。线：%1$s</string>
     <string name="csv_skip_line_not_enough_columns">由于扬声器数量不足，线路通行证：%1$s</string>
     <string name="delete_category_confirmation">您确定要删除%1$s类别吗？</string>
     <string name="delete_source_confirmation">您确定要删除%1$s源吗？</string>
@@ -1143,7 +1143,7 @@
     <string name="error_empty_amount">空的数量</string>
     <string name="error_empty_category">空类别</string>
     <string name="error_no_csv_app">没有打开CSV文件的应用程序。您可以通过文件管理器手动打开文件，也可以使用“共享”功能。</string>
-    <string name="error_unsupported_file_type">[%1$s处理程序]不支持文件类型：%2$s</string>
+    <string name="error_unsupported_file_type">[%1$s处理程序]不支持文件类型：%1$s</string>
     <string name="error_zero_amount">金额较小或等于零：%1$s</string>
     <string name="export_button_friendly">导出到CSV</string>
     <string name="export_import">出口和导入</string>
@@ -1165,10 +1165,10 @@
     <string name="import_error_date_format">无法识别文件中的日期。检查文件格式并确保与银行的格式相对应。</string>
     <string name="import_error_file_read">未设法读取文件。检查文件未损坏。</string>
     <string name="import_error_invalid_format">%1$s文件不是受支持的提取物，也不支持格式。</string>
-    <string name="import_error_io_exception">文件读数错误%1$s：%2$s</string>
+    <string name="import_error_io_exception">文件读数错误%1$s：%1$s</string>
     <string name="import_error_no_transactions">•FD了。检查文件格式。</string>
     <string name="import_error_no_transactions_found">在%1$s文件中没有找到任何交易</string>
-    <string name="import_error_pdf_extraction_exception">从pdf文件提取文本%1$s：%2$s时出错</string>
+    <string name="import_error_pdf_extraction_exception">从pdf文件提取文本%1$s：%1$s时出错</string>
     <string name="import_error_pdf_extraction_failed">无法从PDF中删除文本，或者文件为空：%1$s</string>
     <string name="import_error_statistics_file">该文件包含统计信息，而不是交易。请选择带有交易的文件以进行导入。</string>
     <string name="import_error_unknown_format">未识别文件格式。仅支持银行的CSV文件和提取物。</string>
@@ -1182,30 +1182,30 @@
 
 单击下面的银行以查找详细说明。</string>
     <string name="import_progress_completed">文件导入%1$s完成</string>
-    <string name="import_progress_count">%1$d来自%2$s transactions</string>
+    <string name="import_progress_count">%1$d来自%1$s transactions</string>
   <string name="import_progress_format_validated_skipping_headers">文件格式%1$s经过验证，传递头条…</string>
   <string name="import_progress_processing_transactions">从文件%1$s …</string>
-  <string name="import_progress_saving_transactions">从文件中保存__p_0__交易%2$s …</string>
+  <string name="import_progress_saving_transactions">从文件中保存__p_0__交易%1$s …</string>
     <string name="import_progress_starting">文件导入%1$s</string>
   <string name="import_progress_text_extracted_validating">文本是从%1$s提取的，检查格式…</string>
     <string name="import_results">导入结果</string>
     <string name="import_section_description">从CSV文件或银行提取物中导入交易。支持Sberbank，T-Bank，Alfa-Bank和Ozon Bank。</string>
     <string name="import_section_description_friendly">从银行或CSV文件下载放电，以将交易添加到应用程序中。支持Sberbank，T-Bank，Alfa-Bank和Ozon Bank。</string>
     <string name="import_section_title_emoji">📥导入交易</string>
-    <string name="import_success_message">导入的%1$s事务，%2$s从文件中错过</string>
-    <string name="import_summary">导入成功完成。导入：%1$s，错过：%2$s</string>
+    <string name="import_success_message">导入的%1$s事务，%1$s从文件中错过</string>
+    <string name="import_summary">导入成功完成。导入：%1$s，错过：%1$s</string>
     <string name="import_total_amount">总金额：％d₽</string>
     <string name="import_transactions_hint">点击从不同银行进口交易</string>
   <string name="importing_file">我们导入文件…</string>
     <string name="log_category_expense_usage_increased">类别：增加的消耗类别使用仪表：%1$s</string>
     <string name="log_category_income_usage_increased">类别：收入类别的使用仪表增加：%1$s</string>
     <string name="log_category_positions_updated">[category_sort]更新类别的位置</string>
-    <string name="log_category_usage_count">类别：%1$s类别的使用次数已获得%2$s</string>
-    <string name="log_csv_amount_processed">[%1$s]金额的处理行：\'%2$s \'，货币：\'%3$s \'</string>
-    <string name="log_csv_date_found">[%1$s]找到了一个带有日期的列：%2$s，含义：\'%3$s \'</string>
-    <string name="log_csv_date_not_found">[%1$s]在__PH_1_列中找不到日期，或者不喜欢日期：\'%3$s \'</string>
-    <string name="log_csv_date_parsed">[%1$s]成功铺平了日期\'%2$s \'，格式\'%3$s \'</string>
-    <string name="log_csv_delimiter_used">[%1$s]使用分隔符：\'%2$s \'，找到列：%3$s</string>
+    <string name="log_category_usage_count">类别：%1$s类别的使用次数已获得%1$s</string>
+    <string name="log_csv_amount_processed">[%1$s]金额的处理行：\'%1$s \'，货币：\'%1$s \'</string>
+    <string name="log_csv_date_found">[%1$s]找到了一个带有日期的列：%1$s，含义：\'%1$s \'</string>
+    <string name="log_csv_date_not_found">[%1$s]在__PH_1_列中找不到日期，或者不喜欢日期：\'%1$s \'</string>
+    <string name="log_csv_date_parsed">[%1$s]成功铺平了日期\'%1$s \'，格式\'%1$s \'</string>
+    <string name="log_csv_delimiter_used">[%1$s]使用分隔符：\'%1$s \'，找到列：%1$s</string>
     <string name="log_disabling_wallets">关闭钱包</string>
     <string name="log_enabling_expense_wallet">打开钱包以进行消费，选择第一个钱包：%1$s</string>
     <string name="log_enabling_income_wallets">包含钱包以获取收入，自动选择所有%1$s钱包</string>
@@ -1219,7 +1219,7 @@
     <string name="log_ozon_import_created">[%1$s处理程序]创建ozonpdfimportusecase</string>
     <string name="log_parse_money_empty">parsemoneyexpresion：初始表达式为空，我们返回0</string>
     <string name="log_parse_money_empty_after_clean">parsemoneyexpresion：表达式是空的，或者只是一个点，返回0</string>
-    <string name="log_parse_money_expression">Parsemoney Expression：初始表达式：\'%1$s \'，在删除空间和更换逗号之后：\'__ %2$s \'</string>
+    <string name="log_parse_money_expression">Parsemoney Expression：初始表达式：\'%1$s \'，在删除空间和更换逗号之后：\'__ %1$s \'</string>
     <string name="log_parse_money_expression_error">parsemoneyexpresion：错误计算表达式\'%1$s \'，返回0</string>
     <string name="log_parse_money_expression_success">Parsemoneyexpresion：成功计算为表达式，结果：%1$s</string>
     <string name="log_parse_money_invalid_chars">parsemoneyexpresion：表达式包含不可接受的字符，已清除：\'%1$s \'</string>
@@ -1231,10 +1231,10 @@
     <string name="log_saving_income_wallets">我们将钱包保存以进行补给：%1$d PC。</string>
     <string name="log_sberbank_import_created">[%1$s处理程序] Sberbankpdfimportusecase的创建</string>
     <string name="log_sberbank_indicator_found">[%1$s处理程序]在文件内容中找到了sberbank指示器</string>
-    <string name="log_sberbank_read_error">[%1$s处理程序]读取用于确定文件时的错误：%2$s</string>
+    <string name="log_sberbank_read_error">[%1$s处理程序]读取用于确定文件时的错误：%1$s</string>
     <string name="log_select_wallet_event">selectwallet事件 -  alletid = %1$s，selected =％$ 2</string>
     <string name="log_source_positions_updated">[source_sort]更新来源的位置</string>
-    <string name="log_source_usage_count">来源：使用源%1$s：%2$s的数量已获得</string>
+    <string name="log_source_usage_count">来源：使用源%1$s：%1$s的数量已获得</string>
     <string name="log_source_usage_increased">来源：增加来源使用计数器：%1$s</string>
     <string name="log_transaction_after_switch">交易：切换类型后 -  ISXPENSE =％1 $ b，类别= %1$s</string>
     <string name="log_transaction_empty_amount_error">交易：验证错误 - 空数量</string>
@@ -1247,7 +1247,7 @@
     <string name="log_transaction_validation_result">交易：validateInput-结果：iSvalid =％1 $ b，hasamounterror =％$ 2</string>
     <string name="log_transaction_wallets_loaded">交易：下载的%1$s钱包</string>
     <string name="log_transaction_zero_amount_error">交易：验证错误 - 金额较小或等于零：%1$s</string>
-    <string name="log_updating_selected_wallets">更新选定钱包的列表：是%1$s，它变成%2$s</string>
+    <string name="log_updating_selected_wallets">更新选定钱包的列表：是%1$s，它变成%1$s</string>
     <string name="log_wallets_loaded">加载的%1$s钱包</string>
     <string name="new_transaction_title">新交易</string>
     <string name="no_subcategories_available">此类别没有可用的子类别</string>
@@ -1267,7 +1267,7 @@
     <string name="ozon_instructions_title">通过Ozon银行申请：</string>
     <string name="proceed_to_import">去导入</string>
     <string name="profile_export_import_subtitle">导出或导入您的数据</string>
-    <string name="progress_percentage">%d%%%%%%%%</string>
+    <string name="progress_percentage">%d%%%</string>
     <string name="sberbank_card_pattern">^（？：地图|卡）\ s+\*{4}（\ d {4}）$</string>
     <string name="sberbank_category">类别</string>
     <string name="sberbank_date_operation">操作日期</string>
@@ -1328,4 +1328,101 @@
     <string name="default_small_amount">0 ₽</string>
     <string name="balance_widget_description">用于显示当前余额，收入和费用的小部件</string>
     <string name="small_balance_widget_description">紧凑的小部件用于显示当前余额</string>
+  <string name="months_short_label">月</string>
+  <!-- Feedback and export/import messages -->
+  <string name="export_success_path">导出完成：%1$s</string>
+  <string name="export_failed_transactions">导出交易失败</string>
+  <string name="export_unknown_error">未知导出错误</string>
+  <string name="error_failed_delete_transaction">删除交易失败</string>
+  <string name="error_failed_update_transaction">更新交易失败</string>
+
+  <!-- Debts -->
+  <string name="debt_title">债务</string>
+  <string name="debt_add">添加债务</string>
+  <string name="debt_edit">编辑债务</string>
+  <string name="debt_counterparty">交易对手</string>
+  <string name="debt_amount">金额</string>
+  <string name="debt_field_title">标题</string>
+  <string name="debt_principal">债务金额</string>
+  <string name="debt_remaining">剩余</string>
+  <string name="debt_due_at">到期日</string>
+  <string name="debt_note">备注</string>
+  <string name="debt_type_borrowed">我欠</string>
+  <string name="debt_type_lent">欠我</string>
+  <string name="debt_status_active">活跃</string>
+  <string name="debt_status_paid">已付</string>
+  <string name="debt_status_overdue">逾期</string>
+  <string name="debt_status_writeoff">已核销</string>
+  <string name="debt_repay">还款</string>
+  <string name="debt_create_success">债务已创建</string>
+  <string name="debt_update_success">债务已更新</string>
+  <string name="debt_repay_success">付款已记录</string>
+  <string name="debt_empty_title">暂无债务</string>
+  <string name="debt_empty_subtitle">添加您的第一笔债务以跟踪余额和付款</string>
+  <string name="debt_filter_all">全部</string>
+  <string name="debt_filter_active">活跃</string>
+  <string name="debt_filter_overdue">逾期</string>
+  <string name="debt_filter_borrowed">我欠</string>
+  <string name="debt_filter_lent">欠我</string>
+  <string name="debt_due_date_short">到期：%1$s</string>
+  <string name="debt_due_not_set">未设置到期日</string>
+
+    <!-- Plurals -->
+    <plurals name="transactions_count">
+        <item quantity="one">%d transaction</item>
+        <item quantity="other">%d transactions</item>
+    </plurals>
+    
+    <plurals name="important_count">
+        <item quantity="one">%d important</item>
+        <item quantity="other">%d important</item>
+    </plurals>
+    
+    <plurals name="large_count">
+        <item quantity="one">%d large</item>
+        <item quantity="other">%d large</item>
+    </plurals>
+    
+    <plurals name="small_count">
+        <item quantity="one">%d small</item>
+        <item quantity="other">%d small</item>
+    </plurals>
+    
+    <plurals name="month_count">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    
+    <plurals name="day_count">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    
+    <plurals name="week_count">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    
+    <plurals name="year_count">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+
+    <string name="achievement_category_master_desc">使用%1$s个不同类别</string>
+    <string name="achievement_transaction_counter_desc">添加%1$d笔交易</string>
+    <string name="achievement_savings_milestone_desc">总共节省%1$s</string>
+    <string name="achievement_import_master_desc">导入数据%1$d次</string>
+    <string name="achievement_security_guard_desc">启用安全功能</string>
+    <string name="achievement_analytics_expert_desc">查看统计%1$d次</string>
+    <string name="achievement_goal_setter_desc">设定并实现%1$d个财务目标</string>
+    <string name="achievement_debt_free_desc">还清%1$s债务</string>
+    <string name="achievement_investment_starter_desc">开始投资%1$s</string>
+    <string name="achievement_budget_sticker_desc">连续%1$d个月遵守预算</string>
+    <string name="achievement_income_diversifier_desc">拥有%1$d个收入来源</string>
+    <string name="achievement_expense_tracker_desc">连续%1$d天跟踪支出</string>
+    <string name="achievement_savings_rate_improver_desc">提高储蓄率%1$s%%</string>
+    <string name="achievement_financial_educator_desc">阅读%1$d个财务提示</string>
+    <string name="achievement_retirement_planner_desc">规划退休，目标%1$s</string>
+    <string name="achievement_tax_optimizer_desc">优化税收%1$s</string>
+    <string name="achievement_insurance_protector_desc">获得%1$s保险保障</string>
 </resources>

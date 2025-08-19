@@ -266,7 +266,6 @@
     <string name="important_emoji">⚠️</string>
     <string name="important_level">Important</string>
     <string name="improve_savings_rate_description">Your savings can be significantly increased for better financial security.</string>
-  <string name="improve_savings_rate_impact">Goal: 15–20% of income</string>
     <string name="improve_savings_rate_title">Improve the norm of savings</string>
     <string name="include_refunds">Take into account refunds</string>
     <string name="include_transfers">Учитывать переводы</string>
@@ -395,15 +394,15 @@
     <string name="optimize_category_title">Optimize costs in category %s</string>
     <string name="path_copied">The path is copied</string>
     <string name="period_all_time">For all the time</string>
-    <string name="period_custom">%1$s - %2$s</string>
+    <string name="period_custom">%1$s - %1$s</string>
     <string name="period_day">%1$s</string>
     <string name="period_duration_description">Set the duration of the period in days</string>
-    <string name="period_month">%1$s - %2$s</string>
+    <string name="period_month">%1$s - %1$s</string>
   <string name="period_quarter">Quarter</string>
     <string name="period_settings">Settings of the period</string>
     <string name="period_settings_title">Settings of the period</string>
-    <string name="period_week">%1$s - %2$s</string>
-    <string name="period_year">%1$s - %2$s</string>
+    <string name="period_week">%1$s - %1$s</string>
+    <string name="period_year">%1$s - %1$s</string>
     <string name="permission_rationale">For the application of the application, permission is necessary.</string>
     <string name="permission_required">Permission required</string>
     <string name="permission_settings_rationale">For the application of the application, permission is necessary.Go to the settings.</string>
@@ -838,7 +837,7 @@
     <string name="log_error_loading_achievements">Error when loading achievements</string>
     <string name="log_error_saving_achievements">Error while maintaining achievements</string>
     <string name="log_transaction_update">Transaction update: %1$s</string>
-    <string name="log_transaction_add">Adding transaction: sum = %1$s, category = %2$s</string>
+    <string name="log_transaction_add">Adding transaction: sum = %1$s,category = %1$s</string>
     <string name="log_transaction_not_found">Transaction with id = %1$s not found</string>
     <string name="month_january">January</string>
     <string name="month_february">February</string>
@@ -865,10 +864,10 @@
     <string name="recommendation_improve_expense_control_desc">Your expenditure discipline (%1$s/100) indicates the need for better expenses.Try to keep the budget and avoid impulsive purchases.</string>
     <string name="recommendation_increase_retirement_savings">Increase pension savings</string>
   <string name="recommendation_increase_retirement_savings_desc">To reach the retirement goal, increase monthly savings by %1$s. Current progress: %2$s%%</string>
-  <string name="recommendation_increase_savings_rate_desc" formatted="false">Your savings rate is %1$s% below your income group average. Try auto-saving 10% of income.</string>
+  <string name="recommendation_increase_savings_rate_desc" formatted="false">Your savings rate is %1$s%% below your income group average. Try auto-saving 10% of income.</string>
     <string name="recommendation_diversify_income">Diversify the sources of income</string>
     <string name="recommendation_diversify_income_desc">You only have %1$s source of income.Consider the possibility of additional earnings or passive income to increase financial stability.</string>
-    <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about %1$s month.</string>
+    <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about %1$d month.</string>
     <string name="recommendation_budget_exceeded">The budget exceeded by the category %1$s</string>
     <string name="recommendation_budget_exceeded_desc">You exceeded the budget by the category %1$s.Review the expenses or increase the limit.</string>
     <string name="recommendation_budget_close_to_limit">Close to the limit in category %1$s</string>
@@ -877,7 +876,7 @@
     <string name="recommendation_check_subscriptions_desc">You have regular subscriptions.Check if they are all relevant and whether you are needed.</string>
     <string name="recommendation_save_on_cafe">Save on cafes and restaurants</string>
     <string name="recommendation_save_on_cafe_desc">You often spend on cafes and restaurants.Try cooking at home to save.</string>
-    <string name="export_filename">Finance _%1$s. Csv</string>
+    <string name="export_filename">Finance _%1$s.Csv</string>
     <string name="export_csv_header">ID, date, category, sum, type, note, source</string>
     <string name="log_csv_file_created">CSV file created: %1$s, size: %2$s byte</string>
     <string name="log_export_error">Error when exporting transactions in CSV</string>
@@ -885,7 +884,7 @@
     <string name="log_file_created">File created: %1$s</string>
     <string name="log_file_ready_for_send">The file is ready for sending: %1$s</string>
     <string name="error_no_transactions_to_export">No transactions for export</string>
-    <string name="tip_top_category_spending" formatted="false">You spend the most on the category: %1$s. Consider whether these expenses can be reduced.</string>
+    <string name="tip_top_category_spending" formatted="false">You spend the most on the category: %1$s.Consider whether these expenses can be reduced.</string>
     <string name="tip_subscriptions_found">You have regular subscriptions.Check if you really need all of them.</string>
     <string name="tip_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance to avoid financial stress.</string>
     <string name="tip_small_expenses">You have a lot of small expenses.Try to combine purchases or abandon the excess.</string>
@@ -1032,7 +1031,7 @@
     <string name="income_stability">Income stability</string>
     <string name="insights">Insights</string>
     <string name="monday">Monday</string>
-    <string name="months_format">%1$s month.</string>
+    <string name="months_format">%1$d month.</string>
     <string name="months_of_savings">Months of savings</string>
     <string name="no_category">Without category</string>
     <string name="personal_advice_subtitle">Based on the analysis of your finance</string>
@@ -1075,28 +1074,28 @@
     <string name="comment">Comment</string>
     <string name="csv_amount_not_found">The amount of the %1$s index was not found.Line: %2$s</string>
     <string name="csv_amount_parse_error">It was not possible to ferment the amount: %1$s (after cleaning).Line: %2$s</string>
-    <string name="csv_amount_parse_exception">Error with parsing sums: %1$s.%2$s</string>
+    <string name="csv_amount_parse_exception">Error with parsing sums: %1$s.%1$s</string>
     <string name="csv_date_format">yyyy-MM-dd</string>
     <string name="csv_date_not_found">The date on the %1$s index was not found.Line: %2$s</string>
-    <string name="csv_date_parse_error">It was not possible to post the date: %1$s with the %2$s format.Line: %3$s</string>
+    <string name="csv_date_parse_error">It was not possible to post the date: %1$s with the %1$s format.Line: %2$s</string>
     <string name="csv_example">5,2025-03-26_06-37-11, salary, 50 545 ₽, income, note to transaction, cash \n48,2025-03-26_05-42-11, products, 3 149 ₽, consumption, note to transaction, cash</string>
     <string name="csv_example_title">An example of the contents of the file:</string>
     <string name="csv_file_empty">The CSV file is empty.</string>
-    <string name="csv_format_check">CSV format check.First line: %1$s.Separator: %2$s.Validen: %3$s</string>
+    <string name="csv_format_check">CSV format check.First line: %1$s.Separator: %1$s.Validen: %1$s</string>
     <string name="csv_format_instructions">1. The first line may contain columns \n2.The structure of the CSV file should contain the following columns: \n - column 1: id or operation number \n - column 2: Date in the YYYY -MM -DD_HH -MM -SS \n - Stolbier 3: Description or category \n - Column 4: Sum (with currency designation) \n - Stolbie 5: Type of operation(Income/consumption) \n - column 6: note (optionally) \n - column 7: source of funds (optionally)</string>
     <string name="csv_header_skipped">The line of the headline is missed: %1$s</string>
     <string name="csv_imported_note">Imported from Generic CSV</string>
     <string name="csv_instructions_title">CSV file format for imports:</string>
     <string name="csv_no_description">N/A</string>
     <string name="csv_no_header">There is no title (according to the config)</string>
-    <string name="csv_not_enough_columns">Not enough columns.At least %1$s was expected, %2$s was received.Line: %3$s</string>
+    <string name="csv_not_enough_columns">Not enough columns.At least %1$s was expected, %1$s was received.Line: %2$s</string>
     <string name="csv_note">Make sure the date format corresponds to the specified YYYY-MM-DD_HH-MM-SS template.The column separator is a comma.</string>
     <string name="csv_note_title">Note:</string>
-    <string name="csv_parse_line_error">Error with Parsing Lines: %1$s.Config: %2$s</string>
+    <string name="csv_parse_line_error">Error with Parsing Lines: %1$s.Config: %1$s</string>
     <string name="csv_parsing_line">Line Parsing: %1$s</string>
     <string name="csv_requirements">• Columns: date, sum, category \n • separator: comma or point with a comma \n • Coding: UTF-8 \n • Example: 01.01.2023.1000, products</string>
     <string name="csv_requirements_title">Requirements for CSV file:</string>
-    <string name="csv_skip_invalid_status">Passing the transaction due to the universal status: %1$s.Valid: %2$s.Line: %3$s</string>
+    <string name="csv_skip_invalid_status">Passing the transaction due to the universal status: %1$s.Valid: %1$s.Line: %2$s</string>
     <string name="csv_skip_line_not_enough_columns">Line pass due to insufficient number of speakers: %1$s</string>
     <string name="delete_category_confirmation">Are you sure you want to delete the %1$s category?</string>
     <string name="delete_source_confirmation">Are you sure you want to delete the %1$s source?</string>
@@ -1105,7 +1104,7 @@
     <string name="error_empty_amount">Empty amount</string>
     <string name="error_empty_category">Empty category</string>
     <string name="error_no_csv_app">There is no application for opening CSV files.You can open the file manually through the file manager or use the "share" function.</string>
-    <string name="error_unsupported_file_type">[%1$s handler] does not support the file type: %2$s</string>
+    <string name="error_unsupported_file_type">[%1$s handler] does not support the file type: %1$s</string>
     <string name="error_zero_amount">The amount is less or equal to zero: %1$s</string>
     <string name="export_button_friendly">Export to CSV</string>
     <string name="export_import">Export and import</string>
@@ -1127,10 +1126,10 @@
     <string name="import_error_date_format">It was not possible to recognize the dates in the file.Check the file format and make sure that it corresponds to the format from the bank.</string>
     <string name="import_error_file_read">Not managed to read the file.Check that the file is not damaged.</string>
     <string name="import_error_invalid_format">The %1$s file is not a supported extract or the format is not supported.</string>
-    <string name="import_error_io_exception">File reading error %1$s: %2$s</string>
+    <string name="import_error_io_exception">File reading error %1$s: %1$s</string>
     <string name="import_error_no_transactions">There are no transactions for imports in the file.Check the file format.</string>
     <string name="import_error_no_transactions_found">Not a single transaction was found in the %1$s file</string>
-    <string name="import_error_pdf_extraction_exception">Error when extracting text from pdf file %1$s: %2$s</string>
+    <string name="import_error_pdf_extraction_exception">Error when extracting text from pdf file %1$s: %1$s</string>
     <string name="import_error_pdf_extraction_failed">It was not possible to remove the text from the PDF or the file is empty: %1$s</string>
     <string name="import_error_statistics_file">The file contains statistics, not transactions.Please select a file with transactions for imports.</string>
     <string name="import_error_unknown_format">The file format is not recognized.Only CSV files and extracts from banks are supported.</string>
@@ -1138,30 +1137,30 @@
   <string name="import_in_progress">I import transactions …</string>
     <string name="import_instructions">1. Download the discharge from the bank in CSV, PDF or XLSX \n2 format.For alpha bank, it is better to use the XLSX \n3 format.For Sberbank, PDF \n4 is also supported.Press the button below and select the \n5 file.Wait for the end of the \n \nnas on the bank below to find out detailed instructions.</string>
     <string name="import_progress_completed">File import %1$s completed</string>
-    <string name="import_progress_count">%1$s from %2$s transactions</string>
+    <string name="import_progress_count">%1$s from %1$s transactions</string>
   <string name="import_progress_format_validated_skipping_headers">The file format %1$s verified, passing headlines …</string>
   <string name="import_progress_processing_transactions">Transaction processing from the file %1$s …</string>
-  <string name="import_progress_saving_transactions">Preservation of %1$s transactions from the file %2$s …</string>
+  <string name="import_progress_saving_transactions">Preservation of %1$s transactions from the file %1$s …</string>
     <string name="import_progress_starting">File import %1$s</string>
-  <string name="import_progress_text_extracted_validating">The text is extracted from %1$s, checking the format …</string>
+  <string name="import_progress_text_extracted_validating">The text is extracted from %1$s,checking the format …</string>
     <string name="import_results">Import results</string>
     <string name="import_section_description">Import transactions from CSV files or bank extracts.Sberbank, T-Bank, Alfa-Bank and Ozon Bank are supported.</string>
     <string name="import_section_description_friendly">Download the discharge from the bank or CSV file to add transactions to the application.Sberbank, T-Bank, Alfa-Bank and Ozon Bank are supported.</string>
     <string name="import_section_title_emoji">📥 Import transactions</string>
-    <string name="import_success_message">Imported %1$s transactions, %2$s missed from the file %3$s</string>
-    <string name="import_summary">Import is successfully completed.Imported: %1$s, missed: %2$s</string>
+    <string name="import_success_message">Imported %1$s transactions, %1$s missed from the file %1$s</string>
+    <string name="import_summary">Import is successfully completed.Imported: %1$s,missed: %1$s</string>
     <string name="import_total_amount">Total amount: %d ₽</string>
     <string name="import_transactions_hint">Click to import transactions from different banks</string>
   <string name="importing_file">We import the file …</string>
     <string name="log_category_expense_usage_increased">Category: Increased meter of use of the consumable category: %1$s</string>
     <string name="log_category_income_usage_increased">Category: Increased meter of use of the revenue category: %1$s</string>
     <string name="log_category_positions_updated">[Category_Sort] Updating the positions of categories</string>
-    <string name="log_category_usage_count">Category: The number of use of the category %1$s: %2$s has been obtained</string>
-    <string name="log_csv_amount_processed">[%1$s] Processed line of the amount: %2$s, currency: %3$s</string>
-    <string name="log_csv_date_found">[%1$s] Found a column with the date: %2$s, meaning: %3$s</string>
-    <string name="log_csv_date_not_found">[%1$s] Date was not found in the %2$s column or not like the date: %3$s</string>
-    <string name="log_csv_date_parsed">[%1$s] successfully paved the date %2$s with the format %3$s</string>
-    <string name="log_csv_delimiter_used">[%1$s] Use the separator: %2$s, found columns: %3$s</string>
+    <string name="log_category_usage_count">Category: The number of use of the category %1$s: %1$s has been obtained</string>
+    <string name="log_csv_amount_processed">[%1$s] Processed line of the amount: %1$s,currency: %1$s</string>
+    <string name="log_csv_date_found">[%1$s] Found a column with the date: %1$s,meaning: %1$s</string>
+    <string name="log_csv_date_not_found">[%1$s] Date was not found in the %1$s column or not like the date: %1$s</string>
+    <string name="log_csv_date_parsed">[%1$s] successfully paved the date %1$s with the format %1$s</string>
+    <string name="log_csv_delimiter_used">[%1$s] Use the separator: %1$s,found columns: %1$s</string>
     <string name="log_disabling_wallets">Turning off the wallets</string>
     <string name="log_enabling_expense_wallet">Turning on the wallet for the consumption, select the first wallet: %1$s</string>
     <string name="log_enabling_income_wallets">Inclusion of purse for income, automatic choice of all %1$s wallets</string>
@@ -1171,39 +1170,39 @@
     <string name="log_expense_categories_sorted">[Category_Sort] County categories are sorted by use: %1$s</string>
     <string name="log_income_categories_sorted">[Category_Sort] Revenue categories are sorted by use: %1$s</string>
     <string name="log_no_wallets_for_expense">No available wallets for expenses</string>
-    <string name="log_not_saving_wallets">Do not save wallets: isxpense =%%%%1 $ b, adtowallet =%%%%$ 2 $ b, Selectedwallets = %1$s</string>
+    <string name="log_not_saving_wallets">Do not save wallets: isxpense =%%1 $ b, adtowallet =%%$ 2 $ b, Selectedwallets = %1$s</string>
     <string name="log_ozon_import_created">[%1$s handler] Creation Ozonpdfimportusecase</string>
     <string name="log_parse_money_empty">PARSEMONEYEXPRESION: Initial expression is empty, we return 0</string>
     <string name="log_parse_money_empty_after_clean">PARSEMONEYEXPRESION: The expression is empty or only a point, return 0</string>
-    <string name="log_parse_money_expression">PARSEMONEYEXPRESSION: Initial expression: %1$s, after removing spaces and replacement of commas: %2$s</string>
-    <string name="log_parse_money_expression_error">PARSEMONEYEXPRESION: Error calculating the expression %1$s, return 0</string>
+    <string name="log_parse_money_expression">PARSEMONEYEXPRESSION: Initial expression: %1$s,after removing spaces and replacement of commas: %1$s</string>
+    <string name="log_parse_money_expression_error">PARSEMONEYEXPRESION: Error calculating the expression %1$s,return 0</string>
     <string name="log_parse_money_expression_success">PARSEMONEYEXPRESION: Successfully calculated as an expression, result: %1$s</string>
     <string name="log_parse_money_invalid_chars">PARSEMONEYEXPRESION: The expression contained unacceptable characters, cleared: %1$s</string>
     <string name="log_parse_money_number_error">PARSEMONEYEXPRESSION: A mistake of a simple number: %1$s</string>
     <string name="log_parse_money_remove_operator">PARSEMONEYEXPRESION: Remove the hanging operator, a new expression: %1$s</string>
     <string name="log_parse_money_simple_number">PARSEMONEYEXPRESION: Processed as a simple number: %1$s</string>
-    <string name="log_parse_money_unrecognized">PARSEMONEYEXPRESSION: It was not possible to recognize either the number or as the expression: %1$s, we return 0</string>
+    <string name="log_parse_money_unrecognized">PARSEMONEYEXPRESSION: It was not possible to recognize either the number or as the expression: %1$s,we return 0</string>
     <string name="log_saving_expense_wallets">We save the wallets for debiting: %1$s pcs.</string>
     <string name="log_saving_income_wallets">We save the wallets for replenishment: %1$s pcs.</string>
     <string name="log_sberbank_import_created">[%1$s handler] Creation of sberbankpdfimportusecase</string>
     <string name="log_sberbank_indicator_found">[%1$s handler] found Sberbank indicator in file contents</string>
-    <string name="log_sberbank_read_error">[%1$s handler] Error when reading a file for determining: %2$s</string>
-    <string name="log_select_wallet_event">SelectWallet Event - Walletid = %1$s, Selected =%%%%$ 2</string>
+    <string name="log_sberbank_read_error">[%1$s handler] Error when reading a file for determining: %1$s</string>
+    <string name="log_select_wallet_event">SelectWallet Event - Walletid = %1$s,Selected =%%$ 2</string>
     <string name="log_source_positions_updated">[Source_Sort] Updating the positions of sources</string>
-    <string name="log_source_usage_count">Source: The amount of using the source %1$s: %2$s has been obtained</string>
+    <string name="log_source_usage_count">Source: The amount of using the source %1$s: %1$s has been obtained</string>
     <string name="log_source_usage_increased">Source: Increased the source use counter: %1$s</string>
-    <string name="log_transaction_after_switch">Transaction: after switching type - isxpense =%%%%1 $ b, Category = %1$s</string>
+    <string name="log_transaction_after_switch">Transaction: after switching type - isxpense =%%1 $ b, Category = %1$s</string>
     <string name="log_transaction_empty_amount_error">Transaction: Validation error - empty amount</string>
     <string name="log_transaction_empty_category_error">Transaction: Validation error - empty category</string>
-    <string name="log_transaction_initialize_screen">AddtransactionViewmodel: Initializescreen completed, Forcexpense =%%%%$ 1 $ b, isxpense =%%%%$ 2</string>
+    <string name="log_transaction_initialize_screen">AddtransactionViewmodel: Initializescreen completed, Forcexpense =%%$ 1 $ b, isxpense =%%$ 2</string>
     <string name="log_transaction_parse_amount_error">Transaction: Validation Error in Parsing Sum: %1$s</string>
     <string name="log_transaction_reset_fields">Transaction: resetting of fields and notes</string>
-    <string name="log_transaction_type_switch">Transaction: switching type of transaction from %%%%1 $ B per %%%%$ b</string>
+    <string name="log_transaction_type_switch">Transaction: switching type of transaction from %%1 $ B per %%$ b</string>
     <string name="log_transaction_validate_input">Transaction: Validateinput - incoming validation amount: %1$s</string>
-    <string name="log_transaction_validation_result">Transaction: Validateinput - result: isvalid =%%%%1 $ b, Hasamounterror =%%%%$ 2</string>
+    <string name="log_transaction_validation_result">Transaction: Validateinput - result: isvalid =%%1 $ b, Hasamounterror =%%$ 2</string>
     <string name="log_transaction_wallets_loaded">Transaction: downloaded %1$s wallets</string>
-    <string name="log_transaction_zero_amount_error">Transaction: Validation error - the amount is less or equal to zero: %%%%1 $ f</string>
-    <string name="log_updating_selected_wallets">Updating the list of selected wallets: it was %1$s, it became %2$s</string>
+    <string name="log_transaction_zero_amount_error">Transaction: Validation error - the amount is less or equal to zero: %%1 $ f</string>
+    <string name="log_updating_selected_wallets">Updating the list of selected wallets: it was %1$s,it became %1$s</string>
     <string name="log_wallets_loaded">Loaded %1$s wallets</string>
     <string name="new_transaction_title">New transaction</string>
     <string name="no_subcategories_available">There are no available subcategories for this category</string>
@@ -1255,4 +1254,100 @@
     <string name="balance_widget_description">Widget for displaying the current balance, income and expenses</string>
     <string name="small_balance_widget_description">Compact widget for displaying the current balance</string>
   <string name="months_short_label">mo.</string>
+  <!-- Feedback and export/import messages -->
+  <string name="export_success_path">Export completed: %1$s</string>
+  <string name="export_failed_transactions">Failed to export transactions</string>
+  <string name="export_unknown_error">Unknown export error</string>
+  <string name="error_failed_delete_transaction">Failed to delete transaction</string>
+  <string name="error_failed_update_transaction">Failed to update transaction</string>
+
+  <!-- Debts -->
+  <string name="debt_title">Debts</string>
+  <string name="debt_add">Add debt</string>
+  <string name="debt_edit">Edit debt</string>
+  <string name="debt_counterparty">Counterparty</string>
+  <string name="debt_amount">Amount</string>
+  <string name="debt_field_title">Title</string>
+  <string name="debt_principal">Debt amount</string>
+  <string name="debt_remaining">Remaining</string>
+  <string name="debt_due_at">Due date</string>
+  <string name="debt_note">Note</string>
+  <string name="debt_type_borrowed">I owe</string>
+  <string name="debt_type_lent">I am owed</string>
+  <string name="debt_status_active">Active</string>
+  <string name="debt_status_paid">Paid</string>
+  <string name="debt_status_overdue">Overdue</string>
+  <string name="debt_status_writeoff">Written off</string>
+  <string name="debt_repay">Repay</string>
+  <string name="debt_create_success">Debt created</string>
+  <string name="debt_update_success">Debt updated</string>
+  <string name="debt_repay_success">Payment recorded</string>
+  <string name="debt_empty_title">No debts yet</string>
+  <string name="debt_empty_subtitle">Add your first debt to track balance and payments</string>
+  <string name="debt_filter_all">All</string>
+  <string name="debt_filter_active">Active</string>
+  <string name="debt_filter_overdue">Overdue</string>
+  <string name="debt_filter_borrowed">I owe</string>
+  <string name="debt_filter_lent">I am owed</string>
+  <string name="debt_due_date_short">Due: %1$s</string>
+  <string name="debt_due_not_set">Due date not set</string>
+
+    <!-- Plurals -->
+    <plurals name="transactions_count">
+        <item quantity="one">%d transaction</item>
+        <item quantity="other">%d transactions</item>
+    </plurals>
+    
+    <plurals name="important_count">
+        <item quantity="one">%d important</item>
+        <item quantity="other">%d important</item>
+    </plurals>
+    
+    <plurals name="large_count">
+        <item quantity="one">%d large</item>
+        <item quantity="other">%d large</item>
+    </plurals>
+    
+    <plurals name="small_count">
+        <item quantity="one">%d small</item>
+        <item quantity="other">%d small</item>
+    </plurals>
+    
+    <plurals name="month_count">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    
+    <plurals name="day_count">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    
+    <plurals name="week_count">
+        <item quantity="one">%d week</item>
+        <item quantity="other">%d weeks</item>
+    </plurals>
+    
+    <plurals name="year_count">
+        <item quantity="one">%d year</item>
+        <item quantity="other">%d years</item>
+    </plurals>
+
+    <string name="achievement_category_master_desc">Use %1$s different categories</string>
+    <string name="achievement_transaction_counter_desc">Add %1$d transactions</string>
+    <string name="achievement_savings_milestone_desc">Save %1$s in total</string>
+    <string name="achievement_import_master_desc">Import data %1$d times</string>
+    <string name="achievement_security_guard_desc">Enable security features</string>
+    <string name="achievement_analytics_expert_desc">View statistics %1$d times</string>
+    <string name="achievement_goal_setter_desc">Set and achieve %1$d financial goals</string>
+    <string name="achievement_debt_free_desc">Pay off %1$s in debt</string>
+    <string name="achievement_investment_starter_desc">Start investing %1$s</string>
+    <string name="achievement_budget_sticker_desc">Stay within budget for %1$d months</string>
+    <string name="achievement_income_diversifier_desc">Have %1$d income sources</string>
+    <string name="achievement_expense_tracker_desc">Track expenses for %1$d days</string>
+    <string name="achievement_savings_rate_improver_desc">Improve savings rate by %1$s%%</string>
+    <string name="achievement_financial_educator_desc">Read %1$d financial tips</string>
+    <string name="achievement_retirement_planner_desc">Plan retirement with %1$s</string>
+    <string name="achievement_tax_optimizer_desc">Optimize taxes by %1$s</string>
+    <string name="achievement_insurance_protector_desc">Get insurance coverage of %1$s</string>
 </resources>

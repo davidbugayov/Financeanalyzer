@@ -66,7 +66,7 @@ fun EnhancedTipCard(
     if (tips.isEmpty()) return
 
     var isExpanded by remember { mutableStateOf(false) }
-    var currentTipIndex by remember { mutableStateOf(0) }
+    var currentTipIndex by remember { mutableIntStateOf(0) }
 
     val currentTip = tips[currentTipIndex]
     val hasMultipleTips = tips.size > 1

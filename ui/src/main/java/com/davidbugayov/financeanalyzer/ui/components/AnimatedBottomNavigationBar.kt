@@ -56,11 +56,11 @@ import com.davidbugayov.financeanalyzer.ui.R
  */
 @Composable
 fun AnimatedBottomNavigationBar(
+    modifier: Modifier = Modifier,
     visible: Boolean = true,
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onAddClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
     // IME insets (keyboard)

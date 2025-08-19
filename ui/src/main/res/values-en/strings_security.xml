@@ -2,6 +2,8 @@
 <resources>
   <string name="security_title">Security</string>
   <string name="security_app_lock_title">App lock</string>
+    <string name="auth_enter_pin">Enter PIN</string>
+    <string name="auth_wrong_pin">Wrong PIN</string>
 </resources>
 
 

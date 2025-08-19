@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 @Deprecated("Используйте UnifiedRecommendationCard для новых реализаций")
 @Composable
 fun AdviceCard(
+    modifier: Modifier = Modifier,
     title: String,
     description: String,
     priority: AdvicePriority = AdvicePriority.NORMAL,
-    modifier: Modifier = Modifier,
 ) {
     // Используем новый унифицированный компонент
     val unifiedRecommendation =

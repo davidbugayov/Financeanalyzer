@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 一般错误 -->
+    <string name="error_unknown_type">未知结果类型</string>
+    <string name="error_action_failed">执行操作失败：%1$s</string>
+    
+    <!-- 配置文件错误 -->
+    <string name="error_rustore_rating">在RuStore中请求评分时出错</string>
+    <string name="error_memory_tracking">跟踪内存时出错</string>
+    
+    <!-- 交易历史错误 -->
+    <string name="error_widgets_updated">删除后更新了小部件</string>
+    
+    <!-- 分析错误 -->
+    <string name="error_profile_analytics">获取配置文件分析时出错</string>
+    
+    <!-- 成就错误 -->
+    <string name="error_achievements_loading">加载成就进度时出错</string>
+    <string name="error_achievement_progress_update">更新成就进度%1$s时出错</string>
+    <string name="error_achievement_check">检查成就%1$s时出错</string>
+    
+    <!-- 钱包错误 -->
+    <string name="error_wallet_allocation_no_wallets">AllocateIncomeUseCase：没有钱包，不需要分配</string>
+    <string name="error_wallet_allocation_no_limit">AllocateIncomeUseCase：总限制&lt;= 0，跳过分配</string>
+    <string name="error_wallet_allocation_failed">AllocateIncomeUseCase：收入分配错误：%1$s</string>
+    <string name="error_wallet_balance_rollback">UpdateWalletBalancesUseCase：回滚%1$d个原始钱包，金额：%2$s</string>
+    <string name="error_wallet_balance_update_failed">UpdateWalletBalancesUseCase：更新钱包余额时出错：%1$s</string>
+    
+    <!-- 验证错误 -->
+    <string name="error_validation_transaction">验证交易：amount=\'%1$s\'，category=\'%2$s\'，source=\'%3$s\'</string>
+    <string name="error_validation_result">验证结果：isValid=%1$s，amountError=%2$s，categoryError=%3$s，sourceError=%4$s，errorMsg=%5$s</string>
+</resources>
+

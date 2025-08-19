@@ -33,11 +33,11 @@ import com.davidbugayov.financeanalyzer.ui.R
  */
 @Composable
 fun PremiumStatisticsCard(
+    modifier: Modifier = Modifier,
     title: String,
     icon: ImageVector,
     statistics: List<StatisticItem>,
     accentColor: Color = MaterialTheme.colorScheme.primary,
-    modifier: Modifier = Modifier,
 ) {
     var isVisible by remember { mutableStateOf(true) }
 

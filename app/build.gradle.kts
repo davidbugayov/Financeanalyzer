@@ -476,7 +476,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
 }
 
-apply(plugin = "com.huawei.agconnect")
+// Apply Huawei AGConnect plugin only when building Huawei variants to avoid noise for other flavors
+if (gradle.startParameter.taskNames.any { it.contains("Huawei", ignoreCase = true) }) {
+    apply(plugin = "com.huawei.agconnect")
+}
 
 composeCompiler {
     // Включаем генерацию отчетов компилятора Compose (полезно для анализа рекомпозиций)

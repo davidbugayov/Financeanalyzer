@@ -11,6 +11,11 @@
   <string name="show_expenses">显示支出</string>
   <string name="and_more_categories">还有 %1$d 个类别</string>
   <string name="hide">隐藏</string>
+    <string name="profile">个人资料</string>
+    <string name="total_income">总收入</string>
+    <string name="total_expense">总支出</string>
+    <string name="no_expenses_period">该期间无支出</string>
+    <string name="no_incomes_period">该期间无收入</string>
 </resources>
 
 

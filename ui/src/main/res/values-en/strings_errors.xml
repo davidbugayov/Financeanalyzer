@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- General errors -->
+    <string name="error_unknown_type">Unknown result type</string>
+    <string name="error_action_failed">Failed to perform action: %1$s</string>
+    
+    <!-- Profile errors -->
+    <string name="error_rustore_rating">Error requesting rating in RuStore</string>
+    <string name="error_memory_tracking">Error tracking memory</string>
+    
+    <!-- Transaction history errors -->
+    <string name="error_widgets_updated">Widgets updated after deletion</string>
+    
+    <!-- Analytics errors -->
+    <string name="error_profile_analytics">Error getting profile analytics</string>
+    
+    <!-- Achievement errors -->
+    <string name="error_achievements_loading">Error loading achievement progress</string>
+    <string name="error_achievement_progress_update">Error updating achievement progress %1$s</string>
+    <string name="error_achievement_check">Error checking achievement %1$s</string>
+    
+    <!-- Wallet errors -->
+    <string name="error_wallet_allocation_no_wallets">AllocateIncomeUseCase: no wallets, allocation not needed</string>
+    <string name="error_wallet_allocation_no_limit">AllocateIncomeUseCase: total limit &lt;= 0, allocation skipped</string>
+    <string name="error_wallet_allocation_failed">AllocateIncomeUseCase: income allocation error: %1$s</string>
+    <string name="error_wallet_balance_rollback">UpdateWalletBalancesUseCase: Rollback for %1$d original wallets, amount: %2$s</string>
+    <string name="error_wallet_balance_update_failed">UpdateWalletBalancesUseCase: Error updating wallet balances: %1$s</string>
+    
+    <!-- Validation errors -->
+    <string name="error_validation_transaction">Validating transaction: amount=\'%1$s\', category=\'%2$s\', source=\'%3$s\'</string>
+    <string name="error_validation_result">Validation result: isValid=%1$s, amountError=%2$s, categoryError=%3$s, sourceError=%4$s, errorMsg=%5$s</string>
+</resources>
+

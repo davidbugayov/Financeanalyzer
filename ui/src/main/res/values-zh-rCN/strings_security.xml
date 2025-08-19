@@ -2,6 +2,8 @@
 <resources>
   <string name="security_title">安全</string>
   <string name="security_app_lock_title">应用锁</string>
+    <string name="auth_enter_pin">输入PIN</string>
+    <string name="auth_wrong_pin">PIN错误</string>
 </resources>
 
 

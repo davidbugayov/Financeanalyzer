@@ -18,11 +18,11 @@ import com.davidbugayov.financeanalyzer.ui.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
+    modifier: Modifier = Modifier,
     title: String,
     showBackButton: Boolean = false,
     onBackClick: () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = {

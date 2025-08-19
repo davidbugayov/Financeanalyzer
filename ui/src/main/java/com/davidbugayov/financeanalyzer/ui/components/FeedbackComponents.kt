@@ -53,13 +53,13 @@ enum class FeedbackType {
  */
 @Composable
 fun FeedbackMessage(
+    modifier: Modifier = Modifier,
     title: String,
     message: String? = null,
     type: FeedbackType,
     visible: Boolean,
     onDismiss: () -> Unit,
     duration: Long = 3000L,
-    modifier: Modifier = Modifier,
     isFilePath: Boolean = false,
 ) {
     val context = LocalContext.current

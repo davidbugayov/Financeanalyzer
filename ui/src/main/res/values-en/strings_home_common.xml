@@ -11,6 +11,11 @@
   <string name="show_expenses">Show expenses</string>
   <string name="and_more_categories">And %1$d more categories</string>
   <string name="hide">Hide</string>
+    <string name="profile">Profile</string>
+    <string name="total_income">Total income</string>
+    <string name="total_expense">Total expense</string>
+    <string name="no_expenses_period">No expenses for the period</string>
+    <string name="no_incomes_period">No income for the period</string>
 </resources>
 
 
