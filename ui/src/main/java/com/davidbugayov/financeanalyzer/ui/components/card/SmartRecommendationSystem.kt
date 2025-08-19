@@ -38,6 +38,7 @@ import com.davidbugayov.financeanalyzer.ui.R
  */
 @Composable
 fun SmartRecommendationCard(
+    modifier: Modifier = Modifier,
     recommendations: List<SmartRecommendation>,
     title: String = stringResource(id = R.string.smart_card_default_title),
     subtitle: String = stringResource(id = R.string.smart_card_default_subtitle),
@@ -45,7 +46,6 @@ fun SmartRecommendationCard(
     showPriorityIndicator: Boolean = true,
     onRecommendationClick: ((SmartRecommendation) -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     val sortedRecommendations = recommendations.sortedBy { it.priority.order }
 

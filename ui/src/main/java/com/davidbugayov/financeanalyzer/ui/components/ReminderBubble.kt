@@ -51,6 +51,7 @@ import kotlinx.coroutines.delay
  */
 @Composable
 fun ReminderBubble(
+    modifier: Modifier = Modifier,
     visible: Boolean,
     title: String,
     description: String,
@@ -61,7 +62,6 @@ fun ReminderBubble(
     autoDismissTimeMillis: Long = 15000,
     onDismiss: () -> Unit,
     onAction: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
         visible = visible,
