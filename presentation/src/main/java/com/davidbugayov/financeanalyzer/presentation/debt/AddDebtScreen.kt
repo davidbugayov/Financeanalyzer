@@ -111,7 +111,7 @@ fun addDebtScreen(
                 Text(
                     text =
                         dueAt.value?.let {
-                            java.text.SimpleDateFormat("dd.MM.yyyy").format(java.util.Date(it))
+                            java.text.SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(java.util.Date(it))
                         } ?: stringResource(id = UiR.string.debt_due_not_set),
                 )
                 Button(onClick = {

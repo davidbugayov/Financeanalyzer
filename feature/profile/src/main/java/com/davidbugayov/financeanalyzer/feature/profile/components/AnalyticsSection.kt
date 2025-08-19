@@ -374,12 +374,12 @@ fun AnalyticsSection(
  */
 @Composable
 private fun AnimatedFinancialCard(
+    modifier: Modifier = Modifier,
     title: String,
     value: String,
     color: Color,
     icon: Painter,
     animationDelay: Int = 0,
-    modifier: Modifier = Modifier,
 ) {
     var visible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(

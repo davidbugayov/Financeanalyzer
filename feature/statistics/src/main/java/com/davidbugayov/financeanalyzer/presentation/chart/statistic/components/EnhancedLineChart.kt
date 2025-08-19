@@ -115,8 +115,8 @@ fun EnhancedLineChart(
             else -> String.format(Locale.getDefault(), "%.0f", value)
         }
     },
-    onPointSelected: (LineChartPoint?) -> Unit = {},
     modifier: Modifier = Modifier,
+    onPointSelected: (LineChartPoint?) -> Unit = {},
     chartHeight: Dp = DefaultChartHeight,
     selectionThresholdDp: Dp = DefaultSelectionThreshold,
 ) {

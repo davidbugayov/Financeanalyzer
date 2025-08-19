@@ -42,11 +42,7 @@ object UiUtils {
                     dateFormat.format(endDate),
                 )
             PeriodType.QUARTER ->
-                context.getString(
-                    UiR.string.period_quarter,
-                    dateFormat.format(startDate),
-                    dateFormat.format(endDate),
-                )
+                context.getString(UiR.string.period_quarter)
             PeriodType.YEAR ->
                 context.getString(
                     UiR.string.period_year,

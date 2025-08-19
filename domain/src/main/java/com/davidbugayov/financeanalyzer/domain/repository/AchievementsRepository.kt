@@ -336,16 +336,16 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
      */
     private fun saveAchievements(achievements: List<Achievement>) {
         try {
-            val editor = prefs.edit()
-            achievements.forEach { achievement ->
-                editor.putInt("${achievement.id}_progress", achievement.currentProgress)
-                editor.putBoolean("${achievement.id}_unlocked", achievement.isUnlocked)
-                achievement.dateUnlocked?.let { date ->
-                    editor.putLong("${achievement.id}_date", date)
+            prefs.edit {
+                achievements.forEach { achievement ->
+                    putInt("${achievement.id}_progress", achievement.currentProgress)
+                    putBoolean("${achievement.id}_unlocked", achievement.isUnlocked)
+                    achievement.dateUnlocked?.let { date ->
+                        putLong("${achievement.id}_date", date)
+                    }
                 }
+                putBoolean("achievements_initialized", true)
             }
-            editor.putBoolean("achievements_initialized", true)
-            editor.apply()
         } catch (e: Exception) {
             Timber.e(e, rp.getString(R.string.log_error_saving_achievements))
         }

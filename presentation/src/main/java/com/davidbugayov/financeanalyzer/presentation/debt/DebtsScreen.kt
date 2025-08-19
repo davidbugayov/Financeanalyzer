@@ -180,7 +180,7 @@ private fun debtCard(
 
             val dueText =
                 debt.dueAt?.let { millis ->
-                    val date = java.text.SimpleDateFormat("dd.MM.yyyy").format(java.util.Date(millis))
+                    val date = java.text.SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(java.util.Date(millis))
                     stringResource(id = UiR.string.debt_due_date_short, date)
                 } ?: stringResource(id = UiR.string.debt_due_not_set)
 

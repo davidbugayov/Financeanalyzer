@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.categories.model
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.CategoryRandomPalette
@@ -158,7 +159,7 @@ object CategoryProvider {
      */
     fun parseColorFromHex(hex: String): Color =
         try {
-            Color(android.graphics.Color.parseColor(hex))
+            Color(hex.toColorInt())
         } catch (e: Exception) {
             DefaultCategoryColor
         }

@@ -71,7 +71,7 @@ import timber.log.Timber
  */
 @Composable
 private fun HomeTopBar(
-    profileIconModifier: Modifier = Modifier,
+    modifier: Modifier = Modifier,
     onGenerateTestData: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToDebts: () -> Unit,
@@ -92,7 +92,7 @@ private fun HomeTopBar(
                 }
             }
             IconButton(
-                modifier = profileIconModifier,
+                modifier = modifier,
                 onClick = {
                     onNavigateToProfile()
                 },

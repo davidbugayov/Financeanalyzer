@@ -91,6 +91,7 @@ fun SecuritySettingsSection(
  */
 @Composable
 private fun SecurityActionCard(
+    modifier: Modifier = Modifier,
     icon: ImageVector,
     iconBackground: Color,
     title: String,
@@ -98,7 +99,6 @@ private fun SecurityActionCard(
     isEnabled: Boolean,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
 ) {
     Card(
         onClick = onClick,

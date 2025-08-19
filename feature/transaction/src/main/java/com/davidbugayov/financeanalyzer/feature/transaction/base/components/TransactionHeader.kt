@@ -52,12 +52,8 @@ fun transactionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Кнопка выбора даты: строго используем локаль приложения из Resources
-        val ctx = LocalContext.current
-        val cfg = ctx.resources.configuration
-
-        @Suppress("DEPRECATION")
-        val appLocale: Locale = if (Build.VERSION.SDK_INT >= 24) cfg.locales[0] else cfg.locale
+        // Кнопка выбора даты: используем Locale.getDefault() вместо LocalContext
+        val appLocale: Locale = Locale.getDefault()
         val dateFormat = SimpleDateFormat("dd MMMM yyyy", appLocale)
         val formattedDate = dateFormat.format(date)
 
