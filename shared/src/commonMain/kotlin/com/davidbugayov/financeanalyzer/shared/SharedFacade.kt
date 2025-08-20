@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.shared.model.BalanceMetrics
 import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository
 import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository
@@ -205,7 +206,15 @@ class SharedFacade {
         try {
             transactionRepository?.addTransaction(transaction)
             true
-        } catch (_: Throwable) {
+        } catch (t: Throwable) {
+            AnalyticsProviderBridge.getProvider()?.logEvent(
+                eventName = "kmp_repo_error",
+                parameters = mapOf(
+                    "op" to "addTransaction",
+                    "type" to (t::class.simpleName ?: "Throwable"),
+                    "message" to (t.message ?: ""),
+                ),
+            )
             false
         }
 
@@ -219,7 +228,15 @@ class SharedFacade {
         try {
             transactionRepository?.updateTransaction(transaction)
             true
-        } catch (_: Throwable) {
+        } catch (t: Throwable) {
+            AnalyticsProviderBridge.getProvider()?.logEvent(
+                eventName = "kmp_repo_error",
+                parameters = mapOf(
+                    "op" to "updateTransaction",
+                    "type" to (t::class.simpleName ?: "Throwable"),
+                    "message" to (t.message ?: ""),
+                ),
+            )
             false
         }
 
@@ -245,8 +262,15 @@ class SharedFacade {
                     repo.updateWallet(updated)
                 }
             }
-        } catch (_: Throwable) {
-            // ignore: best-effort обновление для Android/UI совместимости
+        } catch (t: Throwable) {
+            AnalyticsProviderBridge.getProvider()?.logEvent(
+                eventName = "kmp_wallet_update_error",
+                parameters = mapOf(
+                    "op" to "updateWalletBalances",
+                    "type" to (t::class.simpleName ?: "Throwable"),
+                    "message" to (t.message ?: ""),
+                ),
+            )
         }
     }
 
@@ -260,7 +284,15 @@ class SharedFacade {
         try {
             transactionRepository?.deleteTransaction(transaction.id)
             true
-        } catch (_: Throwable) {
+        } catch (t: Throwable) {
+            AnalyticsProviderBridge.getProvider()?.logEvent(
+                eventName = "kmp_repo_error",
+                parameters = mapOf(
+                    "op" to "deleteTransaction",
+                    "type" to (t::class.simpleName ?: "Throwable"),
+                    "message" to (t.message ?: ""),
+                ),
+            )
             false
         }
 }
