@@ -194,6 +194,75 @@ class SharedFacade {
      */
     suspend fun allocateIncome(income: Money): Boolean =
         allocateIncomeUseCase?.invoke(income) ?: false
+
+    /**
+     * Добавляет транзакцию через репозиторий. Возвращает успех операции.
+     *
+     * @param transaction транзакция из общего KMP-модуля
+     * @return true при успехе, иначе false
+     */
+    suspend fun addTransaction(transaction: Transaction): Boolean =
+        try {
+            transactionRepository?.addTransaction(transaction)
+            true
+        } catch (_: Throwable) {
+            false
+        }
+
+    /**
+     * Обновляет транзакцию через репозиторий. Возвращает успех операции.
+     *
+     * @param transaction транзакция из общего KMP-модуля
+     * @return true при успехе, иначе false
+     */
+    suspend fun updateTransaction(transaction: Transaction): Boolean =
+        try {
+            transactionRepository?.updateTransaction(transaction)
+            true
+        } catch (_: Throwable) {
+            false
+        }
+
+    /**
+     * Обновляет балансы кошельков по списку ID. Если репозиторий не передан — no-op.
+     *
+     * @param walletIdsToUpdate список ID кошельков для обновления
+     * @param amountForWallets сумма, на которую изменить баланс (положительная для дохода)
+     * @param originalTransaction исходная транзакция (необязательно)
+     */
+    suspend fun updateWalletBalances(
+        walletIdsToUpdate: List<String>,
+        amountForWallets: Money,
+        originalTransaction: Transaction? = null,
+    ) {
+        val repo = walletRepository ?: return
+        try {
+            val all = repo.getAllWallets()
+            walletIdsToUpdate.forEach { id ->
+                val wallet = all.firstOrNull { it.id == id }
+                if (wallet != null) {
+                    val updated = wallet.copy(balance = wallet.balance + amountForWallets)
+                    repo.updateWallet(updated)
+                }
+            }
+        } catch (_: Throwable) {
+            // ignore: best-effort обновление для Android/UI совместимости
+        }
+    }
+
+    /**
+     * Удаляет транзакцию по её ID из переданного объекта.
+     *
+     * @param transaction транзакция, ID которой нужно удалить
+     * @return true при успехе, иначе false
+     */
+    suspend fun deleteTransaction(transaction: Transaction): Boolean =
+        try {
+            transactionRepository?.deleteTransaction(transaction.id)
+            true
+        } catch (_: Throwable) {
+            false
+        }
 }
 
 

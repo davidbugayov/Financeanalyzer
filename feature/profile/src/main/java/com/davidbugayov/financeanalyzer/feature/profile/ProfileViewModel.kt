@@ -273,7 +273,7 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 val filePath = sharedFacade.exportTransactionsCsv(emptyList())
-                if (filePath != null) {
+                if (filePath.isNotBlank()) {
                     _state.update { currentState ->
                         currentState.copy(
                             exportSuccess =
@@ -290,18 +290,6 @@ class ProfileViewModel(
                     AchievementTrigger.onTransactionExported()
                     AchievementTrigger.onMilestoneReached("export_master")
                     AchievementTrigger.onMilestoneReached("backup_enthusiast")
-                } else {
-                    _state.update { currentState ->
-                        currentState.copy(
-                            exportError =
-                                GlobalContext
-                                    .get()
-                                    .get<ResourceProvider>()
-                                    .getString(UiR.string.export_failed_transactions),
-                            exportSuccess = null,
-                            exportedFilePath = null,
-                        )
-                    }
                 }
             } catch (exception: Exception) {
                 _state.update { currentState ->
