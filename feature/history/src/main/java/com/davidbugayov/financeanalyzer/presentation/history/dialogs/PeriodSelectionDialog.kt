@@ -50,6 +50,60 @@ fun PeriodSelectionDialog(
 ) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
+    fun rangeFor(type: PeriodType): Pair<Date, Date> {
+        val now = java.util.Calendar.getInstance()
+        val end = now.apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 59)
+            set(java.util.Calendar.MILLISECOND, 999)
+        }.time
+
+        val startCal = java.util.Calendar.getInstance()
+        when (type) {
+            PeriodType.DAY -> {
+                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                startCal.set(java.util.Calendar.MINUTE, 0)
+                startCal.set(java.util.Calendar.SECOND, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.WEEK -> {
+                startCal.add(java.util.Calendar.DAY_OF_MONTH, -6)
+                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                startCal.set(java.util.Calendar.MINUTE, 0)
+                startCal.set(java.util.Calendar.SECOND, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.MONTH -> {
+                startCal.add(java.util.Calendar.DAY_OF_MONTH, -29)
+                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                startCal.set(java.util.Calendar.MINUTE, 0)
+                startCal.set(java.util.Calendar.SECOND, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.QUARTER -> {
+                startCal.add(java.util.Calendar.DAY_OF_MONTH, -89)
+                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                startCal.set(java.util.Calendar.MINUTE, 0)
+                startCal.set(java.util.Calendar.SECOND, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.YEAR -> {
+                startCal.add(java.util.Calendar.DAY_OF_YEAR, -364)
+                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                startCal.set(java.util.Calendar.MINUTE, 0)
+                startCal.set(java.util.Calendar.SECOND, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.ALL -> {
+                startCal.set(2000, 0, 1, 0, 0, 0)
+                startCal.set(java.util.Calendar.MILLISECOND, 0)
+            }
+            PeriodType.CUSTOM -> return startDate to endDate
+        }
+        return startCal.time to end
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(UiR.string.dialog_select_period_title)) },
@@ -61,7 +115,6 @@ fun PeriodSelectionDialog(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState()),
             ) {
-                // Все время
                 PeriodOption(
                     periodType = PeriodType.ALL,
                     selectedPeriod = selectedPeriod,
@@ -69,31 +122,36 @@ fun PeriodSelectionDialog(
                     onPeriodSelected = onPeriodSelected,
                 )
 
-                // День
-                PeriodOption(
-                    periodType = PeriodType.DAY,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_day),
-                    onPeriodSelected = onPeriodSelected,
-                )
+                run {
+                    val (s, _) = rangeFor(PeriodType.DAY)
+                    PeriodOption(
+                        periodType = PeriodType.DAY,
+                        selectedPeriod = selectedPeriod,
+                        title = stringResource(UiR.string.period_day, dateFormat.format(s)),
+                        onPeriodSelected = onPeriodSelected,
+                    )
+                }
 
-                // Неделя
-                PeriodOption(
-                    periodType = PeriodType.WEEK,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_week),
-                    onPeriodSelected = onPeriodSelected,
-                )
+                run {
+                    val (s, e) = rangeFor(PeriodType.WEEK)
+                    PeriodOption(
+                        periodType = PeriodType.WEEK,
+                        selectedPeriod = selectedPeriod,
+                        title = stringResource(UiR.string.period_week, dateFormat.format(s), dateFormat.format(e)),
+                        onPeriodSelected = onPeriodSelected,
+                    )
+                }
 
-                // Месяц
-                PeriodOption(
-                    periodType = PeriodType.MONTH,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_month),
-                    onPeriodSelected = onPeriodSelected,
-                )
+                run {
+                    val (s, e) = rangeFor(PeriodType.MONTH)
+                    PeriodOption(
+                        periodType = PeriodType.MONTH,
+                        selectedPeriod = selectedPeriod,
+                        title = stringResource(UiR.string.period_month, dateFormat.format(s), dateFormat.format(e)),
+                        onPeriodSelected = onPeriodSelected,
+                    )
+                }
 
-                // Квартал
                 PeriodOption(
                     periodType = PeriodType.QUARTER,
                     selectedPeriod = selectedPeriod,
@@ -101,70 +159,24 @@ fun PeriodSelectionDialog(
                     onPeriodSelected = onPeriodSelected,
                 )
 
-                // Год
-                PeriodOption(
-                    periodType = PeriodType.YEAR,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_year),
-                    onPeriodSelected = onPeriodSelected,
-                )
-
-                // Произвольный период
-                PeriodOption(
-                    periodType = PeriodType.CUSTOM,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_custom),
-                    onPeriodSelected = onPeriodSelected,
-                )
-
-                // Если выбран произвольный период, показываем поля для выбора дат
-                if (selectedPeriod == PeriodType.CUSTOM) {
-                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_medium)))
-
-                    // Поле начальной даты
-                    DateField(
-                        label = stringResource(UiR.string.period_start_date),
-                        date = startDate,
-                        dateFormat = dateFormat,
-                        onClick = onStartDateClick,
-                    )
-
-                    Spacer(modifier = Modifier.height(dimensionResource(UiR.dimen.spacing_small)))
-
-                    // Поле конечной даты
-                    DateField(
-                        label = stringResource(UiR.string.period_end_date),
-                        date = endDate,
-                        dateFormat = dateFormat,
-                        onClick = onEndDateClick,
+                run {
+                    val (s, e) = rangeFor(PeriodType.YEAR)
+                    PeriodOption(
+                        periodType = PeriodType.YEAR,
+                        selectedPeriod = selectedPeriod,
+                        title = stringResource(UiR.string.period_year, dateFormat.format(s), dateFormat.format(e)),
+                        onPeriodSelected = onPeriodSelected,
                     )
                 }
             }
         },
         confirmButton = {
-            if (selectedPeriod == PeriodType.CUSTOM) {
-                TextButton(onClick = onConfirm) {
-                    Text(stringResource(UiR.string.dialog_apply))
-                }
-            } else {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(UiR.string.dialog_close))
-                }
-            }
+            TextButton(onClick = onDismiss) { Text(stringResource(UiR.string.dialog_close)) }
         },
-        dismissButton = {
-            if (selectedPeriod == PeriodType.CUSTOM) {
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(UiR.string.dialog_cancel))
-                }
-            }
-        },
+        dismissButton = {},
     )
 }
 
-/**
- * Опция выбора периода с радио-кнопкой.
- */
 @Composable
 private fun PeriodOption(
     periodType: PeriodType,
@@ -192,34 +204,3 @@ private fun PeriodOption(
     }
 }
 
-/**
- * Поле для отображения и выбора даты.
- */
-@Composable
-private fun DateField(
-    label: String,
-    date: Date,
-    dateFormat: SimpleDateFormat,
-    onClick: () -> Unit,
-) {
-    Column {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onClick)
-                    .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = dateFormat.format(date),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-    }
-}

@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core"))
     implementation(project(":shared"))
+    implementation(project(":navigation"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
