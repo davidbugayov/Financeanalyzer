@@ -157,10 +157,11 @@ fun TransactionHistoryScreen(
 
     // Логируем открытие экрана истории
     LaunchedEffect(Unit) {
-        AnalyticsUtils.logScreenView(
-            screenName = "transaction_history",
-            screenClass = "TransactionHistoryScreen",
-        )
+        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()?.
+            logScreenView(
+                screenName = "transaction_history",
+                screenClass = "TransactionHistoryScreen",
+            )
         Timber.d("TransactionHistoryScreen открыт, текущий период: ${state.periodType}")
         viewModel.loadTransactions()
         viewModel.checkTransactionCount()

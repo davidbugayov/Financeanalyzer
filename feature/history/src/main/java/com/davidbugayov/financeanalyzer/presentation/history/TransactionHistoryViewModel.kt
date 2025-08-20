@@ -599,19 +599,37 @@ class TransactionHistoryViewModel(
     private fun filterTransactions(
         transactions: List<Transaction>,
         state: TransactionHistoryState,
-    ): List<Transaction> =
-        sharedFacade
-            .filterTransactions(
-                transactions = transactions.map { it.toShared() },
-                periodType =
-                    com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(
-                        toDomainPeriodType(state.periodType).name,
-                    ),
-                now = Date().toLocalDateKmp(),
-                customStart = state.startDate.toLocalDateKmp(),
-                customEnd = state.endDate.toLocalDateKmp(),
-                isExpense = null,
-            ).map { it.toDomain() }
+    ): List<Transaction> {
+        // 1) Сначала фильтруем по периоду через shared use-case (проверенная логика)
+        val periodFiltered =
+            sharedFacade
+                .filterTransactions(
+                    transactions = transactions.map { it.toShared() },
+                    periodType =
+                        com.davidbugayov.financeanalyzer.shared.model.filter.PeriodType.valueOf(
+                            toDomainPeriodType(state.periodType).name,
+                        ),
+                    now = Date().toLocalDateKmp(),
+                    customStart = state.startDate.toLocalDateKmp(),
+                    customEnd = state.endDate.toLocalDateKmp(),
+                    isExpense = null,
+                ).map { it.toDomain() }
+
+        // 2) Затем применяем выбранные в UI фильтры по категориям и источникам
+        val hasCategoryFilter = state.selectedCategories.isNotEmpty()
+        val hasSourceFilter = state.selectedSources.isNotEmpty()
+
+        if (!hasCategoryFilter && !hasSourceFilter) return periodFiltered
+
+        val categoriesSet = state.selectedCategories.toSet()
+        val sourcesSet = state.selectedSources.toSet()
+
+        return periodFiltered.filter { tx ->
+            val categoryOk = if (hasCategoryFilter) categoriesSet.contains(tx.category) else true
+            val sourceOk = if (hasSourceFilter) sourcesSet.contains(tx.source) else true
+            categoryOk && sourceOk
+        }
+    }
 
     /**
      * Преобразует PeriodType из presentation в PeriodType из domain

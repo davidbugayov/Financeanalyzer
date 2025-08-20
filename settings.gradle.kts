@@ -58,6 +58,7 @@ include(":navigation")
 include(":utils")
 include(":ui")
 include(":shared")
+include(":analytics")
 
 // Feature modules
 include(":feature")

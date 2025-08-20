@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer
 
 import android.os.Build
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
@@ -30,8 +30,8 @@ class FinanceApp : BaseFinanceApp() {
      * Инициализирует компоненты, специфичные для RuStore flavor
      */
     override fun initFlavor() {
-        // Логируем событие открытия приложения
-        AnalyticsUtils.logAppOpen()
+        // Логируем событие открытия приложения через провайдера
+        AnalyticsProviderBridge.getProvider()?.logAppOpen()
         // Проверяем наличие обновлений в RuStore (с внутренним троттлингом)
         RuStoreUtils.checkForUpdates(this)
     }

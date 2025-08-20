@@ -21,10 +21,11 @@ fun editTransactionScreen(
     transactionId: String? = null,
 ) {
     LaunchedEffect(Unit) {
-        AnalyticsUtils.logScreenView(
-            screenName = "edit_transaction",
-            screenClass = "EditTransactionScreen",
-        )
+        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()?.
+            logScreenView(
+                screenName = "edit_transaction",
+                screenClass = "EditTransactionScreen",
+            )
 
         // Проверяем ID транзакции и загружаем её если ID валидный
         if (!transactionId.isNullOrBlank()) {

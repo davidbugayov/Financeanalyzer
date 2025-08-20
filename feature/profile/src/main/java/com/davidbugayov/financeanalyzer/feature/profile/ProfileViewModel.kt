@@ -109,7 +109,11 @@ class ProfileViewModel(
                     AppTheme.setTheme(event.theme)
 
                     // Логируем изменение темы
-                    AnalyticsUtils.logScreenView("theme_changed", event.theme.name)
+                    com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
+                        .getProvider()?.logEvent(
+                            "theme_changed",
+                            mapOf("theme" to event.theme.name),
+                        )
                 }
             }
             is ProfileEvent.ShowThemeDialog -> {
@@ -167,7 +171,11 @@ class ProfileViewModel(
                     _state.update { it.copy(selectedCurrency = event.currency, showCurrencyDialog = false) }
 
                     // Логируем изменение валюты
-                    AnalyticsUtils.logScreenView("currency_changed", event.currency.name)
+                    com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
+                        .getProvider()?.logEvent(
+                            "currency_changed",
+                            mapOf("currency" to event.currency.name),
+                        )
                 }
             }
             is ProfileEvent.ShowCurrencyDialog -> {

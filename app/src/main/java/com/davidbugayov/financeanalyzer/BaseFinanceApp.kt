@@ -7,6 +7,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AndroidAnalyticsProviderImpl
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
@@ -142,8 +144,11 @@ abstract class BaseFinanceApp :
         // Регистрируем наблюдатель за жизненным циклом приложения
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
-        // Отправляем событие открытия приложения
-        AnalyticsUtils.logAppOpen()
+        // Регистрируем Android-провайдера аналитики для KMP слоя
+        AnalyticsProviderBridge.setProvider(AndroidAnalyticsProviderImpl())
+
+        // Отправляем событие открытия приложения через провайдера
+        AnalyticsProviderBridge.getProvider()?.logAppOpen()
 
         // Отслеживаем использование памяти
         MemoryUtils.trackMemoryUsage(this)
@@ -203,12 +208,12 @@ abstract class BaseFinanceApp :
         Timber.d("Android version: $androidVersion")
         Timber.d("App version: $appVersion")
 
-        // Отправляем данные устройства в аналитику
-        AnalyticsUtils.setUserProperty("device_model", deviceInfo)
-        AnalyticsUtils.setUserProperty("android_version", androidVersion)
-        AnalyticsUtils.setUserProperty("app_version", appVersion)
-        AnalyticsUtils.setUserProperty("app_flavor", BuildConfig.FLAVOR)
-        AnalyticsUtils.setUserProperty("app_build_type", BuildConfig.BUILD_TYPE)
+        // Отправляем данные устройства в аналитику через провайдера
+        AnalyticsProviderBridge.getProvider()?.setUserProperty("device_model", deviceInfo)
+        AnalyticsProviderBridge.getProvider()?.setUserProperty("android_version", androidVersion)
+        AnalyticsProviderBridge.getProvider()?.setUserProperty("app_version", appVersion)
+        AnalyticsProviderBridge.getProvider()?.setUserProperty("app_flavor", BuildConfig.FLAVOR)
+        AnalyticsProviderBridge.getProvider()?.setUserProperty("app_build_type", BuildConfig.BUILD_TYPE)
     }
 
     /**
@@ -216,7 +221,7 @@ abstract class BaseFinanceApp :
      */
     override fun onStart(owner: LifecycleOwner) {
         super<DefaultLifecycleObserver>.onStart(owner)
-        AnalyticsUtils.logAppForeground()
+        AnalyticsProviderBridge.getProvider()?.logAppForeground()
 
         // Триггеры достижений за активность
         checkActivityMilestones()
@@ -227,7 +232,7 @@ abstract class BaseFinanceApp :
      */
     override fun onStop(owner: LifecycleOwner) {
         super<DefaultLifecycleObserver>.onStop(owner)
-        AnalyticsUtils.logAppBackground()
+        AnalyticsProviderBridge.getProvider()?.logAppBackground()
 
         // Отправляем статистику сессии
         userEventTracker.sendSessionStats()

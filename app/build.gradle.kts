@@ -343,6 +343,7 @@ dependencies {
             ":feature:transaction",
             ":feature:widget",
             ":feature:security",
+            ":analytics"
         )
 
     modules.forEach { module ->

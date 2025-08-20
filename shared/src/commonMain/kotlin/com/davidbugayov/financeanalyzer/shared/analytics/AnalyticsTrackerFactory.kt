@@ -9,7 +9,8 @@ object AnalyticsTrackerFactory {
      * Создает экземпляр трекера аналитики для текущей платформы
      */
     fun create(): AnalyticsTracker {
-        return NoOpAnalyticsTracker()
+        val provider = AnalyticsProviderBridge.getProvider()
+        return if (provider != null) ProviderBackedAnalyticsTracker(provider) else NoOpAnalyticsTracker()
     }
 }
 
