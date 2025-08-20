@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!-- Statistics/Financial health strings -->
   <string name="financial_health_title">Financial health</string>
   <string name="financial_health_explanation">Financial health is a composite indicator that evaluates your current financial condition and resilience. It accounts for your savings rate, expense control, and the presence of an emergency fund.</string>
@@ -17,7 +17,7 @@
     <string name="achievement_backup_enthusiast_title">Enthusiast of backups</string>
     <string name="achievement_budget_keeper_desc">Do not exceed the budget 3 months</string>
     <string name="achievement_budget_keeper_title">The keeper of the budget</string>
-  <string name="achievement_budget_saver_desc">Saved 20% of the budget</string>
+  <string name="achievement_budget_saver_desc">Saved 20%% of the budget</string>
     <string name="achievement_budget_saver_title">Economist</string>
     <string name="achievement_category_organizer_desc">10 categories have been created</string>
     <string name="achievement_category_organizer_title">Organizer of categories</string>
@@ -41,7 +41,7 @@
     <string name="achievement_first_steps_title">The first steps</string>
     <string name="achievement_first_transaction_desc">The first transaction was created</string>
     <string name="achievement_first_transaction_title">The first transaction</string>
-  <string name="achievement_healthy_spender_desc">Spend less than 50% of income</string>
+  <string name="achievement_healthy_spender_desc">Spend less than 50%% of income</string>
     <string name="achievement_healthy_spender_title">Healthy wasteland</string>
     <string name="achievement_month_user_desc">Use the application for a month</string>
     <string name="achievement_month_user_title">Monthly user</string>
@@ -176,7 +176,7 @@
     <string name="critical_emoji">🚨</string>
     <string name="critical_level">Critical</string>
     <string name="critical_level_alt">Critical</string>
-  <string name="critical_low_savings_description">Your savings rate is less than 5% of income. This is critically low.</string>
+  <string name="critical_low_savings_description" tools:ignore="StringFormatCount">Your savings rate is less than 5% of income. This is critically low.</string>
   <string name="critical_low_savings_impact">Immediately increase savings to at least 10%</string>
     <string name="critical_low_savings_title">Critically low savings</string>
     <string name="current_balance">Current balance</string>
@@ -262,10 +262,11 @@
     <string name="import_categories_title">Import of categories</string>
     <string name="import_error_unknown">Unknown import error</string>
     <string name="import_transactions_title">Import of transactions</string>
-    <string name="important_count_recommendations">%d important recommendations</string>
+  <!-- Используется plurals: important_count_recommendations -->
     <string name="important_emoji">⚠️</string>
     <string name="important_level">Important</string>
     <string name="improve_savings_rate_description">Your savings can be significantly increased for better financial security.</string>
+  <string name="improve_savings_rate_impact" tools:ignore="StringFormatCount">Goal: 15-20% of income</string>
     <string name="improve_savings_rate_title">Improve the norm of savings</string>
     <string name="include_refunds">Take into account refunds</string>
     <string name="include_transfers">Учитывать переводы</string>
@@ -275,7 +276,7 @@
     <string name="income_category">Income</string>
     <string name="income_type">Income</string>
     <string name="increase_savings_rate_description_ui">Your savings can be significantly increased to achieve financial goals.</string>
-  <string name="increase_savings_rate_impact_ui">Goal: 20% of income</string>
+  <string name="increase_savings_rate_impact_ui" tools:ignore="StringFormatCount">Goal: 20% of income</string>
     <string name="increase_savings_rate_title_ui">Increase the norm of savings</string>
   <string name="initializing_subcategories">Initialization of subcategories …</string>
     <string name="insight_active_weekday">Active day of the week</string>
@@ -288,8 +289,7 @@
     <string name="insight_expense_concentration_high">High concentration</string>
   <string name="insight_expense_concentration_metric">%s%% in one category</string>
     <string name="insight_expense_frequency">The frequency of expenses</string>
-    <string name="insight_expense_frequency_desc">%d transactions for the period</string>
-    <string name="insight_expense_frequency_metric">%d transactions</string>
+  <!-- Use plurals: insight_expense_frequency_desc / insight_expense_frequency_metric -->
     <string name="insight_expense_pattern">Pattern of expenses</string>
     <string name="insight_expense_pattern_desc">The most active day: %s</string>
     <string name="insight_expense_pattern_metric">%s</string>
@@ -303,18 +303,17 @@
     <string name="insight_financial_protection">Financial protection</string>
     <string name="insight_financial_protection_excellent">Excellent</string>
     <string name="insight_financial_protection_good">Good</string>
-    <string name="insight_financial_protection_metric">Reserve fund: %d months</string>
+    <string name="insight_financial_protection_metric" tools:ignore="PluralsCandidate">Reserve fund: %d months</string>
     <string name="insight_financial_protection_minimal">Minimum</string>
     <string name="insight_financial_protection_none">Absent</string>
     <string name="insight_high_activity">High activity</string>
-    <string name="insight_high_activity_desc">%d transactions for the period</string>
-    <string name="insight_high_activity_metric">%d transactions</string>
+  <!-- Use plurals: insight_high_activity_desc / insight_high_activity_metric -->
     <string name="insight_large_expenses">Large expenses</string>
     <string name="insight_large_expenses_desc">Analysis of large purchases and expenses</string>
-    <string name="insight_large_expenses_metric">%d large expenses</string>
+  <!-- Use plurals: insight_large_expenses_metric -->
     <string name="insight_small_expenses">Minor expenses</string>
     <string name="insight_small_expenses_desc">Analysis of small everyday expenses</string>
-    <string name="insight_small_expenses_metric">%d small expenses</string>
+  <!-- Use plurals: insight_small_expenses_metric -->
     <string name="invalid_date">The wrong date</string>
   <string name="investment_tip_bonds">Consider bonds for stable income: 14–16% yield from reliable issuers.</string>
     <string name="investment_tip_business">Increase in real business through shares or borrowings for high income with moderate risks.</string>
@@ -339,7 +338,7 @@
     <string name="loading_error">Loading error</string>
     <string name="log_error_loading_wallets">Mistag Error</string>
     <string name="low_level">Short</string>
-    <string name="many_small_expenses_description">You have %d of small expenses, which in total make up a significant amount.</string>
+  <!-- Use plurals: many_small_expenses_description -->
     <string name="many_small_expenses_impact">Analyze the need for every waste</string>
     <string name="many_small_expenses_title">A lot of small expenses</string>
     <string name="medium_level">Average</string>
@@ -347,7 +346,7 @@
     <string name="months_short">month</string>
     <string name="my_wallets">My wallets</string>
   <string name="budget_summary">Budget summary</string>
-  <string name="calculation_period_days">Calculation period: %1$d days</string>
+  <string name="calculation_period_days" tools:ignore="PluralsCandidate">Calculation period: %1$d days</string>
   <string name="total_limit">Total limit</string>
   <string name="spent">Spent</string>
   <string name="balance_label">Balance</string>
@@ -416,7 +415,7 @@
     <string name="preview_enhanced_title">Improved card</string>
     <string name="quarter">Quarter</string>
     <string name="rec_budget_auto_desc">Configure automatic transfers into saving.</string>
-  <string name="rec_budget_auto_impact">10% of each income</string>
+  <string name="rec_budget_auto_impact" tools:ignore="StringFormatCount">10% of each income</string>
     <string name="rec_budget_auto_title">Automatic savings</string>
     <string name="rec_budget_category_desc">Divide the budget by categories for better control.</string>
     <string name="rec_budget_category_impact">Create categories limits</string>
@@ -428,12 +427,12 @@
     <string name="rec_budget_track_impact">Weekly control</string>
     <string name="rec_budget_track_title">Track the budget</string>
     <string name="rec_critical_debt_desc">You have a high level of debt load.</string>
-  <string name="rec_critical_debt_impact">Reduce debts to 30% of income</string>
+  <string name="rec_critical_debt_impact" tools:ignore="StringFormatCount">Reduce debts to 30% of income</string>
     <string name="rec_critical_debt_title">High debts</string>
     <string name="rec_critical_emergency_desc">You do not have a reserve fund.This is critical for financial security.</string>
     <string name="rec_critical_emergency_impact">Create a fund for 3-6 months of expenses</string>
     <string name="rec_critical_emergency_title">Create a reserve fund</string>
-  <string name="rec_critical_savings_desc">Your savings are less than 10% of income.</string>
+  <string name="rec_critical_savings_desc" tools:ignore="StringFormatCount">Your savings are less than 10% of income.</string>
   <string name="rec_critical_savings_impact">Increase savings to 20%</string>
     <string name="rec_critical_savings_title">Low savings</string>
     <string name="rec_high_emergency_desc">Your reserve fund is less than the recommended size.</string>
@@ -443,7 +442,7 @@
     <string name="rec_high_expense_impact">Analyze large expenses</string>
     <string name="rec_high_expense_title">Optimize the costs</string>
     <string name="rec_high_savings_desc">Your savings can be increased.</string>
-  <string name="rec_high_savings_impact">Goal: 15–20% of income</string>
+  <string name="rec_high_savings_impact" tools:ignore="StringFormatCount">Goal: 15–20% of income</string>
     <string name="rec_high_savings_title">Improve savings</string>
     <string name="rec_medium_habits_desc">Regular tracking will help to better control finance.</string>
     <string name="rec_medium_habits_impact">Keep accounting daily</string>
@@ -477,7 +476,7 @@
     <string name="refresh">Refresh</string>
     <string name="reset_filters">Subtract filters</string>
     <string name="retry">Retry</string>
-    <string name="reward_coins">%d coins</string>
+  <!-- Use plurals: reward_coins -->
     <string name="save">Save</string>
     <string name="savings_category">Saving</string>
     <string name="savings_rate">Savings rate</string>
@@ -651,7 +650,7 @@
   <string name="tip_easy_savings_title">Save up to 10% without effort</string>
     <string name="tip_increase_income_desc">Consider the freelance/part -time work or monetization of skills</string>
   <string name="tip_increase_income_title">Increase income by 5–10%</string>
-  <string name="tip_increase_savings_desc">You save %1$s%% of income. Aim for at least 10–20%</string>
+  <string name="tip_increase_savings_desc">You save %1$s%% of income. Aim for at least 10–20%%</string>
     <string name="tip_increase_savings_title">Increase the norm of savings</string>
   <string name="tip_rule_50_30_20_desc">50% needs, 30% wants, 20% savings and investments</string>
     <string name="tip_rule_50_30_20_title">Follow the rule 50/30/20</string>
@@ -817,7 +816,7 @@
     <string name="achievement_first_savings">The first penny</string>
     <string name="achievement_emergency_fund">Safety pillow</string>
     <string name="achievement_economical">Economical</string>
-  <string name="achievement_economical_desc">Spend less than 80% of the monthly budget</string>
+  <string name="achievement_economical_desc" tools:ignore="StringFormatCount">Spend less than 80% of the monthly budget</string>
     <string name="achievement_regular_user">Permanent user</string>
     <string name="achievement_regular_user_desc">Use the application for a week in a row</string>
     <string name="achievement_loyal_user">True user</string>
@@ -857,17 +856,17 @@
     <string name="recommendation_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance and look for alternatives.</string>
     <string name="recommendation_cafe_spending">You often spend on cafes and restaurants.Try cooking at home more often - this will help to save.</string>
     <string name="recommendation_small_expenses">You have a lot of small expenses.Keep accounting and try to abandon unnecessary purchases.</string>
-  <string name="recommendation_no_savings">You don’t save regularly. Set aside at least 10% of income monthly.</string>
+  <string name="recommendation_no_savings" tools:ignore="StringFormatCount">You don\'t save regularly. Set aside at least 10% of income monthly.</string>
     <string name="recommendation_improve_financial_health">Improve overall financial health</string>
     <string name="recommendation_improve_financial_health_desc">Your financial health coefficient (%1$s/100) is lower than average.Focus on increasing the norms of savings and stabilization of income.</string>
     <string name="recommendation_improve_expense_control">Improve expenses</string>
     <string name="recommendation_improve_expense_control_desc">Your expenditure discipline (%1$s/100) indicates the need for better expenses.Try to keep the budget and avoid impulsive purchases.</string>
     <string name="recommendation_increase_retirement_savings">Increase pension savings</string>
-  <string name="recommendation_increase_retirement_savings_desc">To reach the retirement goal, increase monthly savings by %1$s. Current progress: %2$s%%</string>
-  <string name="recommendation_increase_savings_rate_desc" formatted="false">Your savings rate is %1$s%% below your income group average. Try auto-saving 10% of income.</string>
+  <string name="recommendation_increase_retirement_savings_desc">To reach the retirement goal, increase monthly savings by %1$s. Current progress: %2$d%%</string>
+  <string name="recommendation_increase_savings_rate_desc">Your savings rate is %1$d%% below your income group average. Try auto-saving 10%% of income.</string>
     <string name="recommendation_diversify_income">Diversify the sources of income</string>
     <string name="recommendation_diversify_income_desc">You only have %1$s source of income.Consider the possibility of additional earnings or passive income to increase financial stability.</string>
-    <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about %1$d month.</string>
+    <string name="recommendation_create_emergency_fund_desc" tools:ignore="PluralsCandidate">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about %1$d month.</string>
     <string name="recommendation_budget_exceeded">The budget exceeded by the category %1$s</string>
     <string name="recommendation_budget_exceeded_desc">You exceeded the budget by the category %1$s.Review the expenses or increase the limit.</string>
     <string name="recommendation_budget_close_to_limit">Close to the limit in category %1$s</string>
@@ -878,17 +877,17 @@
     <string name="recommendation_save_on_cafe_desc">You often spend on cafes and restaurants.Try cooking at home to save.</string>
     <string name="export_filename">Finance _%1$s.Csv</string>
     <string name="export_csv_header">ID, date, category, sum, type, note, source</string>
-    <string name="log_csv_file_created">CSV file created: %1$s, size: %2$s byte</string>
+  <string name="log_csv_file_created" tools:ignore="StringFormatCount">CSV file created: %1$s, size: %2$s</string>
     <string name="log_export_error">Error when exporting transactions in CSV</string>
     <string name="log_export_unexpected_error">Unforeseen error when exporting transactions</string>
     <string name="log_file_created">File created: %1$s</string>
     <string name="log_file_ready_for_send">The file is ready for sending: %1$s</string>
     <string name="error_no_transactions_to_export">No transactions for export</string>
-    <string name="tip_top_category_spending" formatted="false">You spend the most on the category: %1$s.Consider whether these expenses can be reduced.</string>
+  <string name="tip_top_category_spending">You spend the most on the category: %1$s. Consider whether these expenses can be reduced.</string>
     <string name="tip_subscriptions_found">You have regular subscriptions.Check if you really need all of them.</string>
     <string name="tip_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance to avoid financial stress.</string>
     <string name="tip_small_expenses">You have a lot of small expenses.Try to combine purchases or abandon the excess.</string>
-  <string name="tip_expenses_equal_income">Your expenses equal or exceed income. Try saving at least 10% of income.</string>
+  <string name="tip_expenses_equal_income" tools:ignore="StringFormatCount">Your expenses equal or exceed income. Try saving at least 10% of income.</string>
     <string name="income_range_insufficient_data">Data is not enough</string>
     <string name="achievement_category_organizer">Categories expert</string>
     <string name="achievement_first_steps_desc">Create the first transaction</string>
@@ -1022,7 +1021,7 @@
     <string name="financial_health_evaluation_description">A comprehensive assessment of your financial health based on key indicators</string>
   <string name="financial_health_recommended_values_content" formatted="false">• Savings rate: 10–20%\n• Emergency fund: 3–6 months of expenses\n• Expense control: ≤90% of income\n• Income diversification: ≥2 sources\n• Regular analysis: weekly</string>
     <string name="financial_health_score">Financial health coefficient</string>
-  <string name="financial_health_tips_content">• Set aside 10–20% of each income\n• Track all expenses\n• Build a 3–6 month emergency fund\n• Diversify income sources\n• Review finances weekly</string>
+  <string name="financial_health_tips_content" tools:ignore="StringFormatCount">• Set aside 10–20% of each income\n• Track all expenses\n• Build a 3–6 month emergency fund\n• Diversify income sources\n• Review finances weekly</string>
     <string name="friday">Friday</string>
     <string name="golden_budget_rules_subtitle">Verified principles of financial planning</string>
     <string name="golden_budget_rules_title">💰 Golden budget rules</string>
@@ -1031,7 +1030,7 @@
     <string name="income_stability">Income stability</string>
     <string name="insights">Insights</string>
     <string name="monday">Monday</string>
-    <string name="months_format">%1$d month.</string>
+  <string name="months_format" tools:ignore="PluralsCandidate">%1$d months</string>
     <string name="months_of_savings">Months of savings</string>
     <string name="no_category">Without category</string>
     <string name="personal_advice_subtitle">Based on the analysis of your finance</string>
@@ -1072,40 +1071,40 @@
     <string name="bank_sberbank_pdf">Sberbank PDF</string>
     <string name="choose_file_button">Select a file for import</string>
     <string name="comment">Comment</string>
-    <string name="csv_amount_not_found">The amount of the %1$s index was not found.Line: %2$s</string>
-    <string name="csv_amount_parse_error">It was not possible to ferment the amount: %1$s (after cleaning).Line: %2$s</string>
-    <string name="csv_amount_parse_exception">Error with parsing sums: %1$s.%1$s</string>
+  <string name="csv_amount_not_found" tools:ignore="PluralsCandidate">The amount at index %1$d was not found. Line: %2$s</string>
+  <string name="csv_amount_parse_error">Unable to parse amount: \'%1$s\' (after cleaning). Line: %2$s</string>
+  <string name="csv_amount_parse_exception">Error parsing amount: \'%1$s\'. %2$s</string>
     <string name="csv_date_format">yyyy-MM-dd</string>
-    <string name="csv_date_not_found">The date on the %1$s index was not found.Line: %2$s</string>
-    <string name="csv_date_parse_error">It was not possible to post the date: %1$s with the %1$s format.Line: %2$s</string>
+  <string name="csv_date_not_found" tools:ignore="PluralsCandidate">The date at index %1$d was not found. Line: %2$s</string>
+  <string name="csv_date_parse_error">Unable to parse date: \'%1$s\' with format \'%2$s\'. Line: %3$s</string>
     <string name="csv_example">5,2025-03-26_06-37-11, salary, 50 545 ₽, income, note to transaction, cash \n48,2025-03-26_05-42-11, products, 3 149 ₽, consumption, note to transaction, cash</string>
     <string name="csv_example_title">An example of the contents of the file:</string>
     <string name="csv_file_empty">The CSV file is empty.</string>
-    <string name="csv_format_check">CSV format check.First line: %1$s.Separator: %1$s.Validen: %1$s</string>
-    <string name="csv_format_instructions">1. The first line may contain columns \n2.The structure of the CSV file should contain the following columns: \n - column 1: id or operation number \n - column 2: Date in the YYYY -MM -DD_HH -MM -SS \n - Stolbier 3: Description or category \n - Column 4: Sum (with currency designation) \n - Stolbie 5: Type of operation(Income/consumption) \n - column 6: note (optionally) \n - column 7: source of funds (optionally)</string>
-    <string name="csv_header_skipped">The line of the headline is missed: %1$s</string>
+  <string name="csv_format_check">CSV format check. First line: %1$s. Separator: \"%2$s\". Valid: %3$s</string>
+  <string name="csv_format_instructions">1. The first line may contain columns \n2. The structure of the CSV file should contain the following columns:\n   - Column 1: ID or operation number\n   - Column 2: Date in the yyyy-MM-dd_HH-mm-ss format\n   - Column 3: Description or category\n   - Column 4: Amount (with currency symbol)\n   - Column 5: Operation type (Income/Expense)\n   - Column 6: Note (optional)\n   - Column 7: Source (optional)</string>
+  <string name="csv_header_skipped">Header line skipped: %1$s</string>
     <string name="csv_imported_note">Imported from Generic CSV</string>
-    <string name="csv_instructions_title">CSV file format for imports:</string>
+  <string name="csv_instructions_title">CSV file format for import:</string>
     <string name="csv_no_description">N/A</string>
-    <string name="csv_no_header">There is no title (according to the config)</string>
-    <string name="csv_not_enough_columns">Not enough columns.At least %1$s was expected, %1$s was received.Line: %2$s</string>
-    <string name="csv_note">Make sure the date format corresponds to the specified YYYY-MM-DD_HH-MM-SS template.The column separator is a comma.</string>
+  <string name="csv_no_header">No header (by config)</string>
+  <string name="csv_not_enough_columns">Not enough columns. Expected at least %1$d, got %2$d. Line: %3$s</string>
+  <string name="csv_note">Make sure the date format corresponds to yyyy-MM-dd_HH-mm-ss. Column separator is a comma.</string>
     <string name="csv_note_title">Note:</string>
-    <string name="csv_parse_line_error">Error with Parsing Lines: %1$s.Config: %1$s</string>
-    <string name="csv_parsing_line">Line Parsing: %1$s</string>
-    <string name="csv_requirements">• Columns: date, sum, category \n • separator: comma or point with a comma \n • Coding: UTF-8 \n • Example: 01.01.2023.1000, products</string>
-    <string name="csv_requirements_title">Requirements for CSV file:</string>
-    <string name="csv_skip_invalid_status">Passing the transaction due to the universal status: %1$s.Valid: %1$s.Line: %2$s</string>
-    <string name="csv_skip_line_not_enough_columns">Line pass due to insufficient number of speakers: %1$s</string>
-    <string name="delete_category_confirmation">Are you sure you want to delete the %1$s category?</string>
-    <string name="delete_source_confirmation">Are you sure you want to delete the %1$s source?</string>
+  <string name="csv_parse_line_error">Error parsing line: %1$s. Config: %2$s</string>
+  <string name="csv_parsing_line">Parsing line: %1$s</string>
+  <string name="csv_requirements">• Columns: date, amount, category\n• Separator: comma or semicolon\n• Encoding: UTF-8\n• Example: 01.01.2023,1000,Groceries</string>
+  <string name="csv_requirements_title">CSV file requirements:</string>
+  <string name="csv_skip_invalid_status">Skipping transaction due to invalid status: \"%1$s\". Valid: %2$s. Line: %3$s</string>
+  <string name="csv_skip_line_not_enough_columns">Skipping line due to insufficient number of columns: %1$s</string>
+  <string name="delete_category_confirmation">Are you sure you want to delete the category "%1$s"?</string>
+  <string name="delete_source_confirmation">Are you sure you want to delete the source "%1$s"?</string>
     <string name="edit_note">Note</string>
-    <string name="error_date_parse_failed">It was not possible to post the date of any of the available formats</string>
+  <string name="error_date_parse_failed">Failed to parse date with available formats</string>
     <string name="error_empty_amount">Empty amount</string>
     <string name="error_empty_category">Empty category</string>
-    <string name="error_no_csv_app">There is no application for opening CSV files.You can open the file manually through the file manager or use the "share" function.</string>
-    <string name="error_unsupported_file_type">[%1$s handler] does not support the file type: %1$s</string>
-    <string name="error_zero_amount">The amount is less or equal to zero: %1$s</string>
+  <string name="error_no_csv_app">No app to open CSV files. Open manually via file manager or use the Share function.</string>
+  <string name="error_unsupported_file_type" tools:ignore="StringFormatCount">[%1$s handler] does not support file type: %2$s</string>
+  <string name="error_zero_amount">Amount is less than or equal to zero: %1$s</string>
     <string name="export_button_friendly">Export to CSV</string>
     <string name="export_import">Export and import</string>
   <string name="export_import_screen_title">Export and import</string>
@@ -1137,7 +1136,7 @@
   <string name="import_in_progress">I import transactions …</string>
     <string name="import_instructions">1. Download the discharge from the bank in CSV, PDF or XLSX \n2 format.For alpha bank, it is better to use the XLSX \n3 format.For Sberbank, PDF \n4 is also supported.Press the button below and select the \n5 file.Wait for the end of the \n \nnas on the bank below to find out detailed instructions.</string>
     <string name="import_progress_completed">File import %1$s completed</string>
-    <string name="import_progress_count">%1$s from %1$s transactions</string>
+  <string name="import_progress_count" tools:ignore="PluralsCandidate">%1$d of %2$d transactions</string>
   <string name="import_progress_format_validated_skipping_headers">The file format %1$s verified, passing headlines …</string>
   <string name="import_progress_processing_transactions">Transaction processing from the file %1$s …</string>
   <string name="import_progress_saving_transactions">Preservation of %1$s transactions from the file %1$s …</string>
@@ -1149,7 +1148,7 @@
     <string name="import_section_title_emoji">📥 Import transactions</string>
     <string name="import_success_message">Imported %1$s transactions, %1$s missed from the file %1$s</string>
     <string name="import_summary">Import is successfully completed.Imported: %1$s,missed: %1$s</string>
-    <string name="import_total_amount">Total amount: %d ₽</string>
+  <string name="import_total_amount">Total amount: %1$d ₽</string>
     <string name="import_transactions_hint">Click to import transactions from different banks</string>
   <string name="importing_file">We import the file …</string>
     <string name="log_category_expense_usage_increased">Category: Increased meter of use of the consumable category: %1$s</string>
@@ -1170,7 +1169,7 @@
     <string name="log_expense_categories_sorted">[Category_Sort] County categories are sorted by use: %1$s</string>
     <string name="log_income_categories_sorted">[Category_Sort] Revenue categories are sorted by use: %1$s</string>
     <string name="log_no_wallets_for_expense">No available wallets for expenses</string>
-    <string name="log_not_saving_wallets">Do not save wallets: isxpense =%%1 $ b, adtowallet =%%$ 2 $ b, Selectedwallets = %1$s</string>
+  <string name="log_not_saving_wallets">Do not save wallets: isExpense=%1$b, addToWallet=%2$b, selectedWallets=%3$d</string>
     <string name="log_ozon_import_created">[%1$s handler] Creation Ozonpdfimportusecase</string>
     <string name="log_parse_money_empty">PARSEMONEYEXPRESION: Initial expression is empty, we return 0</string>
     <string name="log_parse_money_empty_after_clean">PARSEMONEYEXPRESION: The expression is empty or only a point, return 0</string>
@@ -1187,22 +1186,22 @@
     <string name="log_sberbank_import_created">[%1$s handler] Creation of sberbankpdfimportusecase</string>
     <string name="log_sberbank_indicator_found">[%1$s handler] found Sberbank indicator in file contents</string>
     <string name="log_sberbank_read_error">[%1$s handler] Error when reading a file for determining: %1$s</string>
-    <string name="log_select_wallet_event">SelectWallet Event - Walletid = %1$s,Selected =%%$ 2</string>
+  <string name="log_select_wallet_event">SelectWallet event - walletId=%1$s, selected=%2$b</string>
     <string name="log_source_positions_updated">[Source_Sort] Updating the positions of sources</string>
     <string name="log_source_usage_count">Source: The amount of using the source %1$s: %1$s has been obtained</string>
     <string name="log_source_usage_increased">Source: Increased the source use counter: %1$s</string>
     <string name="log_transaction_after_switch">Transaction: after switching type - isxpense =%%1 $ b, Category = %1$s</string>
     <string name="log_transaction_empty_amount_error">Transaction: Validation error - empty amount</string>
     <string name="log_transaction_empty_category_error">Transaction: Validation error - empty category</string>
-    <string name="log_transaction_initialize_screen">AddtransactionViewmodel: Initializescreen completed, Forcexpense =%%$ 1 $ b, isxpense =%%$ 2</string>
+  <string name="log_transaction_initialize_screen">AddTransactionViewModel: initializeScreen completed, forceExpense=%1$b, isExpense=%2$b</string>
     <string name="log_transaction_parse_amount_error">Transaction: Validation Error in Parsing Sum: %1$s</string>
     <string name="log_transaction_reset_fields">Transaction: resetting of fields and notes</string>
-    <string name="log_transaction_type_switch">Transaction: switching type of transaction from %%1 $ B per %%$ b</string>
+  <string name="log_transaction_type_switch">Transaction: switching type from %1$b to %2$b</string>
     <string name="log_transaction_validate_input">Transaction: Validateinput - incoming validation amount: %1$s</string>
-    <string name="log_transaction_validation_result">Transaction: Validateinput - result: isvalid =%%1 $ b, Hasamounterror =%%$ 2</string>
+  <string name="log_transaction_validation_result">Transaction: validateInput - result: isValid=%1$b, hasAmountError=%2$b</string>
     <string name="log_transaction_wallets_loaded">Transaction: downloaded %1$s wallets</string>
-    <string name="log_transaction_zero_amount_error">Transaction: Validation error - the amount is less or equal to zero: %%1 $ f</string>
-    <string name="log_updating_selected_wallets">Updating the list of selected wallets: it was %1$s,it became %1$s</string>
+  <string name="log_transaction_zero_amount_error">Transaction: validation error - amount less than or equal to zero: %1$f</string>
+    <string name="log_updating_selected_wallets">Updating the list of selected wallets: it was %1$s,it became %2$s</string>
     <string name="log_wallets_loaded">Loaded %1$s wallets</string>
     <string name="new_transaction_title">New transaction</string>
     <string name="no_subcategories_available">There are no available subcategories for this category</string>
@@ -1228,7 +1227,7 @@
     <string name="select_wallets_content_description">The choice of wallets</string>
     <string name="select_wallets_for_income">Select the wallets for replenishment</string>
     <string name="selected_wallet_count">1 wallet is chosen</string>
-    <string name="selected_wallets_count">Selected: %d</string>
+  <!-- Use plurals: selected_wallets_count -->
     <string name="show_less">Show less</string>
     <string name="supported_banks_title">Supported banks</string>
     <string name="tinkoff_instructions">1. Enter the Tinkoff \n2 application.Select a card or account \n3.Click on three points in the upper right corner \n4.Select the "extract and certificates" \n5.Select the "Office on the account" \n6.Choose a period of extract (for example, for the last month) \n7.Click "Order an extract" \n8.Wait for the formation of an extract (usually takes several minutes) \n9.Open the receipt received and click on the "share" \n10 on the icon.Save the PDF file for the \n11 device.Import the saved file into our \n \n application automatically recognizes the new Tinkoff statement format and correctly imports all transactions.</string>
@@ -1247,8 +1246,8 @@
     <string name="wallet_income_explanation">The amount will be added to the selected wallets</string>
     <string name="wallet_selected_for_expense">A wallet is chosen for writing off</string>
     <string name="wallet_selected_for_income">The wallet is selected for replenishment</string>
-    <string name="wallets_selected_for_expense">Selected %d wallets for expense</string>
-    <string name="wallets_selected_for_income">Selected %d wallets for income</string>
+  <!-- Use plurals: wallets_selected_for_expense -->
+  <!-- Use plurals: wallets_selected_for_income -->
     <string name="default_amount">0.00 ₽</string>
     <string name="default_small_amount">0 ₽</string>
     <string name="balance_widget_description">Widget for displaying the current balance, income and expenses</string>
@@ -1297,56 +1296,80 @@
         <item quantity="one">%d transaction</item>
         <item quantity="other">%d transactions</item>
     </plurals>
-    
+
     <plurals name="important_count">
         <item quantity="one">%d important</item>
         <item quantity="other">%d important</item>
     </plurals>
-    
+
     <plurals name="large_count">
         <item quantity="one">%d large</item>
         <item quantity="other">%d large</item>
     </plurals>
-    
+
     <plurals name="small_count">
         <item quantity="one">%d small</item>
         <item quantity="other">%d small</item>
     </plurals>
-    
+
     <plurals name="month_count">
         <item quantity="one">%d month</item>
         <item quantity="other">%d months</item>
     </plurals>
-    
+
     <plurals name="day_count">
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
     </plurals>
-    
+
     <plurals name="week_count">
         <item quantity="one">%d week</item>
         <item quantity="other">%d weeks</item>
     </plurals>
-    
+
     <plurals name="year_count">
         <item quantity="one">%d year</item>
         <item quantity="other">%d years</item>
     </plurals>
 
     <string name="achievement_category_master_desc">Use %1$s different categories</string>
-    <string name="achievement_transaction_counter_desc">Add %1$d transactions</string>
+    <plurals name="achievement_transaction_counter_desc">
+      <item quantity="one">Add %1$d transaction</item>
+      <item quantity="other">Add %1$d transactions</item>
+    </plurals>
     <string name="achievement_savings_milestone_desc">Save %1$s in total</string>
-    <string name="achievement_import_master_desc">Import data %1$d times</string>
+    <plurals name="achievement_import_master_desc">
+      <item quantity="one">Import data %1$d time</item>
+      <item quantity="other">Import data %1$d times</item>
+    </plurals>
     <string name="achievement_security_guard_desc">Enable security features</string>
-    <string name="achievement_analytics_expert_desc">View statistics %1$d times</string>
-    <string name="achievement_goal_setter_desc">Set and achieve %1$d financial goals</string>
+    <plurals name="achievement_analytics_expert_desc">
+      <item quantity="one">View statistics %1$d time</item>
+      <item quantity="other">View statistics %1$d times</item>
+    </plurals>
+    <plurals name="achievement_goal_setter_desc">
+      <item quantity="one">Set and achieve %1$d financial goal</item>
+      <item quantity="other">Set and achieve %1$d financial goals</item>
+    </plurals>
     <string name="achievement_debt_free_desc">Pay off %1$s in debt</string>
     <string name="achievement_investment_starter_desc">Start investing %1$s</string>
-    <string name="achievement_budget_sticker_desc">Stay within budget for %1$d months</string>
-    <string name="achievement_income_diversifier_desc">Have %1$d income sources</string>
-    <string name="achievement_expense_tracker_desc">Track expenses for %1$d days</string>
+    <plurals name="achievement_budget_sticker_desc">
+      <item quantity="one">Stay within budget for %1$d month</item>
+      <item quantity="other">Stay within budget for %1$d months</item>
+    </plurals>
+    <plurals name="achievement_income_diversifier_desc">
+      <item quantity="one">Have %1$d income source</item>
+      <item quantity="other">Have %1$d income sources</item>
+    </plurals>
+    <plurals name="achievement_expense_tracker_desc">
+      <item quantity="one">Track expenses for %1$d day</item>
+      <item quantity="other">Track expenses for %1$d days</item>
+    </plurals>
     <string name="achievement_savings_rate_improver_desc">Improve savings rate by %1$s%%</string>
-    <string name="achievement_financial_educator_desc">Read %1$d financial tips</string>
+    <plurals name="achievement_financial_educator_desc">
+      <item quantity="one">Read %1$d financial tip</item>
+      <item quantity="other">Read %1$d financial tips</item>
+    </plurals>
     <string name="achievement_retirement_planner_desc">Plan retirement with %1$s</string>
     <string name="achievement_tax_optimizer_desc">Optimize taxes by %1$s</string>
     <string name="achievement_insurance_protector_desc">Get insurance coverage of %1$s</string>
@@ -1373,48 +1396,5 @@
     <string name="achievement_retirement_planner">Планировщик пенсии</string>
     <string name="achievement_tax_optimizer">Оптимизатор налогов</string>
     <string name="achievement_insurance_protector">Защитник страховки</string>
-    <plurals name="transaction_count">
-        <item quantity="one">%d транзакция</item>
-        <item quantity="other">%d транзакций</item>
-    </plurals>
-    <plurals name="category_count">
-        <item quantity="one">%d категория</item>
-        <item quantity="other">%d категорий</item>
-    </plurals>
-    <plurals name="goal_count">
-        <item quantity="one">%d цель</item>
-        <item quantity="other">%d целей</item>
-    </plurals>
-    <plurals name="achievement_count">
-        <item quantity="one">%d достижение</item>
-        <item quantity="other">%d достижений</item>
-    </plurals>
-    <plurals name="source_count">
-        <item quantity="one">%d источник</item>
-        <item quantity="other">%d источников</item>
-    </plurals>
-    <plurals name="tip_count">
-        <item quantity="one">%d совет</item>
-        <item quantity="other">%d советов</item>
-    </plurals>
-    <plurals name="debt_count">
-        <item quantity="one">%d долг</item>
-        <item quantity="other">%d долгов</item>
-    </plurals>
-    <plurals name="wallet_count">
-        <item quantity="one">%d кошелек</item>
-        <item quantity="other">%d кошельков</item>
-    </plurals>
-    <plurals name="budget_count">
-        <item quantity="one">%d бюджет</item>
-        <item quantity="other">%d бюджетов</item>
-    </plurals>
-    <plurals name="export_count">
-        <item quantity="one">%d экспорт</item>
-        <item quantity="other">%d экспортов</item>
-    </plurals>
-    <plurals name="import_count">
-        <item quantity="one">%d импорт</item>
-        <item quantity="other">%d импортов</item>
-    </plurals>
+  <!-- Plurals moved to plurals.xml -->
 </resources>

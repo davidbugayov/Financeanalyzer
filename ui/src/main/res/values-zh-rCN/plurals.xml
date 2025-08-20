@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <!-- Recommendations -->
+  <plurals name="important_count_recommendations">
+    <item quantity="other">%d 条重要建议</item>
+  </plurals>
+
+  <!-- Transactions -->
+  <plurals name="transaction_count">
+    <item quantity="other">%d 笔交易</item>
+  </plurals>
+
+  <!-- Large expenses -->
+  <plurals name="large_expenses_count">
+    <item quantity="other">%d 笔大额支出</item>
+  </plurals>
+
+  <!-- Small expenses -->
+  <plurals name="small_expenses_count">
+    <item quantity="other">%d 笔小额支出</item>
+  </plurals>
+
+  <!-- Income sources -->
+  <plurals name="income_sources_count">
+    <item quantity="other">%d 个收入来源</item>
+  </plurals>
+
+  <!-- Tips -->
+  <plurals name="tips_count">
+    <item quantity="other">%d 条建议</item>
+  </plurals>
+
+  <!-- Debts -->
+  <plurals name="debts_count">
+    <item quantity="other">%d 笔债务</item>
+  </plurals>
+
+  <!-- Months -->
+  <plurals name="months_count">
+    <item quantity="other">%d 个月</item>
+  </plurals>
+
+  <!-- Days -->
+  <plurals name="days_count">
+    <item quantity="other">%d 天</item>
+  </plurals>
+
+  <!-- Hours -->
+  <plurals name="hours_count">
+    <item quantity="other">%d 小时</item>
+  </plurals>
+
+  <!-- Minutes -->
+  <plurals name="minutes_count">
+    <item quantity="other">%d 分钟</item>
+  </plurals>
+
+  <!-- Seconds -->
+  <plurals name="seconds_count">
+    <item quantity="other">%d 秒</item>
+  </plurals>
+
+  <!-- Bytes -->
+  <plurals name="bytes_count">
+    <item quantity="other">%d 字节</item>
+  </plurals>
+
+  <!-- Critical recommendations -->
+  <plurals name="critical_count_recommendations">
+    <item quantity="other">%d 条关键建议</item>
+  </plurals>
+
+  <!-- Selected wallets -->
+  <plurals name="selected_wallets_count">
+    <item quantity="other">选择了 %d 个钱包</item>
+  </plurals>
+
+  <!-- Wallets for expense -->
+  <plurals name="wallets_selected_for_expense">
+    <item quantity="other">选择了 %d 个钱包用于支出</item>
+  </plurals>
+
+  <!-- Wallets for income -->
+  <plurals name="wallets_selected_for_income">
+    <item quantity="other">选择了 %d 个钱包用于收入</item>
+  </plurals>
+
+  <!-- Transactions for period -->
+  <plurals name="insight_expense_frequency_desc">
+    <item quantity="other">期间 %d 笔交易</item>
+  </plurals>
+
+  <!-- Transactions (metric) -->
+  <plurals name="insight_expense_frequency_metric">
+    <item quantity="other">%d 笔交易</item>
+  </plurals>
+
+  <!-- High activity -->
+  <plurals name="insight_high_activity_desc">
+    <item quantity="other">期间 %d 笔交易</item>
+  </plurals>
+
+  <!-- High activity (metric) -->
+  <plurals name="insight_high_activity_metric">
+    <item quantity="other">%d 笔交易</item>
+  </plurals>
+
+  <!-- Large expenses (metric) -->
+  <plurals name="insight_large_expenses_metric">
+    <item quantity="other">%d 笔大额支出</item>
+  </plurals>
+
+  <!-- Small expenses (metric) -->
+  <plurals name="insight_small_expenses_metric">
+    <item quantity="other">%d 笔小额支出</item>
+  </plurals>
+
+  <!-- Many small expenses -->
+  <plurals name="many_small_expenses_description">
+    <item quantity="other">您有 %d 笔小额支出，总计构成重要金额。</item>
+  </plurals>
+
+  <!-- Reserve fund -->
+  <plurals name="insight_financial_protection_metric">
+    <item quantity="other">储备基金：%d 个月</item>
+  </plurals>
+
+  <!-- Coins -->
+  <plurals name="reward_coins">
+    <item quantity="other">%d 个硬币</item>
+  </plurals>
+</resources>

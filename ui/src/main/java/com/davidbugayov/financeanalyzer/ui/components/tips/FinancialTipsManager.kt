@@ -29,12 +29,12 @@ enum class TipCategory(
  * Финансовый совет с категоризацией и приоритизацией
  */
 data class FinancialTip(
-    @StringRes val titleResId: Int,
-    @StringRes val descriptionResId: Int,
+    @param:StringRes val titleResId: Int,
+    @param:StringRes val descriptionResId: Int,
     val descriptionArgs: List<Any> = emptyList(),
     val category: TipCategory,
     val priority: Int = category.priority,
-    @StringRes val actionResId: Int? = null,
+    @param:StringRes val actionResId: Int? = null,
     val isPersonalized: Boolean = false,
 )
 

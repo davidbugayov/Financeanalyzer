@@ -23,7 +23,7 @@ object LocaleUtils {
                 when (code.lowercase(Locale.ROOT)) {
                     "en" -> Locale.ENGLISH
                     "zh" -> Locale.SIMPLIFIED_CHINESE
-                    else -> Locale("ru")
+                    else -> Locale.forLanguageTag("ru")
                 }
             Timber.tag("LANG").d("LocaleUtils.wrapContext: code=%s locale=%s", code, locale.toLanguageTag())
 

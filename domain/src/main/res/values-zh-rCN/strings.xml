@@ -102,7 +102,7 @@
     <string name="recommendation_increase_retirement_savings">增加退休储蓄</string>
     <string name="recommendation_increase_retirement_savings_desc">为达成退休目标，每月需额外存下 %1$s。当前进度：%2$d%%</string>
     <string name="recommendation_increase_savings_rate">recommendation_increase_savings_rate</string>
-    <string name="recommendation_increase_savings_rate_desc">您对收入组平均水平低的__p_0 __ %%的储蓄率。尝试从收入自动推迟10 %%。</string>
+  <string name="recommendation_increase_savings_rate_desc">您的储蓄率比收入组平均水平低 %1$d%%。尝试自动从收入中储蓄 10%。</string>
     <string name="recommendation_large_expenses">发现大额一次性支出，请提前规划并评估替代方案。</string>
     <string name="recommendation_no_savings">您没有规律存钱，建议每月至少存下 10% 收入。</string>
     <string name="recommendation_save_on_cafe">减少餐饮花费</string>

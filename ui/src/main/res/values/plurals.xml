@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <!-- Рекомендации -->
+  <plurals name="important_count_recommendations">
+    <item quantity="one">%d важная рекомендация</item>
+    <item quantity="few">%d важные рекомендации</item>
+    <item quantity="many">%d важных рекомендаций</item>
+    <item quantity="other">%d важных рекомендаций</item>
+  </plurals>
+
+  <!-- Транзакции -->
+  <plurals name="transaction_count">
+    <item quantity="one">%d транзакция</item>
+    <item quantity="few">%d транзакции</item>
+    <item quantity="many">%d транзакций</item>
+    <item quantity="other">%d транзакций</item>
+  </plurals>
+
+  <!-- Крупные расходы -->
+  <plurals name="large_expenses_count">
+    <item quantity="one">%d крупная трата</item>
+    <item quantity="few">%d крупные траты</item>
+    <item quantity="many">%d крупных трат</item>
+    <item quantity="other">%d крупных трат</item>
+  </plurals>
+
+  <!-- Мелкие расходы -->
+  <plurals name="small_expenses_count">
+    <item quantity="one">%d мелкая трата</item>
+    <item quantity="few">%d мелкие траты</item>
+    <item quantity="many">%d мелких трат</item>
+    <item quantity="other">%d мелких трат</item>
+  </plurals>
+
+  <!-- Источники дохода -->
+  <plurals name="income_sources_count">
+    <item quantity="one">%d источник дохода</item>
+    <item quantity="few">%d источника дохода</item>
+    <item quantity="many">%d источников дохода</item>
+    <item quantity="other">%d источников дохода</item>
+  </plurals>
+
+  <!-- Советы -->
+  <plurals name="tips_count">
+    <item quantity="one">%d совет</item>
+    <item quantity="few">%d совета</item>
+    <item quantity="many">%d советов</item>
+    <item quantity="other">%d советов</item>
+  </plurals>
+
+  <!-- Долги -->
+  <plurals name="debts_count">
+    <item quantity="one">%d долг</item>
+    <item quantity="few">%d долга</item>
+    <item quantity="many">%d долгов</item>
+    <item quantity="other">%d долгов</item>
+  </plurals>
+
+  <!-- Месяцы -->
+  <plurals name="months_count">
+    <item quantity="one">%d месяц</item>
+    <item quantity="few">%d месяца</item>
+    <item quantity="many">%d месяцев</item>
+    <item quantity="other">%d месяцев</item>
+  </plurals>
+
+  <!-- Дни -->
+  <plurals name="days_count">
+    <item quantity="one">%d день</item>
+    <item quantity="few">%d дня</item>
+    <item quantity="many">%d дней</item>
+    <item quantity="other">%d дней</item>
+  </plurals>
+
+  <!-- Часы -->
+  <plurals name="hours_count">
+    <item quantity="one">%d час</item>
+    <item quantity="few">%d часа</item>
+    <item quantity="many">%d часов</item>
+    <item quantity="other">%d часов</item>
+  </plurals>
+
+  <!-- Минуты -->
+  <plurals name="minutes_count">
+    <item quantity="one">%d минута</item>
+    <item quantity="few">%d минуты</item>
+    <item quantity="many">%d минут</item>
+    <item quantity="other">%d минут</item>
+  </plurals>
+
+  <!-- Секунды -->
+  <plurals name="seconds_count">
+    <item quantity="one">%d секунда</item>
+    <item quantity="few">%d секунды</item>
+    <item quantity="many">%d секунд</item>
+    <item quantity="other">%d секунд</item>
+  </plurals>
+
+  <!-- Байты -->
+  <plurals name="bytes_count">
+    <item quantity="one">%d байт</item>
+    <item quantity="few">%d байта</item>
+    <item quantity="many">%d байт</item>
+    <item quantity="other">%d байт</item>
+  </plurals>
+
+  <!-- Критические рекомендации -->
+  <plurals name="critical_count_recommendations">
+    <item quantity="one">%d критическая рекомендация</item>
+    <item quantity="few">%d критические рекомендации</item>
+    <item quantity="many">%d критических рекомендаций</item>
+    <item quantity="other">%d критических рекомендаций</item>
+  </plurals>
+
+  <!-- Выбранные кошельки -->
+  <plurals name="selected_wallets_count">
+    <item quantity="one">Выбран %d кошелёк</item>
+    <item quantity="few">Выбрано %d кошелька</item>
+    <item quantity="many">Выбрано %d кошельков</item>
+    <item quantity="other">Выбрано %d кошельков</item>
+  </plurals>
+
+  <!-- Кошельки для списания -->
+  <plurals name="wallets_selected_for_expense">
+    <item quantity="one">Выбран %d кошелёк для списания</item>
+    <item quantity="few">Выбрано %d кошелька для списания</item>
+    <item quantity="many">Выбрано %d кошельков для списания</item>
+    <item quantity="other">Выбрано %d кошельков для списания</item>
+  </plurals>
+
+  <!-- Кошельки для пополнения -->
+  <plurals name="wallets_selected_for_income">
+    <item quantity="one">Выбран %d кошелёк для пополнения</item>
+    <item quantity="few">Выбрано %d кошелька для пополнения</item>
+    <item quantity="many">Выбрано %d кошельков для пополнения</item>
+    <item quantity="other">Выбрано %d кошельков для пополнения</item>
+  </plurals>
+
+  <!-- Транзакции за период -->
+  <plurals name="insight_expense_frequency_desc">
+    <item quantity="one">%d транзакция за период</item>
+    <item quantity="few">%d транзакции за период</item>
+    <item quantity="many">%d транзакций за период</item>
+    <item quantity="other">%d транзакций за период</item>
+  </plurals>
+
+  <!-- Транзакции (метрика) -->
+  <plurals name="insight_expense_frequency_metric">
+    <item quantity="one">%d транзакция</item>
+    <item quantity="few">%d транзакции</item>
+    <item quantity="many">%d транзакций</item>
+    <item quantity="other">%d транзакций</item>
+  </plurals>
+
+  <!-- Высокая активность -->
+  <plurals name="insight_high_activity_desc">
+    <item quantity="one">%d транзакция за период</item>
+    <item quantity="few">%d транзакции за период</item>
+    <item quantity="many">%d транзакций за период</item>
+    <item quantity="other">%d транзакций за период</item>
+  </plurals>
+
+  <!-- Высокая активность (метрика) -->
+  <plurals name="insight_high_activity_metric">
+    <item quantity="one">%d транзакция</item>
+    <item quantity="few">%d транзакции</item>
+    <item quantity="many">%d транзакций</item>
+    <item quantity="other">%d транзакций</item>
+  </plurals>
+
+  <!-- Крупные траты (метрика) -->
+  <plurals name="insight_large_expenses_metric">
+    <item quantity="one">%d крупная трата</item>
+    <item quantity="few">%d крупные траты</item>
+    <item quantity="many">%d крупных трат</item>
+    <item quantity="other">%d крупных трат</item>
+  </plurals>
+
+  <!-- Мелкие траты (метрика) -->
+  <plurals name="insight_small_expenses_metric">
+    <item quantity="one">%d мелкая трата</item>
+    <item quantity="few">%d мелкие траты</item>
+    <item quantity="many">%d мелких трат</item>
+    <item quantity="other">%d мелких трат</item>
+  </plurals>
+
+  <!-- Много мелких трат -->
+  <plurals name="many_small_expenses_description">
+    <item quantity="one">У вас %d мелкая трата, которая в сумме составляет значительную сумму.</item>
+    <item quantity="few">У вас %d мелкие траты, которые в сумме составляют значительную сумму.</item>
+    <item quantity="many">У вас %d мелких трат, которые в сумме составляют значительную сумму.</item>
+    <item quantity="other">У вас %d мелких трат, которые в сумме составляют значительную сумму.</item>
+  </plurals>
+
+  <!-- Резервный фонд -->
+  <plurals name="insight_financial_protection_metric">
+    <item quantity="one">Резервный фонд: %d месяц</item>
+    <item quantity="few">Резервный фонд: %d месяца</item>
+    <item quantity="many">Резервный фонд: %d месяцев</item>
+    <item quantity="other">Резервный фонд: %d месяцев</item>
+  </plurals>
+
+  <!-- Монеты -->
+  <plurals name="reward_coins">
+    <item quantity="one">%d монета</item>
+    <item quantity="few">%d монеты</item>
+    <item quantity="many">%d монет</item>
+    <item quantity="other">%d монет</item>
+  </plurals>
+</resources>

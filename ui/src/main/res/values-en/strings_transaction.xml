@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="edit_transaction_title">Edit Transaction</string>
+  <string name="save_button_text">Save</string>
+  <string name="add_button_text">Add</string>
+  <string name="import_transactions_content_description">Import Transactions</string>
+  <string name="dialog_delete">Delete</string>
+  <string name="delete_source_title">Delete Source</string>
+  <!-- duplicate moved to strings.xml -->
+  <!-- bank_* already exists in strings.xml -->
+  <string name="header_date">Date</string>
+  <string name="header_amount">Amount</string>
+  <string name="transaction_source_alfa">Alfa-Bank</string>
+  <string name="transaction_source_tinkoff">Tinkoff</string>
+  <string name="csv_expense_value">Expense</string>
+  <string name="import_unknown_error">Unknown import error</string>
+  <string name="subcategory_selected">Subcategory selected</string>
+  <string name="has_subcategories">Has subcategories</string>
+</resources>

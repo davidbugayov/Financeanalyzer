@@ -825,15 +825,11 @@ fun FinancialStatisticsScreen(
                                             Spacer(Modifier.height(6.dp))
 
                                             // Форматируем сумму с валютой
-                                            val currency =
-                                                stringResource(id = UiR.string.settings_currency_current_value)
+                                            val currencyCode = stringResource(id = UiR.string.settings_currency_current_value)
                                             val formatted =
-                                                java.text.NumberFormat
-                                                    .getNumberInstance(
-                                                        Locale("ru", "RU"),
-                                                    ).format(predictedExpenses.toMajorDouble()) +
-                                                    " " +
-                                                    currency
+                                                java.text.NumberFormat.getCurrencyInstance().apply {
+                                                    this.currency = java.util.Currency.getInstance(currencyCode)
+                                                }.format(predictedExpenses.toMajorDouble())
 
                                             Text(
                                                 text = stringResource(id = UiR.string.prediction_next_month, formatted),

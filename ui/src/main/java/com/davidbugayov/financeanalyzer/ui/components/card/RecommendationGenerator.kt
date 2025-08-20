@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 
@@ -110,7 +111,11 @@ object RecommendationGenerator {
             recommendations.add(
                 UnifiedRecommendation(
                     title = stringResource(R.string.many_small_expenses_title),
-                    description = stringResource(R.string.many_small_expenses_description, expenseTransactionsCount),
+                    description = pluralStringResource(
+                        R.plurals.many_small_expenses_description,
+                        expenseTransactionsCount,
+                        expenseTransactionsCount,
+                    ),
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.MEDIUM,
                     impact = stringResource(R.string.many_small_expenses_impact),
@@ -120,69 +125,6 @@ object RecommendationGenerator {
         }
 
         return recommendations.sortedBy { it.priority.order }
-    }
-
-    /**
-     * Генерация простых советов для основного экрана статистики
-     */
-    @Composable
-    fun generateSimpleTips(
-        savingsRate: Float,
-        topExpenseCategory: String,
-        monthsOfSavings: Float,
-        mostFrequentExpenseDay: String,
-    ): List<UnifiedRecommendation> {
-        val tips = mutableListOf<UnifiedRecommendation>()
-
-        if (savingsRate < 10f) {
-            tips.add(
-                UnifiedRecommendation(
-                    title = stringResource(R.string.recommendation_increase_savings_title),
-                    icon = Icons.Filled.Savings,
-                    priority = UnifiedRecommendationPriority.HIGH,
-                    category = stringResource(R.string.recommendation_category_savings),
-                ),
-            )
-        }
-
-        if (topExpenseCategory.isNotEmpty()) {
-            tips.add(
-                UnifiedRecommendation(
-                    title = stringResource(R.string.recommendation_optimize_category_title, topExpenseCategory),
-                    icon = Icons.AutoMirrored.Filled.TrendingUp,
-                    priority = UnifiedRecommendationPriority.MEDIUM,
-                    category = stringResource(R.string.recommendation_category_expenses),
-                ),
-            )
-        }
-
-        if (monthsOfSavings < 3) {
-            tips.add(
-                UnifiedRecommendation(
-                    title = stringResource(R.string.recommendation_emergency_fund_title),
-                    icon = Icons.Filled.PriorityHigh,
-                    priority = UnifiedRecommendationPriority.HIGH,
-                    category = stringResource(R.string.recommendation_category_emergency_fund),
-                ),
-            )
-        }
-
-        if (mostFrequentExpenseDay.isNotEmpty()) {
-            tips.add(
-                UnifiedRecommendation(
-                    title =
-                        stringResource(
-                            R.string.recommendation_plan_purchases_title,
-                            mostFrequentExpenseDay.lowercase(),
-                        ),
-                    icon = Icons.Filled.Lightbulb,
-                    priority = UnifiedRecommendationPriority.NORMAL,
-                    category = stringResource(R.string.recommendation_category_planning),
-                ),
-            )
-        }
-
-        return tips
     }
 
     /**

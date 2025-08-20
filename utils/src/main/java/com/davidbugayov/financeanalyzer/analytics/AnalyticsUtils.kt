@@ -21,6 +21,7 @@ object AnalyticsUtils {
     /**
      * Логирует событие
      */
+    @Suppress("DEPRECATION")
     fun logEvent(
         eventName: String,
         parameters: android.os.Bundle,

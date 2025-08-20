@@ -92,7 +92,7 @@
     <string name="recommendation_check_subscriptions_desc">You have recurring subscriptions. Check if you still need them.</string>
     <string name="recommendation_check_subscriptions_title">Check subscriptions</string>
     <string name="recommendation_create_emergency_fund">recommendation_create_emergency_fund</string>
-    <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses.Now you have funds about __ph_0__ month.</string>
+  <string name="recommendation_create_emergency_fund_desc">It is recommended to have a reserve for 3-6 months of expenses. Now you have funds about %1$d month(s).</string>
     <string name="recommendation_diversify_income">Diversify income</string>
     <string name="recommendation_diversify_income_desc">You have only %1$d income source(s). Consider additional or passive income.</string>
     <string name="recommendation_improve_expense_control">Improve expense control</string>
@@ -102,7 +102,7 @@
     <string name="recommendation_increase_retirement_savings">Increase retirement savings</string>
     <string name="recommendation_increase_retirement_savings_desc">To reach your retirement goal, save an extra %1$s monthly. Progress: %2$d%%</string>
     <string name="recommendation_increase_savings_rate">recommendation_increase_savings_rate</string>
-    <string name="recommendation_increase_savings_rate_desc">Your savings rate for __ph_0 __ %% below the average in your income group.Try to automatically postpone 10 %% from income.</string>
+  <string name="recommendation_increase_savings_rate_desc">Your savings rate is %1$d%% below the average in your income group. Try to automatically save 10%% from income.</string>
     <string name="recommendation_large_expenses">Large one-time expenses detected. Plan ahead and consider alternatives.</string>
     <string name="recommendation_no_savings">You do not save regularly. Save at least 10%% every month.</string>
     <string name="recommendation_save_on_cafe">Save on eating out</string>

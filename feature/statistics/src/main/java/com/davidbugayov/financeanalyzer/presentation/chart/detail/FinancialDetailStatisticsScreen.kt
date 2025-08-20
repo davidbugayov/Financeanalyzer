@@ -221,13 +221,7 @@ fun FinancialDetailStatisticsScreen(
                                                     context,
                                                     metrics.topExpenseCategory,
                                                 ),
-                                        topExpenseCategories =
-                                            metrics.topExpenseCategories.map {
-                                                it.first to
-                                                    it.second.formatForDisplay(
-                                                        true,
-                                                    )
-                                            },
+                                        
                                         mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                                     )
                                 PremiumStatisticsCard(

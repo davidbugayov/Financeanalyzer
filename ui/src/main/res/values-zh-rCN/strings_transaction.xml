@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="edit_transaction_title">编辑交易</string>
+  <string name="save_button_text">保存</string>
+  <string name="add_button_text">添加</string>
+  <string name="import_transactions_content_description">导入交易</string>
+  <string name="dialog_delete">删除</string>
+  <string name="delete_source_title">删除来源</string>
+  <!-- duplicate moved to strings.xml -->
+  <!-- bank_* already exists in strings.xml -->
+  <string name="header_date">日期</string>
+  <string name="header_amount">金额</string>
+  <string name="transaction_source_alfa">阿尔法银行</string>
+  <string name="transaction_source_tinkoff">Tinkoff</string>
+  <string name="csv_expense_value">支出</string>
+  <string name="import_unknown_error">导入时发生未知错误</string>
+  <string name="subcategory_selected">已选择子类别</string>
+  <string name="has_subcategories">有子类别</string>
+</resources>

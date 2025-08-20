@@ -235,7 +235,7 @@ private fun debtProgress(debt: Debt) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             modifier =
                 Modifier
                     .fillMaxWidth()

@@ -48,14 +48,14 @@ fun SharedTransaction.toCore(): DomainTransaction = toDomain()
  */
 fun List<SharedTransaction>.toCore(): List<DomainTransaction> = map { it.toCore() }
 
+@Suppress("DEPRECATION")
 fun SharedTransaction.toDomain(): DomainTransaction {
-    val dateJava =
-        java.util.Date.from(
-            java.time.LocalDate
-                .of(date.year, date.monthNumber, date.day)
-                .atStartOfDay(java.time.ZoneId.systemDefault())
-                .toInstant(),
-        )
+    val instant =
+        java.time.LocalDateTime
+            .of(date.year, date.monthNumber, date.dayOfMonth, 0, 0)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+    val dateJava = java.util.Date.from(instant)
     return DomainTransaction(
         id = this.id,
         amount = this.amount,

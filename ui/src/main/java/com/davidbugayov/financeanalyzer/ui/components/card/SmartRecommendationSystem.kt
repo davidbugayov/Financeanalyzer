@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,7 +72,8 @@ fun SmartRecommendationCard(
                                         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                     ),
                             ),
-                    ).padding(20.dp),
+                    )
+                    .padding(20.dp),
         ) {
             // Заголовок с улучшенной типографикой
             SmartCardHeader(
@@ -181,7 +183,8 @@ private fun MinimalRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }.padding(vertical = 12.dp),
+                    }
+                    .padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Иконка с анимацией
@@ -273,7 +276,8 @@ private fun EnhancedRecommendationsList(
                         .fillMaxWidth()
                         .clickable(enabled = onRecommendationClick != null) {
                             onRecommendationClick?.invoke(recommendation)
-                        }.padding(bottom = 12.dp),
+                        }
+                        .padding(bottom = 12.dp),
             ) {
                 Column(
                     modifier =
@@ -424,7 +428,8 @@ private fun CompactRecommendationsList(
                     .fillMaxWidth()
                     .clickable(enabled = onRecommendationClick != null) {
                         onRecommendationClick?.invoke(recommendation)
-                    }.padding(vertical = 8.dp),
+                    }
+                    .padding(vertical = 8.dp),
             verticalAlignment = Alignment.Top,
         ) {
             // Современная bullet точка
@@ -518,13 +523,13 @@ private fun RecommendationStats(recommendations: List<SmartRecommendation>) {
                         buildString {
                             if (criticalCount > 0) {
                                 append(
-                                    stringResource(id = R.string.critical_count_recommendations, criticalCount),
+                                    pluralStringResource(id = R.plurals.critical_count_recommendations, criticalCount),
                                 )
                             }
                             if (criticalCount > 0 && highCount > 0) append(", ")
                             if (highCount > 0) {
                                 append(
-                                    stringResource(id = R.string.important_count_recommendations, highCount),
+                                    pluralStringResource(id = R.plurals.important_count_recommendations, highCount),
                                 )
                             }
                             append(stringResource(id = R.string.recommendations_require_attention))

@@ -56,17 +56,15 @@ fun DatePickerDialog(
                 (minDate == null || selectedDate >= minDate) &&
                     (maxDate == null || selectedDate <= maxDate)
             if (!isValid) {
-                coroutineScope.launch {
-                    snackbarHostState.showSnackbar(
-                        if (minDate != null && selectedDate < minDate) {
-                            dateBeforeMinimumMessage
-                        } else if (maxDate != null && selectedDate > maxDate) {
-                            dateAfterMaximumMessage
-                        } else {
-                            invalidDateMessage
-                        },
-                    )
-                }
+                snackbarHostState.showSnackbar(
+                    if (minDate != null && selectedDate < minDate) {
+                        dateBeforeMinimumMessage
+                    } else if (maxDate != null && selectedDate > maxDate) {
+                        dateAfterMaximumMessage
+                    } else {
+                        invalidDateMessage
+                    },
+                )
             } else {
                 snackbarHostState.currentSnackbarData?.dismiss()
             }
@@ -86,6 +84,7 @@ fun DatePickerDialog(
                         if (isValid) {
                             onDateSelected(selectedDate)
                         } else {
+                            // Используем rememberCoroutineScope для обработки клика
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     if (minDate != null && selectedDate < minDate) {

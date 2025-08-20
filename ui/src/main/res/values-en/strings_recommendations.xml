@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <string name="recommendation_emergency_fund_title">Create an emergency fund NOW</string>
   <string name="recommendation_emergency_fund_description">You have less than one month of expenses in reserve. This is critically risky for financial stability.</string>
   <string name="recommendation_emergency_fund_impact">Protection against financial shock if income is lost</string>
 
   <string name="recommendation_savings_rate_low_title">Savings rate is critically low</string>
-  <string name="recommendation_savings_rate_low_description">You save less than 5% of income. This endangers your financial future.</string>
+  <string name="recommendation_savings_rate_low_description" tools:ignore="StringFormatCount">You save less than 5% of income. This endangers your financial future.</string>
   <string name="recommendation_savings_rate_low_impact">Start from 10% — the minimum for financial safety</string>
 
   <string name="recommendation_increase_savings_title">Increase your savings rate</string>
-  <string name="recommendation_increase_savings_description">Aim for 15–20% of income to stay financially stable.</string>
+  <string name="recommendation_increase_savings_description" tools:ignore="StringFormatCount">Aim for 15–20% of income to stay financially stable.</string>
   <string name="recommendation_increase_savings_impact">A +5% increase improves financial health</string>
 
   <string name="recommendation_investments_title">Time to consider investments</string>

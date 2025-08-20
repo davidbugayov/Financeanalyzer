@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- General errors -->
     <string name="error_unknown_type">Unknown result type</string>
     <string name="error_action_failed">Failed to perform action: %1$s</string>
@@ -23,7 +23,7 @@
     <string name="error_wallet_allocation_no_wallets">AllocateIncomeUseCase: no wallets, allocation not needed</string>
     <string name="error_wallet_allocation_no_limit">AllocateIncomeUseCase: total limit &lt;= 0, allocation skipped</string>
     <string name="error_wallet_allocation_failed">AllocateIncomeUseCase: income allocation error: %1$s</string>
-    <string name="error_wallet_balance_rollback">UpdateWalletBalancesUseCase: Rollback for %1$d original wallets, amount: %2$s</string>
+    <string name="error_wallet_balance_rollback" tools:ignore="PluralsCandidate">UpdateWalletBalancesUseCase: Rollback for %1$d original wallets, amount: %2$s</string>
     <string name="error_wallet_balance_update_failed">UpdateWalletBalancesUseCase: Error updating wallet balances: %1$s</string>
     
     <!-- Validation errors -->

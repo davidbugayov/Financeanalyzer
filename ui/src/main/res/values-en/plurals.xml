@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <!-- Recommendations -->
+  <plurals name="important_count_recommendations">
+    <item quantity="one">%d important recommendation</item>
+    <item quantity="other">%d important recommendations</item>
+  </plurals>
+
+  <!-- Transactions -->
+  <plurals name="transaction_count">
+    <item quantity="one">%d transaction</item>
+    <item quantity="other">%d transactions</item>
+  </plurals>
+
+  <!-- Large expenses -->
+  <plurals name="large_expenses_count">
+    <item quantity="one">%d large expense</item>
+    <item quantity="other">%d large expenses</item>
+  </plurals>
+
+  <!-- Small expenses -->
+  <plurals name="small_expenses_count">
+    <item quantity="one">%d small expense</item>
+    <item quantity="other">%d small expenses</item>
+  </plurals>
+
+  <!-- Income sources -->
+  <plurals name="income_sources_count">
+    <item quantity="one">%d income source</item>
+    <item quantity="other">%d income sources</item>
+  </plurals>
+
+  <!-- Tips -->
+  <plurals name="tips_count">
+    <item quantity="one">%d tip</item>
+    <item quantity="other">%d tips</item>
+  </plurals>
+
+  <!-- Debts -->
+  <plurals name="debts_count">
+    <item quantity="one">%d debt</item>
+    <item quantity="other">%d debts</item>
+  </plurals>
+
+  <!-- Months -->
+  <plurals name="months_count">
+    <item quantity="one">%d month</item>
+    <item quantity="other">%d months</item>
+  </plurals>
+
+  <!-- Days -->
+  <plurals name="days_count">
+    <item quantity="one">%d day</item>
+    <item quantity="other">%d days</item>
+  </plurals>
+
+  <!-- Hours -->
+  <plurals name="hours_count">
+    <item quantity="one">%d hour</item>
+    <item quantity="other">%d hours</item>
+  </plurals>
+
+  <!-- Minutes -->
+  <plurals name="minutes_count">
+    <item quantity="one">%d minute</item>
+    <item quantity="other">%d minutes</item>
+  </plurals>
+
+  <!-- Seconds -->
+  <plurals name="seconds_count">
+    <item quantity="one">%d second</item>
+    <item quantity="other">%d seconds</item>
+  </plurals>
+
+  <!-- Bytes -->
+  <plurals name="bytes_count">
+    <item quantity="one">%d byte</item>
+    <item quantity="other">%d bytes</item>
+  </plurals>
+
+  <!-- Critical recommendations -->
+  <plurals name="critical_count_recommendations">
+    <item quantity="one">%d critical recommendation</item>
+    <item quantity="other">%d critical recommendations</item>
+  </plurals>
+
+  <!-- Selected wallets -->
+  <plurals name="selected_wallets_count">
+    <item quantity="one">Selected %d wallet</item>
+    <item quantity="other">Selected %d wallets</item>
+  </plurals>
+
+  <!-- Wallets for expense -->
+  <plurals name="wallets_selected_for_expense">
+    <item quantity="one">Selected %d wallet for expense</item>
+    <item quantity="other">Selected %d wallets for expense</item>
+  </plurals>
+
+  <!-- Wallets for income -->
+  <plurals name="wallets_selected_for_income">
+    <item quantity="one">Selected %d wallet for income</item>
+    <item quantity="other">Selected %d wallets for income</item>
+  </plurals>
+
+  <!-- Transactions for period -->
+  <plurals name="insight_expense_frequency_desc">
+    <item quantity="one">%d transaction for the period</item>
+    <item quantity="other">%d transactions for the period</item>
+  </plurals>
+
+  <!-- Transactions (metric) -->
+  <plurals name="insight_expense_frequency_metric">
+    <item quantity="one">%d transaction</item>
+    <item quantity="other">%d transactions</item>
+  </plurals>
+
+  <!-- High activity -->
+  <plurals name="insight_high_activity_desc">
+    <item quantity="one">%d transaction for the period</item>
+    <item quantity="other">%d transactions for the period</item>
+  </plurals>
+
+  <!-- High activity (metric) -->
+  <plurals name="insight_high_activity_metric">
+    <item quantity="one">%d transaction</item>
+    <item quantity="other">%d transactions</item>
+  </plurals>
+
+  <!-- Large expenses (metric) -->
+  <plurals name="insight_large_expenses_metric">
+    <item quantity="one">%d large expense</item>
+    <item quantity="other">%d large expenses</item>
+  </plurals>
+
+  <!-- Small expenses (metric) -->
+  <plurals name="insight_small_expenses_metric">
+    <item quantity="one">%d small expense</item>
+    <item quantity="other">%d small expenses</item>
+  </plurals>
+
+  <!-- Many small expenses -->
+  <plurals name="many_small_expenses_description">
+    <item quantity="one">You have %d small expense, which in total makes up a significant amount.</item>
+    <item quantity="other">You have %d small expenses, which in total make up a significant amount.</item>
+  </plurals>
+
+  <!-- Reserve fund -->
+  <plurals name="insight_financial_protection_metric">
+    <item quantity="one">Reserve fund: %d month</item>
+    <item quantity="other">Reserve fund: %d months</item>
+  </plurals>
+
+  <!-- Coins -->
+  <plurals name="reward_coins">
+    <item quantity="one">%d coin</item>
+    <item quantity="other">%d coins</item>
+  </plurals>
+</resources>
