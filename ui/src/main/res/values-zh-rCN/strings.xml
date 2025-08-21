@@ -116,6 +116,10 @@
   <string name="bank_yoomoney">ЮMoney</string>
   <string name="bank_cash">现金</string>
   <string name="bank_gazprombank">Gazprombank 银行</string>
+  <string name="reward_coins">%d 金币</string>
+  <string name="selected_wallets_count">已选择：%d</string>
+  <string name="wallets_selected_for_expense">为支出选择了 %d 个钱包</string>
+  <string name="wallets_selected_for_income">为收入选择了 %d 个钱包</string>
     <string name="budget">预算</string>
     <string name="budget_exceeded">预算超出了</string>
     <string name="budget_limit">预算限制</string>
@@ -180,6 +184,7 @@
     <string name="critical_low_savings_impact">立即将储蓄提高至至少10％</string>
     <string name="critical_low_savings_title">储蓄至关重要</string>
     <string name="current_balance">当前平衡</string>
+  <string name="critical_count_recommendations">%d 条关键建议</string>
     <string name="custom">现金</string>
     <string name="date">日期</string>
     <string name="date_after_maximum">日期不能以后最大</string>

@@ -1374,4 +1374,8 @@
   <!-- moved to strings_achievements.xml -->
   <string name="bank_sberbank">Sberbank</string>
   <!-- Plurals moved to plurals.xml -->
+  <string name="reward_coins">%d coins</string>
+  <string name="selected_wallets_count">Selected: %d</string>
+  <string name="wallets_selected_for_expense">%d wallets selected for expense</string>
+  <string name="wallets_selected_for_income">%d wallets selected for income</string>
 </resources>
