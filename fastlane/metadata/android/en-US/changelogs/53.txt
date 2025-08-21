@@ -1,0 +1,6 @@
+• Localization: Completed localization of achievement strings for English and Chinese languages
+• Localization: Verified translation accuracy - all strings are written in their respective languages
+• Achievements: Added new achievements for retirement planning, tax optimization, and insurance coverage
+• Achievements: Expanded achievement system with support for multiple localizations
+• Quality: Improved achievement resource structure using plurals for correct display
+• Stability: Resolved potential localization issues and improved compatibility

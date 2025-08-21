@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/ic_notification_wallet"
+  android:insetLeft="@dimen/launcher_monochrome_inset"
+  android:insetTop="@dimen/launcher_monochrome_inset"
+  android:insetRight="@dimen/launcher_monochrome_inset"
+  android:insetBottom="@dimen/launcher_monochrome_inset"/>
+
+

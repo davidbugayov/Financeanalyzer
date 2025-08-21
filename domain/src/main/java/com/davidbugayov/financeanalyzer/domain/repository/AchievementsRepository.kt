@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.R
+// Избегаем зависимости на UI-модуль: будем получать строки по имени из пакета UI
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
@@ -78,227 +79,238 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     // Предустановленные достижения
     private val rp: ResourceProvider = GlobalContext.get().get()
 
+    // Получение строки из UI-модуля по имени ресурса, чтобы не тащить зависимость на :ui
+    private fun uiString(name: String): String {
+        return try {
+            val resId = context.resources.getIdentifier(name, "string", "com.davidbugayov.financeanalyzer.ui")
+            if (resId != 0) context.getString(resId) else name
+        } catch (e: Exception) {
+            Timber.w(e, "uiString lookup failed for %s", name)
+            name
+        }
+    }
+
     private val defaultAchievements = listOf(
         Achievement(
             id = "first_transaction",
-            title = rp.getString(R.string.achievement_first_steps),
-            description = rp.getString(R.string.achievement_first_steps_desc),
+            title = uiString("achievement_first_steps"),
+            description = uiString("achievement_first_steps_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 10
+            rewardCoins = 10,
         ),
         Achievement(
             id = "transaction_master",
-            title = rp.getString(R.string.achievement_transaction_master),
-            description = rp.getString(R.string.achievement_transaction_master_desc),
+            title = uiString("achievement_transaction_master"),
+            description = uiString("achievement_transaction_master_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
             targetProgress = 100,
-            rewardCoins = 50
+            rewardCoins = 50,
         ),
         Achievement(
             id = "data_analyst",
-            title = rp.getString(R.string.achievement_data_analyst),
-            description = rp.getString(R.string.achievement_data_analyst_desc),
+            title = uiString("achievement_data_analyst"),
+            description = uiString("achievement_data_analyst_desc"),
             iconRes = 0,
             category = AchievementCategory.STATISTICS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 10,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "first_budget",
-            title = rp.getString(R.string.achievement_first_budget),
-            description = rp.getString(R.string.achievement_first_budget_desc),
+            title = uiString("achievement_first_budget"),
+            description = uiString("achievement_first_budget_desc"),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 15
+            rewardCoins = 15,
         ),
         Achievement(
             id = "app_explorer",
-            title = rp.getString(R.string.achievement_explorer),
-            description = rp.getString(R.string.achievement_explorer_desc),
+            title = uiString("achievement_explorer"),
+            description = uiString("achievement_explorer_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
             targetProgress = 5,
-            rewardCoins = 30
+            rewardCoins = 30,
         ),
         Achievement(
             id = "category_organizer",
-            title = rp.getString(R.string.achievement_category_organizer),
-            description = rp.getString(R.string.achievement_category_organizer_desc),
+            title = uiString("achievement_category_organizer"),
+            description = uiString("achievement_category_organizer_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 10,
-            rewardCoins = 25
+            rewardCoins = 25,
         ),
         Achievement(
             id = "early_bird",
-            title = rp.getString(R.string.achievement_early_bird),
-            description = rp.getString(R.string.achievement_early_bird_desc),
+            title = uiString("achievement_early_bird"),
+            description = uiString("achievement_early_bird_desc"),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 15
+            rewardCoins = 15,
         ),
         Achievement(
             id = "night_owl",
-            title = rp.getString(R.string.achievement_night_owl),
-            description = rp.getString(R.string.achievement_night_owl_desc),
+            title = uiString("achievement_night_owl"),
+            description = uiString("achievement_night_owl_desc"),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 15
+            rewardCoins = 15,
         ),
         Achievement(
             id = "first_savings",
-            title = rp.getString(R.string.achievement_first_savings),
-            description = rp.getString(R.string.achievement_first_savings_desc),
+            title = uiString("achievement_first_savings"),
+            description = uiString("achievement_first_savings_desc"),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "emergency_fund",
-            title = rp.getString(R.string.achievement_emergency_fund),
-            description = rp.getString(R.string.achievement_emergency_fund_desc),
+            title = uiString("achievement_emergency_fund"),
+            description = uiString("achievement_emergency_fund_desc"),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
             rarity = AchievementRarity.RARE,
             targetProgress = 1,
-            rewardCoins = 100
+            rewardCoins = 100,
         ),
         Achievement(
             id = "economical",
-            title = rp.getString(R.string.achievement_economical),
-            description = rp.getString(R.string.achievement_economical_desc),
+            title = uiString("achievement_economical"),
+            description = uiString("achievement_economical_desc"),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 30
+            rewardCoins = 30,
         ),
         Achievement(
             id = "regular_user",
-            title = rp.getString(R.string.achievement_regular_user),
-            description = rp.getString(R.string.achievement_regular_user_desc),
+            title = uiString("achievement_regular_user"),
+            description = uiString("achievement_regular_user_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
             targetProgress = 7,
-            rewardCoins = 25
+            rewardCoins = 25,
         ),
         Achievement(
             id = "loyal_user",
-            title = rp.getString(R.string.achievement_loyal_user),
-            description = rp.getString(R.string.achievement_loyal_user_desc),
+            title = uiString("achievement_loyal_user"),
+            description = uiString("achievement_loyal_user_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.RARE,
             targetProgress = 30,
-            rewardCoins = 50
+            rewardCoins = 50,
         ),
         Achievement(
             id = "category_expert",
-            title = rp.getString(R.string.achievement_category_expert),
-            description = rp.getString(R.string.achievement_category_expert_desc),
+            title = uiString("achievement_category_expert"),
+            description = uiString("achievement_category_expert_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
             targetProgress = 1,
-            rewardCoins = 40
+            rewardCoins = 40,
         ),
         Achievement(
             id = "tinkoff_integrator",
-            title = rp.getString(R.string.achievement_tinkoff_integrator),
-            description = rp.getString(R.string.achievement_tinkoff_integrator_desc),
+            title = uiString("achievement_tinkoff_integrator"),
+            description = uiString("achievement_tinkoff_integrator_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "sber_collector",
-            title = rp.getString(R.string.achievement_sber_collector),
-            description = rp.getString(R.string.achievement_sber_collector_desc),
+            title = uiString("achievement_sber_collector"),
+            description = uiString("achievement_sber_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "alpha_analyst",
-            title = rp.getString(R.string.achievement_alpha_analyst),
-            description = rp.getString(R.string.achievement_alpha_analyst_desc),
+            title = uiString("achievement_alpha_analyst"),
+            description = uiString("achievement_alpha_analyst_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "ozon_collector",
-            title = rp.getString(R.string.achievement_ozon_collector),
-            description = rp.getString(R.string.achievement_ozon_collector_desc),
+            title = uiString("achievement_ozon_collector"),
+            description = uiString("achievement_ozon_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 20
+            rewardCoins = 20,
         ),
         Achievement(
             id = "multi_bank_collector",
-            title = rp.getString(R.string.achievement_multi_bank_collector),
-            description = rp.getString(R.string.achievement_multi_bank_collector_desc),
+            title = uiString("achievement_multi_bank_collector"),
+            description = uiString("achievement_multi_bank_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.EPIC,
             targetProgress = 1,
-            rewardCoins = 100
+            rewardCoins = 100,
         ),
         Achievement(
             id = "export_master",
-            title = rp.getString(R.string.achievement_export_master),
-            description = rp.getString(R.string.achievement_export_master_desc),
+            title = uiString("achievement_export_master"),
+            description = uiString("achievement_export_master_desc"),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 15
+            rewardCoins = 15,
         ),
         Achievement(
             id = "backup_enthusiast",
-            title = rp.getString(R.string.achievement_backup_enthusiast),
-            description = rp.getString(R.string.achievement_backup_enthusiast_desc),
+            title = uiString("achievement_backup_enthusiast"),
+            description = uiString("achievement_backup_enthusiast_desc"),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
             rarity = AchievementRarity.RARE,
             targetProgress = 5,
-            rewardCoins = 50
+            rewardCoins = 50,
         ),
         Achievement(
             id = "csv_importer",
-            title = rp.getString(R.string.achievement_csv_importer),
-            description = rp.getString(R.string.achievement_csv_importer_desc),
+            title = uiString("achievement_csv_importer"),
+            description = uiString("achievement_csv_importer_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
-            rewardCoins = 15
-        )
+            rewardCoins = 15,
+        ),
     )
 
     private val _achievements = MutableStateFlow(loadAchievements())

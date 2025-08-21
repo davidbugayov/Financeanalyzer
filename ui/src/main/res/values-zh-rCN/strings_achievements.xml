@@ -25,6 +25,32 @@
   <string name="achievements_rarity_rare">稀有</string>
   <string name="achievements_rarity_epic">史诗</string>
   <string name="achievements_rarity_legendary">传说</string>
+  <string name="achievement_retirement_planner_desc">规划退休，目标%1$s</string>
+  <string name="achievement_tax_optimizer_desc">优化税收%1$s</string>
+  <string name="achievement_insurance_protector_desc">获得%1$s保险保障</string>
+  <string name="achievement_first_steps">第一步</string>
+  <string name="achievement_transaction_master">交易大师</string>
+  <string name="achievement_savings_champion">储蓄冠军</string>
+  <string name="achievement_savings_champion_desc">存下 100,000 卢布</string>
+  <string name="achievement_budget_expert">预算专家</string>
+  <string name="achievement_budget_expert_desc">连续 3 个月遵守预算</string>
+  <string name="achievement_category_explorer">分类探索者</string>
+  <string name="achievement_category_explorer_desc">使用 10 个不同类别</string>
+  <string name="achievement_import_master">导入大师</string>
+  <string name="achievement_export_master">导出大师</string>
+  <string name="achievement_security_guard">安全守护</string>
+  <string name="achievement_analytics_expert">分析专家</string>
+  <string name="achievement_goal_setter">目标制定者</string>
+  <string name="achievement_debt_free">无债一身轻</string>
+  <string name="achievement_investment_starter">投资新手</string>
+  <string name="achievement_budget_sticker">预算遵守者</string>
+  <string name="achievement_income_diversifier">收入多元化者</string>
+  <string name="achievement_expense_tracker">支出跟踪者</string>
+  <string name="achievement_savings_rate_improver">储蓄提升者</string>
+  <string name="achievement_financial_educator">理财学习者</string>
+  <string name="achievement_retirement_planner">退休规划者</string>
+  <string name="achievement_tax_optimizer">税务优化者</string>
+  <string name="achievement_insurance_protector">保险守护者</string>
 </resources>
 
 

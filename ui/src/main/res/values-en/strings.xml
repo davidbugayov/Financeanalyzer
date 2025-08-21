@@ -1371,31 +1371,7 @@
       <item quantity="one">Read %1$d financial tip</item>
       <item quantity="other">Read %1$d financial tips</item>
     </plurals>
-    <string name="achievement_retirement_planner_desc">Plan retirement with %1$s</string>
-    <string name="achievement_tax_optimizer_desc">Optimize taxes by %1$s</string>
-    <string name="achievement_insurance_protector_desc">Get insurance coverage of %1$s</string>
-    <string name="achievement_first_steps">First steps</string>
-    <string name="achievement_transaction_master">Transaction master</string>
-    <string name="achievement_savings_champion">Savings champion</string>
-    <string name="achievement_savings_champion_desc">Save 100,000 rubles</string>
-    <string name="achievement_budget_expert">Budget expert</string>
-    <string name="achievement_budget_expert_desc">Stick to budget for 3 months in a row</string>
-    <string name="achievement_category_explorer">Category explorer</string>
-    <string name="achievement_category_explorer_desc">Use 10 different categories</string>
-    <string name="achievement_import_master">Import master</string>
-    <string name="achievement_export_master">Export master</string>
-    <string name="achievement_security_guard">Security guard</string>
-    <string name="achievement_analytics_expert">Analytics expert</string>
-    <string name="achievement_goal_setter">Goal setter</string>
-    <string name="achievement_debt_free">Debt free</string>
-    <string name="achievement_investment_starter">Investment starter</string>
-    <string name="achievement_budget_sticker">Budget sticker</string>
-    <string name="achievement_income_diversifier">Income diversifier</string>
-    <string name="achievement_expense_tracker">Expense tracker</string>
-    <string name="achievement_savings_rate_improver">Savings improver</string>
-    <string name="achievement_financial_educator">Financial educator</string>
-    <string name="achievement_retirement_planner">Retirement planner</string>
-    <string name="achievement_tax_optimizer">Tax optimizer</string>
-    <string name="achievement_insurance_protector">Insurance protector</string>
+  <!-- moved to strings_achievements.xml -->
+  <string name="bank_sberbank">Sberbank</string>
   <!-- Plurals moved to plurals.xml -->
 </resources>

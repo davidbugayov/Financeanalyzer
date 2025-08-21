@@ -1,4 +1,3 @@
-import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -39,8 +38,8 @@ android {
             libs.versions.compileSdk
                 .get()
                 .toInt()
-        versionCode = 52
-        versionName = "2.26.3"
+        versionCode = 53
+        versionName = "2.27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
