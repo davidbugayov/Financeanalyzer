@@ -883,6 +883,8 @@
     <string name="log_file_created">File created: %1$s</string>
     <string name="log_file_ready_for_send">The file is ready for sending: %1$s</string>
     <string name="error_no_transactions_to_export">No transactions for export</string>
+    <string name="export_transaction_type_expense">Expense</string>
+    <string name="export_transaction_type_income">Income</string>
   <string name="tip_top_category_spending">You spend the most on the category: %1$s. Consider whether these expenses can be reduced.</string>
     <string name="tip_subscriptions_found">You have regular subscriptions.Check if you really need all of them.</string>
     <string name="tip_large_expenses">Large one -time expenses have been discovered.Plan such expenses in advance to avoid financial stress.</string>
@@ -1378,4 +1380,6 @@
   <string name="selected_wallets_count">Selected: %d</string>
   <string name="wallets_selected_for_expense">%d wallets selected for expense</string>
   <string name="wallets_selected_for_income">%d wallets selected for income</string>
+  
+
 </resources>

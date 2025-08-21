@@ -6,7 +6,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 import timber.log.Timber
 
 /**
@@ -22,7 +21,7 @@ class AddTransactionUseCase(
         return try {
             Timber.d(
                 GlobalContext.get().get<ResourceProvider>()
-                    .getString(R.string.log_transaction_add, transaction.amount.toString(), transaction.category)
+                    .getStringByName("log_transaction_add"), transaction.amount.toString(), transaction.category
             )
             val transactionId = transactionRepository.addTransaction(transaction)
             Result.success(transactionId)

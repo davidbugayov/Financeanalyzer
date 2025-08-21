@@ -14,7 +14,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * UseCase для экспорта транзакций в CSV-файл.
@@ -46,13 +45,13 @@ class ExportTransactionsToCSVUseCase(
             if (transactions.isEmpty()) {
                 return@withContext Result.Error(
                     AppException.Business.InvalidOperation(
-                        GlobalContext.get().get<ResourceProvider>().getString(R.string.error_no_transactions_to_export)
+                        GlobalContext.get().get<ResourceProvider>().getStringByName("error_no_transactions_to_export")
                     )
                 )
             }
 
             // Создаем файл во временной директории с понятным именем
-            val fileName = GlobalContext.get().get<ResourceProvider>().getString(R.string.export_filename, getCurrentDateTimeFormatted())
+            val fileName = GlobalContext.get().get<ResourceProvider>().getStringByName("export_filename") + "_" + getCurrentDateTimeFormatted() + ".csv"
             val file = File.createTempFile("transactions_", ".csv")
             // Переименовываем файл с красивым именем
             val finalFile = File(file.parent, fileName)
@@ -61,7 +60,7 @@ class ExportTransactionsToCSVUseCase(
             // Записываем данные в файл с красивыми заголовками
             FileWriter(finalFile).use { writer ->
                 // Заголовок CSV на русском языке
-                writer.append("${GlobalContext.get().get<ResourceProvider>().getString(R.string.export_csv_header)}\n")
+                writer.append("${GlobalContext.get().get<ResourceProvider>().getStringByName("export_csv_header")}\n")
 
                 // Данные транзакций
                 transactions.forEach { transaction ->
@@ -73,19 +72,19 @@ class ExportTransactionsToCSVUseCase(
                     
                     writer.append("\"${transaction.category}\",")
                     writer.append("\"${transaction.amount.toPlainString()}\",")
-                    writer.append("\"${if (transaction.isExpense) GlobalContext.get().get<ResourceProvider>().getString(R.string.export_transaction_type_expense) else GlobalContext.get().get<ResourceProvider>().getString(R.string.export_transaction_type_income)}\",")
+                    writer.append("\"${if (transaction.isExpense) GlobalContext.get().get<ResourceProvider>().getStringByName("export_transaction_type_expense") else GlobalContext.get().get<ResourceProvider>().getStringByName("export_transaction_type_income")}\",")
                     writer.append("\"${transaction.note ?: ""}\",")
                     writer.append("\"${transaction.source}\"\n")
                 }
             }
 
-            Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_csv_file_created, finalFile.absolutePath, finalFile.length().toInt()))
+            Timber.d(GlobalContext.get().get<ResourceProvider>().getStringByName("log_csv_file_created"), finalFile.absolutePath, finalFile.length().toInt())
             return@withContext Result.Success(finalFile)
         } catch (e: IOException) {
-            Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(R.string.log_export_error))
+            Timber.e(e, GlobalContext.get().get<ResourceProvider>().getStringByName("log_export_error"))
             return@withContext Result.Error(AppException.FileSystem.ReadError(cause = e))
         } catch (e: Exception) {
-            Timber.e(e, GlobalContext.get().get<ResourceProvider>().getString(R.string.log_export_unexpected_error))
+            Timber.e(e, GlobalContext.get().get<ResourceProvider>().getStringByName("log_export_unexpected_error"))
             return@withContext Result.Error(AppException.Unknown(cause = e))
         }
     }
@@ -95,7 +94,7 @@ class ExportTransactionsToCSVUseCase(
      * Пока возвращает заглушку - логика должна быть реализована в UI слое
      */
     fun openCSVFile(file: File): Result<Unit> {
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_file_created, file.absolutePath))
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getStringByName("log_file_created"), file.absolutePath)
         return Result.Success(Unit)
     }
 
@@ -104,7 +103,7 @@ class ExportTransactionsToCSVUseCase(
      * Пока возвращает заглушку - логика должна быть реализована в UI слое
      */
     fun shareCSVFile(file: File): Result<Unit> {
-        Timber.d(GlobalContext.get().get<ResourceProvider>().getString(R.string.log_file_ready_for_send, file.absolutePath))
+        Timber.d(GlobalContext.get().get<ResourceProvider>().getStringByName("log_file_ready_for_send"), file.absolutePath)
         return Result.Success(Unit)
     }
 

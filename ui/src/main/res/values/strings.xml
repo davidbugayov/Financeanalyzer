@@ -876,6 +876,8 @@
     <string name="log_file_created">Файл создан: %1$s</string>
     <string name="log_file_ready_for_send">Файл готов для отправки: %1$s</string>
     <string name="error_no_transactions_to_export">Нет транзакций для экспорта</string>
+    <string name="export_transaction_type_expense">Расход</string>
+    <string name="export_transaction_type_income">Доход</string>
   <string name="tip_top_category_spending">Вы тратите больше всего на категорию: "%1$s". Подумайте, можно ли сократить эти расходы.</string>
     <string name="tip_subscriptions_found">У вас есть регулярные подписки. Проверьте, все ли из них вам действительно нужны.</string>
     <string name="tip_large_expenses">Обнаружены крупные разовые расходы. Планируйте такие траты заранее, чтобы избежать финансового стресса.</string>
@@ -1366,4 +1368,6 @@
   <!-- moved to strings_achievements.xml -->
   <string name="bank_sberbank">Сбербанк</string>
   <!-- Plurals moved to plurals.xml -->
+  
+
 </resources>

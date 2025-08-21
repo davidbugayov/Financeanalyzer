@@ -17,4 +17,17 @@ class AndroidResourceProvider(
         val ctx = context.applicationContext
         return if (args.isNotEmpty()) ctx.getString(id, *args) else ctx.getString(id)
     }
+    
+    override fun getStringByName(
+        name: String,
+        vararg args: Any?,
+    ): String {
+        val ctx = context.applicationContext
+        val resourceId = ctx.resources.getIdentifier(name, "string", ctx.packageName)
+        return if (resourceId != 0) {
+            if (args.isNotEmpty()) ctx.getString(resourceId, *args) else ctx.getString(resourceId)
+        } else {
+            name // fallback to name if resource not found
+        }
+    }
 }

@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.validation
 
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.domain.R
+
 import org.koin.core.context.GlobalContext
 
 class ValidateTransactionUseCase {
@@ -24,7 +24,7 @@ class ValidateTransactionUseCase {
         val sourceError = false
         val isValid = !amountError
 
-        val errorMsg = if (amountError) resourceProvider.getString(R.string.error_enter_transaction_amount) else null
+        val errorMsg = if (amountError) resourceProvider.getStringByName("error_enter_transaction_amount") else null
 
         Timber.d(
             "Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg",

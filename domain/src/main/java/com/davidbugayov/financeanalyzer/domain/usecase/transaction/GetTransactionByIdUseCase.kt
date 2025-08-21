@@ -6,7 +6,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * UseCase для получения транзакции по ID.
@@ -25,7 +24,7 @@ class GetTransactionByIdUseCase(
             } else {
                 Result.error(
                     AppException.Data.NotFound(
-                        GlobalContext.get().get<ResourceProvider>().getString(R.string.log_transaction_not_found, id)
+                        GlobalContext.get().get<ResourceProvider>().getStringByName("log_transaction_not_found")
                     )
                 )
             }

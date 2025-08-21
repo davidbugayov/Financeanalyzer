@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.domain.model
 
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 
 /**
  * Тип кошелька.
@@ -33,12 +32,12 @@ enum class WalletType {
     fun getDisplayName(): String {
         val rp: ResourceProvider = GlobalContext.get().get()
         return when (this) {
-            CASH -> rp.getString(R.string.wallet_type_cash)
-            CARD -> rp.getString(R.string.wallet_type_card)
-            SAVINGS -> rp.getString(R.string.wallet_type_savings)
-            INVESTMENT -> rp.getString(R.string.wallet_type_investment)
-            GOAL -> rp.getString(R.string.wallet_type_goal)
-            OTHER -> rp.getString(R.string.wallet_type_other)
+            CASH -> rp.getStringByName("wallet_type_cash")
+            CARD -> rp.getStringByName("wallet_type_card")
+            SAVINGS -> rp.getStringByName("wallet_type_savings")
+            INVESTMENT -> rp.getStringByName("wallet_type_investment")
+            GOAL -> rp.getStringByName("wallet_type_goal")
+            OTHER -> rp.getStringByName("wallet_type_other")
         }
     }
 
@@ -48,12 +47,12 @@ enum class WalletType {
     fun getDescription(): String {
         val rp: ResourceProvider = GlobalContext.get().get()
         return when (this) {
-            CASH -> rp.getString(R.string.wallet_type_cash_description)
-            CARD -> rp.getString(R.string.wallet_type_card_description)
-            SAVINGS -> rp.getString(R.string.wallet_type_savings_description)
-            INVESTMENT -> rp.getString(R.string.wallet_type_investment_description)
-            GOAL -> rp.getString(R.string.wallet_type_goal_description)
-            OTHER -> rp.getString(R.string.wallet_type_other_description)
+            CASH -> rp.getStringByName("wallet_type_cash_description")
+            CARD -> rp.getStringByName("wallet_type_card_description")
+            SAVINGS -> rp.getStringByName("wallet_type_savings_description")
+            INVESTMENT -> rp.getStringByName("wallet_type_investment_description")
+            GOAL -> rp.getStringByName("wallet_type_goal_description")
+            OTHER -> rp.getStringByName("wallet_type_other_description")
         }
     }
 

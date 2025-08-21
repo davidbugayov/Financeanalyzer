@@ -4,7 +4,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -138,18 +137,18 @@ class GroupTransactionsUseCase {
     private fun getMonthNumber(monthName: String): Int {
         val rp: ResourceProvider = GlobalContext.get().get()
         return when (monthName.lowercase()) {
-            rp.getString(R.string.month_january) -> 1
-            rp.getString(R.string.month_february) -> 2
-            rp.getString(R.string.month_march) -> 3
-            rp.getString(R.string.month_april) -> 4
-            rp.getString(R.string.month_may) -> 5
-            rp.getString(R.string.month_june) -> 6
-            rp.getString(R.string.month_july) -> 7
-            rp.getString(R.string.month_august) -> 8
-            rp.getString(R.string.month_september) -> 9
-            rp.getString(R.string.month_october) -> 10
-            rp.getString(R.string.month_november) -> 11
-            rp.getString(R.string.month_december) -> 12
+            rp.getStringByName("month_january") -> 1
+            rp.getStringByName("month_february") -> 2
+            rp.getStringByName("month_march") -> 3
+            rp.getStringByName("month_april") -> 4
+            rp.getStringByName("month_may") -> 5
+            rp.getStringByName("month_june") -> 6
+            rp.getStringByName("month_july") -> 7
+            rp.getStringByName("month_august") -> 8
+            rp.getStringByName("month_september") -> 9
+            rp.getStringByName("month_october") -> 10
+            rp.getStringByName("month_november") -> 11
+            rp.getStringByName("month_december") -> 12
             else -> 0
         }
     }

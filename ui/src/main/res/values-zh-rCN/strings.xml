@@ -888,6 +888,8 @@
     <string name="log_file_created">创建的文件：%1$s</string>
     <string name="log_file_ready_for_send">该文件准备发送：%1$s</string>
     <string name="error_no_transactions_to_export">没有出口交易</string>
+    <string name="export_transaction_type_expense">费用</string>
+    <string name="export_transaction_type_income">收入</string>
     <string name="tip_top_category_spending">您在类别上花费最多：\'%1$s \'。考虑是否可以减少这些费用。</string>
     <string name="tip_subscriptions_found">您有定期订阅。检查您是否真的需要所有这些。</string>
     <string name="tip_large_expenses">很大的一个时间费用已被发现。预先计划此类费用以避免财务压力。</string>
@@ -905,8 +907,8 @@
     <string name="all_categories">所有类别</string>
     <string name="all_sources">所有来源</string>
     <string name="clear_selection">清洁选择</string>
-    <string name="delete_category_confirm_irreversible">您确定要删除类别“ %1$s”？此操作无法取消。</string>
-    <string name="delete_category_confirm_move">您确定要删除类别“ %1$s”？此类别中的所有交易将移至“另一个”类别。</string>
+    <string name="delete_category_confirm_irreversible">您确定要删除类别" %1$s"？此操作无法取消。</string>
+    <string name="delete_category_confirm_move">您确定要删除类别" %1$s"？此类别中的所有交易将移至"另一个"类别。</string>
     <string name="category_filter">按类别过滤</string>
     <string name="source_filter">源过滤器</string>
     <string name="filter">筛选</string>
@@ -964,7 +966,7 @@
     <string name="onboarding_button_start">开始</string>
     <string name="onboarding_welcome_title">欢迎</string>
     <string name="libraries_title">使用的库</string>
-    <string name="libraries_description">申请中使用的“货币”中使用的库列表</string>
+    <string name="libraries_description">申请中使用的"货币"中使用的库列表</string>
     <string name="licenses_note">所有图书馆均根据其许可使用。图书馆开发人员的网站上提供了全文许可。</string>
     <string name="license_colon">许可证：%1$s</string>
     <string name="settings_currency_current_value">₽</string>
@@ -1076,10 +1078,10 @@
     <string name="add_note">添加一个笔记</string>
     <string name="alfabank_instructions_mobile">1。输入Alfa-Bank应用程序
 2。选择一张卡或帐户
-3。单击“提取”图标（文档图标）
+3。单击"提取"图标（文档图标）
 4。表示放电期
-5。单击“表格”
-6。编队后，单击“下载”
+5。单击"表格"
+6。编队后，单击"下载"
 7。选择XLSX格式（Excel）
 8。将文件保存在设备上
 9。将此XLSX文件导入我们的应用程序</string>
@@ -1087,11 +1089,11 @@
     <string name="alfabank_instructions_title_web">通过在线Alfa-Bank（Web版本）：</string>
     <string name="alfabank_instructions_web">1。输入阿尔法银行在线帐户个人帐户
 2。选择帐户或卡
-3。单击“提取”按钮
+3。单击"提取"按钮
 4。表示放电期
-5。单击“形成提取物”
-6。选择“ Excel”格式
-7。点击“下载”
+5。单击"形成提取物"
+6。选择" Excel"格式
+7。点击"下载"
 8。将下载的XLSX文件导入我们的应用程序</string>
     <string name="alfabank_note">我们的应用程序支持Alfa Bank的Excel文件（.XLSX）的直接导入。只需选择一个下载的文件，所有交易将自动识别。</string>
     <string name="alfabank_note_important">重要的：</string>
@@ -1146,7 +1148,7 @@
     <string name="error_date_parse_failed">无法发布任何可用格式的日期</string>
     <string name="error_empty_amount">空的数量</string>
     <string name="error_empty_category">空类别</string>
-    <string name="error_no_csv_app">没有打开CSV文件的应用程序。您可以通过文件管理器手动打开文件，也可以使用“共享”功能。</string>
+    <string name="error_no_csv_app">没有打开CSV文件的应用程序。您可以通过文件管理器手动打开文件，也可以使用"共享"功能。</string>
     <string name="error_unsupported_file_type">[%1$s处理程序]不支持文件类型：%1$s</string>
     <string name="error_zero_amount">金额较小或等于零：%1$s</string>
     <string name="export_button_friendly">导出到CSV</string>
@@ -1257,15 +1259,15 @@
     <string name="no_subcategories_available">此类别没有可用的子类别</string>
     <string name="ozon_instructions">1。输入Ozon银行申请
 2。选择一张卡或帐户
-3。转到“更多”选项卡（屏幕下方）
-4。选择“获得帮助”
-5。选择“资金的移动”
+3。转到"更多"选项卡（屏幕下方）
+4。选择"获得帮助"
+5。选择"资金的移动"
 6。选择俄语
 7。选择需要提取的帐户
 8。表示排放期（例如，上个月）
-9。选择操作类型（我们建议“所有操作”）
-10。单击“表格”
-11.编队后，单击“下载PDF”
+9。选择操作类型（我们建议"所有操作"）
+10。单击"表格"
+11.编队后，单击"下载PDF"
 12.将文件保存在设备上
 13.将此PDF文件导入我们的应用程序</string>
     <string name="ozon_instructions_title">通过Ozon银行申请：</string>
@@ -1278,11 +1280,11 @@
     <string name="sberbank_headers">操作日期（MSC），处理日期和授权代码，类别，操作描述，帐户货币中的金额，货币金额，货币的运营，其余资金，其余资金，以帐户的货币为单位</string>
     <string name="sberbank_instructions">1。输入Sberbank申请
 2。单击您需要提取的卡片
-3。单击“详细信息”按钮（右上角的三个点）
-4。选择“帐户中的目标”
+3。单击"详细信息"按钮（右上角的三个点）
+4。选择"帐户中的目标"
 5。表示需要提取的时间
-6。单击“形成提取物”
-7。编队后，单击“下载PDF”
+6。单击"形成提取物"
+7。编队后，单击"下载PDF"
 8。将文件保存在设备上
 9。将此PDF文件导入我们的应用程序</string>
     <string name="sberbank_instructions_title">通过Sberbank移动应用程序：</string>
@@ -1301,12 +1303,12 @@
     <string name="tinkoff_instructions">1。输入Tinkoff应用程序
 2。选择一张卡或帐户
 3。单击右上角的三个点
-4。选择“氧化和帮助”
-5。选择“帐户中的目标”
+4。选择"氧化和帮助"
+5。选择"帐户中的目标"
 6。选择排放期（例如，在上个月）
-7。单击“订购提取物”
+7。单击"订购提取物"
 8。等待提取物的形成（通常需要几分钟）
-9。打开收到的声明，然后单击“共享”图标
+9。打开收到的声明，然后单击"共享"图标
 10。将PDF文件保存到设备
 11。将保存的文件导入我们的应用程序
 
@@ -1437,4 +1439,6 @@
   <!-- moved to strings_achievements.xml -->
   <string name="bank_sberbank">Sberbank</string>
     <!-- Plurals moved to plurals.xml -->
+    
+
 </resources>

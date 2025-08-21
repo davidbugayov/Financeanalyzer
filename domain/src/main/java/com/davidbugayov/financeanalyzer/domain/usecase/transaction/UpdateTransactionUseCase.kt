@@ -6,7 +6,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import org.koin.core.context.GlobalContext
-import com.davidbugayov.financeanalyzer.domain.R
 import timber.log.Timber
 
 /**
@@ -21,7 +20,7 @@ class UpdateTransactionUseCase(
     suspend operator fun invoke(transaction: Transaction): Result<Unit> {
         return try {
             val rp: ResourceProvider = GlobalContext.get().get()
-            Timber.d(rp.getString(R.string.log_transaction_update, transaction.toString()))
+            Timber.d(rp.getStringByName("log_transaction_update"), transaction.toString())
             transactionRepository.updateTransaction(transaction)
             Result.success(Unit)
         } catch (e: Exception) {

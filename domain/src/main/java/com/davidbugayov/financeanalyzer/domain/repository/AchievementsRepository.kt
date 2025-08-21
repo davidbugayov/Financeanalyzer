@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.domain.repository
 import android.content.Context
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
-import com.davidbugayov.financeanalyzer.domain.R
+
 // Избегаем зависимости на UI-модуль: будем получать строки по имени из пакета UI
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
@@ -339,7 +339,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
                 }
             }
         } catch (e: Exception) {
-            Timber.e(e, rp.getString(R.string.log_error_loading_achievements))
+            Timber.e(e, rp.getStringByName("log_error_loading_achievements"))
             emptyList()
         }
     }
@@ -360,7 +360,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
                 putBoolean("achievements_initialized", true)
             }
         } catch (e: Exception) {
-            Timber.e(e, rp.getString(R.string.log_error_saving_achievements))
+            Timber.e(e, rp.getStringByName("log_error_saving_achievements"))
         }
     }
 
