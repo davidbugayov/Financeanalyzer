@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint
+
 import kotlin.math.hypot
 import timber.log.Timber
 

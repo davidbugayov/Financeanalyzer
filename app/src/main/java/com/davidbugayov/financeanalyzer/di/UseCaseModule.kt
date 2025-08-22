@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
@@ -34,6 +35,9 @@ val useCaseModule =
         single<ImportTransactionsUseCase> {
             ImportTransactionsUseCaseImpl(get<ImportTransactionsManager>())
         }
+
+        // Transactions
+        single { LoadTransactionsUseCase(get()) }
 
         // Subcategories
         single { GetSubcategoryByIdUseCase(get()) }

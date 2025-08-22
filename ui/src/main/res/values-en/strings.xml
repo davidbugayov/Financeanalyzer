@@ -964,7 +964,7 @@
     <string name="libraries_description">List of libraries used in the "Money under control" application</string>
     <string name="licenses_note">All libraries are used in accordance with their licenses.Full texts of licenses are available on the websites of library developers.</string>
     <string name="license_colon">License: %s</string>
-    <string name="settings_currency_current_value">₽</string>
+    <string name="settings_currency_current_value">RUB</string>
     <string name="select_reminder_time">Choose a reminder time</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>

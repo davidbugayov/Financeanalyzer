@@ -826,10 +826,23 @@ fun FinancialStatisticsScreen(
 
                                             // Форматируем сумму с валютой
                                             val currencyCode = stringResource(id = UiR.string.settings_currency_current_value)
-                                            val formatted =
-                                                java.text.NumberFormat.getCurrencyInstance().apply {
-                                                    this.currency = java.util.Currency.getInstance(currencyCode)
-                                                }.format(predictedExpenses.toMajorDouble())
+                                            val formatted = remember(predictedExpenses, currencyCode) {
+                                                try {
+                                                    // Проверяем, что currencyCode является валидным 3-буквенным кодом
+                                                    if (currencyCode.length == 3 && currencyCode.all { it.isLetter() }) {
+                                                        java.text.NumberFormat.getCurrencyInstance().apply {
+                                                            this.currency = java.util.Currency.getInstance(currencyCode)
+                                                        }.format(predictedExpenses.toMajorDouble())
+                                                    } else {
+                                                        // Если код невалидный, используем простое форматирование
+                                                        "${predictedExpenses.toMajorDouble()} ${predictedExpenses.currency.symbol}"
+                                                    }
+                                                } catch (e: IllegalArgumentException) {
+                                                    // Если возникла ошибка с валютой, используем простое форматирование
+                                                    timber.log.Timber.w(e, "Invalid currency code: $currencyCode, using fallback formatting")
+                                                    "${predictedExpenses.toMajorDouble()} ${predictedExpenses.currency.symbol}"
+                                                }
+                                            }
 
                                             Text(
                                                 text = stringResource(id = UiR.string.prediction_next_month, formatted),

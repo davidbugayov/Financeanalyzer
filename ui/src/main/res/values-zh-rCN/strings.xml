@@ -969,7 +969,7 @@
     <string name="libraries_description">申请中使用的"货币"中使用的库列表</string>
     <string name="licenses_note">所有图书馆均根据其许可使用。图书馆开发人员的网站上提供了全文许可。</string>
     <string name="license_colon">许可证：%1$s</string>
-    <string name="settings_currency_current_value">₽</string>
+    <string name="settings_currency_current_value">RUB</string>
     <string name="select_reminder_time">选择提醒时间</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>

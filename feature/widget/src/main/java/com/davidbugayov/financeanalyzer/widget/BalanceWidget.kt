@@ -71,22 +71,23 @@ class BalanceWidget :
                                 .zero()
                                 .currency
                         }
+                    // Расчет доходов (положительные суммы)
                     val income =
                         transactions.filter { !it.isExpense }.fold(
                             Money.zero(currency),
                         ) { acc, t -> acc + t.amount }
+                    
+                    // Расчет расходов (положительные суммы)
                     val expense =
                         transactions.filter { it.isExpense }.fold(
                             Money.zero(currency),
                         ) { acc, t -> acc + t.amount }
+                    
+                    // Для отображения расходов со знаком минус
                     val negativeExpense = expense.negate()
-                    val firstExpense = transactions.firstOrNull { it.isExpense }
-                    val balance =
-                        if (firstExpense != null && firstExpense.amount.isNegative()) {
-                            transactions.fold(Money.zero(currency)) { acc, t -> acc + t.amount }
-                        } else {
-                            income - expense
-                        }
+                    
+                    // Простой расчет баланса: доходы минус расходы
+                    val balance = income - expense
                     withContext(Dispatchers.Main) {
                         views.setTextViewText(R.id.widget_balance, balance.formatForDisplay(useMinimalDecimals = true))
                         views.setTextViewText(R.id.widget_income, income.formatForDisplay(useMinimalDecimals = true))

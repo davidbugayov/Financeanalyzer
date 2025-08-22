@@ -52,7 +52,7 @@ class CalculatePeerComparisonUseCase {
         val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val rates = byMonth.values.map { monthTxs ->
             val income = monthTxs.filter { !it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
-            val expense = monthTxs.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
+            val expense = monthTxs.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble()
             if (income > 0.0) (income - expense) / income else 0.0
         }
         return if (rates.isNotEmpty()) rates.average() else 0.0
@@ -61,10 +61,10 @@ class CalculatePeerComparisonUseCase {
     private fun calculateExpenseBreakdown(transactions: List<Transaction>): Map<String, Double> {
         val expenses = transactions.filter { it.isExpense }
         if (expenses.isEmpty()) return emptyMap()
-        val total = expenses.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
+        val total = expenses.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble()
         if (total == 0.0) return emptyMap()
         return expenses.groupBy { it.category }
-            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble() / total }
+            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble() / total }
     }
 
     private fun getIncomeRangeBenchmarks(incomeRange: String): IncomeBenchmarks {

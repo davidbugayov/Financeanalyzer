@@ -55,7 +55,7 @@ class CalculateRetirementForecastUseCase {
     private fun calculateAverageMonthlyExpense(transactions: List<Transaction>): Money {
         val monthly = transactions.filter { it.isExpense }
             .groupBy { t -> "${t.date.year}-${t.date.month}" }
-            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) } }
+            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) } }
         if (monthly.isEmpty()) return Money.zero()
         val avg = monthly.values.fold(BigDecimal.ZERO) { acc, amount -> acc.add(amount) }.divide(BigDecimal.valueOf(monthly.size.toDouble()), 10, java.math.RoundingMode.HALF_EVEN)
         return Money(avg)
