@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Inset to avoid oversized monochrome in themed launchers -->
+    <item
+        android:top="14dp"
+        android:bottom="14dp"
+        android:left="14dp"
+        android:right="14dp"
+        android:drawable="@drawable/ic_wallet"/>
+    
+</layer-list>
+
+

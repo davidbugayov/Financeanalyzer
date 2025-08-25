@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="6dp"
     android:background="@drawable/widget_minimal_background"
@@ -32,17 +32,18 @@
             android:text="@string/default_amount"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="#2196F3"
+            android:textColor="@color/income"
             android:includeFontPadding="false"
             android:ellipsize="end"
             android:maxLines="1"
             android:gravity="center" />
     </LinearLayout>
 
-    <View
+    <ImageView
         android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="#E0E0E0" />
+        android:layout_height="32dp"
+        android:src="@drawable/widget_divider"
+        android:contentDescription="@null" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -73,10 +74,11 @@
             android:gravity="center" />
     </LinearLayout>
 
-    <View
+    <ImageView
         android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="#E0E0E0" />
+        android:layout_height="32dp"
+        android:src="@drawable/widget_divider"
+        android:contentDescription="@null" />
 
     <LinearLayout
         android:layout_width="0dp"

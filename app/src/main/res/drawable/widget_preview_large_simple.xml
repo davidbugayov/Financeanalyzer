@@ -11,10 +11,10 @@
         </shape>
     </item>
     
-    <!-- Первая секция - баланс -->
+    <!-- Первая секция - баланс (цвет дохода) -->
     <item android:gravity="start|center_vertical" android:start="12dp">
         <shape android:shape="rectangle">
-            <solid android:color="#2196F3" />
+            <solid android:color="#00C853" />
             <corners android:radius="3dp" />
             <size
                 android:width="20dp"
