@@ -18,8 +18,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 class SmallBalanceWidget : AppWidgetProvider() {
+    override fun onEnabled(context: Context) {
+        // Разблокируем ачивку добавления маленького виджета 1x1
+        AchievementTrigger.onMilestoneReached("widget_small_added")
+    }
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

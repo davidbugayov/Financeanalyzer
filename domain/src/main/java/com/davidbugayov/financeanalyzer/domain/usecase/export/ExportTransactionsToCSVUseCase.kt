@@ -78,7 +78,8 @@ class ExportTransactionsToCSVUseCase(
                 }
             }
 
-            Timber.d(GlobalContext.get().get<ResourceProvider>().getStringByName("log_csv_file_created"), finalFile.absolutePath, finalFile.length().toInt())
+            val msg = GlobalContext.get().get<ResourceProvider>().getStringByName("log_csv_file_created")
+            Timber.d("$msg: ${finalFile.absolutePath} (${finalFile.length()} B)")
             return@withContext Result.Success(finalFile)
         } catch (e: IOException) {
             Timber.e(e, GlobalContext.get().get<ResourceProvider>().getStringByName("log_export_error"))

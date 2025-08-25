@@ -18,8 +18,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 class BalanceWidget : AppWidgetProvider() {
+    override fun onEnabled(context: Context) {
+        // Разблокируем ачивку добавления большого виджета (4x1)
+        AchievementTrigger.onMilestoneReached("widget_large_added")
+    }
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

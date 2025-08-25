@@ -25,6 +25,8 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.navigation.appNavHostImpl
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
@@ -35,6 +37,7 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 class FinanceActivity :
     FragmentActivity(),
@@ -140,6 +143,8 @@ class FinanceActivity :
             when (screen) {
                 "add" -> {
                     startDestination = Screen.AddTransaction.route
+                    // Триггер ачивки перехода из шортката
+                    AchievementTrigger.onMilestoneReached("shortcut_add_transaction")
                 }
             }
         }
@@ -152,6 +157,8 @@ class FinanceActivity :
             when (screen) {
                 "add" -> {
                     navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
+                    // Триггер ачивки при повторном открытии через шорткат
+                    AchievementTrigger.onMilestoneReached("shortcut_add_transaction")
                 }
             }
         }
@@ -159,7 +166,11 @@ class FinanceActivity :
 
     private fun applyContent() {
         setContent {
-            financeAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
+            AchievementNotificationManager(
+                achievementEngine = AchievementEngineProvider.get(),
+            ) {
+                financeAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
+            }
         }
     }
 

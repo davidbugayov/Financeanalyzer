@@ -302,18 +302,8 @@ class AchievementsViewModel(
         )
 
     init {
-        // Инициализируем достижения в репозитории если их еще нет
-        viewModelScope.launch {
-            // Получаем текущие достижения из репозитория
-            val existingAchievements = achievementsRepository.getAllAchievements().first()
-
-            // Если репозиторий пустой, инициализируем дефолтными достижениями
-            if (existingAchievements.isEmpty()) {
-                defaultAchievements.forEach { achievement ->
-                    achievementsRepository.updateAchievement(achievement)
-                }
-            }
-        }
+        // Репозиторий теперь сам возвращает дефолтные ачивки
+        // Дополнительная инициализация не нужна
     }
 
     /**

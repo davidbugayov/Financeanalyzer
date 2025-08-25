@@ -79,10 +79,18 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     // Предустановленные достижения
     private val rp: ResourceProvider = GlobalContext.get().get()
 
-    // Получение строки из UI-модуля по имени ресурса, чтобы не тащить зависимость на :ui
+    // Получение строки из ресурсов приложения (учитываем debug applicationIdSuffix)
     private fun uiString(name: String): String {
         return try {
-            val resId = context.resources.getIdentifier(name, "string", "com.davidbugayov.financeanalyzer.ui")
+            val candidatePackages = listOf(
+                context.packageName, // com.davidbugayov.financeanalyzer(.debug|.fdroid|...)
+                "com.davidbugayov.financeanalyzer.ui",
+                "com.davidbugayov.financeanalyzer",
+            )
+            val resId = candidatePackages
+                .asSequence()
+                .map { pkg -> context.resources.getIdentifier(name, "string", pkg) }
+                .firstOrNull { it != 0 } ?: 0
             if (resId != 0) context.getString(resId) else name
         } catch (e: Exception) {
             Timber.w(e, "uiString lookup failed for %s", name)
@@ -93,8 +101,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     private val defaultAchievements = listOf(
         Achievement(
             id = "first_transaction",
-            title = uiString("achievement_first_steps"),
-            description = uiString("achievement_first_steps_desc"),
+            title = uiString("achievement_first_steps_title"),
+            description = uiString("achievement_first_steps_description"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
@@ -103,7 +111,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "transaction_master",
-            title = uiString("achievement_transaction_master"),
+            title = uiString("achievement_transaction_master_title"),
             description = uiString("achievement_transaction_master_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
@@ -113,7 +121,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "data_analyst",
-            title = uiString("achievement_data_analyst"),
+            title = uiString("achievement_data_analyst_title"),
             description = uiString("achievement_data_analyst_desc"),
             iconRes = 0,
             category = AchievementCategory.STATISTICS,
@@ -123,7 +131,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "first_budget",
-            title = uiString("achievement_first_budget"),
+            title = uiString("achievement_first_budget_title"),
             description = uiString("achievement_first_budget_desc"),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
@@ -133,8 +141,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "app_explorer",
-            title = uiString("achievement_explorer"),
-            description = uiString("achievement_explorer_desc"),
+            title = uiString("achievement_app_explorer_title"),
+            description = uiString("achievement_app_explorer_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
             rarity = AchievementRarity.COMMON,
@@ -143,7 +151,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "category_organizer",
-            title = uiString("achievement_category_organizer"),
+            title = uiString("achievement_category_organizer_title"),
             description = uiString("achievement_category_organizer_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
@@ -153,7 +161,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "early_bird",
-            title = uiString("achievement_early_bird"),
+            title = uiString("achievement_early_bird_title"),
             description = uiString("achievement_early_bird_desc"),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
@@ -163,7 +171,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "night_owl",
-            title = uiString("achievement_night_owl"),
+            title = uiString("achievement_night_owl_title"),
             description = uiString("achievement_night_owl_desc"),
             iconRes = 0,
             category = AchievementCategory.SPECIAL,
@@ -173,7 +181,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "first_savings",
-            title = uiString("achievement_first_savings"),
+            title = uiString("achievement_first_savings_title"),
             description = uiString("achievement_first_savings_desc"),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
@@ -183,7 +191,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "emergency_fund",
-            title = uiString("achievement_emergency_fund"),
+            title = uiString("achievement_emergency_fund_title"),
             description = uiString("achievement_emergency_fund_desc"),
             iconRes = 0,
             category = AchievementCategory.SAVINGS,
@@ -193,7 +201,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "economical",
-            title = uiString("achievement_economical"),
+            title = uiString("achievement_economical_title"),
             description = uiString("achievement_economical_desc"),
             iconRes = 0,
             category = AchievementCategory.BUDGET,
@@ -203,7 +211,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "regular_user",
-            title = uiString("achievement_regular_user"),
+            title = uiString("achievement_regular_user_title"),
             description = uiString("achievement_regular_user_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
@@ -213,7 +221,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "loyal_user",
-            title = uiString("achievement_loyal_user"),
+            title = uiString("achievement_loyal_user_title"),
             description = uiString("achievement_loyal_user_desc"),
             iconRes = 0,
             category = AchievementCategory.MILESTONES,
@@ -223,7 +231,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "category_expert",
-            title = uiString("achievement_category_expert"),
+            title = uiString("achievement_category_expert_title"),
             description = uiString("achievement_category_expert_desc"),
             iconRes = 0,
             category = AchievementCategory.TRANSACTIONS,
@@ -233,7 +241,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "tinkoff_integrator",
-            title = uiString("achievement_tinkoff_integrator"),
+            title = uiString("achievement_tinkoff_integrator_title"),
             description = uiString("achievement_tinkoff_integrator_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
@@ -243,7 +251,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "sber_collector",
-            title = uiString("achievement_sber_collector"),
+            title = uiString("achievement_sber_collector_title"),
             description = uiString("achievement_sber_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
@@ -253,7 +261,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "alpha_analyst",
-            title = uiString("achievement_alpha_analyst"),
+            title = uiString("achievement_alpha_analyst_title"),
             description = uiString("achievement_alpha_analyst_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
@@ -263,7 +271,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "ozon_collector",
-            title = uiString("achievement_ozon_collector"),
+            title = uiString("achievement_ozon_collector_title"),
             description = uiString("achievement_ozon_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
@@ -273,7 +281,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "multi_bank_collector",
-            title = uiString("achievement_multi_bank_collector"),
+            title = uiString("achievement_multi_bank_collector_title"),
             description = uiString("achievement_multi_bank_collector_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
@@ -283,7 +291,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "export_master",
-            title = uiString("achievement_export_master"),
+            title = uiString("achievement_export_master_title"),
             description = uiString("achievement_export_master_desc"),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
@@ -293,7 +301,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "backup_enthusiast",
-            title = uiString("achievement_backup_enthusiast"),
+            title = uiString("achievement_backup_enthusiast_title"),
             description = uiString("achievement_backup_enthusiast_desc"),
             iconRes = 0,
             category = AchievementCategory.EXPORT,
@@ -303,13 +311,45 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         ),
         Achievement(
             id = "csv_importer",
-            title = uiString("achievement_csv_importer"),
+            title = uiString("achievement_csv_importer_title"),
             description = uiString("achievement_csv_importer_desc"),
             iconRes = 0,
             category = AchievementCategory.IMPORT,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 15,
+        ),
+        // Shortcut
+        Achievement(
+            id = "shortcut_add_transaction",
+            title = uiString("achievement_shortcut_add_title"),
+            description = uiString("achievement_shortcut_add_desc"),
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 10,
+        ),
+        // Widgets
+        Achievement(
+            id = "widget_small_added",
+            title = uiString("achievement_widget_small_added_title"),
+            description = uiString("achievement_widget_small_added_desc"),
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 10,
+        ),
+        Achievement(
+            id = "widget_large_added",
+            title = uiString("achievement_widget_large_added_title"),
+            description = uiString("achievement_widget_large_added_desc"),
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.RARE,
+            targetProgress = 1,
+            rewardCoins = 20,
         ),
     )
 
@@ -322,8 +362,8 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
         return try {
             val initialized = prefs.getBoolean("achievements_initialized", false)
             if (!initialized) {
-                // Пусть UI-слой инициализирует локализованными строками
-                emptyList()
+                // Если не инициализированы, возвращаем дефолтные ачивки
+                defaultAchievements
             } else {
                 // Загружаем прогресс для каждого достижения отдельно, базируясь на текущем списке по умолчанию
                 defaultAchievements.map { achievement ->
@@ -340,7 +380,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
             }
         } catch (e: Exception) {
             Timber.e(e, rp.getStringByName("log_error_loading_achievements"))
-            emptyList()
+            defaultAchievements
         }
     }
 
