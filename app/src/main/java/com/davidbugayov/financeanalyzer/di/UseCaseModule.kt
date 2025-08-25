@@ -46,6 +46,14 @@ val useCaseModule =
         single { CreateDebtUseCase(get()) }
         single { GetDebtsUseCase(get()) }
         single { RepayDebtUseCase(get()) }
+        
+        // Wallet
+        single {
+            com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
+                get(),
+                get()
+            )
+        }
 
         // Analytics
         single { CalculateBalanceMetricsUseCase() }

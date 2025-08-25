@@ -73,7 +73,7 @@ tasks.register("lintAll") {
         ":feature:statistics:lintDebug",
         ":feature:profile:lintDebug",
         ":feature:onboarding:lintDebug",
-        ":feature:widget:lintDebug"
+
     )
     
     doLast {
@@ -93,7 +93,7 @@ tasks.register("resetLintBaseline") {
             "app", "core", "data", "domain", "ui", "utils", "navigation", "presentation",
             "feature", "feature:home", "feature:budget", "feature:transaction", 
             "feature:history", "feature:statistics", "feature:profile", 
-            "feature:onboarding", "feature:widget"
+            "feature:onboarding"
         )
         
         modules.forEach { module ->

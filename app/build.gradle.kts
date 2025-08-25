@@ -340,7 +340,7 @@ dependencies {
             ":feature:history",
             ":feature:statistics",
             ":feature:transaction",
-            ":feature:widget",
+
             ":feature:security",
             ":analytics"
         )

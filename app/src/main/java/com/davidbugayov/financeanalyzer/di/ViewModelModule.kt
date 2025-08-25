@@ -43,9 +43,9 @@ val viewModelModule =
 
         viewModelOf(::TransactionHistoryViewModel)
 
-        viewModel { BudgetViewModel(get(), get(), get(), get()) }
+        viewModel { BudgetViewModel(get(), get(), get(), get(), get()) }
 
-        viewModelOf(::WalletTransactionsViewModel)
+        viewModel { WalletTransactionsViewModel(get(), get(), get(), get()) }
 
         viewModelOf(::WalletSetupViewModel)
 

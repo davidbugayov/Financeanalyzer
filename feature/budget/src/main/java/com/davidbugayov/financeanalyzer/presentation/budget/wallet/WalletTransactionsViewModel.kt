@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
@@ -27,6 +28,7 @@ class WalletTransactionsViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
 ) : ViewModel(),
     KoinComponent {
     private val _state = MutableStateFlow(WalletTransactionsState())
@@ -89,6 +91,9 @@ class WalletTransactionsViewModel(
                             isLoading = false,
                         )
                     }
+                    
+                    // Обновляем виджеты при изменении кошелька
+                    updateWidgetsUseCase()
                 } else {
                     _state.update {
                         it.copy(

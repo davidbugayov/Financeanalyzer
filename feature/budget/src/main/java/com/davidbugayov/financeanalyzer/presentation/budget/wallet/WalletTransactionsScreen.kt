@@ -209,6 +209,8 @@ fun WalletTransactionsScreen(
                 onDismiss = { showImportCategoriesDialog = false },
                 onImport = { selectedCategories ->
                     // Связываем выбранные категории
+                    viewModel.onEvent(WalletTransactionsEvent.LinkCategories(selectedCategories))
+                    showImportCategoriesDialog = false
                 },
                 title = stringResource(UiR.string.import_categories_title),
                 subtitle = stringResource(UiR.string.import_categories_subtitle),

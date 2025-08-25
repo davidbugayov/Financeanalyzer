@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
@@ -24,6 +25,7 @@ class BudgetViewModel(
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
     private val sharedFacade: SharedFacade,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(BudgetState())
     val state: StateFlow<BudgetState> = _state.asStateFlow()
@@ -79,7 +81,7 @@ class BudgetViewModel(
             is BudgetEvent.AddFundsToWallet -> addFundsToWallet(event.categoryId, event.amount)
             is BudgetEvent.SpendFromWallet -> spendFromWallet(event.categoryId, event.amount)
             is BudgetEvent.TransferBetweenWallets ->
-                transferBetweenWallets(
+                transferFundsBetweenWallets(
                     event.fromCategoryId,
                     event.toCategoryId,
                     event.amount,
@@ -245,6 +247,9 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                // Обновляем виджеты при изменении кошелька
+                updateWidgetsUseCase()
             } catch (e: Exception) {
                 Timber.e(e, "Error updating wallet")
                 _state.update {
@@ -327,6 +332,9 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                // Обновляем виджеты при изменении баланса кошелька
+                updateWidgetsUseCase()
 
                 Timber.d("Средства успешно добавлены в кошелек")
             } catch (e: Exception) {
@@ -391,7 +399,7 @@ class BudgetViewModel(
     /**
      * Переводит средства между кошельками
      */
-    private fun transferBetweenWallets(
+    private fun transferFundsBetweenWallets(
         fromWalletId: String,
         toWalletId: String,
         amount: Money,
@@ -431,6 +439,9 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                // Обновляем виджеты при изменении балансов кошельков
+                updateWidgetsUseCase()
 
                 Timber.d("Средства успешно переведены между кошельками")
             } catch (e: Exception) {

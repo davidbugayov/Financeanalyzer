@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    
+    <!-- Белый фон с серой рамкой -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M2,2 L38,2 A2,2 0 0,1 40,4 L40,36 A2,2 0 0,1 38,38 L2,38 A2,2 0 0,1 0,36 L0,4 A2,2 0 0,1 2,2 Z" />
+    
+    <!-- Серая рамка -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M1,1 L39,1 A1,1 0 0,1 40,2 L40,38 A1,1 0 0,1 39,39 L1,39 A1,1 0 0,1 0,38 L0,2 A1,1 0 0,1 1,1 Z" />
+    
+    <!-- Белый фон внутри -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M2,2 L38,2 A1,1 0 0,1 39,3 L39,37 A1,1 0 0,1 38,38 L2,38 A1,1 0 0,1 1,37 L1,3 A1,1 0 0,1 2,2 Z" />
+    
+    <!-- Заголовок "Current balance" -->
+    <path
+        android:fillColor="#666666"
+        android:pathData="M8,12 L32,12 A1,1 0 0,1 33,13 L33,15 A1,1 0 0,1 32,16 L8,16 A1,1 0 0,1 7,15 L7,13 A1,1 0 0,1 8,12 Z" />
+    
+    <!-- Сумма "0 ₽" -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M10,24 L30,24 A1,1 0 0,1 31,25 L31,29 A1,1 0 0,1 30,30 L10,30 A1,1 0 0,1 9,29 L9,25 A1,1 0 0,1 10,24 Z" />
+</vector>

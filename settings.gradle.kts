@@ -67,7 +67,7 @@ include(":feature:profile")
 include(":feature:history")
 include(":feature:statistics")
 include(":feature:transaction")
-include(":feature:widget")
+
 include(":feature:budget")
 include(":feature:onboarding")
 include(":feature:security")

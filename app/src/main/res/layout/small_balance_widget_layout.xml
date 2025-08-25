@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/small_widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="6dp"
+    android:background="@drawable/widget_small_minimal_background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/small_widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/current_balance"
+        android:textSize="9sp"
+        android:textColor="#666666"
+        android:includeFontPadding="false"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/small_widget_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/default_small_amount"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#2196F3"
+        android:includeFontPadding="false"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:gravity="center" />
+</LinearLayout>

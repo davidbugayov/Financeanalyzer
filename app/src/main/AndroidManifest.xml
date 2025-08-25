@@ -84,10 +84,10 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
-      <!-- Объявление виджета баланса -->
+        <!-- Объявление виджета баланса -->
         <receiver
             android:name=".widget.BalanceWidget"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -96,10 +96,10 @@
                 android:resource="@xml/balance_widget_info" />
         </receiver>
 
-      <!-- Маленький виджет баланса -->
+        <!-- Маленький виджет баланса -->
         <receiver
             android:name=".widget.SmallBalanceWidget"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -108,7 +108,7 @@
                 android:resource="@xml/small_balance_widget_info" />
         </receiver>
 
-      <!-- BroadcastReceiver для уведомлений о транзакциях -->
+        <!-- BroadcastReceiver для уведомлений о транзакциях -->
         <receiver
             android:name=".utils.TransactionReminderReceiver"
             android:exported="false">

@@ -311,6 +311,9 @@ class HomeViewModel(
                 val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
                 val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
+                
+                // Обновляем виджеты при изменении данных
+                updateWidgetsUseCase()
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при плавном обновлении: %s", e.message)
                 loadTransactions()
@@ -372,6 +375,9 @@ class HomeViewModel(
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())?.first()
                 updateFilteredTransactions(_state.value.currentFilter)
+                
+                // Обновляем виджеты после загрузки данных
+                updateWidgetsUseCase()
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, error = e.message) }
                 throw e

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="6dp"
+    android:background="@drawable/widget_minimal_background"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/current_balance"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/widget_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_amount"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#E0E0E0" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/income"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/widget_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_amount"
+            android:textSize="12sp"
+            android:textColor="#4CAF50"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="#E0E0E0" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/expense"
+            android:textSize="10sp"
+            android:textColor="#666666"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/widget_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_amount"
+            android:textSize="12sp"
+            android:textColor="#F44336"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:gravity="center" />
+    </LinearLayout>
+</LinearLayout>

@@ -5,10 +5,12 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import timber.log.Timber
 
 class UpdateWalletBalancesUseCase(
     private val walletRepository: WalletRepository,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -63,6 +65,10 @@ class UpdateWalletBalancesUseCase(
                 }
             }
             Timber.d("UpdateWalletBalancesUseCase: Балансы кошельков успешно обновлены")
+            
+            // Обновляем виджеты после изменения балансов кошельков
+            updateWidgetsUseCase()
+            
             Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(

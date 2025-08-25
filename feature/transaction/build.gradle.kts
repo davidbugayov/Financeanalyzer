@@ -78,7 +78,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":feature"))
-    implementation(project(":feature:widget"))
+
     implementation(project(":presentation"))
     implementation(project(":shared"))
 

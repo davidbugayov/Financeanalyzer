@@ -262,6 +262,9 @@ class SharedFacade {
                     repo.updateWallet(updated)
                 }
             }
+            
+            // Обновляем виджеты после изменения балансов кошельков
+            // В KMP это заглушка - реальное обновление происходит в platform-specific коде
         } catch (t: Throwable) {
             AnalyticsProviderBridge.getProvider()?.logEvent(
                 eventName = "kmp_wallet_update_error",

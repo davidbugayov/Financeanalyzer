@@ -32,7 +32,9 @@ import com.davidbugayov.financeanalyzer.utils.AppLocale
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class FinanceActivity :
     FragmentActivity(),
@@ -165,6 +167,22 @@ class FinanceActivity :
         super<DefaultLifecycleObserver>.onResume(owner)
         // Экран блокировки показывается только при запуске приложения,
         // а не при сворачивании/разворачивании
+        
+        // Обновляем виджеты при возвращении в приложение
+        updateWidgets()
+    }
+    
+    /**
+     * Обновляет все активные виджеты
+     */
+    private fun updateWidgets() {
+        try {
+            val widgetRefresher = AndroidWidgetRefresher(this)
+            widgetRefresher.refresh()
+            Timber.d("Виджеты обновлены при запуске приложения")
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при обновлении виджетов")
+        }
     }
 
     override fun onDestroy() {

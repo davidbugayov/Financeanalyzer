@@ -67,8 +67,7 @@ val appModule =
 
         // Use cases
         single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
-            com.davidbugayov.financeanalyzer.widget
-                .AndroidWidgetRefresher(androidContext())
+            com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher(androidContext())
         }
         single {
             com.davidbugayov.financeanalyzer.domain.usecase.widgets
@@ -77,6 +76,12 @@ val appModule =
         single<ImportTransactionsUseCase> {
             com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl(
                 get<ImportTransactionsManager>(),
+            )
+        }
+        single {
+            com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
+                get(),
+                get()
             )
         }
 

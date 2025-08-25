@@ -1,6 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Деньги под Контролем</string>
+    <string name="total">Итого</string>
+    <string name="current_balance">Текущий баланс</string>
+    <string name="income">Доходы</string>
+    <string name="expense">Расходы</string>
+    <string name="default_amount">0 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
 </resources>
 
 
