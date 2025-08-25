@@ -58,7 +58,11 @@ fun groupedTransactionList(
             val total: Money =
                 list.fold(Money.zero(currentCurrency)) { acc, tx ->
                     val convertedAmount = Money.fromMajor(tx.amount.toMajorDouble(), currentCurrency)
-                    acc + convertedAmount
+                    if (tx.isExpense) {
+                        acc - convertedAmount.abs()
+                    } else {
+                        acc + convertedAmount
+                    }
                 }
             val expanded = expandedMap.getOrPut(key) { true }
 
@@ -112,7 +116,11 @@ fun groupedTransactionList(
                         modifier = Modifier.weight(1f),
                     )
                     Text(
-                        text = total.formatForDisplay(),
+                        text = if (total.isNegative()) {
+                            "-${total.abs().formatForDisplay()}"
+                        } else {
+                            "+${total.formatForDisplay()}"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = tintColor,
                     )
