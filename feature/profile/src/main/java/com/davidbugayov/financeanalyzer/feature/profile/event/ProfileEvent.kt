@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.feature.profile.event
 
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
+import com.davidbugayov.financeanalyzer.shared.model.ExportAction
 import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 

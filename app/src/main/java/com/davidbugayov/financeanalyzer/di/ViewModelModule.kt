@@ -67,5 +67,15 @@ val viewModelModule =
             )
         }
 
-        viewModel { DebtsViewModel(get(), get(), get()) }
+        viewModel {
+            DebtsViewModel(
+                createDebtUseCase = get(),
+                getDebtsUseCase = get(),
+                repayDebtUseCase = get(),
+                calculateDebtStatisticsUseCase = get(),
+                getFilteredDebtsUseCase = get(),
+                exportDebtsToCSVUseCase = get(),
+                checkOverdueDebtsUseCase = get(),
+            )
+        }
     }

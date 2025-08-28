@@ -1,13 +1,15 @@
 package com.davidbugayov.financeanalyzer.di
 
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.CalculateDebtStatisticsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.CheckOverdueDebtsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.CreateDebtUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.ExportDebtsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.GetDebtsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.debt.GetFilteredDebtsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.RepayDebtUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateCategoryStatsUseCase
@@ -36,26 +38,20 @@ val useCaseModule =
         single<ImportTransactionsUseCase> {
             ImportTransactionsUseCaseImpl(get<ImportTransactionsManager>())
         }
-        single { ExportTransactionsToCSVUseCase(get()) }
 
         // Transactions
         single { LoadTransactionsUseCase(get()) }
-
-        // Subcategories
-        single { GetSubcategoryByIdUseCase(get()) }
 
         // Debts
         single { CreateDebtUseCase(get()) }
         single { GetDebtsUseCase(get()) }
         single { RepayDebtUseCase(get()) }
+        single { CalculateDebtStatisticsUseCase(get()) }
+        single { GetFilteredDebtsUseCase(get()) }
+        single { ExportDebtsToCSVUseCase(get()) }
+        single { CheckOverdueDebtsUseCase(get()) }
 
-        // Wallet
-        single {
-            com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
-                get(),
-                get(),
-            )
-        }
+
 
         // Analytics
         single { CalculateBalanceMetricsUseCase() }

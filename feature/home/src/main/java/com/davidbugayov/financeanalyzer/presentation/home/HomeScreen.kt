@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -33,7 +34,7 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
@@ -102,12 +103,12 @@ private fun HomeTopBar(
                     contentDescription = stringResource(UiR.string.profile),
                 )
             }
-            // IconButton(onClick = onNavigateToDebts) {
-            //     Icon(
-            //         imageVector = Icons.Default.Add,
-            //         contentDescription = stringResource(UiR.string.debt_title),
-            //     )
-            // }
+            IconButton(onClick = onNavigateToDebts) {
+                Icon(
+                    imageVector = Icons.Default.AccountBalance,
+                    contentDescription = stringResource(UiR.string.debt_title),
+                )
+            }
         },
     )
 }
@@ -254,7 +255,7 @@ fun HomeScreen(
     var showDetailDialog by remember { mutableStateOf(false) }
 
     // Состояние для подкатегории и иконки категории
-    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+    val sharedFacade = remember { SharedFacade() }
     var subcategoryNameForActions by remember { mutableStateOf("") }
     var subcategoryNameForDetail by remember { mutableStateOf("") }
     var categoryIconForActions by remember { mutableStateOf<ImageVector?>(null) }
@@ -267,7 +268,7 @@ fun HomeScreen(
     LaunchedEffect(selectedTransactionForActions?.subcategoryId) {
         selectedTransactionForActions?.subcategoryId?.let { subcategoryId ->
             try {
-                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                val subcategory = sharedFacade.getSubcategoryById(subcategoryId)
                 subcategoryNameForActions = subcategory?.name ?: ""
             } catch (_: Exception) {
                 subcategoryNameForActions = ""
@@ -297,7 +298,7 @@ fun HomeScreen(
     LaunchedEffect(selectedTransactionForDetail?.subcategoryId) {
         selectedTransactionForDetail?.subcategoryId?.let { subcategoryId ->
             try {
-                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                val subcategory = sharedFacade.getSubcategoryById(subcategoryId)
                 subcategoryNameForDetail = subcategory?.name ?: ""
             } catch (_: Exception) {
                 subcategoryNameForDetail = ""

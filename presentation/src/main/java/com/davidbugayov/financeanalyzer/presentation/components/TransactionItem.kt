@@ -48,7 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
 import com.davidbugayov.financeanalyzer.shared.model.Money
@@ -105,8 +105,8 @@ fun transactionItem(
     val isDarkTheme = isSystemInDarkTheme()
     val context = LocalContext.current
 
-    // Получаем UseCase для загрузки подкатегорий
-    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+    // Получаем SharedFacade для работы с данными
+    val sharedFacade = remember { SharedFacade() }
 
     // Состояние для названия подкатегории
     var subcategoryName by remember { mutableStateOf("") }
@@ -115,7 +115,7 @@ fun transactionItem(
     LaunchedEffect(transaction.subcategoryId) {
         transaction.subcategoryId?.let { subcategoryId ->
             try {
-                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                val subcategory = sharedFacade.getSubcategoryById(subcategoryId)
                 subcategoryName = subcategory?.name ?: ""
             } catch (e: Exception) {
                 Timber.e(e.toString())

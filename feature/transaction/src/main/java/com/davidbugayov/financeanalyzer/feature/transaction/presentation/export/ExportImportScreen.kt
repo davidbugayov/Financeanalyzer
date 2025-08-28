@@ -59,6 +59,7 @@ import androidx.compose.ui.window.Dialog
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.shared.model.ExportAction
 
 /**
  * Экран экспорта/импорта транзакций.
@@ -240,9 +241,9 @@ fun exportImportScreen(
             // Export Action Dialog
             if (showExportDialog) {
                 modernCsvExportDialog(
-                    onShare = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.SHARE) },
-                    onOpen = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.OPEN) },
-                    onSave = { viewModel.exportTransactions(ExportImportViewModel.ExportAction.SAVE) },
+                    onShare = { viewModel.exportTransactions(ExportAction.SHARE) },
+                    onOpen = { viewModel.exportTransactions(ExportAction.OPEN) },
+                    onSave = { viewModel.exportTransactions(ExportAction.SAVE) },
                     onDismiss = { showExportDialog = false },
                 )
             }

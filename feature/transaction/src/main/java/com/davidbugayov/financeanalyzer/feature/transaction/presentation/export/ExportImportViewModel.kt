@@ -6,9 +6,14 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.util.Result
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.model.ExportAction
 import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,9 +28,8 @@ import timber.log.Timber
  */
 class ExportImportViewModel(
     application: Application,
-) : AndroidViewModel(application),
-    KoinComponent {
-    private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase by inject()
+) : AndroidViewModel(application) {
+    private val sharedFacade = SharedFacade()
 
     private val _isExporting = MutableStateFlow(false)
     val isExporting: StateFlow<Boolean> = _isExporting.asStateFlow()
@@ -47,37 +51,40 @@ class ExportImportViewModel(
 
             try {
                 Timber.d("[ExportImportViewModel] Начинаем экспорт с действием: $action")
-                val result = exportTransactionsToCSVUseCase()
 
-                when (result) {
-                    is Result.Success<File> -> {
-                        val file = result.data
-                        Timber.d("[ExportImportViewModel] Экспорт успешен: ${file.absolutePath}")
+                // Получаем все транзакции
+                val transactions = sharedFacade.loadTransactions()
 
-                        // Триггеры достижений за экспорт
-                        AchievementTrigger.onTransactionExported()
-                        AchievementTrigger.onMilestoneReached("export_master")
-                        AchievementTrigger.onMilestoneReached("backup_enthusiast")
+                if (transactions.isEmpty()) {
+                    _exportError.value = "Нет транзакций для экспорта"
+                    return@launch
+                }
 
-                        // Выполняем выбранное действие
-                        when (action) {
-                            ExportAction.SHARE -> {
-                                val shareResult = shareFile(file)
-                                handleActionResult(shareResult, "поделиться файлом")
-                            }
-                            ExportAction.OPEN -> {
-                                val openResult = openFile(file)
-                                handleActionResult(openResult, "открыть файл")
-                            }
-                            ExportAction.SAVE -> {
-                                _exportResult.value = "Файл сохранен: ${file.absolutePath}"
-                            }
-                        }
+                // Экспортируем в CSV
+                val csvContent = sharedFacade.exportTransactionsCsv(transactions)
+                Timber.d("[ExportImportViewModel] CSV сгенерирован, размер: ${csvContent.length}")
+
+                // Сохраняем в файл
+                val file = saveCsvToFile(csvContent)
+                Timber.d("[ExportImportViewModel] Файл сохранен: ${file.absolutePath}")
+
+                // Триггеры достижений за экспорт
+                AchievementTrigger.onTransactionExported()
+                AchievementTrigger.onMilestoneReached("export_master")
+                AchievementTrigger.onMilestoneReached("backup_enthusiast")
+
+                // Выполняем выбранное действие
+                when (action) {
+                    ExportAction.SHARE -> {
+                        val shareResult = shareFile(file)
+                        handleActionResult(shareResult, "поделиться файлом")
                     }
-                    is Result.Error -> {
-                        val errorMsg = result.exception.message ?: "Неизвестная ошибка экспорта"
-                        Timber.e("[ExportImportViewModel] Ошибка экспорта: $errorMsg")
-                        _exportError.value = errorMsg
+                    ExportAction.OPEN -> {
+                        val openResult = openFile(file)
+                        handleActionResult(openResult, "открыть файл")
+                    }
+                    ExportAction.SAVE -> {
+                        _exportResult.value = "Файл сохранен: ${file.absolutePath}"
                     }
                 }
             } catch (e: Exception) {
@@ -114,6 +121,24 @@ class ExportImportViewModel(
     fun clearExportMessages() {
         _exportResult.value = null
         _exportError.value = null
+    }
+
+    /**
+     * Сохраняет CSV содержимое в файл
+     */
+    private fun saveCsvToFile(csvContent: String): File {
+        val context = getApplication<Application>()
+        val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(Date())
+        val fileName = "transactions_export_$timestamp.csv"
+
+        // Сохраняем в кэш директорию приложения
+        val file = File(context.cacheDir, fileName)
+
+        FileOutputStream(file).use { outputStream ->
+            outputStream.write(csvContent.toByteArray(Charsets.UTF_8))
+        }
+
+        return file
     }
 
     /**
@@ -230,12 +255,5 @@ class ExportImportViewModel(
             )
         }
 
-    /**
-     * Типы действий для экспорта.
-     */
-    enum class ExportAction {
-        SHARE, // Поделиться файлом
-        OPEN, // Открыть файл
-        SAVE, // Только сохранить
-    }
+
 }

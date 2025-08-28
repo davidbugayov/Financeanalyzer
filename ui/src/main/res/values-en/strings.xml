@@ -1368,6 +1368,8 @@
       <item quantity="one">Track expenses for %1$d day</item>
       <item quantity="other">Track expenses for %1$d days</item>
     </plurals>
+
+
     <string name="achievement_savings_rate_improver_desc">Improve savings rate by %1$s%%</string>
     <plurals name="achievement_financial_educator_desc">
       <item quantity="one">Read %1$d financial tip</item>

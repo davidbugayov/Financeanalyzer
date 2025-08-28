@@ -41,7 +41,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -97,7 +97,7 @@ fun TransactionHistoryScreen(
     var categoryColorForActions by remember { mutableStateOf<androidx.compose.ui.graphics.Color?>(null) }
 
     // Состояние для подкатегории
-    val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase = koinInject()
+    val sharedFacade = remember { SharedFacade() }
     var subcategoryNameForActions by remember { mutableStateOf("") }
     var subcategoryNameForDetail by remember { mutableStateOf("") }
 
@@ -105,7 +105,7 @@ fun TransactionHistoryScreen(
     LaunchedEffect(selectedTransaction?.subcategoryId) {
         selectedTransaction?.subcategoryId?.let { subcategoryId ->
             try {
-                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                val subcategory = sharedFacade.getSubcategoryById(subcategoryId)
                 subcategoryNameForActions = subcategory?.name ?: ""
             } catch (_: Exception) {
                 subcategoryNameForActions = ""
@@ -119,7 +119,7 @@ fun TransactionHistoryScreen(
     LaunchedEffect(selectedTransactionForDetail?.subcategoryId) {
         selectedTransactionForDetail?.subcategoryId?.let { subcategoryId ->
             try {
-                val subcategory = getSubcategoryByIdUseCase(subcategoryId)
+                val subcategory = sharedFacade.getSubcategoryById(subcategoryId)
                 subcategoryNameForDetail = subcategory?.name ?: ""
             } catch (_: Exception) {
                 subcategoryNameForDetail = ""

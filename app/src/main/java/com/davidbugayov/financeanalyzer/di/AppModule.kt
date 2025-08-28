@@ -78,12 +78,7 @@ val appModule =
                 get<ImportTransactionsManager>(),
             )
         }
-        single {
-            com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
-                get(),
-                get(),
-            )
-        }
+
 
         // App-level coroutine scope
         single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
