@@ -243,6 +243,8 @@ fun CompactLayout(
                                 totalExpense = state.filteredExpense,
                                 currentFilter = state.currentFilter,
                                 balance = state.filteredBalance,
+                                periodStartDate = state.periodStartDate,
+                                periodEndDate = state.periodEndDate,
                             )
                         }
                     }

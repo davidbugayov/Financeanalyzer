@@ -25,6 +25,8 @@ data class HomeState(
     val filteredIncome: Money = Money.zero(),
     val filteredExpense: Money = Money.zero(),
     val filteredBalance: Money = Money.zero(),
+    val periodStartDate: java.util.Date? = null,
+    val periodEndDate: java.util.Date? = null,
     val transactionToDelete: Transaction? = null,
     val topCategories: Map<String, Money> = emptyMap(),
     val smartExpenseTips: List<String> = emptyList(),

@@ -330,6 +330,7 @@ class HomeViewModel(
         transactions: List<Transaction>,
     ) {
         viewModelScope.launch {
+            val (startDate, endDate) = getPeriodDates(filter)
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
                     val income = financialMetrics.getTotalIncomeAsMoney()
@@ -350,6 +351,8 @@ class HomeViewModel(
                     filteredIncome = filteredIncome,
                     filteredExpense = filteredExpense,
                     filteredBalance = filteredBalance,
+                    periodStartDate = startDate,
+                    periodEndDate = endDate,
                     isLoading = false, // Не показываем индикатор загрузки
                 )
             }
@@ -508,6 +511,8 @@ class HomeViewModel(
                     filteredIncome = filteredIncome,
                     filteredExpense = filteredExpense,
                     filteredBalance = filteredBalance,
+                    periodStartDate = startDate,
+                    periodEndDate = endDate,
                     isLoading = false,
                     smartExpenseTips = tips, // обновляем советы
                     expenseOptimizationRecommendations = recommendations, // сохраняем рекомендации
@@ -635,7 +640,8 @@ class HomeViewModel(
                 startCalendar.set(Calendar.MILLISECOND, 0)
             }
             TransactionFilter.MONTH -> {
-                startCalendar.add(Calendar.DAY_OF_MONTH, -29)
+                // Устанавливаем начало текущего месяца
+                startCalendar.set(Calendar.DAY_OF_MONTH, 1)
                 startCalendar.set(Calendar.HOUR_OF_DAY, 0)
                 startCalendar.set(Calendar.MINUTE, 0)
                 startCalendar.set(Calendar.SECOND, 0)

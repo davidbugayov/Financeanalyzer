@@ -65,6 +65,8 @@ fun HomeGroupSummary(
     totalExpense: Money,
     currentFilter: TransactionFilter = TransactionFilter.MONTH,
     balance: Money? = null,
+    periodStartDate: java.util.Date? = null,
+    periodEndDate: java.util.Date? = null,
 ) {
     val cardBg = LocalSummaryCardBackground.current
     val incomeColor = LocalSummaryIncome.current
@@ -78,7 +80,7 @@ fun HomeGroupSummary(
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
     var showExpenses by rememberSaveable { mutableStateOf(true) }
 
-    val periodTitle = periodTitleForFilter(currentFilter)
+    val periodTitle = periodTitleForFilter(currentFilter, periodStartDate, periodEndDate)
 
     val categoryGroups =
         remember(filteredTransactions, showExpenses) {
@@ -472,13 +474,34 @@ private fun SummaryHideButton(
 }
 
 @Composable
-private fun periodTitleForFilter(filter: TransactionFilter): String =
-    when (filter) {
-        TransactionFilter.TODAY -> stringResource(UiR.string.filter_today)
-        TransactionFilter.WEEK -> stringResource(UiR.string.filter_week)
-        TransactionFilter.MONTH -> stringResource(UiR.string.filter_month)
+private fun periodTitleForFilter(
+    filter: TransactionFilter,
+    startDate: java.util.Date? = null,
+    endDate: java.util.Date? = null
+): String {
+    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+
+    return when (filter) {
+        TransactionFilter.TODAY -> {
+            startDate?.let { "${stringResource(UiR.string.filter_today)} (${dateFormat.format(it)})" }
+                ?: stringResource(UiR.string.filter_today)
+        }
+        TransactionFilter.WEEK -> {
+            if (startDate != null && endDate != null) {
+                "${stringResource(UiR.string.filter_week)} (${dateFormat.format(startDate)} - ${dateFormat.format(endDate)})"
+            } else {
+                stringResource(UiR.string.filter_week)
+            }
+        }
+        TransactionFilter.MONTH -> {
+            startDate?.let {
+                val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
+                "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)})"
+            } ?: stringResource(UiR.string.filter_month)
+        }
         TransactionFilter.ALL -> stringResource(UiR.string.all_time)
     }
+}
 
 /**
  * Класс для хранения сводной информации о категории
