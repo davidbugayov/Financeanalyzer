@@ -140,14 +140,8 @@ fun BalanceCard(
                     .fillMaxWidth()
                     .background(gradientBrush)
                     .padding(
-                        vertical =
-                            dimensionResource(
-                                UiR.dimen.enhanced_summary_card_padding_vertical,
-                            ),
-                        horizontal =
-                            dimensionResource(
-                                UiR.dimen.enhanced_summary_card_padding_horizontal,
-                            ),
+                        vertical = 16.dp,
+                        horizontal = 16.dp,
                     ),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -155,7 +149,7 @@ fun BalanceCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
+                        8.dp,
                     ),
             )
             // Баланс в центре, снизу две цветные плашки доходов/расходов
@@ -163,7 +157,7 @@ fun BalanceCard(
             Spacer(
                 modifier =
                     Modifier.height(
-                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
+                        8.dp,
                     ),
             )
             Row(
@@ -217,14 +211,14 @@ private fun AmountPill(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         color = Color.Transparent,
-        tonalElevation = 2.dp,
-        shadowElevation = 2.dp,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
         border = BorderStroke(width = 1.dp, color = color.copy(alpha = 0.2f)),
     ) {
         Column(
             modifier = Modifier
                 .background(pillGradient)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 10.dp, vertical = 6.dp),
         ) {
             Text(
                 text = stringResource(id = labelRes),

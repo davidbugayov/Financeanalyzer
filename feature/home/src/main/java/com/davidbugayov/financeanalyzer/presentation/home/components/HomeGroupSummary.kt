@@ -98,7 +98,7 @@ fun HomeGroupSummary(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 2.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         border =
@@ -108,7 +108,7 @@ fun HomeGroupSummary(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(8.dp),
         ) {
             SummaryHeader(periodTitle, textPrimary)
             SummaryTotals(
@@ -120,7 +120,7 @@ fun HomeGroupSummary(
                 balanceColor,
                 textSecondary,
             )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = dividerColor)
+            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), color = dividerColor)
             SummaryCategorySwitcher(
                 showExpenses,
                 onSwitch = { showExpenses = !showExpenses },
@@ -164,7 +164,7 @@ private fun SummaryHeader(
         style = MaterialTheme.typography.titleMedium,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 4.dp),
+        modifier = Modifier.padding(bottom = 2.dp),
         color = textPrimary,
     )
 }
@@ -181,7 +181,7 @@ private fun SummaryTotals(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         // Доходы
         androidx.compose.foundation.layout.Box(
@@ -191,7 +191,7 @@ private fun SummaryTotals(
                     color = incomeColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -205,7 +205,7 @@ private fun SummaryTotals(
                         tint = incomeColor,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(UiR.string.total_income),
                         fontSize = 14.sp,
@@ -230,7 +230,7 @@ private fun SummaryTotals(
                     color = expenseColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -244,7 +244,7 @@ private fun SummaryTotals(
                         tint = expenseColor,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(UiR.string.total_expense),
                         fontSize = 14.sp,
@@ -269,7 +269,7 @@ private fun SummaryTotals(
                     color = balanceColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -307,7 +307,7 @@ private fun SummaryCategorySwitcher(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(bottom = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -345,7 +345,7 @@ private fun SummaryCategoryList(
     val totalAmount = visibleCategories.sumOf { it.amount.abs().amount }.toFloat()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         visibleCategories.forEach { categorySummary ->
             val progress = if (totalAmount > 0f) {
@@ -356,7 +356,7 @@ private fun SummaryCategoryList(
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(1.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

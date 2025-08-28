@@ -66,8 +66,8 @@ fun PermissionUtilsHomeFilterChips(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(UiR.dimen.spacing_small)),
+                .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         filters.forEach { filterData ->
             FilterChipItem(

@@ -74,8 +74,8 @@ fun ExpandedLayout(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                .padding(horizontal = 12.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         ExpandedLeftPanel(
             state = state,
@@ -109,7 +109,7 @@ private fun ExpandedLeftPanel(
         modifier =
             modifier
                 .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
 
