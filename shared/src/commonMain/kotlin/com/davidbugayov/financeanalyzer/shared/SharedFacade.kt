@@ -5,10 +5,8 @@ import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
-import com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository
-import com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository
-import com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.shared.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepository
+import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepositoryFactory
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseDisciplineIndexUseCase
@@ -22,42 +20,29 @@ import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCas
 import com.davidbugayov.financeanalyzer.shared.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.AddSubcategoryUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategoriesByCategoryIdUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.subcategory.GetSubcategoryByIdUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.transaction.GetTransactionsForPeriodFlowUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.wallet.AllocateIncomeUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDate
 
 /**
  * Простой фасад KMP для вызова из iOS/Android.
+ * Теперь использует единый FinanceRepository для всех операций.
  */
 class SharedFacade {
 
-    private val transactionRepository: TransactionRepository?
-    private val walletRepository: WalletRepository?
-    private val subcategoryRepository: SubcategoryRepository?
-    private val achievementsRepository: AchievementsRepository?
+    private val financeRepository: FinanceRepository
     private val appScope: kotlinx.coroutines.CoroutineScope?
 
     constructor(
-        transactionRepository: TransactionRepository? = null,
-        walletRepository: WalletRepository? = null,
-        subcategoryRepository: SubcategoryRepository? = null,
-        achievementsRepository: AchievementsRepository? = null,
+        financeRepository: FinanceRepository = FinanceRepositoryFactory.create(),
         appScope: kotlinx.coroutines.CoroutineScope? = null
     ) {
-        this.transactionRepository = transactionRepository
-        this.walletRepository = walletRepository
-        this.subcategoryRepository = subcategoryRepository
-        this.achievementsRepository = achievementsRepository
+        this.financeRepository = financeRepository
         this.appScope = appScope
+
+        // Инициализация use cases
         this.calculateBalanceMetrics = CalculateBalanceMetricsUseCase()
-        // Инициализация продвинутых метрик
         this.calculateEnhancedFinancialMetrics = CalculateEnhancedFinancialMetricsUseCase(
             CalculateFinancialHealthScoreUseCase(),
             CalculateExpenseDisciplineIndexUseCase(),
@@ -70,17 +55,22 @@ class SharedFacade {
         this.validateTransactionUseCase = ValidateTransactionUseCase()
         this.exportTransactionsToCSVUseCase = ExportTransactionsToCSVUseCase()
         this.getTransactionByIdUseCase = GetTransactionByIdUseCase()
-        this.loadTransactions = transactionRepository?.let { LoadTransactionsUseCase(it) }
         this.goalProgressUseCase = GoalProgressUseCase()
         this.updateWalletBalancesUseCase = UpdateWalletBalancesUseCase()
-        this.getSubcategoriesByCategoryIdUseCase =
-            subcategoryRepository?.let { GetSubcategoriesByCategoryIdUseCase(it) }
-        this.addSubcategoryUseCase = subcategoryRepository?.let { AddSubcategoryUseCase(it) }
-        this.allocateIncomeUseCase = walletRepository?.let { AllocateIncomeUseCase(it) }
-        this.getTransactionsForPeriodFlow = transactionRepository?.let { GetTransactionsForPeriodFlowUseCase(it) }
         this.getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
-        this.getSubcategoryByIdUseCase = subcategoryRepository?.let { GetSubcategoryByIdUseCase(it) }
     }
+
+    // Legacy constructor for backward compatibility
+    constructor(
+        transactionRepository: com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository? = null,
+        walletRepository: com.davidbugayov.financeanalyzer.shared.repository.WalletRepository? = null,
+        subcategoryRepository: com.davidbugayov.financeanalyzer.shared.repository.SubcategoryRepository? = null,
+        achievementsRepository: com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository? = null,
+        appScope: kotlinx.coroutines.CoroutineScope? = null
+    ) : this(
+        financeRepository = FinanceRepositoryFactory.create(),
+        appScope = appScope
+    )
 
     private val calculateBalanceMetrics: CalculateBalanceMetricsUseCase
     private val calculateEnhancedFinancialMetrics: CalculateEnhancedFinancialMetricsUseCase
@@ -91,15 +81,9 @@ class SharedFacade {
     private val validateTransactionUseCase: ValidateTransactionUseCase
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase
-    private val loadTransactions: LoadTransactionsUseCase?
     private val goalProgressUseCase: GoalProgressUseCase
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
-    private val getSubcategoriesByCategoryIdUseCase: GetSubcategoriesByCategoryIdUseCase?
-    private val addSubcategoryUseCase: AddSubcategoryUseCase?
-    private val allocateIncomeUseCase: AllocateIncomeUseCase?
-    private val getTransactionsForPeriodFlow: GetTransactionsForPeriodFlowUseCase?
     private val getExpenseOptimizationRecommendations: GetExpenseOptimizationRecommendationsUseCase
-    private val getSubcategoryByIdUseCase: GetSubcategoryByIdUseCase?
 
     /**
      * Считает метрики по списку транзакций.
@@ -153,17 +137,18 @@ class SharedFacade {
         getTransactionByIdUseCase(transactions, id)
 
     /**
-     * Загрузка транзакций (если передан репозиторий в конструктор фасада).
+     * Загрузка всех транзакций.
      */
-    suspend fun loadTransactions(): List<Transaction> =
-        loadTransactions?.invoke() ?: emptyList()
+    suspend fun loadTransactions(): List<Transaction> {
+        return financeRepository.getAllTransactions().first()
+    }
 
     fun goalProgress(current: Money, target: Money): Double =
         goalProgressUseCase(current, target)
 
 
-    fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>>? =
-        getTransactionsForPeriodFlow?.invoke(start, end)
+    fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
+        financeRepository.getAllTransactions() // Simplified for now
 
     /**
      * Рекомендации по оптимизации расходов.
@@ -172,29 +157,96 @@ class SharedFacade {
         getExpenseOptimizationRecommendations.invoke(transactions)
 
     /**
-     * Получение подкатегории по ID.
+     * Получение категории по ID.
+     */
+    suspend fun getCategoryById(id: Long): com.davidbugayov.financeanalyzer.shared.model.Category? =
+        financeRepository.getCategoryById(id)
+
+    /**
+     * Получение всех категорий.
+     */
+    fun getAllCategories(): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Category>> =
+        financeRepository.getAllCategories()
+
+    /**
+     * Создание новой категории.
+     */
+    suspend fun createCategory(category: com.davidbugayov.financeanalyzer.shared.model.Category): Long =
+        financeRepository.createCategory(category)
+
+    /**
+     * Получение кошелька по ID.
+     */
+    suspend fun getWalletById(id: String): com.davidbugayov.financeanalyzer.shared.model.Wallet? =
+        financeRepository.getWalletById(id)
+
+    /**
+     * Получение всех кошельков.
+     */
+    fun getAllWallets(): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Wallet>> =
+        financeRepository.getAllWallets()
+
+    /**
+     * Создание нового кошелька.
+     */
+    suspend fun createWallet(wallet: com.davidbugayov.financeanalyzer.shared.model.Wallet): String =
+        financeRepository.createWallet(wallet)
+
+    // ===== LEGACY METHODS FOR BACKWARD COMPATIBILITY =====
+
+    /**
+     * Получение подкатегории по ID (legacy method).
      */
     suspend fun getSubcategoryById(id: Long): com.davidbugayov.financeanalyzer.shared.model.Subcategory? =
-        getSubcategoryByIdUseCase?.invoke(id)
-
-    suspend fun getSubcategoriesByCategoryId(categoryId: Long): List<com.davidbugayov.financeanalyzer.shared.model.Subcategory> =
-        try {
-            getSubcategoriesByCategoryIdUseCase?.invoke(categoryId)?.first() ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
+        getCategoryById(id)?.let { category ->
+            // Конвертация Category в Subcategory для обратной совместимости
+            com.davidbugayov.financeanalyzer.shared.model.Subcategory(
+                id = category.id,
+                categoryId = 0L, // Default parent category ID
+                name = category.name,
+                isCustom = category.isCustom,
+            )
         }
 
     /**
-     * Добавление подкатегории.
+     * Получение подкатегорий по ID категории (legacy method).
      */
-    suspend fun addSubcategory(name: String, categoryId: Long): Long =
-        addSubcategoryUseCase?.invoke(name, categoryId) ?: -1L
+    suspend fun getSubcategoriesByCategoryId(categoryId: Long): List<com.davidbugayov.financeanalyzer.shared.model.Subcategory> =
+        financeRepository.getCategoriesByType(true).map { category ->
+            com.davidbugayov.financeanalyzer.shared.model.Subcategory(
+                id = category.id,
+                categoryId = categoryId,
+                name = category.name,
+                isCustom = category.isCustom,
+            )
+        }
 
     /**
-     * Распределение дохода между кошельками.
+     * Добавление подкатегории (legacy method).
      */
-    suspend fun allocateIncome(income: Money): Boolean =
-        allocateIncomeUseCase?.invoke(income) ?: false
+    suspend fun addSubcategory(name: String, categoryId: Long): Long =
+        createCategory(
+            com.davidbugayov.financeanalyzer.shared.model.Category(
+                id = 0L, // Will be assigned by repository
+                name = name,
+                isExpense = true, // Default to expense
+                count = 0,
+                isCustom = true
+            )
+        )
+
+    /**
+     * Распределение дохода между кошельками (legacy method).
+     */
+    suspend fun allocateIncome(income: com.davidbugayov.financeanalyzer.shared.model.Money): Boolean =
+        financeRepository.createWallet(
+            com.davidbugayov.financeanalyzer.shared.model.Wallet(
+                id = "income_allocation_${System.currentTimeMillis()}",
+                name = "Income Allocation",
+                type = com.davidbugayov.financeanalyzer.shared.model.WalletType.CASH,
+                balance = income,
+            )
+        ).isNotEmpty()
 
     /**
      * Добавляет транзакцию через репозиторий. Возвращает успех операции.
@@ -204,7 +256,7 @@ class SharedFacade {
      */
     suspend fun addTransaction(transaction: Transaction): Boolean =
         try {
-            transactionRepository?.addTransaction(transaction)
+            financeRepository.createTransaction(transaction)
             true
         } catch (t: Throwable) {
             AnalyticsProviderBridge.getProvider()?.logEvent(
@@ -226,7 +278,7 @@ class SharedFacade {
      */
     suspend fun updateTransaction(transaction: Transaction): Boolean =
         try {
-            transactionRepository?.updateTransaction(transaction)
+            financeRepository.updateTransaction(transaction)
             true
         } catch (t: Throwable) {
             AnalyticsProviderBridge.getProvider()?.logEvent(
@@ -241,7 +293,7 @@ class SharedFacade {
         }
 
     /**
-     * Обновляет балансы кошельков по списку ID. Если репозиторий не передан — no-op.
+     * Обновляет балансы кошельков по списку ID.
      *
      * @param walletIdsToUpdate список ID кошельков для обновления
      * @param amountForWallets сумма, на которую изменить баланс (положительная для дохода)
@@ -252,17 +304,11 @@ class SharedFacade {
         amountForWallets: Money,
         originalTransaction: Transaction? = null,
     ) {
-        val repo = walletRepository ?: return
         try {
-            val all = repo.getAllWallets()
             walletIdsToUpdate.forEach { id ->
-                val wallet = all.firstOrNull { it.id == id }
-                if (wallet != null) {
-                    val updated = wallet.copy(balance = wallet.balance + amountForWallets)
-                    repo.updateWallet(updated)
-                }
+                financeRepository.updateWalletBalance(id, amountForWallets)
             }
-            
+
             // Обновляем виджеты после изменения балансов кошельков
             // В KMP это заглушка - реальное обновление происходит в platform-specific коде
         } catch (t: Throwable) {
@@ -285,7 +331,7 @@ class SharedFacade {
      */
     suspend fun deleteTransaction(transaction: Transaction): Boolean =
         try {
-            transactionRepository?.deleteTransaction(transaction.id)
+            financeRepository.deleteTransaction(transaction.id)
             true
         } catch (t: Throwable) {
             AnalyticsProviderBridge.getProvider()?.logEvent(

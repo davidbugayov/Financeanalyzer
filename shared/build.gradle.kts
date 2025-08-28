@@ -49,6 +49,9 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(libs.kotlin.coroutines.android)
+                // Dependencies will be added later to avoid circular dependencies
+                // implementation(project(":domain"))
+                // implementation(project(":data"))
             }
         }
         val androidUnitTest by getting
