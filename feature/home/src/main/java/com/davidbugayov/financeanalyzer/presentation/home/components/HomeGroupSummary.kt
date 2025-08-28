@@ -188,11 +188,11 @@ private fun SummaryHeader(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 6.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f)
         )
     ) {
         Row(
@@ -205,16 +205,16 @@ private fun SummaryHeader(
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = periodTitle,
                 style = MaterialTheme.typography.titleMedium,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = textPrimary,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -540,7 +540,9 @@ private fun periodTitleForFilter(
     endDate: java.util.Date? = null,
     transactionCount: Int = 0
 ): String {
-    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+    // Используем русскую локаль для корректного отображения месяцев/дат
+    val ruLocale = java.util.Locale("ru", "RU")
+    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
     val transactionText = if (transactionCount == 1) {
         "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
     } else if (transactionCount in 2..4) {
@@ -552,19 +554,23 @@ private fun periodTitleForFilter(
     return when (filter) {
         TransactionFilter.TODAY -> {
             startDate?.let {
-                "${stringResource(UiR.string.filter_today)} (${dateFormat.format(it)}) • $transactionText"
+                val dayMonthFormat = java.text.SimpleDateFormat("d MMMM", ruLocale)
+                "${stringResource(UiR.string.filter_today)} (${dayMonthFormat.format(it)}) • $transactionText"
             } ?: "${stringResource(UiR.string.filter_today)} • $transactionText"
         }
         TransactionFilter.WEEK -> {
             if (startDate != null && endDate != null) {
-                "${stringResource(UiR.string.filter_week)} (${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}) • $transactionText"
+                val dayMonth = java.text.SimpleDateFormat("d MMMM", ruLocale)
+                val startStr = dayMonth.format(startDate)
+                val endStr = dayMonth.format(endDate)
+                "${stringResource(UiR.string.filter_week)} ($startStr - $endStr) • $transactionText"
             } else {
                 "${stringResource(UiR.string.filter_week)} • $transactionText"
             }
         }
         TransactionFilter.MONTH -> {
             startDate?.let {
-                val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
+                val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", ruLocale)
                 "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)}) • $transactionText"
             } ?: "${stringResource(UiR.string.filter_month)} • $transactionText"
         }

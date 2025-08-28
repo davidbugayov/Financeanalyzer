@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
@@ -825,27 +826,11 @@ fun FinancialStatisticsScreen(
                                             Spacer(Modifier.height(6.dp))
 
                                             // Форматируем сумму с валютой
-                                            val currencyCode = stringResource(id = UiR.string.settings_currency_current_value)
-                                            val formatted = remember(predictedExpenses, currencyCode) {
-                                                try {
-                                                    // Проверяем, что currencyCode является валидным 3-буквенным кодом
-                                                    if (currencyCode.length == 3 && currencyCode.all { it.isLetter() }) {
-                                                        java.text.NumberFormat.getCurrencyInstance().apply {
-                                                            this.currency = java.util.Currency.getInstance(currencyCode)
-                                                        }.format(predictedExpenses.toMajorDouble())
-                                                    } else {
-                                                        // Если код невалидный, используем простое форматирование
-                                                        "${predictedExpenses.toMajorDouble()} ${predictedExpenses.currency.symbol}"
-                                                    }
-                                                } catch (e: IllegalArgumentException) {
-                                                    // Если возникла ошибка с валютой, используем простое форматирование
-                                                    timber.log.Timber.w(e, "Invalid currency code: $currencyCode, using fallback formatting")
-                                                    "${predictedExpenses.toMajorDouble()} ${predictedExpenses.currency.symbol}"
-                                                }
-                                            }
+                                            // Форматируем сумму через Money.formatForDisplay (единый формат приложения)
+                                            val amountText = predictedExpenses.formatForDisplay(showCurrency = true, useMinimalDecimals = true)
 
                                             Text(
-                                                text = stringResource(id = UiR.string.prediction_next_month, formatted),
+                                                text = stringResource(id = UiR.string.prediction_next_month, amountText),
                                                 style = MaterialTheme.typography.titleSmall,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             )

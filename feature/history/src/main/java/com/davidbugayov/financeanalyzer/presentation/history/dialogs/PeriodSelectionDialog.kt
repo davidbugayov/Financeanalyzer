@@ -48,7 +48,9 @@ fun PeriodSelectionDialog(
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val ru = Locale("ru", "RU")
+    val fullDate = SimpleDateFormat("dd.MM.yyyy", ru)
+    val dayMonth = SimpleDateFormat("d MMMM", ru)
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
         val now = java.util.Calendar.getInstance()
@@ -127,7 +129,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.DAY,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_day, dateFormat.format(s)),
+                        title = stringResource(UiR.string.period_day, dayMonth.format(s)),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -137,7 +139,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.WEEK,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_week, dateFormat.format(s), dateFormat.format(e)),
+                        title = stringResource(UiR.string.period_week, dayMonth.format(s), dayMonth.format(e)),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -147,7 +149,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.MONTH,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_month, dateFormat.format(s), dateFormat.format(e)),
+                        title = stringResource(UiR.string.period_month, dayMonth.format(s), dayMonth.format(e)),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -164,7 +166,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.YEAR,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_year, dateFormat.format(s), dateFormat.format(e)),
+                        title = stringResource(UiR.string.period_year, fullDate.format(s), fullDate.format(e)),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }

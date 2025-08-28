@@ -53,7 +53,7 @@ fun transactionPagingList(
             item(key = headerContentKey) {
                 // Уменьшаем вертикальные отступы вокруг хедера
                 androidx.compose.foundation.layout.Column(
-                    modifier = Modifier.padding(top = 0.dp, bottom = 2.dp)
+                    modifier = Modifier.padding(top = 0.dp, bottom = 0.dp)
                 ) { header() }
             }
         }
@@ -66,7 +66,7 @@ fun transactionPagingList(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 0.dp),
                     )
                 }
                 is TransactionListItem.Item -> {

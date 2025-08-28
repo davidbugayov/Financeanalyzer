@@ -50,7 +50,7 @@ private fun CompactBalanceAndFilters(
     showGroupSummary: Boolean,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
 
@@ -217,7 +217,7 @@ fun CompactLayout(
             Modifier
                 .fillMaxSize()
                 .padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         CompactBalanceAndFilters(
             state = state,
