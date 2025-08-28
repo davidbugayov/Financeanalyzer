@@ -115,41 +115,9 @@ fun BalanceCard(
                         dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
                     ),
             )
-            // Баланс в центре, снизу две цветные плашки доходов/расходов
+            // Только текущий баланс без блоков доходов/расходов
             BalanceCardAmount(balance)
-            Spacer(
-                modifier =
-                    Modifier.height(
-                        dimensionResource(UiR.dimen.enhanced_summary_card_spacing),
-                    ),
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AmountPill(
-                    labelRes = UiR.string.income,
-                    amountText = income.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
-                    icon = Icons.Filled.ArrowUpward,
-                    color = incomeColor,
-                    modifier = Modifier.weight(1f),
-                )
-                Spacer(
-                    modifier =
-                        Modifier.width(
-                            dimensionResource(
-                                UiR.dimen.enhanced_summary_card_spacing,
-                            ),
-                        ),
-                )
-                AmountPill(
-                    labelRes = UiR.string.expenses,
-                    amountText = expense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
-                    icon = Icons.Filled.ArrowDownward,
-                    color = expenseColor,
-                    modifier = Modifier.weight(1f),
-                )
-            }
+            
         }
     }
 }

@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
@@ -331,6 +332,13 @@ class HomeViewModel(
     ) {
         viewModelScope.launch {
             val (startDate, endDate) = getPeriodDates(filter)
+            val currentCurrency = CurrencyProvider.getCurrency()
+            // Локальная гарантированная фильтрация по диапазону дат
+            val strictlyFiltered =
+                transactions.filter { tx ->
+                    val t = tx.date
+                    !t.before(startDate) && !t.after(endDate)
+                }
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
                     val income = financialMetrics.getTotalIncomeAsMoney()
@@ -338,15 +346,15 @@ class HomeViewModel(
                     val balance = financialMetrics.getCurrentBalance()
                     Triple(income, expense, balance)
                 } else {
-                    val stats = calculateStats(transactions)
+                    val stats = calculateStats(strictlyFiltered)
                     stats
                 }
 
-            val transactionGroups = groupTransactionsByDate(transactions)
+            val transactionGroups = groupTransactionsByDate(strictlyFiltered, currentCurrency)
 
             _state.update {
                 it.copy(
-                    filteredTransactions = transactions,
+                    filteredTransactions = strictlyFiltered,
                     transactionGroups = transactionGroups,
                     filteredIncome = filteredIncome,
                     filteredExpense = filteredExpense,
@@ -486,7 +494,14 @@ class HomeViewModel(
         viewModelScope.launch {
             val (startDate, endDate) = getPeriodDates(filter)
             val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
-            val filteredTransactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
+            val raw = (flow?.first() ?: emptyList()).map { it.toDomain() }
+            // Локальная гарантированная фильтрация по диапазону дат
+            val filteredTransactions =
+                raw.filter { tx ->
+                    val t = tx.date
+                    !t.before(startDate) && !t.after(endDate)
+                }
+            val currentCurrency = CurrencyProvider.getCurrency()
 
             val (filteredIncome, filteredExpense, filteredBalance) =
                 if (filter == TransactionFilter.ALL) {
@@ -498,7 +513,7 @@ class HomeViewModel(
                     val stats = calculateStats(filteredTransactions)
                     stats
                 }
-            val transactionGroups = groupTransactionsByDate(filteredTransactions)
+            val transactionGroups = groupTransactionsByDate(filteredTransactions, currentCurrency)
             val tips = sharedFacade.smartExpenseTips(filteredTransactions.map { it.toShared() })
             val recommendations =
                 sharedFacade.expenseOptimizationRecommendations(
@@ -530,28 +545,24 @@ class HomeViewModel(
      * @return Triple из (доход, расход, баланс)
      */
     private fun calculateStats(transactions: List<Transaction>): Triple<Money, Money, Money> {
+        // Транзакции сюда передаются уже ОТФИЛЬТРОВАННЫМИ по текущему периоду в updateFilteredTransactions*
+        val currentCurrency = CurrencyProvider.getCurrency()
         if (transactions.isEmpty()) {
-            val currentCurrency = CurrencyProvider.getCurrency()
             return Triple(Money.zero(currentCurrency), Money.zero(currentCurrency), Money.zero(currentCurrency))
         }
 
-        // Находим минимальную и максимальную даты в транзакциях
-        val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
-        val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
-        val currentCurrency = CurrencyProvider.getCurrency()
-        val metrics =
-            sharedFacade.calculateMetrics(
-                transactions.map { it.toShared() },
-                currentCurrency.name,
-                startDate.toLocalDateKmp(),
-                endDate.toLocalDateKmp(),
-            )
-        val income = Money.fromMajor(metrics.income.toMajorDouble(), currentCurrency)
-        val expense = Money.fromMajor(metrics.expense.toMajorDouble(), currentCurrency)
-        val balance = income - expense
+        val income = transactions
+            .asSequence()
+            .filter { !it.isExpense }
+            .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount }
 
-        val result = Triple(income, expense, balance)
-        return result
+        val expense = transactions
+            .asSequence()
+            .filter { it.isExpense }
+            .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount.abs() }
+
+        val balance = income - expense
+        return Triple(income, expense, balance)
     }
 
     /**
@@ -561,6 +572,7 @@ class HomeViewModel(
      */
     private fun groupTransactionsByDate(
         transactions: List<Transaction>,
+        currentCurrency: Currency = CurrencyProvider.getCurrency(),
     ): List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup> {
         if (transactions.isEmpty()) {
             return emptyList()
@@ -590,12 +602,12 @@ class HomeViewModel(
             val income =
                 transactionsForDate
                     .filter { !it.isExpense }
-                    .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+                    .fold(Money.zero(currentCurrency)) { acc, transaction -> acc + transaction.amount }
 
             val expense =
                 transactionsForDate
                     .filter { it.isExpense }
-                    .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
+                    .fold(Money.zero(currentCurrency)) { acc, transaction -> acc + transaction.amount.abs() }
 
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }

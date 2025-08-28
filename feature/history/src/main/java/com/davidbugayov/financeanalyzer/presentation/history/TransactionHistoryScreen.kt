@@ -2,12 +2,14 @@
 
 package com.davidbugayov.financeanalyzer.presentation.history
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
@@ -443,7 +445,8 @@ fun TransactionHistoryScreen(
                 modifier =
                     Modifier
                         .fillMaxSize()
-                        .padding(horizontal = dimensionResource(UiR.dimen.spacing_normal)),
+                        .padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -462,7 +465,7 @@ fun TransactionHistoryScreen(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
+                            .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val context = LocalContext.current
@@ -486,7 +489,7 @@ fun TransactionHistoryScreen(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = dimensionResource(UiR.dimen.spacing_small)),
+                                .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Выбранные категории

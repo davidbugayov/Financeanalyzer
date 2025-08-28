@@ -50,7 +50,7 @@ private fun CompactBalanceAndFilters(
     showGroupSummary: Boolean,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
 
@@ -58,7 +58,7 @@ private fun CompactBalanceAndFilters(
             Text(
                 text = it,
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 2.dp),
             )
         }
 
@@ -216,8 +216,8 @@ fun CompactLayout(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         CompactBalanceAndFilters(
             state = state,
@@ -233,10 +233,9 @@ fun CompactLayout(
                 val context = LocalContext.current
                 val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
 
-                val headerContent: (@Composable () -> Unit) = {
-                    Column {
-                        // HomeTipsCard удалён по решению UX
-                        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                val headerContent: (@Composable () -> Unit)? =
+                    if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                        {
                             HomeGroupSummary(
                                 filteredTransactions = state.filteredTransactions,
                                 totalIncome = state.filteredIncome,
@@ -247,8 +246,7 @@ fun CompactLayout(
                                 periodEndDate = state.periodEndDate,
                             )
                         }
-                    }
-                }
+                    } else null
 
                 com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
                     items = itemsToDisplay,

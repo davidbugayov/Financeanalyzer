@@ -1,20 +1,26 @@
 package com.davidbugayov.financeanalyzer.presentation.history.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,6 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -227,80 +235,91 @@ private fun ExpandableGroupHeader(
 ) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val balanceTextColor = if (balance >= 0) incomeColor else expenseColor
+    val isPositive = balance >= 0
+    val primaryColor = if (isPositive) incomeColor else expenseColor
 
-    // Улучшенные цвета фона для лучшей видимости на темном фоне
-    val cardBackgroundColor =
-        if (balance >= 0) {
-            // Для доходов - более яркий зеленый фон
-            incomeColor.copy(alpha = 0.15f)
-        } else {
-            // Для расходов - более яркий красный фон
-            expenseColor.copy(alpha = 0.15f)
-        }
-
-    // Добавляем границу для лучшей видимости
-    val borderColor =
-        if (balance >= 0) {
-            incomeColor.copy(alpha = 0.3f)
-        } else {
-            expenseColor.copy(alpha = 0.3f)
-        }
+    // Градиент для заголовка
+    val headerGradient = Brush.horizontalGradient(
+        colors = listOf(
+            primaryColor.copy(alpha = 0.08f),
+            primaryColor.copy(alpha = 0.04f),
+            primaryColor.copy(alpha = 0.01f)
+        )
+    )
 
     Card(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = dimensionResource(id = UiR.dimen.spacing_normal),
-                    vertical = dimensionResource(id = UiR.dimen.spacing_small),
-                ).clickable { onToggle(!isExpanded) },
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
-        border =
-            BorderStroke(
-                width = 1.dp,
-                color = borderColor,
-            ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 2.dp)
+            .clickable { onToggle(!isExpanded) },
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(
+            width = 1.dp,
+            color = primaryColor.copy(alpha = 0.3f)
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(id = UiR.dimen.spacing_normal)),
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(headerGradient)
+                .padding(8.dp)
         ) {
-            Icon(
-                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription =
-                    if (isExpanded) {
-                        stringResource(
-                            UiR.string.collapse,
-                        )
-                    } else {
-                        stringResource(UiR.string.expand)
-                    },
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(id = UiR.dimen.spacing_medium)))
-            Text(
-                text = date,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f),
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Левая часть с датой и иконкой
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (isExpanded) {
+                            stringResource(UiR.string.collapse)
+                        } else {
+                            stringResource(UiR.string.expand)
+                        },
+                        tint = primaryColor,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
 
-            Text(
-                text = if (balance >= 0) {
-                    "+${Money.fromMajor(balance).formatForDisplay()}"
-                } else {
-                    "-${Money.fromMajor(balance).abs().formatForDisplay()}"
-                },
-                style = MaterialTheme.typography.bodyLarge,
-                color = balanceTextColor,
-                fontWeight = FontWeight.Bold,
-            )
+                // Правая часть с суммой и иконкой тренда
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    // Иконка тренда
+                    Icon(
+                        imageVector = if (isPositive) Icons.Default.ArrowUpward else Icons.Default.ArrowUpward,
+                        contentDescription = null,
+                        tint = primaryColor,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    // Сумма
+                    Text(
+                        text = if (isPositive) {
+                            "+${Money.fromMajor(balance).formatForDisplay(showCurrency = false)}"
+                        } else {
+                            "-${Money.fromMajor(balance).abs().formatForDisplay(showCurrency = false)}"
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = primaryColor,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
         }
     }
 }

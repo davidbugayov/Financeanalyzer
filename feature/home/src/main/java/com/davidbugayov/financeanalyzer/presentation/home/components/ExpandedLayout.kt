@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -109,7 +110,7 @@ private fun ExpandedLeftPanel(
         modifier =
             modifier
                 .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
 
@@ -175,10 +176,16 @@ private fun ExpandedRightPanel(
                     onTransactionLongClick = onTransactionLongClick,
                     listState = listState,
                     headerContent = {
-                        var showTips by remember { mutableStateOf(true) }
-                        if (showTips) {
+                        // Показываем приветственную карточку только один раз (shared pref flag)
+                        val context = LocalContext.current
+                        val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+                        var dismissed by remember { mutableStateOf(prefs.getBoolean("welcome_tips_dismissed", false)) }
+                        if (!dismissed) {
                             HomeTipsCard(
-                                onClose = { showTips = false },
+                                onClose = {
+                                    prefs.edit().putBoolean("welcome_tips_dismissed", true).apply()
+                                    dismissed = true
+                                },
                                 modifier = Modifier.padding(bottom = 8.dp),
                             )
                         }

@@ -47,11 +47,14 @@ fun transactionPagingList(
     val fabSpacerKey = stringResource(UiR.string.fab_spacer)
     val errorLoadingAdditionalData = stringResource(UiR.string.error_loading_additional_data)
 
-    LazyColumn(modifier = Modifier.fillMaxWidth(), state = lazyState) {
+    LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 0.dp), state = lazyState) {
         // Optional header
         headerContent?.let { header ->
             item(key = headerContentKey) {
-                header()
+                // Уменьшаем вертикальные отступы вокруг хедера
+                androidx.compose.foundation.layout.Column(
+                    modifier = Modifier.padding(top = 0.dp, bottom = 2.dp)
+                ) { header() }
             }
         }
         items(count = items.itemCount) { index ->
@@ -63,7 +66,7 @@ fun transactionPagingList(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 4.dp),
                     )
                 }
                 is TransactionListItem.Item -> {

@@ -3,7 +3,9 @@ package com.davidbugayov.financeanalyzer.presentation.home.state
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 
 /**
  * Состояние экрана Home.
@@ -15,16 +17,16 @@ data class HomeState(
     val transactionGroups: List<TransactionGroup> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null,
-    val balance: Money = Money.zero(),
-    val income: Money = Money.zero(),
-    val expense: Money = Money.zero(),
-    val dailyIncome: Money = Money.zero(),
-    val dailyExpense: Money = Money.zero(),
+    val balance: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val income: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val expense: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val dailyIncome: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val dailyExpense: Money = Money.zero(CurrencyProvider.getCurrency()),
     val currentFilter: TransactionFilter = TransactionFilter.MONTH,
     val showGroupSummary: Boolean = true,
-    val filteredIncome: Money = Money.zero(),
-    val filteredExpense: Money = Money.zero(),
-    val filteredBalance: Money = Money.zero(),
+    val filteredIncome: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val filteredExpense: Money = Money.zero(CurrencyProvider.getCurrency()),
+    val filteredBalance: Money = Money.zero(CurrencyProvider.getCurrency()),
     val periodStartDate: java.util.Date? = null,
     val periodEndDate: java.util.Date? = null,
     val transactionToDelete: Transaction? = null,

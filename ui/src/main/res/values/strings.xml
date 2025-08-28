@@ -1368,6 +1368,10 @@
   <!-- moved to strings_achievements.xml -->
   <string name="bank_sberbank">Сбербанк</string>
   <!-- Plurals moved to plurals.xml -->
-  
+
+  <!-- Home Group Summary -->
+  <string name="summary_for_period">Сводка за выбранный период</string>
+  <string name="transactions_few">транзакции</string>
+  <string name="transactions_many">транзакций</string>
 
 </resources>

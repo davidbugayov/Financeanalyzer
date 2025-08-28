@@ -16,11 +16,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -75,12 +78,29 @@ fun HomeGroupSummary(
     val textSecondary = LocalSummaryTextSecondary.current
     val dividerColor = LocalSummaryDivider.current
 
-    val calculatedBalance = balance ?: totalIncome.minus(totalExpense)
+    // Пересчитываем суммы строго по переданным filteredTransactions,
+    // чтобы исключить любые расхождения с выбранным периодом
+    val computedIncome =
+        remember(filteredTransactions) {
+            filteredTransactions
+                .asSequence()
+                .filter { !it.isExpense }
+                .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount }
+        }
+    val computedExpense =
+        remember(filteredTransactions) {
+            filteredTransactions
+                .asSequence()
+                .filter { it.isExpense }
+                .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount.abs() }
+        }
+    val calculatedBalance = balance ?: computedIncome.minus(computedExpense)
     val balanceColor = if (calculatedBalance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
     var showExpenses by rememberSaveable { mutableStateOf(true) }
 
-    val periodTitle = periodTitleForFilter(currentFilter, periodStartDate, periodEndDate)
+    val transactionCount = filteredTransactions.size
+    val periodTitle = periodTitleForFilter(currentFilter, periodStartDate, periodEndDate, transactionCount)
 
     val categoryGroups =
         remember(filteredTransactions, showExpenses) {
@@ -90,7 +110,7 @@ fun HomeGroupSummary(
                 .map { (category, transactions) ->
                     CategorySummary(
                         category = category,
-                        amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
+                        amount = transactions.fold(Money.zero(totalIncome.currency)) { acc, transaction -> acc + transaction.amount },
                         isExpense = showExpenses,
                     )
                 }.sortedByDescending { it.amount.amount }
@@ -100,7 +120,7 @@ fun HomeGroupSummary(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 2.dp),
+                .padding(horizontal = 6.dp, vertical = 2.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         border =
@@ -110,17 +130,20 @@ fun HomeGroupSummary(
             ),
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(6.dp),
         ) {
             SummaryHeader(periodTitle, textPrimary)
             SummaryTotals(
-                totalIncome,
-                totalExpense,
+                computedIncome,
+                computedExpense,
                 calculatedBalance,
                 incomeColor,
                 expenseColor,
                 balanceColor,
                 textSecondary,
+                currentFilter,
+                periodStartDate,
+                periodEndDate,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), color = dividerColor)
             SummaryCategorySwitcher(
@@ -161,14 +184,40 @@ private fun SummaryHeader(
     periodTitle: String,
     textPrimary: Color,
 ) {
-    Text(
-        text = periodTitle,
-        style = MaterialTheme.typography.titleMedium,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 2.dp),
-        color = textPrimary,
-    )
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 6.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = periodTitle,
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = textPrimary,
+            )
+        }
+    }
 }
 
 @Composable
@@ -180,11 +229,22 @@ private fun SummaryTotals(
     expenseColor: Color,
     balanceColor: Color,
     textSecondary: Color,
+    currentFilter: TransactionFilter,
+    periodStartDate: java.util.Date? = null,
+    periodEndDate: java.util.Date? = null,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
+        // Информационная строка о периоде
+        Text(
+            text = stringResource(UiR.string.summary_for_period),
+            style = MaterialTheme.typography.labelSmall,
+            color = textSecondary,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
         // Доходы
         androidx.compose.foundation.layout.Box(
             modifier = Modifier
@@ -193,7 +253,7 @@ private fun SummaryTotals(
                     color = incomeColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -207,7 +267,7 @@ private fun SummaryTotals(
                         tint = incomeColor,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(UiR.string.total_income),
                         fontSize = 14.sp,
@@ -232,7 +292,7 @@ private fun SummaryTotals(
                     color = expenseColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -246,7 +306,7 @@ private fun SummaryTotals(
                         tint = expenseColor,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(UiR.string.total_expense),
                         fontSize = 14.sp,
@@ -271,7 +331,7 @@ private fun SummaryTotals(
                     color = balanceColor.copy(alpha = 0.08f),
                     shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
                 )
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -477,29 +537,38 @@ private fun SummaryHideButton(
 private fun periodTitleForFilter(
     filter: TransactionFilter,
     startDate: java.util.Date? = null,
-    endDate: java.util.Date? = null
+    endDate: java.util.Date? = null,
+    transactionCount: Int = 0
 ): String {
     val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+    val transactionText = if (transactionCount == 1) {
+        "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
+    } else if (transactionCount in 2..4) {
+        "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
+    } else {
+        "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
+    }
 
     return when (filter) {
         TransactionFilter.TODAY -> {
-            startDate?.let { "${stringResource(UiR.string.filter_today)} (${dateFormat.format(it)})" }
-                ?: stringResource(UiR.string.filter_today)
+            startDate?.let {
+                "${stringResource(UiR.string.filter_today)} (${dateFormat.format(it)}) • $transactionText"
+            } ?: "${stringResource(UiR.string.filter_today)} • $transactionText"
         }
         TransactionFilter.WEEK -> {
             if (startDate != null && endDate != null) {
-                "${stringResource(UiR.string.filter_week)} (${dateFormat.format(startDate)} - ${dateFormat.format(endDate)})"
+                "${stringResource(UiR.string.filter_week)} (${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}) • $transactionText"
             } else {
-                stringResource(UiR.string.filter_week)
+                "${stringResource(UiR.string.filter_week)} • $transactionText"
             }
         }
         TransactionFilter.MONTH -> {
             startDate?.let {
                 val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault())
-                "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)})"
-            } ?: stringResource(UiR.string.filter_month)
+                "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)}) • $transactionText"
+            } ?: "${stringResource(UiR.string.filter_month)} • $transactionText"
         }
-        TransactionFilter.ALL -> stringResource(UiR.string.all_time)
+        TransactionFilter.ALL -> "${stringResource(UiR.string.all_time)} • $transactionText"
     }
 }
 
