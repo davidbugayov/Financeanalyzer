@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -73,7 +74,8 @@ fun ExpandedLayout(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         ExpandedLeftPanel(
             state = state,
@@ -106,11 +108,11 @@ private fun ExpandedLeftPanel(
     Column(
         modifier =
             modifier
-                .padding(end = 8.dp)
                 .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
-        Spacer(modifier = Modifier.height(16.dp))
+
         HomeFilterChips(
             currentFilter = state.currentFilter,
             onFilterSelected = onFilterSelected,
@@ -122,8 +124,8 @@ private fun ExpandedLeftPanel(
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
         )
+
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
             HomeGroupSummary(
                 filteredTransactions = state.filteredTransactions,
                 totalIncome = state.filteredIncome,

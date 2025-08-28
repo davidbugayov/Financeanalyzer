@@ -1,6 +1,9 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +23,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -63,15 +69,25 @@ private fun BalanceCardTitle(balance: Money) {
 private fun BalanceCardAmount(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
+    val textColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+
+    // Добавляем знак к балансу
+    val displayText = if (balance.amount >= BigDecimal.ZERO) {
+        "+${balance.formatForDisplay(showCurrency = true)}"
+    } else {
+        balance.formatForDisplay(showCurrency = true)
+    }
+
     Text(
-        text = balance.formatForDisplay(showCurrency = true),
+        text = displayText,
         style = MaterialTheme.typography.headlineMedium,
         fontSize =
             dimensionResource(
                 UiR.dimen.enhanced_summary_card_balance_font_size,
             ).value.sp,
-        fontWeight = FontWeight.Bold,
-        color = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
+        fontWeight = FontWeight.ExtraBold,
+        color = textColor,
+        modifier = Modifier.padding(vertical = 4.dp)
     )
 }
 
@@ -84,18 +100,45 @@ fun BalanceCard(
 ) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val cardColor = MaterialTheme.colorScheme.background
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
     val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+
+    // Создаем градиентную заливку
+    val gradientBrush = androidx.compose.ui.graphics.Brush.verticalGradient(
+        colors = if (balance.amount >= BigDecimal.ZERO) {
+            listOf(
+                incomeColor.copy(alpha = 0.08f),
+                incomeColor.copy(alpha = 0.04f),
+                incomeColor.copy(alpha = 0.01f)
+            )
+        } else {
+            listOf(
+                expenseColor.copy(alpha = 0.08f),
+                expenseColor.copy(alpha = 0.04f),
+                expenseColor.copy(alpha = 0.01f)
+            )
+        }
+    )
+
+    // Анимация появления
+    val scale = remember { Animatable(0.95f) }
+    LaunchedEffect(balance) {
+        scale.animateTo(1f, tween(300))
+    }
+
     Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        border = BorderStroke(width = 3.dp, color = balanceTextColor),
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer(scaleX = scale.value, scaleY = scale.value),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(width = 2.dp, color = balanceTextColor.copy(alpha = 0.3f)),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .background(gradientBrush)
                     .padding(
                         vertical =
                             dimensionResource(
@@ -162,14 +205,27 @@ private fun AmountPill(
     color: Color,
     modifier: Modifier = Modifier,
 ) {
+    val pillGradient = androidx.compose.ui.graphics.Brush.horizontalGradient(
+        colors = listOf(
+            color.copy(alpha = 0.1f),
+            color.copy(alpha = 0.05f),
+            color.copy(alpha = 0.02f)
+        )
+    )
+
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
-        color = color.copy(alpha = 0.06f),
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
+        shape = RoundedCornerShape(16.dp),
+        color = Color.Transparent,
+        tonalElevation = 2.dp,
+        shadowElevation = 2.dp,
+        border = BorderStroke(width = 1.dp, color = color.copy(alpha = 0.2f)),
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .background(pillGradient)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+        ) {
             Text(
                 text = stringResource(id = labelRes),
                 style =

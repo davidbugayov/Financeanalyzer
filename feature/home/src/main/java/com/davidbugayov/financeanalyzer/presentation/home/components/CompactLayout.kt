@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,24 +49,30 @@ private fun CompactBalanceAndFilters(
     onToggleGroupSummary: (Boolean) -> Unit,
     showGroupSummary: Boolean,
 ) {
-    BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
-    state.error?.let {
-        Text(
-            text = it,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(vertical = 4.dp),
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
+
+        state.error?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+        }
+
+        HomeFilterChips(
+            currentFilter = state.currentFilter,
+            onFilterSelected = onFilterSelected,
+        )
+
+        HomeTransactionsHeader(
+            currentFilter = state.currentFilter,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
         )
     }
-    HomeFilterChips(
-        currentFilter = state.currentFilter,
-        onFilterSelected = onFilterSelected,
-    )
-
-    HomeTransactionsHeader(
-        currentFilter = state.currentFilter,
-        showGroupSummary = showGroupSummary,
-        onToggleGroupSummary = onToggleGroupSummary,
-    )
 }
 
 @Composable
@@ -209,7 +216,8 @@ fun CompactLayout(
         modifier =
             Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         CompactBalanceAndFilters(
             state = state,
