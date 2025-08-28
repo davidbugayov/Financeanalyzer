@@ -1,16 +1,23 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
+import com.davidbugayov.financeanalyzer.domain.contracts.TransactionRepositoryContract
+import com.davidbugayov.financeanalyzer.domain.contracts.TransactionFilter
+import com.davidbugayov.financeanalyzer.domain.contracts.TransactionType
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 /**
- * Интерфейс репозитория для работы с транзакциями.
+ * Legacy interface for transaction repository operations.
+ * Now extends the new contract interface for better abstraction.
+ * This interface is kept for backward compatibility during migration.
+ *
  * Следует принципу инверсии зависимостей (Dependency Inversion Principle).
  * Высокоуровневые модули не должны зависеть от низкоуровневых модулей.
  * Оба должны зависеть от абстракций.
  */
-interface ITransactionRepository {
+interface ITransactionRepository : TransactionRepositoryContract {
     /**
      * Загружает все транзакции
      * @return Список транзакций
