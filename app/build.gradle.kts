@@ -38,8 +38,8 @@ android {
             libs.versions.compileSdk
                 .get()
                 .toInt()
-        versionCode = 57
-        versionName = "2.31"
+        versionCode = 58
+        versionName = "2.32"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
