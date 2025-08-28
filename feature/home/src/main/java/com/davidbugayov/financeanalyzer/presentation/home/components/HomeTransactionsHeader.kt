@@ -33,7 +33,7 @@ fun HomeTransactionsHeader(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(vertical = 0.dp),
+                .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

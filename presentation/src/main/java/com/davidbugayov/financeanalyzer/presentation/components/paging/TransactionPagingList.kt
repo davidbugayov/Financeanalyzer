@@ -66,7 +66,7 @@ fun transactionPagingList(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 0.dp),
+                                .padding(top = 6.dp, bottom = 6.dp),
                     )
                 }
                 is TransactionListItem.Item -> {
