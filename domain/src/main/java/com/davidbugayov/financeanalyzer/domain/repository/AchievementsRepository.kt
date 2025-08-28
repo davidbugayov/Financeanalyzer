@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
@@ -80,6 +81,7 @@ class AchievementsRepositoryImpl(private val context: Context) : AchievementsRep
     private val rp: ResourceProvider = GlobalContext.get().get()
 
     // Получение строки из ресурсов приложения (учитываем debug applicationIdSuffix)
+    @SuppressLint("DiscouragedApi")
     private fun uiString(name: String): String {
         return try {
             val candidatePackages = listOf(

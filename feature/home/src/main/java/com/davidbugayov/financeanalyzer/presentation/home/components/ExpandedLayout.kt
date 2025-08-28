@@ -181,7 +181,7 @@ private fun ExpandedRightPanel(
                         if (!dismissed) {
                             HomeTipsCard(
                                 onClose = {
-                                    prefs.edit().putBoolean("welcome_tips_dismissed", true).apply()
+                                    prefs.edit().putBoolean("welcome_tips_dismissed", true).commit()
                                     dismissed = true
                                 },
                                 modifier = Modifier.padding(bottom = 8.dp),
