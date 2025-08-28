@@ -257,7 +257,7 @@ fun achievementNotification(
  */
 @androidx.compose.ui.tooling.preview.Preview
 @Composable
-private fun AchievementNotificationPreview() {
+private fun achievementNotificationPreview() {
     MaterialTheme {
         achievementNotification(
             title = stringResource(R.string.achievement_first_steps_title),

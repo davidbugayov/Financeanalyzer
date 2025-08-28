@@ -26,7 +26,7 @@ import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.navigation.appNavHostImpl
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -166,7 +166,7 @@ class FinanceActivity :
 
     private fun applyContent() {
         setContent {
-            AchievementNotificationManager(
+            achievementNotificationManager(
                 achievementEngine = AchievementEngineProvider.get(),
             ) {
                 financeAppContent(navigationManager, startDestination, ::setFirstLaunchCompleted)
