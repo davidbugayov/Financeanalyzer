@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Achievement titles -->
+    <string name="achievement_first_steps_title">First Steps</string>
+    <string name="achievement_transaction_master_title">Transaction Master</string>
+    <string name="achievement_data_analyst_title">Data Analyst</string>
+    <string name="achievement_first_budget_title">First Budget</string>
+    <string name="achievement_app_explorer_title">App Explorer</string>
+    <string name="achievement_category_organizer_title">Category Organizer</string>
+    <string name="achievement_early_bird_title">Early Bird</string>
+    <string name="achievement_night_owl_title">Night Owl</string>
+    <string name="achievement_first_savings_title">First Savings</string>
+    <string name="achievement_emergency_fund_title">Emergency Fund</string>
+    <string name="achievement_economical_title">Economical</string>
+    <string name="achievement_regular_user_title">Regular User</string>
+    <string name="achievement_loyal_user_title">Loyal User</string>
+    <string name="achievement_category_expert_title">Category Expert</string>
+    <string name="achievement_tinkoff_integrator_title">Tinkoff Integrator</string>
+    <string name="achievement_sber_collector_title">Sber Collector</string>
+    <string name="achievement_alpha_analyst_title">Alpha Analyst</string>
+    <string name="achievement_ozon_collector_title">Ozon Collector</string>
+    <string name="achievement_multi_bank_collector_title">Multi-Bank Collector</string>
+    <string name="achievement_export_master_title">Export Master</string>
+    <string name="achievement_backup_enthusiast_title">Backup Enthusiast</string>
+    <string name="achievement_csv_importer_title">CSV Importer</string>
+    <string name="achievement_widget_small_added_title">1×1 Widget</string>
+    <string name="achievement_widget_large_added_title">3×1 Widget</string>
+    <string name="achievement_shortcut_add_title">Quick Add</string>
+
+    <!-- Achievement descriptions -->
+    <string name="achievement_first_steps_description">Created first transaction</string>
+    <string name="achievement_transaction_master_desc">Created 100 transactions</string>
+    <string name="achievement_data_analyst_desc">Explored all app sections</string>
+    <string name="achievement_first_budget_desc">Created first budget</string>
+    <string name="achievement_app_explorer_desc">Opened all sections</string>
+    <string name="achievement_category_organizer_desc">Created 10 categories</string>
+    <string name="achievement_early_bird_desc">Track finances early in the morning</string>
+    <string name="achievement_night_owl_desc">Track finances late at night</string>
+    <string name="achievement_first_savings_desc">Saved first 1,000</string>
+    <string name="achievement_emergency_fund_desc">Created emergency fund</string>
+    <string name="achievement_economical_desc">Spend less than 80% of monthly budget</string>
+    <string name="achievement_regular_user_desc">Use app for a week in a row</string>
+    <string name="achievement_loyal_user_desc">Use app for a month</string>
+    <string name="achievement_category_expert_desc">Use all available categories</string>
+    <string name="achievement_tinkoff_integrator_desc">Imported transactions from Tinkoff</string>
+    <string name="achievement_sber_collector_desc">Imported transactions from Sberbank</string>
+    <string name="achievement_alpha_analyst_desc">Imported transactions from Alpha Bank</string>
+    <string name="achievement_ozon_collector_desc">Imported transactions from Ozon Bank</string>
+    <string name="achievement_multi_bank_collector_desc">Imported data from all 4 banks</string>
+    <string name="achievement_export_master_desc">Exported data 5 times</string>
+    <string name="achievement_backup_enthusiast_desc">Created 10 backup copies</string>
+    <string name="achievement_csv_importer_desc">Imported CSV file</string>
+    <string name="achievement_widget_small_added_desc">Added small 1×1 widget to home screen</string>
+    <string name="achievement_widget_large_added_desc">Added large 3×1 widget to home screen</string>
+    <string name="achievement_shortcut_add_desc">Opened transaction adding via shortcut</string>
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Achievement titles -->
+    <string name="achievement_first_steps_title">第一步</string>
+    <string name="achievement_transaction_master_title">交易大师</string>
+    <string name="achievement_data_analyst_title">数据分析师</string>
+    <string name="achievement_first_budget_title">第一个预算</string>
+    <string name="achievement_app_explorer_title">应用探索者</string>
+    <string name="achievement_category_organizer_title">类别组织者</string>
+    <string name="achievement_early_bird_title">早起的鸟儿</string>
+    <string name="achievement_night_owl_title">夜猫子</string>
+    <string name="achievement_first_savings_title">第一次储蓄</string>
+    <string name="achievement_emergency_fund_title">应急基金</string>
+    <string name="achievement_economical_title">经济型</string>
+    <string name="achievement_regular_user_title">定期用户</string>
+    <string name="achievement_loyal_user_title">忠实用户</string>
+    <string name="achievement_category_expert_title">类别专家</string>
+    <string name="achievement_tinkoff_integrator_title">Tinkoff 集成商</string>
+    <string name="achievement_sber_collector_title">Sber 收集者</string>
+    <string name="achievement_alpha_analyst_title">Alpha 分析师</string>
+    <string name="achievement_ozon_collector_title">Ozon 收集者</string>
+    <string name="achievement_multi_bank_collector_title">多银行收集者</string>
+    <string name="achievement_export_master_title">导出大师</string>
+    <string name="achievement_backup_enthusiast_title">备份爱好者</string>
+    <string name="achievement_csv_importer_title">CSV 导入者</string>
+    <string name="achievement_widget_small_added_title">1×1 小部件</string>
+    <string name="achievement_widget_large_added_title">3×1 大部件</string>
+    <string name="achievement_shortcut_add_title">快速添加</string>
+
+    <!-- Achievement descriptions -->
+    <string name="achievement_first_steps_description">创建了第一笔交易</string>
+    <string name="achievement_transaction_master_desc">创建了 100 笔交易</string>
+    <string name="achievement_data_analyst_desc">探索了所有应用部分</string>
+    <string name="achievement_first_budget_desc">创建了第一个预算</string>
+    <string name="achievement_app_explorer_desc">打开了所有部分</string>
+    <string name="achievement_category_organizer_desc">创建了 10 个类别</string>
+    <string name="achievement_early_bird_desc">早上早起记录财务</string>
+    <string name="achievement_night_owl_desc">晚上很晚记录财务</string>
+    <string name="achievement_first_savings_desc">存下了第一个 1,000</string>
+    <string name="achievement_emergency_fund_desc">创建了应急基金</string>
+    <string name="achievement_economical_desc">支出少于月预算的 80%</string>
+    <string name="achievement_regular_user_desc">连续一周使用应用</string>
+    <string name="achievement_loyal_user_desc">使用应用一个月</string>
+    <string name="achievement_category_expert_desc">使用所有可用类别</string>
+    <string name="achievement_tinkoff_integrator_desc">从 Tinkoff 导入了交易</string>
+    <string name="achievement_sber_collector_desc">从 Sberbank 导入了交易</string>
+    <string name="achievement_alpha_analyst_desc">从 Alpha Bank 导入了交易</string>
+    <string name="achievement_ozon_collector_desc">从 Ozon Bank 导入了交易</string>
+    <string name="achievement_multi_bank_collector_desc">从所有 4 家银行导入了数据</string>
+    <string name="achievement_export_master_desc">导出了数据 5 次</string>
+    <string name="achievement_backup_enthusiast_desc">创建了 10 个备份副本</string>
+    <string name="achievement_csv_importer_desc">导入了 CSV 文件</string>
+    <string name="achievement_widget_small_added_desc">在主屏幕上添加了 1×1 小部件</string>
+    <string name="achievement_widget_large_added_desc">在主屏幕上添加了 3×1 大部件</string>
+    <string name="achievement_shortcut_add_desc">通过快捷方式打开了交易添加</string>
+</resources>
