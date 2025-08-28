@@ -47,7 +47,7 @@ import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
@@ -416,7 +416,7 @@ fun HomeScreen(
         sharedPreferences.edit { putString("current_filter", filter.name) }
         viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
-    AchievementNotificationManager(
+    achievementNotificationManager(
         achievementEngine = AchievementEngineProvider.get(),
         onAchievementUnlocked = { achievement ->
             // Логируем аналитику разблокировки достижения

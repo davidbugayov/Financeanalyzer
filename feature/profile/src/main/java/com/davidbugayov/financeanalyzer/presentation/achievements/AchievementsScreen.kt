@@ -90,7 +90,7 @@ import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 
 /**
@@ -101,7 +101,7 @@ fun AchievementsScreen(
     achievements: List<Achievement>,
     onBack: () -> Unit,
 ) {
-    AchievementNotificationManager(
+    achievementNotificationManager(
         achievementEngine = AchievementEngineProvider.get(),
         onAchievementUnlocked = { achievement ->
             // Логируем аналитику разблокировки достижения
