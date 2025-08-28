@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Achievement titles -->
-    <string name="achievement_first_steps_title">Первые шаги</string>
-    <string name="achievement_transaction_master_title">Мастер транзакций</string>
-    <string name="achievement_data_analyst_title">Аналитик данных</string>
-    <string name="achievement_first_budget_title">Первый бюджет</string>
-    <string name="achievement_app_explorer_title">Исследователь приложения</string>
-    <string name="achievement_category_organizer_title">Организатор категорий</string>
-    <string name="achievement_early_bird_title">Ранняя пташка</string>
-    <string name="achievement_night_owl_title">Ночная сова</string>
-    <string name="achievement_first_savings_title">Первые сбережения</string>
-    <string name="achievement_emergency_fund_title">Резервный фонд</string>
-    <string name="achievement_economical_title">Экономист</string>
-    <string name="achievement_regular_user_title">Регулярный пользователь</string>
-    <string name="achievement_loyal_user_title">Лояльный пользователь</string>
-    <string name="achievement_category_expert_title">Эксперт по категориям</string>
-    <string name="achievement_tinkoff_integrator_title">Интегратор Тинькофф</string>
-    <string name="achievement_sber_collector_title">Коллекционер Сбер</string>
-    <string name="achievement_alpha_analyst_title">Аналитик Альфа</string>
-    <string name="achievement_ozon_collector_title">Коллекционер Ozon</string>
-    <string name="achievement_multi_bank_collector_title">Мульти-коллекционер</string>
-    <string name="achievement_export_master_title">Мастер экспорта</string>
-    <string name="achievement_backup_enthusiast_title">Энтузиаст резервных копий</string>
-    <string name="achievement_csv_importer_title">CSV импортер</string>
-    <string name="achievement_widget_small_added_title">Виджет 1×1</string>
-    <string name="achievement_widget_large_added_title">Виджет 3×1</string>
-    <string name="achievement_shortcut_add_title">Быстрый добавление</string>
+    <string name="achievement_first_steps_title" translatable="false">Первые шаги</string>
+    <string name="achievement_transaction_master_title" translatable="false">Мастер транзакций</string>
+    <string name="achievement_data_analyst_title" translatable="false">Аналитик данных</string>
+    <string name="achievement_first_budget_title" translatable="false">Первый бюджет</string>
+    <string name="achievement_app_explorer_title" translatable="false">Исследователь приложения</string>
+    <string name="achievement_category_organizer_title" translatable="false">Организатор категорий</string>
+    <string name="achievement_early_bird_title" translatable="false">Ранняя пташка</string>
+    <string name="achievement_night_owl_title" translatable="false">Ночная сова</string>
+    <string name="achievement_first_savings_title" translatable="false">Первые сбережения</string>
+    <string name="achievement_emergency_fund_title" translatable="false">Резервный фонд</string>
+    <string name="achievement_economical_title" translatable="false">Экономист</string>
+    <string name="achievement_regular_user_title" translatable="false">Регулярный пользователь</string>
+    <string name="achievement_loyal_user_title" translatable="false">Лояльный пользователь</string>
+    <string name="achievement_category_expert_title" translatable="false">Эксперт по категориям</string>
+    <string name="achievement_tinkoff_integrator_title" translatable="false">Интегратор Тинькофф</string>
+    <string name="achievement_sber_collector_title" translatable="false">Коллекционер Сбер</string>
+    <string name="achievement_alpha_analyst_title" translatable="false">Аналитик Альфа</string>
+    <string name="achievement_ozon_collector_title" translatable="false">Коллекционер Ozon</string>
+    <string name="achievement_multi_bank_collector_title" translatable="false">Мульти-коллекционер</string>
+    <string name="achievement_export_master_title" translatable="false">Мастер экспорта</string>
+    <string name="achievement_backup_enthusiast_title" translatable="false">Энтузиаст резервных копий</string>
+    <string name="achievement_csv_importer_title" translatable="false">CSV импортер</string>
+    <string name="achievement_widget_small_added_title" translatable="false">Виджет 1×1</string>
+    <string name="achievement_widget_large_added_title" translatable="false">Виджет 3×1</string>
+    <string name="achievement_shortcut_add_title" translatable="false">Быстрый добавление</string>
 
     <!-- Achievement descriptions -->
-    <string name="achievement_first_steps_description">Создана первая транзакция</string>
-    <string name="achievement_transaction_master_desc">Создано 100 транзакций</string>
-    <string name="achievement_data_analyst_desc">Изучили все разделы приложения</string>
-    <string name="achievement_first_budget_desc">Создан первый бюджет</string>
-    <string name="achievement_app_explorer_desc">Открыли все разделы</string>
-    <string name="achievement_category_organizer_desc">Создано 10 категорий</string>
-    <string name="achievement_early_bird_desc">Ведете учет рано утром</string>
-    <string name="achievement_night_owl_desc">Ведете учет поздно вечером</string>
-    <string name="achievement_first_savings_desc">Накопили первую 1000</string>
-    <string name="achievement_emergency_fund_desc">Создали резервный фонд</string>
-    <string name="achievement_economical_desc">Тратите менее 80% от месячного бюджета</string>
-    <string name="achievement_regular_user_desc">Используете приложение неделю подряд</string>
-    <string name="achievement_loyal_user_desc">Используете приложение месяц</string>
-    <string name="achievement_category_expert_desc">Используете все доступные категории</string>
-    <string name="achievement_tinkoff_integrator_desc">Импортировали транзакции из Тинькофф</string>
-    <string name="achievement_sber_collector_desc">Импортировали транзакции из Сбербанк</string>
-    <string name="achievement_alpha_analyst_desc">Импортировали транзакции из Альфа Банк</string>
-    <string name="achievement_ozon_collector_desc">Импортировали транзакции из Ozon Bank</string>
-    <string name="achievement_multi_bank_collector_desc">Импортировали данные из всех 4 банков</string>
-    <string name="achievement_export_master_desc">Экспортировали данные 5 раз</string>
-    <string name="achievement_backup_enthusiast_desc">Создали 10 резервных копий</string>
-    <string name="achievement_csv_importer_desc">Импортировали CSV файл</string>
-    <string name="achievement_widget_small_added_desc">Добавили на рабочий стол маленький виджет 1×1</string>
-    <string name="achievement_widget_large_added_desc">Добавили на рабочий стол большой виджет 3×1</string>
-    <string name="achievement_shortcut_add_desc">Открыли добавление транзакции через шорткат</string>
+    <string name="achievement_first_steps_description" translatable="false">Создана первая транзакция</string>
+    <string name="achievement_transaction_master_desc" translatable="false">Создано 100 транзакций</string>
+    <string name="achievement_data_analyst_desc" translatable="false">Изучили все разделы приложения</string>
+    <string name="achievement_first_budget_desc" translatable="false">Создан первый бюджет</string>
+    <string name="achievement_app_explorer_desc" translatable="false">Открыли все разделы</string>
+    <string name="achievement_category_organizer_desc" translatable="false">Создано 10 категорий</string>
+    <string name="achievement_early_bird_desc" translatable="false">Ведете учет рано утром</string>
+    <string name="achievement_night_owl_desc" translatable="false">Ведете учет поздно вечером</string>
+    <string name="achievement_first_savings_desc" translatable="false">Накопили первую 1000</string>
+    <string name="achievement_emergency_fund_desc" translatable="false">Создали резервный фонд</string>
+    <string name="achievement_economical_desc" translatable="false">Тратите менее 80% от месячного бюджета</string>
+    <string name="achievement_regular_user_desc" translatable="false">Используете приложение неделю подряд</string>
+    <string name="achievement_loyal_user_desc" translatable="false">Используете приложение месяц</string>
+    <string name="achievement_category_expert_desc" translatable="false">Используете все доступные категории</string>
+    <string name="achievement_tinkoff_integrator_desc" translatable="false">Импортировали транзакции из Тинькофф</string>
+    <string name="achievement_sber_collector_desc" translatable="false">Импортировали транзакции из Сбербанк</string>
+    <string name="achievement_alpha_analyst_desc" translatable="false">Импортировали транзакции из Альфа Банк</string>
+    <string name="achievement_ozon_collector_desc" translatable="false">Импортировали транзакции из Ozon Bank</string>
+    <string name="achievement_multi_bank_collector_desc" translatable="false">Импортировали данные из всех 4 банков</string>
+    <string name="achievement_export_master_desc" translatable="false">Экспортировали данные 5 раз</string>
+    <string name="achievement_backup_enthusiast_desc" translatable="false">Создали 10 резервных копий</string>
+    <string name="achievement_csv_importer_desc" translatable="false">Импортировали CSV файл</string>
+    <string name="achievement_widget_small_added_desc" translatable="false">Добавили на рабочий стол маленький виджет 1×1</string>
+    <string name="achievement_widget_large_added_desc" translatable="false">Добавили на рабочий стол большой виджет 3×1</string>
+    <string name="achievement_shortcut_add_desc" translatable="false">Открыли добавление транзакции через шорткат</string>
 </resources>

@@ -23,7 +23,12 @@ class AndroidResourceProvider(
         vararg args: Any?,
     ): String {
         val ctx = context.applicationContext
-        val resourceId = ctx.resources.getIdentifier(name, "string", ctx.packageName)
+        // Используем прямую карту ресурсов вместо getIdentifier для оптимизации
+        val resourceId = try {
+            ctx.resources.getIdentifier(name, "string", ctx.packageName)
+        } catch (e: Exception) {
+            0
+        }
         return if (resourceId != 0) {
             if (args.isNotEmpty()) ctx.getString(resourceId, *args) else ctx.getString(resourceId)
         } else {

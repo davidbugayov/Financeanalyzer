@@ -50,7 +50,7 @@ object WidgetAmountFormatter {
         val formatted = if (amount % 1 == 0.0) {
             amount.toInt().toString()
         } else {
-            String.format("%.1f", amount).removeSuffix(".0")
+            String.format(java.util.Locale.ROOT, "%.1f", amount).removeSuffix(".0")
         }
         
         val result = "$formatted $currencySymbol"
@@ -64,7 +64,7 @@ object WidgetAmountFormatter {
         val formatted = if (amount % 1 == 0.0) {
             amount.toInt().toString()
         } else {
-            String.format("%.1f", amount).removeSuffix(".0")
+            String.format(java.util.Locale.ROOT, "%.1f", amount).removeSuffix(".0")
         }
         
         val result = "$formatted$suffix $currencySymbol"
