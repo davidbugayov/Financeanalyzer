@@ -45,8 +45,8 @@ import com.davidbugayov.financeanalyzer.domain.model.DebtStatus
 import com.davidbugayov.financeanalyzer.domain.model.DebtType
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import kotlin.math.roundToInt
 import java.util.Locale
+import kotlin.math.roundToInt
 import org.koin.androidx.compose.koinViewModel
 
 /**

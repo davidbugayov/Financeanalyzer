@@ -49,9 +49,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
@@ -827,10 +827,18 @@ fun FinancialStatisticsScreen(
 
                                             // Форматируем сумму с валютой
                                             // Форматируем сумму через Money.formatForDisplay (единый формат приложения)
-                                            val amountText = predictedExpenses.formatForDisplay(showCurrency = true, useMinimalDecimals = true)
+                                            val amountText =
+                                                predictedExpenses.formatForDisplay(
+                                                    showCurrency = true,
+                                                    useMinimalDecimals = true,
+                                                )
 
                                             Text(
-                                                text = stringResource(id = UiR.string.prediction_next_month, amountText),
+                                                text =
+                                                    stringResource(
+                                                        id = UiR.string.prediction_next_month,
+                                                        amountText,
+                                                    ),
                                                 style = MaterialTheme.typography.titleSmall,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             )

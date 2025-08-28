@@ -20,7 +20,7 @@ class AndroidWidgetRefresher(
      */
     override fun refresh() {
         val manager = AppWidgetManager.getInstance(appContext)
-        
+
         // Обновляем большой виджет баланса
         val balanceComp = ComponentName(appContext, BalanceWidget::class.java)
         val balanceIds = manager.getAppWidgetIds(balanceComp)
@@ -32,7 +32,7 @@ class AndroidWidgetRefresher(
                 }
             appContext.sendBroadcast(intent)
         }
-        
+
         // Обновляем маленький виджет баланса
         val smallComp = ComponentName(appContext, SmallBalanceWidget::class.java)
         val smallIds = manager.getAppWidgetIds(smallComp)

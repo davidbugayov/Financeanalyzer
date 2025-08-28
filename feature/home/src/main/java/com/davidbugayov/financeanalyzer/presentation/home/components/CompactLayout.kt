@@ -50,7 +50,7 @@ private fun CompactBalanceAndFilters(
     showGroupSummary: Boolean,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         BalanceCard(balance = state.balance, income = state.income, expense = state.expense)
 
@@ -246,7 +246,9 @@ fun CompactLayout(
                                 periodEndDate = state.periodEndDate,
                             )
                         }
-                    } else null
+                    } else {
+                        null
+                    }
 
                 com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
                     items = itemsToDisplay,

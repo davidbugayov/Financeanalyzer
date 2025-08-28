@@ -6,7 +6,6 @@ import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.pluralStringResource
 import com.davidbugayov.financeanalyzer.ui.R
 
 /**

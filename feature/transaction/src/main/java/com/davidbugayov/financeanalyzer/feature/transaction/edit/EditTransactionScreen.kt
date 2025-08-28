@@ -4,7 +4,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.feature.transaction.base.baseTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
@@ -21,8 +20,8 @@ fun editTransactionScreen(
     transactionId: String? = null,
 ) {
     LaunchedEffect(Unit) {
-        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()?.
-            logScreenView(
+        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()
+            ?.logScreenView(
                 screenName = "edit_transaction",
                 screenClass = "EditTransactionScreen",
             )

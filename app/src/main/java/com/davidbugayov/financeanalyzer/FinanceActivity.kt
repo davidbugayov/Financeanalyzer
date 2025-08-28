@@ -24,9 +24,10 @@ import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.navigation.appNavHostImpl
-import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
@@ -37,7 +38,6 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 
 class FinanceActivity :
     FragmentActivity(),
@@ -178,11 +178,11 @@ class FinanceActivity :
         super<DefaultLifecycleObserver>.onResume(owner)
         // Экран блокировки показывается только при запуске приложения,
         // а не при сворачивании/разворачивании
-        
+
         // Обновляем виджеты при возвращении в приложение
         updateWidgets()
     }
-    
+
     /**
      * Обновляет все активные виджеты
      */

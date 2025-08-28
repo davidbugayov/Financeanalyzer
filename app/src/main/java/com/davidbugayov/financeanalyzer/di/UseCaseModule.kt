@@ -3,10 +3,10 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.CreateDebtUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.GetDebtsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.debt.RepayDebtUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
@@ -48,12 +48,12 @@ val useCaseModule =
         single { CreateDebtUseCase(get()) }
         single { GetDebtsUseCase(get()) }
         single { RepayDebtUseCase(get()) }
-        
+
         // Wallet
         single {
             com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
                 get(),
-                get()
+                get(),
             )
         }
 

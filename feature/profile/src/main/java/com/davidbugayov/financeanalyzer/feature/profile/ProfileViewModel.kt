@@ -51,7 +51,10 @@ class ProfileViewModel(
         syncNotificationState()
         syncSecurityState()
 
-        val langLabel = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_current_value)
+        val langLabel =
+            GlobalContext.get().get<ResourceProvider>().getString(
+                UiR.string.settings_language_current_value,
+            )
 
         _state.update {
             it.copy(
@@ -151,7 +154,10 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeLanguage -> {
                 preferencesManager.setAppLanguage(event.language)
-                val label = GlobalContext.get().get<ResourceProvider>().getString(UiR.string.settings_language_current_value)
+                val label =
+                    GlobalContext.get().get<ResourceProvider>().getString(
+                        UiR.string.settings_language_current_value,
+                    )
                 _state.update { it.copy(selectedLanguage = label, showLanguageDialog = false) }
             }
             is ProfileEvent.ChangeCurrency -> {

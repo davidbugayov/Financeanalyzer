@@ -221,7 +221,6 @@ fun FinancialDetailStatisticsScreen(
                                                     context,
                                                     metrics.topExpenseCategory,
                                                 ),
-                                        
                                         mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                                     )
                                 PremiumStatisticsCard(

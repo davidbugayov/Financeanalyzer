@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
@@ -36,10 +35,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.subcategory.GetSubcategoryByIdUseCase
@@ -159,8 +158,8 @@ fun TransactionHistoryScreen(
 
     // Логируем открытие экрана истории
     LaunchedEffect(Unit) {
-        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()?.
-            logScreenView(
+        com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge.getProvider()
+            ?.logScreenView(
                 screenName = "transaction_history",
                 screenClass = "TransactionHistoryScreen",
             )
@@ -446,7 +445,7 @@ fun TransactionHistoryScreen(
                     Modifier
                         .fillMaxSize()
                         .padding(horizontal = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

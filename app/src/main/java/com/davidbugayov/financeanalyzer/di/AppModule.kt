@@ -81,7 +81,7 @@ val appModule =
         single {
             com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase(
                 get(),
-                get()
+                get(),
             )
         }
 

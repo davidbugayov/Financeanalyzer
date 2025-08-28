@@ -312,7 +312,7 @@ class HomeViewModel(
                 val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
                 val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
-                
+
                 // Обновляем виджеты при изменении данных
                 updateWidgetsUseCase()
             } catch (e: Exception) {
@@ -386,7 +386,7 @@ class HomeViewModel(
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())?.first()
                 updateFilteredTransactions(_state.value.currentFilter)
-                
+
                 // Обновляем виджеты после загрузки данных
                 updateWidgetsUseCase()
             } catch (e: Exception) {
@@ -551,15 +551,17 @@ class HomeViewModel(
             return Triple(Money.zero(currentCurrency), Money.zero(currentCurrency), Money.zero(currentCurrency))
         }
 
-        val income = transactions
-            .asSequence()
-            .filter { !it.isExpense }
-            .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount }
+        val income =
+            transactions
+                .asSequence()
+                .filter { !it.isExpense }
+                .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount }
 
-        val expense = transactions
-            .asSequence()
-            .filter { it.isExpense }
-            .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount.abs() }
+        val expense =
+            transactions
+                .asSequence()
+                .filter { it.isExpense }
+                .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount.abs() }
 
         val balance = income - expense
         return Triple(income, expense, balance)

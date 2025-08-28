@@ -6,14 +6,13 @@ import androidx.core.content.edit
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AndroidAnalyticsProviderImpl
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider

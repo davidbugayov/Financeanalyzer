@@ -43,22 +43,22 @@ fun PermissionUtilsHomeFilterChips(
             FilterChipData(
                 TransactionFilter.TODAY,
                 stringResource(UiR.string.filter_today),
-                Icons.Default.Today
+                Icons.Default.Today,
             ),
             FilterChipData(
                 TransactionFilter.WEEK,
                 stringResource(UiR.string.filter_week),
-                Icons.Default.DateRange
+                Icons.Default.DateRange,
             ),
             FilterChipData(
                 TransactionFilter.MONTH,
                 stringResource(UiR.string.filter_month),
-                Icons.Default.CalendarMonth
+                Icons.Default.CalendarMonth,
             ),
             FilterChipData(
                 TransactionFilter.ALL,
                 stringResource(UiR.string.filter_all),
-                Icons.Default.Timeline
+                Icons.Default.Timeline,
             ),
         )
 
@@ -98,7 +98,14 @@ private fun FilterChipItem(
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
     val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     val unselectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+    val borderColor =
+        if (isSelected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.outline.copy(
+                alpha = 0.5f,
+            )
+        }
 
     FilterChip(
         selected = isSelected,
@@ -115,7 +122,7 @@ private fun FilterChipItem(
                 imageVector = filterData.icon,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = if (isSelected) selectedLabelColor else unselectedLabelColor
+                tint = if (isSelected) selectedLabelColor else unselectedLabelColor,
             )
         },
         colors =

@@ -3,9 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.dialogs
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -54,12 +52,13 @@ fun PeriodSelectionDialog(
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
         val now = java.util.Calendar.getInstance()
-        val end = now.apply {
-            set(java.util.Calendar.HOUR_OF_DAY, 23)
-            set(java.util.Calendar.MINUTE, 59)
-            set(java.util.Calendar.SECOND, 59)
-            set(java.util.Calendar.MILLISECOND, 999)
-        }.time
+        val end =
+            now.apply {
+                set(java.util.Calendar.HOUR_OF_DAY, 23)
+                set(java.util.Calendar.MINUTE, 59)
+                set(java.util.Calendar.SECOND, 59)
+                set(java.util.Calendar.MILLISECOND, 999)
+            }.time
 
         val startCal = java.util.Calendar.getInstance()
         when (type) {
@@ -205,4 +204,3 @@ private fun PeriodOption(
         )
     }
 }
-

@@ -10,7 +10,7 @@ import timber.log.Timber
 /**
  * Утилита для принудительного применения локали к baseContext активности.
  * Нужна как fallback, когда AppCompatDelegate.setApplicationLocales не срабатывает.
- * 
+ *
  * @suppress AppBundleLocaleChanges - This is a fallback utility for locale changes
  * when AppCompatDelegate.setApplicationLocales doesn't work properly.
  */

@@ -1,10 +1,10 @@
 package com.davidbugayov.financeanalyzer
 
 import android.os.Build
-import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
+import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics

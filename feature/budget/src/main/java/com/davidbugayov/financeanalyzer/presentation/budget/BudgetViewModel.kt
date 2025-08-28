@@ -247,7 +247,7 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
-                
+
                 // Обновляем виджеты при изменении кошелька
                 updateWidgetsUseCase()
             } catch (e: Exception) {
@@ -332,7 +332,7 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
-                
+
                 // Обновляем виджеты при изменении баланса кошелька
                 updateWidgetsUseCase()
 
@@ -439,7 +439,7 @@ class BudgetViewModel(
 
                 // Перезагружаем кошельки
                 loadBudgetCategories()
-                
+
                 // Обновляем виджеты при изменении балансов кошельков
                 updateWidgetsUseCase()
 

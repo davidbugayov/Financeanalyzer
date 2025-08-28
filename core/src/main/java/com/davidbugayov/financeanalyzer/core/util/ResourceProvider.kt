@@ -10,7 +10,7 @@ interface ResourceProvider {
         @StringRes id: Int,
         vararg args: Any?,
     ): String
-    
+
     fun getStringByName(
         name: String,
         vararg args: Any?,

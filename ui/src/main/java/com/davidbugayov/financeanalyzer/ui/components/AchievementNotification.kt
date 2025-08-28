@@ -56,7 +56,7 @@ import kotlinx.coroutines.delay
  * Компонент для отображения уведомления о разблокированной ачивке
  */
 @Composable
-fun AchievementNotification(
+fun achievementNotification(
     title: String,
     description: String,
     rewardCoins: Int,
@@ -259,7 +259,7 @@ fun AchievementNotification(
 @Composable
 private fun AchievementNotificationPreview() {
     MaterialTheme {
-        AchievementNotification(
+        achievementNotification(
             title = stringResource(R.string.achievement_first_steps_title),
             description = stringResource(R.string.achievement_first_steps_description),
             rewardCoins = 10,

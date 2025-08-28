@@ -91,7 +91,7 @@ class WalletTransactionsViewModel(
                             isLoading = false,
                         )
                     }
-                    
+
                     // Обновляем виджеты при изменении кошелька
                     updateWidgetsUseCase()
                 } else {

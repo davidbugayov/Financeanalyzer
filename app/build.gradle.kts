@@ -340,9 +340,8 @@ dependencies {
             ":feature:history",
             ":feature:statistics",
             ":feature:transaction",
-
             ":feature:security",
-            ":analytics"
+            ":analytics",
         )
 
     modules.forEach { module ->

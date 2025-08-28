@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -30,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -110,7 +110,10 @@ fun HomeGroupSummary(
                 .map { (category, transactions) ->
                     CategorySummary(
                         category = category,
-                        amount = transactions.fold(Money.zero(totalIncome.currency)) { acc, transaction -> acc + transaction.amount },
+                        amount =
+                            transactions.fold(
+                                Money.zero(totalIncome.currency),
+                            ) { acc, transaction -> acc + transaction.amount },
                         isExpense = showExpenses,
                     )
                 }.sortedByDescending { it.amount.amount }
@@ -185,28 +188,31 @@ private fun SummaryHeader(
     textPrimary: Color,
 ) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 6.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 6.dp),
         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.12f),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f)
-        )
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -235,25 +241,26 @@ private fun SummaryTotals(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         // Информационная строка о периоде
         Text(
             text = stringResource(UiR.string.summary_for_period),
             style = MaterialTheme.typography.labelSmall,
             color = textSecondary,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier.padding(bottom = 4.dp),
         )
 
         // Доходы
         androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = incomeColor.copy(alpha = 0.08f),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = incomeColor.copy(alpha = 0.08f),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    )
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -265,7 +272,7 @@ private fun SummaryTotals(
                         imageVector = Icons.Default.ArrowUpward,
                         contentDescription = null,
                         tint = incomeColor,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -286,13 +293,14 @@ private fun SummaryTotals(
 
         // Расходы
         androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = expenseColor.copy(alpha = 0.08f),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = expenseColor.copy(alpha = 0.08f),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    )
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -304,7 +312,7 @@ private fun SummaryTotals(
                         imageVector = Icons.Default.ArrowDownward,
                         contentDescription = null,
                         tint = expenseColor,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -325,13 +333,14 @@ private fun SummaryTotals(
 
         // Баланс
         androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = balanceColor.copy(alpha = 0.08f),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = balanceColor.copy(alpha = 0.08f),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                    )
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -345,11 +354,12 @@ private fun SummaryTotals(
                     color = textSecondary,
                 )
                 Text(
-                    text = if (balance.amount >= java.math.BigDecimal.ZERO) {
-                        "+${balance.formatForDisplay(showCurrency = false)}"
-                    } else {
-                        balance.formatForDisplay(showCurrency = false)
-                    },
+                    text =
+                        if (balance.amount >= java.math.BigDecimal.ZERO) {
+                            "+${balance.formatForDisplay(showCurrency = false)}"
+                        } else {
+                            balance.formatForDisplay(showCurrency = false)
+                        },
                     fontSize = 18.sp,
                     color = balanceColor,
                     fontWeight = FontWeight.ExtraBold,
@@ -410,15 +420,16 @@ private fun SummaryCategoryList(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         visibleCategories.forEach { categorySummary ->
-            val progress = if (totalAmount > 0f) {
-                (categorySummary.amount.abs().amount.toFloat() / totalAmount).coerceIn(0f, 1f)
-            } else {
-                0f
-            }
+            val progress =
+                if (totalAmount > 0f) {
+                    (categorySummary.amount.abs().amount.toFloat() / totalAmount).coerceIn(0f, 1f)
+                } else {
+                    0f
+                }
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(1.dp)
+                verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -453,22 +464,27 @@ private fun SummaryCategoryList(
 
                 // Progress bar для визуализации доли категории
                 androidx.compose.foundation.layout.Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(
-                            color = (if (categorySummary.isExpense) expenseColor else incomeColor).copy(alpha = 0.1f),
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
-                        )
-                ) {
-                    androidx.compose.foundation.layout.Box(
-                        modifier = Modifier
-                            .fillMaxWidth(progress)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
                             .height(3.dp)
                             .background(
-                                color = if (categorySummary.isExpense) expenseColor else incomeColor,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
-                            )
+                                color =
+                                    (if (categorySummary.isExpense) expenseColor else incomeColor).copy(
+                                        alpha = 0.1f,
+                                    ),
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp),
+                            ),
+                ) {
+                    androidx.compose.foundation.layout.Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth(progress)
+                                .height(3.dp)
+                                .background(
+                                    color = if (categorySummary.isExpense) expenseColor else incomeColor,
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp),
+                                ),
                     )
                 }
             }
@@ -538,18 +554,19 @@ private fun periodTitleForFilter(
     filter: TransactionFilter,
     startDate: java.util.Date? = null,
     endDate: java.util.Date? = null,
-    transactionCount: Int = 0
+    transactionCount: Int = 0,
 ): String {
     // Используем русскую локаль для корректного отображения месяцев/дат
     val ruLocale = java.util.Locale("ru", "RU")
     val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
-    val transactionText = if (transactionCount == 1) {
-        "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
-    } else if (transactionCount in 2..4) {
-        "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
-    } else {
-        "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
-    }
+    val transactionText =
+        if (transactionCount == 1) {
+            "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
+        } else if (transactionCount in 2..4) {
+            "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
+        } else {
+            "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
+        }
 
     return when (filter) {
         TransactionFilter.TODAY -> {

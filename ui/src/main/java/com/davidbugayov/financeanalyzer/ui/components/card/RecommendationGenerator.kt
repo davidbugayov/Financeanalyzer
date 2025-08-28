@@ -111,11 +111,12 @@ object RecommendationGenerator {
             recommendations.add(
                 UnifiedRecommendation(
                     title = stringResource(R.string.many_small_expenses_title),
-                    description = pluralStringResource(
-                        R.plurals.many_small_expenses_description,
-                        expenseTransactionsCount,
-                        expenseTransactionsCount,
-                    ),
+                    description =
+                        pluralStringResource(
+                            R.plurals.many_small_expenses_description,
+                            expenseTransactionsCount,
+                            expenseTransactionsCount,
+                        ),
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.MEDIUM,
                     impact = stringResource(R.string.many_small_expenses_impact),

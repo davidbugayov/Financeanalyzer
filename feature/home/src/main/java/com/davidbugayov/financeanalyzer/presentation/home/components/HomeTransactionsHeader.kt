@@ -1,10 +1,10 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.clickable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,12 +43,20 @@ fun HomeTransactionsHeader(
             fontWeight = FontWeight.Medium,
         )
         Text(
-            text = if (showGroupSummary) stringResource(UiR.string.hide_summary) else stringResource(UiR.string.show_summary),
+            text =
+                if (showGroupSummary) {
+                    stringResource(
+                        UiR.string.hide_summary,
+                    )
+                } else {
+                    stringResource(UiR.string.show_summary)
+                },
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .padding(horizontal = 4.dp)
-                .clickable { onToggleGroupSummary(!showGroupSummary) }
+            modifier =
+                Modifier
+                    .padding(horizontal = 4.dp)
+                    .clickable { onToggleGroupSummary(!showGroupSummary) },
         )
     }
 }

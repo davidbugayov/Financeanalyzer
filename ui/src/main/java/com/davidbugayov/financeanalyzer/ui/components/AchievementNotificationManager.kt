@@ -42,7 +42,7 @@ fun AchievementNotificationManager(
 
         // Уведомление о достижении поверх всего контента
         currentNotification?.let { achievement ->
-            AchievementNotification(
+            achievementNotification(
                 title = achievement.title,
                 description = achievement.description,
                 rewardCoins = 0, // Пока используем 0, так как в shared модели нет этого поля

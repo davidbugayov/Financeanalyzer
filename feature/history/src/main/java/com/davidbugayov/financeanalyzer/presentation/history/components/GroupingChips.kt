@@ -16,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
@@ -57,7 +56,7 @@ fun GroupingChips(
                     imageVector = Icons.Default.CalendarViewDay,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (currentGrouping == GroupingType.DAY) selectedLabelColor else unselectedLabelColor
+                    tint = if (currentGrouping == GroupingType.DAY) selectedLabelColor else unselectedLabelColor,
                 )
             },
             colors =
@@ -67,10 +66,11 @@ fun GroupingChips(
                     containerColor = unselectedContainerColor,
                     labelColor = unselectedLabelColor,
                 ),
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = if (currentGrouping == GroupingType.DAY) MaterialTheme.colorScheme.primary else borderColor
-            ),
+            border =
+                androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (currentGrouping == GroupingType.DAY) MaterialTheme.colorScheme.primary else borderColor,
+                ),
         )
 
         FilterChip(
@@ -82,7 +82,7 @@ fun GroupingChips(
                     imageVector = Icons.Default.CalendarViewWeek,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (currentGrouping == GroupingType.WEEK) selectedLabelColor else unselectedLabelColor
+                    tint = if (currentGrouping == GroupingType.WEEK) selectedLabelColor else unselectedLabelColor,
                 )
             },
             colors =
@@ -92,10 +92,11 @@ fun GroupingChips(
                     containerColor = unselectedContainerColor,
                     labelColor = unselectedLabelColor,
                 ),
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = if (currentGrouping == GroupingType.WEEK) MaterialTheme.colorScheme.primary else borderColor
-            ),
+            border =
+                androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (currentGrouping == GroupingType.WEEK) MaterialTheme.colorScheme.primary else borderColor,
+                ),
         )
 
         FilterChip(
@@ -107,7 +108,7 @@ fun GroupingChips(
                     imageVector = Icons.Default.DateRange,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = if (currentGrouping == GroupingType.MONTH) selectedLabelColor else unselectedLabelColor
+                    tint = if (currentGrouping == GroupingType.MONTH) selectedLabelColor else unselectedLabelColor,
                 )
             },
             colors =
@@ -117,10 +118,11 @@ fun GroupingChips(
                     containerColor = unselectedContainerColor,
                     labelColor = unselectedLabelColor,
                 ),
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = if (currentGrouping == GroupingType.MONTH) MaterialTheme.colorScheme.primary else borderColor
-            ),
+            border =
+                androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (currentGrouping == GroupingType.MONTH) MaterialTheme.colorScheme.primary else borderColor,
+                ),
         )
     }
 }
