@@ -130,7 +130,7 @@ fun BalanceCard(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer(scaleX = scale.value, scaleY = scale.value),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         border = BorderStroke(width = 2.dp, color = balanceTextColor.copy(alpha = 0.3f)),
     ) {
