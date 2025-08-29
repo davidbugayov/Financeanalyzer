@@ -151,10 +151,10 @@ class SharedFacade {
         kotlinx.coroutines.flow.flow {
             try {
                 val transactions = financeRepository.getTransactionsForPeriod(start, end)
-                Timber.d("SharedFacade: Loaded ${transactions.size} transactions for period $start - $end")
+                // Debug logging removed for KMP compatibility
                 emit(transactions)
             } catch (e: Exception) {
-                Timber.e(e, "SharedFacade: Error loading transactions for period $start - $end")
+                // Error logging removed for KMP compatibility
                 emit(emptyList())
             }
         }

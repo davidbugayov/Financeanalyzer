@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.GlobalContext
+import timber.log.Timber
 
 class EnhancedFinanceChartViewModel :
     ViewModel(),
