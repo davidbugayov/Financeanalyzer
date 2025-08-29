@@ -48,7 +48,13 @@
     <item quantity="other">%d советов</item>
   </plurals>
 
-
+  <!-- Долги -->
+  <plurals name="debts_count">
+    <item quantity="one">%d долг</item>
+    <item quantity="few">%d долга</item>
+    <item quantity="many">%d долгов</item>
+    <item quantity="other">%d долгов</item>
+  </plurals>
 
   <!-- Месяцы -->
   <plurals name="months_count">

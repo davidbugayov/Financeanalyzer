@@ -640,14 +640,22 @@ private fun periodTitleForFilter(
     // Используем русскую локаль для корректного отображения месяцев/дат
     val ruLocale = java.util.Locale("ru", "RU")
     val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
-    val transactionText =
-        if (transactionCount == 1) {
+    val transactionText = when {
+        // Для английского языка всегда используем одну форму
+        java.util.Locale.getDefault().language == "en" -> {
+            "$transactionCount ${stringResource(UiR.string.transactions).lowercase()}"
+        }
+        // Для русского языка используем правильные формы плюрализации
+        transactionCount == 1 -> {
             "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
-        } else if (transactionCount in 2..4) {
+        }
+        transactionCount in 2..4 -> {
             "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
-        } else {
+        }
+        else -> {
             "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
         }
+    }
 
     return when (filter) {
         TransactionFilter.TODAY -> {

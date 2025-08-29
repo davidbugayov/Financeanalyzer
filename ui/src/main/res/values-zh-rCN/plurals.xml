@@ -30,7 +30,10 @@
     <item quantity="other">%d 条建议</item>
   </plurals>
 
-
+  <!-- Debts -->
+  <plurals name="debts_count">
+    <item quantity="other">%d 个债务</item>
+  </plurals>
 
   <!-- Months -->
   <plurals name="months_count">
