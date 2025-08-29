@@ -118,12 +118,14 @@ class EnhancedFinanceChartViewModel :
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
+            Timber.d("EnhancedFinanceChartViewModel: Loading transactions for period ${_state.value.startDate.toLocalDateKmp()} - ${_state.value.endDate.toLocalDateKmp()}")
             val flow =
                 sharedFacade.transactionsForPeriodFlow(
                     _state.value.startDate.toLocalDateKmp(),
                     _state.value.endDate.toLocalDateKmp(),
                 )
-            val filteredTransactions = (flow?.first() ?: emptyList())
+            val filteredTransactions = flow.first()
+            Timber.d("EnhancedFinanceChartViewModel: Loaded ${filteredTransactions.size} transactions for analytics")
             allTransactions = filteredTransactions
 
             val currentCurrency = CurrencyProvider.getCurrency()

@@ -148,7 +148,16 @@ class SharedFacade {
 
 
     fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
-        financeRepository.getAllTransactions() // Simplified for now
+        kotlinx.coroutines.flow.flow {
+            try {
+                val transactions = financeRepository.getTransactionsForPeriod(start, end)
+                Timber.d("SharedFacade: Loaded ${transactions.size} transactions for period $start - $end")
+                emit(transactions)
+            } catch (e: Exception) {
+                Timber.e(e, "SharedFacade: Error loading transactions for period $start - $end")
+                emit(emptyList())
+            }
+        }
 
     /**
      * Рекомендации по оптимизации расходов.
