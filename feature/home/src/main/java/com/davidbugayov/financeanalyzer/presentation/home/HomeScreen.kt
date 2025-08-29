@@ -502,22 +502,18 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues),
             ) {
-                if (pagingItems.loadState.refresh is androidx.paging.LoadState.Loading && pagingItems.itemCount == 0) {
-                    CenteredLoadingIndicator(message = stringResource(UiR.string.loading_data))
-                } else {
-                    HomeMainContent(
-                        windowSizeIsCompact = windowSize.isCompact(),
-                        state = state,
-                        categoriesViewModel = categoriesViewModel,
-                        pagingItems = pagingItems,
-                        showGroupSummary = state.showGroupSummary,
-                        onToggleGroupSummary = onToggleGroupSummary,
-                        onFilterSelected = onFilterSelected,
-                        onTransactionClick = onTransactionClick,
-                        onTransactionLongClick = onTransactionLongClick,
-                        onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
-                    )
-                }
+                HomeMainContent(
+                    windowSizeIsCompact = windowSize.isCompact(),
+                    state = state,
+                    categoriesViewModel = categoriesViewModel,
+                    pagingItems = pagingItems,
+                    showGroupSummary = state.showGroupSummary,
+                    onToggleGroupSummary = onToggleGroupSummary,
+                    onFilterSelected = onFilterSelected,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick,
+                    onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
+                )
                 HomeFeedback(
                     title =
                         when (feedbackType) {
