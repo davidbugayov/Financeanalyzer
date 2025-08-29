@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -176,12 +177,17 @@ private fun ExpandedRightPanel(
 
         Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
 
+        // Используем ключ для оптимизации перерисовки
+        val contentKey = "${state.currentFilter}_${isEmptyState}_${realTransactionsCount}"
+
         if (isEmptyState) {
             Timber.d("ExpandedLayout: Showing ExpandedEmptyState")
             ExpandedEmptyState(onAddClick)
         } else {
             Timber.d("ExpandedLayout: Showing transaction list")
-            transactionPagingList(
+            // Оборачиваем в key для предотвращения полной перерисовки
+            key(contentKey) {
+                transactionPagingList(
                 items = pagingItems,
                 categoriesViewModel = categoriesViewModel,
                 onTransactionClick = onTransactionClick,
@@ -202,7 +208,8 @@ private fun ExpandedRightPanel(
                         )
                     }
                 },
-            )
+                )
+            }
         }
     }
 }

@@ -15,8 +15,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -230,6 +232,9 @@ fun CompactLayout(
 
         Timber.d("CompactLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
 
+        // Используем ключ для оптимизации перерисовки
+        val contentKey = "${state.currentFilter}_${isEmptyState}_${realTransactionsCount}"
+
         if (isEmptyState) {
             Timber.d("CompactLayout: Showing CompactEmptyState")
             CompactEmptyState(onAddClick)
@@ -288,14 +293,17 @@ fun CompactLayout(
                         null
                     }
 
-            com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
-                items = itemsToDisplay,
-                categoriesViewModel = categoriesViewModel,
-                onTransactionClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
-                listState = listState,
-                headerContent = headerContent,
-            )
+            // Оборачиваем в key для предотвращения полной перерисовки
+            key(contentKey) {
+                com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
+                    items = itemsToDisplay,
+                    categoriesViewModel = categoriesViewModel,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick,
+                    listState = listState,
+                    headerContent = headerContent,
+                )
+            }
         }
     }
 }
