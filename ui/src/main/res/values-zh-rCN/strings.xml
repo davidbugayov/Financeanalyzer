@@ -1,14 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="StringFormatCount">
-  <!-- Statistics/Financial health strings -->
-  <string name="financial_health_title">财务健康</string>
-  <string name="financial_health_explanation">“财务健康”是评估您当前财务状况与稳定性的综合指标。它考虑储蓄率、支出控制以及应急金是否充足。</string>
-  <string name="financial_health_savings_rate_title">储蓄率</string>
-  <string name="financial_health_average_expenses_title">平均支出</string>
-  <string name="financial_health_average_expenses_content">平均支出帮助理解消费趋势。会分析每日、每月与每年的指标，以发现优化预算的机会。</string>
-  <string name="financial_health_financial_cushion_title">应急金</string>
-  <string name="financial_health_financial_cushion_content">应急金是指可支撑3–6个月无收入生活的金额。计算方式：月均支出 × 月数。这是应对突发情况的安全缓冲。</string>
-  <string name="financial_health_tips_title">财务健康建议</string>
+  <!-- Statistics/Financial health strings moved to strings_statistics.xml -->
     <string name="achievement_alfabank_importer_desc">从阿尔法银行导入数据</string>
     <string name="achievement_alfabank_importer_title">阿尔法银行进口商</string>
     <string name="achievement_app_explorer_desc">打开了所有部分</string>
@@ -431,9 +423,7 @@
     <string name="rec_budget_track_desc">定期检查费用符合预算。</string>
     <string name="rec_budget_track_impact">每周控制</string>
     <string name="rec_budget_track_title">跟踪预算</string>
-    <string name="rec_critical_debt_desc">您的债务负荷很高。</string>
-    <string name="rec_critical_debt_impact">将债务减少到收入的30％</string>
-    <string name="rec_critical_debt_title">高债务</string>
+
     <string name="rec_critical_emergency_desc">您没有储备金。这对于财务安全至关重要。</string>
     <string name="rec_critical_emergency_impact">创建3-6个月的费用</string>
     <string name="rec_critical_emergency_title">创建储备金</string>
@@ -978,8 +968,7 @@
     <string name="build_version">集会</string>
     <string name="security_app_lock_description">使用PIN代码保护您的数据</string>
   <!-- duplicate removed: profile_export_import_subtitle defined once below -->
-  <string name="profile_budget_subtitle">预算规划</string>
-  <string name="profile_achievements_subtitle">统计与目标</string>
+
     <string name="security_biometric_description">使用指纹或脸部</string>
     <string name="security_pin_setup_title">PIN码的安装</string>
     <string name="security_pin_confirm_title">确认PIN码</string>
@@ -1342,36 +1331,7 @@
   <string name="error_failed_delete_transaction">删除交易失败</string>
   <string name="error_failed_update_transaction">更新交易失败</string>
 
-  <!-- Debts -->
-  <string name="debt_title">债务</string>
-  <string name="debt_add">添加债务</string>
-  <string name="debt_edit">编辑债务</string>
-  <string name="debt_counterparty">交易对手</string>
-  <string name="debt_amount">金额</string>
-  <string name="debt_field_title">标题</string>
-  <string name="debt_principal">债务金额</string>
-  <string name="debt_remaining">剩余</string>
-  <string name="debt_due_at">到期日</string>
-  <string name="debt_note">备注</string>
-  <string name="debt_type_borrowed">我欠</string>
-  <string name="debt_type_lent">欠我</string>
-  <string name="debt_status_active">活跃</string>
-  <string name="debt_status_paid">已付</string>
-  <string name="debt_status_overdue">逾期</string>
-  <string name="debt_status_writeoff">已核销</string>
-  <string name="debt_repay">还款</string>
-  <string name="debt_create_success">债务已创建</string>
-  <string name="debt_update_success">债务已更新</string>
-  <string name="debt_repay_success">付款已记录</string>
-  <string name="debt_empty_title">暂无债务</string>
-  <string name="debt_empty_subtitle">添加您的第一笔债务以跟踪余额和付款</string>
-  <string name="debt_filter_all">全部</string>
-  <string name="debt_filter_active">活跃</string>
-  <string name="debt_filter_overdue">逾期</string>
-  <string name="debt_filter_borrowed">我欠</string>
-  <string name="debt_filter_lent">欠我</string>
-  <string name="debt_due_date_short">到期：%1$s</string>
-  <string name="debt_due_not_set">未设置到期日</string>
+
 
     <!-- Plurals -->
     <plurals name="transactions_count">
@@ -1421,7 +1381,7 @@
     <plurals name="achievement_goal_setter_desc">
         <item quantity="other">设定并实现%1$d个财务目标</item>
     </plurals>
-    <string name="achievement_debt_free_desc">还清%1$s债务</string>
+
     <string name="achievement_investment_starter_desc">开始投资%1$s</string>
     <plurals name="achievement_budget_sticker_desc">
         <item quantity="other">连续%1$d个月遵守预算</item>
@@ -1439,6 +1399,9 @@
   <!-- moved to strings_achievements.xml -->
   <string name="bank_sberbank">Sberbank</string>
     <!-- Plurals moved to plurals.xml -->
-    
+  <string name="summary_for_period">所选期间的摘要</string>
+  <string name="transactions_few">笔交易</string>
+  <string name="transactions_many">笔交易</string>
+
 
 </resources>

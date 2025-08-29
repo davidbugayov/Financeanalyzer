@@ -1,14 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <!-- Statistics/Financial health strings -->
-  <string name="financial_health_title">Financial health</string>
-  <string name="financial_health_explanation">Financial health is a composite indicator that evaluates your current financial condition and resilience. It accounts for your savings rate, expense control, and the presence of an emergency fund.</string>
-  <string name="financial_health_savings_rate_title">Savings rate</string>
-  <string name="financial_health_average_expenses_title">Average expenses</string>
-  <string name="financial_health_average_expenses_content">Average expenses help you understand your spending dynamics. Daily, monthly, and yearly metrics are analyzed to reveal opportunities to optimize your budget.</string>
-  <string name="financial_health_financial_cushion_title">Emergency fund</string>
-  <string name="financial_health_financial_cushion_content">An emergency fund is the amount that allows you to live without income for 3–6 months. It is calculated as average monthly expenses × number of months. This is your safety buffer for unforeseen events.</string>
-  <string name="financial_health_tips_title">Financial health tips</string>
+  <!-- Statistics/Financial health strings moved to strings_statistics.xml -->
     <string name="achievement_alfabank_importer_desc">Imported data from Alfa-Bank</string>
     <string name="achievement_alfabank_importer_title">Alfa-Bank importer</string>
     <string name="achievement_app_explorer_desc">Opened all sections</string>
@@ -426,9 +418,7 @@
     <string name="rec_budget_track_desc">Regularly check the compliance of expenses to the budget.</string>
     <string name="rec_budget_track_impact">Weekly control</string>
     <string name="rec_budget_track_title">Track the budget</string>
-    <string name="rec_critical_debt_desc">You have a high level of debt load.</string>
-  <string name="rec_critical_debt_impact" tools:ignore="StringFormatCount">Reduce debts to 30% of income</string>
-    <string name="rec_critical_debt_title">High debts</string>
+  
     <string name="rec_critical_emergency_desc">You do not have a reserve fund.This is critical for financial security.</string>
     <string name="rec_critical_emergency_impact">Create a fund for 3-6 months of expenses</string>
     <string name="rec_critical_emergency_title">Create a reserve fund</string>
@@ -1212,8 +1202,6 @@
     <string name="ozon_instructions_title">Through the OZON Bank application:</string>
     <string name="proceed_to_import">Go to import</string>
     <string name="profile_export_import_subtitle">Export or import your data</string>
-  <string name="profile_budget_subtitle">Budget planning</string>
-  <string name="profile_achievements_subtitle">Statistics and goals</string>
   <string name="progress_percentage">%d%%</string>
     <string name="sberbank_card_pattern">^(</string>
     <string name="sberbank_category">CATEGORY</string>
@@ -1263,36 +1251,7 @@
   <string name="error_failed_delete_transaction">Failed to delete transaction</string>
   <string name="error_failed_update_transaction">Failed to update transaction</string>
 
-  <!-- Debts -->
-  <string name="debt_title">Debts</string>
-  <string name="debt_add">Add debt</string>
-  <string name="debt_edit">Edit debt</string>
-  <string name="debt_counterparty">Counterparty</string>
-  <string name="debt_amount">Amount</string>
-  <string name="debt_field_title">Title</string>
-  <string name="debt_principal">Debt amount</string>
-  <string name="debt_remaining">Remaining</string>
-  <string name="debt_due_at">Due date</string>
-  <string name="debt_note">Note</string>
-  <string name="debt_type_borrowed">I owe</string>
-  <string name="debt_type_lent">I am owed</string>
-  <string name="debt_status_active">Active</string>
-  <string name="debt_status_paid">Paid</string>
-  <string name="debt_status_overdue">Overdue</string>
-  <string name="debt_status_writeoff">Written off</string>
-  <string name="debt_repay">Repay</string>
-  <string name="debt_create_success">Debt created</string>
-  <string name="debt_update_success">Debt updated</string>
-  <string name="debt_repay_success">Payment recorded</string>
-  <string name="debt_empty_title">No debts yet</string>
-  <string name="debt_empty_subtitle">Add your first debt to track balance and payments</string>
-  <string name="debt_filter_all">All</string>
-  <string name="debt_filter_active">Active</string>
-  <string name="debt_filter_overdue">Overdue</string>
-  <string name="debt_filter_borrowed">I owe</string>
-  <string name="debt_filter_lent">I am owed</string>
-  <string name="debt_due_date_short">Due: %1$s</string>
-  <string name="debt_due_not_set">Due date not set</string>
+
 
     <!-- Plurals -->
     <plurals name="transactions_count">
@@ -1354,7 +1313,7 @@
       <item quantity="one">Set and achieve %1$d financial goal</item>
       <item quantity="other">Set and achieve %1$d financial goals</item>
     </plurals>
-    <string name="achievement_debt_free_desc">Pay off %1$s in debt</string>
+
     <string name="achievement_investment_starter_desc">Start investing %1$s</string>
     <plurals name="achievement_budget_sticker_desc">
       <item quantity="one">Stay within budget for %1$d month</item>
@@ -1382,6 +1341,9 @@
   <string name="selected_wallets_count">Selected: %d</string>
   <string name="wallets_selected_for_expense">%d wallets selected for expense</string>
   <string name="wallets_selected_for_income">%d wallets selected for income</string>
-  
+  <string name="summary_for_period">Summary for selected period</string>
+  <string name="transactions_few">transactions</string>
+  <string name="transactions_many">transactions</string>
+
 
 </resources>

@@ -29,7 +29,6 @@
     <string name="unknown">Неизвестно</string>
     <string name="profile_budget_subtitle">Планирование расходов</string>
     <!-- export_import и profile_export_import_subtitle определены в strings.xml -->
-    <string name="achievements">Достижения</string>
     <string name="profile_achievements_subtitle">Статистика и цели</string>
   <!-- currency names for localization -->
   <string name="currency_name_rub">Российский рубль</string>

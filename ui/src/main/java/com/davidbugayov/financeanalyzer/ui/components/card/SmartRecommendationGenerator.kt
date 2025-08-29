@@ -57,19 +57,7 @@ object SmartRecommendationGenerator {
             )
         }
 
-        // Высокая долговая нагрузка
-        if (debtToIncomeRatio > 0.4f) {
-            recommendations.add(
-                SmartRecommendation(
-                    title = stringResource(R.string.rec_critical_debt_title),
-                    description = stringResource(R.string.rec_critical_debt_desc),
-                    icon = Icons.Default.Error,
-                    priority = SmartRecommendationPriority.CRITICAL,
-                    impact = stringResource(R.string.rec_critical_debt_impact, (debtToIncomeRatio * 100).toInt()),
-                    category = RecommendationCategory.EXPENSES,
-                ),
-            )
-        }
+
 
         // ⚠️ ВАЖНЫЕ рекомендации (требуют внимания в ближайшее время)
 

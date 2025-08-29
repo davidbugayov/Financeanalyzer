@@ -50,6 +50,14 @@
   <string name="financial_health_recommended_values_title">推荐值</string>
   <string name="financial_health_tooltip_description">点击查看详细信息与建议</string>
   <string name="prediction_subtitle">基于近期交易与趋势</string>
+  <string name="financial_health_title">财务健康</string>
+  <string name="financial_health_explanation">财务健康是评估您当前财务状况与稳定性的综合指标。它考虑储蓄率、支出控制以及应急金是否充足。</string>
+  <string name="financial_health_savings_rate_title">储蓄率</string>
+  <string name="financial_health_average_expenses_title">平均支出</string>
+  <string name="financial_health_average_expenses_content">平均支出帮助理解消费趋势。会分析每日、每月与每年的指标，以发现优化预算的机会。</string>
+  <string name="financial_health_financial_cushion_title">应急金</string>
+  <string name="financial_health_financial_cushion_content">应急金是指可支撑3–6个月无收入生活的金额。计算方式：月均支出 × 月数。这是应对突发情况的安全缓冲。</string>
+  <string name="financial_health_tips_title">财务健康建议</string>
 </resources>
 
 

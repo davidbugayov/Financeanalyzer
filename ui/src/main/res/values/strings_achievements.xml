@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Общие строки достижений -->
+    <string name="achievements">Достижения</string>
     <string name="achievements_overall_progress">Общий прогресс</string>
     <string name="achievements_progress">Прогресс</string>
     <string name="achievements_unlocked">Разблокировано</string>
@@ -49,7 +50,7 @@
   <string name="achievement_security_guard">Охранник безопасности</string>
   <string name="achievement_analytics_expert">Эксперт аналитики</string>
   <string name="achievement_goal_setter">Постановщик целей</string>
-  <string name="achievement_debt_free">Без долгов</string>
+
   <string name="achievement_investment_starter">Начинающий инвестор</string>
   <string name="achievement_budget_sticker">Соблюдающий бюджет</string>
   <string name="achievement_income_diversifier">Диверсификатор дохода</string>

@@ -50,6 +50,14 @@
   <string name="financial_health_recommended_values_title">Recommended values</string>
   <string name="financial_health_tooltip_description">Tap to see detailed information and tips</string>
   <string name="prediction_subtitle">Based on your recent transactions and trends</string>
+  <string name="financial_health_title">Financial health</string>
+  <string name="financial_health_explanation">Financial health is a comprehensive indicator that evaluates your current financial condition and resilience. It takes into account your savings rate, expense control, and the presence of an emergency fund.</string>
+  <string name="financial_health_savings_rate_title">Savings rate</string>
+  <string name="financial_health_average_expenses_title">Average expenses</string>
+  <string name="financial_health_average_expenses_content">Average expenses help you understand your spending dynamics. Daily, monthly, and yearly metrics are analyzed to reveal opportunities to optimize your budget.</string>
+  <string name="financial_health_financial_cushion_title">Emergency fund</string>
+  <string name="financial_health_financial_cushion_content">An emergency fund is the amount that allows you to live without income for 3–6 months. It is calculated as average monthly expenses × number of months. This is your safety buffer for unforeseen events.</string>
+  <string name="financial_health_tips_title">Financial health tips</string>
 </resources>
 
 

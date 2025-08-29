@@ -32,6 +32,8 @@
     <string name="notification_disabled_description">Notifications are disabled</string>
     <string name="permission_required_title">Permission required</string>
     <string name="unknown">Unknown</string>
+    <string name="profile_budget_subtitle">Expense planning</string>
+    <string name="profile_achievements_subtitle">Statistics and goals</string>
 </resources>
 
 

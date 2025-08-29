@@ -1,15 +1,21 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 import android.os.SystemClock
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -75,7 +82,6 @@ private fun HomeTopBar(
     modifier: Modifier = Modifier,
     onGenerateTestData: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToDebts: () -> Unit,
 ) {
     AppTopBar(
         title = stringResource(UiR.string.financial_analyzer),
@@ -101,12 +107,6 @@ private fun HomeTopBar(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = stringResource(UiR.string.profile),
-                )
-            }
-            IconButton(onClick = onNavigateToDebts) {
-                Icon(
-                    imageVector = Icons.Default.AccountBalance,
-                    contentDescription = stringResource(UiR.string.debt_title),
                 )
             }
         },
@@ -440,7 +440,6 @@ fun HomeScreen(
                         showFeedback = true
                     },
                     onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
-                    onNavigateToDebts = { viewModel.onEvent(HomeEvent.NavigateToDebts) },
                     modifier = Modifier,
                 )
             },
@@ -458,8 +457,32 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues),
             ) {
-                if (state.isLoading && state.transactions.isEmpty()) {
+                if (pagingItems.loadState.refresh is androidx.paging.LoadState.Loading) {
                     CenteredLoadingIndicator(message = stringResource(UiR.string.loading_data))
+                } else if (pagingItems.itemCount == 0) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(UiR.string.no_transactions),
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(UiR.string.add_first_transaction_description),
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) }
+                        ) {
+                            Text(stringResource(UiR.string.action_add_transaction))
+                        }
+                    }
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),

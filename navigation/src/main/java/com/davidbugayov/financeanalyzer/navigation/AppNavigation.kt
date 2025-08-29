@@ -84,25 +84,7 @@ class AppNavigation {
         ) {
             onBudgetScreen()
         }
-        composable(
-            route = Screen.Debts.route,
-            enterTransition = defaultEnterLeft(),
-            exitTransition = defaultExitRight(),
-            popEnterTransition = defaultEnterLeft(),
-            popExitTransition = defaultExitRight(),
-        ) {
-            onDebtsScreen()
-        }
 
-        composable(
-            route = Screen.AddDebt.route,
-            enterTransition = defaultEnterUp(),
-            exitTransition = defaultExitDown(),
-            popEnterTransition = defaultEnterUp(),
-            popExitTransition = defaultExitDown(),
-        ) {
-            onAddDebtScreen()
-        }
         composable(
             route = Screen.FinancialStatistics.route,
             arguments =

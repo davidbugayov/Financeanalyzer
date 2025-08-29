@@ -112,11 +112,7 @@ sealed class Screen(
     /** Экран мастера создания кошелька */
     data object WalletSetup : Screen("wallet_setup")
 
-    /** Экран учета долгов */
-    data object Debts : Screen("debts")
 
-    /** Экран добавления долга */
-    data object AddDebt : Screen("debt_add")
 
     data class SubWallets(
         val parentWalletId: String,

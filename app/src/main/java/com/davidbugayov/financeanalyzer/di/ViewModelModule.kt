@@ -12,7 +12,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransac
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
-import com.davidbugayov.financeanalyzer.presentation.debt.DebtsViewModel
+
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.importtransaction.ImportTransactionsViewModel
@@ -67,15 +67,5 @@ val viewModelModule =
             )
         }
 
-        viewModel {
-            DebtsViewModel(
-                createDebtUseCase = get(),
-                getDebtsUseCase = get(),
-                repayDebtUseCase = get(),
-                calculateDebtStatisticsUseCase = get(),
-                getFilteredDebtsUseCase = get(),
-                exportDebtsToCSVUseCase = get(),
-                checkOverdueDebtsUseCase = get(),
-            )
-        }
+
     }

@@ -417,9 +417,7 @@
     <string name="rec_budget_track_desc">Регулярно проверяйте соответствие трат бюджету.</string>
     <string name="rec_budget_track_impact">Еженедельный контроль</string>
     <string name="rec_budget_track_title">Отслеживайте бюджет</string>
-    <string name="rec_critical_debt_desc">У вас высокий уровень долговой нагрузки.</string>
-    <string name="rec_critical_debt_impact">Сократите долги до 30% от доходов</string>
-    <string name="rec_critical_debt_title">Высокие долги</string>
+
     <string name="rec_critical_emergency_desc">У вас нет резервного фонда. Это критически важно для финансовой безопасности.</string>
     <string name="rec_critical_emergency_impact">Создайте фонд на 3-6 месяцев расходов</string>
     <string name="rec_critical_emergency_title">Создайте резервный фонд</string>
@@ -1239,36 +1237,7 @@
     <string name="error_failed_delete_transaction">Не удалось удалить транзакцию</string>
     <string name="error_failed_update_transaction">Не удалось обновить транзакцию</string>
 
-    <!-- Debts -->
-    <string name="debt_title">Долги</string>
-    <string name="debt_add">Добавить долг</string>
-    <string name="debt_edit">Редактировать долг</string>
-    <string name="debt_counterparty">Контрагент</string>
-    <string name="debt_amount">Сумма</string>
-    <string name="debt_field_title">Название</string>
-    <string name="debt_principal">Сумма долга</string>
-    <string name="debt_remaining">Остаток</string>
-    <string name="debt_due_at">Срок</string>
-    <string name="debt_note">Примечание</string>
-    <string name="debt_type_borrowed">Я должен</string>
-    <string name="debt_type_lent">Мне должны</string>
-    <string name="debt_status_active">Активный</string>
-    <string name="debt_status_paid">Погашен</string>
-    <string name="debt_status_overdue">Просрочен</string>
-    <string name="debt_status_writeoff">Списан</string>
-    <string name="debt_repay">Погасить</string>
-    <string name="debt_create_success">Долг создан</string>
-    <string name="debt_update_success">Долг обновлен</string>
-    <string name="debt_repay_success">Платеж учтен</string>
-    <string name="debt_empty_title">Долгов пока нет</string>
-    <string name="debt_empty_subtitle">Добавьте первый долг, чтобы отслеживать остаток и платежи</string>
-    <string name="debt_filter_all">Все</string>
-    <string name="debt_filter_active">Активные</string>
-    <string name="debt_filter_overdue">Просроченные</string>
-    <string name="debt_filter_borrowed">Я должен</string>
-    <string name="debt_filter_lent">Мне должны</string>
-    <string name="debt_due_date_short">Срок: %1$s</string>
-    <string name="debt_due_not_set">Срок не задан</string>
+
 
     <!-- Plurals -->
     <plurals name="transactions_count">
@@ -1338,7 +1307,7 @@
         <item quantity="many">Установите и достигните %1$d финансовых целей</item>
         <item quantity="other">Установите и достигните %1$d финансовых целей</item>
     </plurals>
-    <string name="achievement_debt_free_desc">Погасите %1$s долга</string>
+
     <string name="achievement_investment_starter_desc">Начните инвестировать %1$s</string>
     <plurals name="achievement_budget_sticker_desc">
         <item quantity="one">Соблюдайте бюджет в течение %1$d месяца</item>

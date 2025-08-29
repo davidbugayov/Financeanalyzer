@@ -32,6 +32,8 @@
     <string name="notification_disabled_description">通知已禁用</string>
     <string name="permission_required_title">需要权限</string>
     <string name="unknown">未知</string>
+    <string name="profile_budget_subtitle">支出规划</string>
+    <string name="profile_achievements_subtitle">统计和目标</string>
 </resources>
 
 
