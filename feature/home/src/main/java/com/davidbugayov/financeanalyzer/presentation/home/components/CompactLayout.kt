@@ -176,7 +176,6 @@ fun CompactLayout(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
-    isFilterSwitching: Boolean = false,
 ) {
     val listState: LazyListState = rememberLazyListState()
 
@@ -223,14 +222,10 @@ fun CompactLayout(
         }
 
         // Определяем, показывать ли пустое состояние
-        // Показываем пустое состояние только когда:
-        // 1. Нет реальных транзакций И загрузка завершена, ИЛИ
-        // 2. Идет переключение фильтра И данные еще загружаются И нет элементов
         val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
-        val hasNoItems = pagingItems.itemCount == 0
-        val isEmptyState = (realTransactionsCount == 0 && !isLoading) || (isFilterSwitching && isLoading && hasNoItems)
+        val isEmptyState = realTransactionsCount == 0 && !isLoading
 
-        Timber.d("CompactLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading, isFilterSwitching=$isFilterSwitching")
+        Timber.d("CompactLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
 
         if (isEmptyState) {
             Timber.d("CompactLayout: Showing CompactEmptyState")

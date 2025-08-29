@@ -56,7 +56,6 @@ fun ExpandedLayout(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
-    isFilterSwitching: Boolean = false,
 ) {
     val listState: LazyListState = rememberLazyListState()
 
@@ -93,7 +92,6 @@ fun ExpandedLayout(
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
             modifier = Modifier.weight(1f),
-            isFilterSwitching = isFilterSwitching,
             listState = listState,
         )
     }
@@ -153,7 +151,6 @@ private fun ExpandedRightPanel(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState,
-    isFilterSwitching: Boolean = false,
 ) {
     Timber.d(
         "[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s",
@@ -174,14 +171,10 @@ private fun ExpandedRightPanel(
         }
 
         // Определяем, показывать ли пустое состояние
-        // Показываем пустое состояние только когда:
-        // 1. Нет реальных транзакций И загрузка завершена, ИЛИ
-        // 2. Идет переключение фильтра И данные еще загружаются И нет элементов
         val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
-        val hasNoItems = pagingItems.itemCount == 0
-        val isEmptyState = (realTransactionsCount == 0 && !isLoading) || (isFilterSwitching && isLoading && hasNoItems)
+        val isEmptyState = realTransactionsCount == 0 && !isLoading
 
-        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading, isFilterSwitching=$isFilterSwitching")
+        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
 
         if (isEmptyState) {
             Timber.d("ExpandedLayout: Showing ExpandedEmptyState")

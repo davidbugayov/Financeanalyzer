@@ -7,29 +7,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -168,22 +163,7 @@ private fun HomeMainContent(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
-    isFilterSwitching: Boolean = false,
-    showFilterLoading: Boolean = false,
 ) {
-    // Показываем loading overlay при переключении фильтров
-    if (showFilterLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        return
-    }
 
     if (windowSizeIsCompact) {
         CompactLayout(
@@ -196,7 +176,6 @@ private fun HomeMainContent(
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
-            isFilterSwitching = isFilterSwitching,
         )
     } else {
         ExpandedLayout(
@@ -209,7 +188,6 @@ private fun HomeMainContent(
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
-            isFilterSwitching = isFilterSwitching,
         )
     }
 }
@@ -281,23 +259,13 @@ fun HomeScreen(
     val windowSize = rememberWindowSize()
     val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
 
-    // Отслеживаем переключение фильтров для показа loading состояния
-    var isFilterSwitching by remember { mutableStateOf(false) }
+    // Отслеживаем переключение фильтров для логирования
     var lastFilter by remember { mutableStateOf(state.currentFilter) }
-    var showFilterLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.currentFilter) {
         if (state.currentFilter != lastFilter) {
             Timber.d("HomeScreen: Filter switched from $lastFilter to ${state.currentFilter}")
-            isFilterSwitching = true
-            showFilterLoading = true
             lastFilter = state.currentFilter
-
-            // Быстрее сбрасываем isFilterSwitching, но дольше показываем loading overlay
-            delay(50) // Быстрый сброс isFilterSwitching
-            isFilterSwitching = false
-            delay(100) // Дополнительная задержка для showFilterLoading
-            showFilterLoading = false
         }
     }
 
@@ -548,8 +516,6 @@ fun HomeScreen(
                         onTransactionClick = onTransactionClick,
                         onTransactionLongClick = onTransactionLongClick,
                         onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
-                        isFilterSwitching = isFilterSwitching,
-                        showFilterLoading = showFilterLoading,
                     )
                 }
                 HomeFeedback(
