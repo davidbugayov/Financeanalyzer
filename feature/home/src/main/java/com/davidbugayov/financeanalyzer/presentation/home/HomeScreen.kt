@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -163,6 +164,7 @@ private fun HomeMainContent(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
+    isFilterSwitching: Boolean = false,
 ) {
     if (windowSizeIsCompact) {
         CompactLayout(
@@ -175,6 +177,7 @@ private fun HomeMainContent(
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
+            isFilterSwitching = isFilterSwitching,
         )
     } else {
         ExpandedLayout(
@@ -187,6 +190,7 @@ private fun HomeMainContent(
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
+            isFilterSwitching = isFilterSwitching,
         )
     }
 }
@@ -254,12 +258,29 @@ fun HomeScreen(
     userEventTracker: UserEventTracker = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
-    androidx.compose.runtime.LaunchedEffect(state.currentFilter, state.filteredTransactions.size) {
-        Timber.d("HomeScreen: State updated - filter: ${state.currentFilter}, transactions: ${state.filteredTransactions.size}, income: ${state.filteredIncome}, expense: ${state.filteredExpense}")
-    }
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
     val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
+
+    // Отслеживаем переключение фильтров для показа loading состояния
+    var isFilterSwitching by remember { mutableStateOf(false) }
+    var lastFilter by remember { mutableStateOf(state.currentFilter) }
+
+    LaunchedEffect(state.currentFilter) {
+        if (state.currentFilter != lastFilter) {
+            Timber.d("HomeScreen: Filter switched from $lastFilter to ${state.currentFilter}")
+            isFilterSwitching = true
+            lastFilter = state.currentFilter
+
+            // Сбрасываем состояние через короткую задержку после переключения
+            delay(100) // Небольшая задержка для начала загрузки
+            isFilterSwitching = false
+        }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(state.currentFilter, state.filteredTransactions.size) {
+        Timber.d("HomeScreen: State updated - filter: ${state.currentFilter}, transactions: ${state.filteredTransactions.size}, income: ${state.filteredIncome}, expense: ${state.filteredExpense}")
+    }
 
     // Добавляем логирование для отладки
     LaunchedEffect(pagingItems.loadState) {
@@ -504,6 +525,7 @@ fun HomeScreen(
                         onTransactionClick = onTransactionClick,
                         onTransactionLongClick = onTransactionLongClick,
                         onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
+                        isFilterSwitching = isFilterSwitching,
                     )
                 }
                 HomeFeedback(

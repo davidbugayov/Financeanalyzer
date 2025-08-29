@@ -56,6 +56,7 @@ fun ExpandedLayout(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
+    isFilterSwitching: Boolean = false,
 ) {
     val listState: LazyListState = rememberLazyListState()
 
@@ -92,6 +93,7 @@ fun ExpandedLayout(
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
             modifier = Modifier.weight(1f),
+            isFilterSwitching = isFilterSwitching,
             listState = listState,
         )
     }
@@ -151,6 +153,7 @@ private fun ExpandedRightPanel(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState,
+    isFilterSwitching: Boolean = false,
 ) {
     Timber.d(
         "[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s",
@@ -164,10 +167,17 @@ private fun ExpandedRightPanel(
                 .padding(start = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        // Определяем, показывать ли пустое состояние
-        val isEmptyState = pagingItems.itemCount == 0 && pagingItems.loadState.refresh is androidx.paging.LoadState.NotLoading
+        // Извлекаем реальные транзакции из pagingItems для определения пустого состояния
+        val realTransactionsCount = (0 until pagingItems.itemCount).count { index ->
+            val item = pagingItems[index]
+            item is com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem.Item
+        }
 
-        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, filteredTransactions.size=${state.filteredTransactions.size}, pagingItems.itemCount=${pagingItems.itemCount}, loadState=${pagingItems.loadState.refresh}")
+        // Определяем, показывать ли пустое состояние
+        // Если идет переключение фильтра, показываем пустое состояние до загрузки новых данных
+        val isEmptyState = (realTransactionsCount == 0 && pagingItems.loadState.refresh is androidx.paging.LoadState.NotLoading) || isFilterSwitching
+
+        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, loadState=${pagingItems.loadState.refresh}, isFilterSwitching=$isFilterSwitching")
 
         if (isEmptyState) {
             Timber.d("ExpandedLayout: Showing ExpandedEmptyState")
