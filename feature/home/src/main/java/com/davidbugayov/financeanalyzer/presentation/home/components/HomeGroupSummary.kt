@@ -98,28 +98,45 @@ fun HomeGroupSummary(
     // используя derivedStateOf для реактивности
     val transactionDataKey = if (filteredTransactions.isEmpty()) "empty" else filteredTransactions.joinToString { "${it.id}:${it.amount}" }
 
+    // Используем переданные значения, если они корректны, иначе рассчитываем
+    val useCalculatedValues = totalIncome.amount == BigDecimal.ZERO && totalExpense.amount == BigDecimal.ZERO && filteredTransactions.isNotEmpty()
+
     val computedIncome by remember(transactionDataKey) {
         derivedStateOf {
-            filteredTransactions
-                .asSequence()
-                .filter { !it.isExpense }
-                .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount }
+            if (useCalculatedValues) {
+                filteredTransactions
+                    .asSequence()
+                    .filter { !it.isExpense }
+                    .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount }
+            } else {
+                totalIncome
+            }
         }
     }
 
     val computedExpense by remember(transactionDataKey) {
         derivedStateOf {
-            filteredTransactions
-                .asSequence()
-                .filter { it.isExpense }
-                .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount.abs() }
+            if (useCalculatedValues) {
+                filteredTransactions
+                    .asSequence()
+                    .filter { it.isExpense }
+                    .fold(Money.zero(totalIncome.currency)) { acc, tx -> acc + tx.amount.abs() }
+            } else {
+                totalExpense
+            }
         }
     }
-    val calculatedBalance = computedIncome.minus(computedExpense)
+
+    val calculatedBalance = if (useCalculatedValues) {
+        computedIncome.minus(computedExpense)
+    } else {
+        balance ?: computedIncome.minus(computedExpense)
+    }
+
     val balanceColor = if (calculatedBalance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
 
-    Timber.d("HomeGroupSummary: Calculated values - Income: $computedIncome, Expense: $computedExpense, Balance: $calculatedBalance")
-    Timber.d("HomeGroupSummary: Using ${filteredTransactions.size} transactions for calculation")
+    Timber.d("HomeGroupSummary: Using calculated values: $useCalculatedValues, Income: $computedIncome, Expense: $computedExpense, Balance: $calculatedBalance")
+    Timber.d("HomeGroupSummary: Transaction count: ${filteredTransactions.size}")
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
     var showExpenses by rememberSaveable { mutableStateOf(true) }
 

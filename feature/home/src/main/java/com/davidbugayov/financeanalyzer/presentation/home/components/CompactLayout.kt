@@ -36,9 +36,12 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
+import java.math.BigDecimal
 
 /**
  * Компактный макет для телефонов
@@ -257,23 +260,29 @@ fun CompactLayout(
                                 state.filteredTransactions
                             }
 
-                            val incomeToUse = state.filteredIncome
-                            val expenseToUse = state.filteredExpense
-                            val balanceToUse = state.filteredBalance
+                                                    // Рассчитываем актуальные суммы на основе реальных транзакций
+                        val actualIncome = transactionsToUse
+                            .filter { !it.isExpense }
+                            .sumOf { it.amount.amount.toDouble() }
+                        val actualExpense = transactionsToUse
+                            .filter { it.isExpense }
+                            .sumOf { it.amount.amount.abs().toDouble() }
+                        val actualBalance = actualIncome - actualExpense
+                        val currency = transactionsToUse.firstOrNull()?.amount?.currency ?: Currency.USD
 
-                            Timber.d("CompactLayout: Creating HomeGroupSummary with data - transactions: ${transactionsToUse.size}, income: $incomeToUse, expense: $expenseToUse, balance: $balanceToUse")
-                            Timber.d("CompactLayout: HomeGroupSummary will calculate its own stats from ${transactionsToUse.size} transactions")
-                            Timber.d("CompactLayout: Transaction IDs being passed: ${transactionsToUse.map { it.id }}")
-                            HomeGroupSummary(
-                                filteredTransactions = transactionsToUse,
-                                totalIncome = incomeToUse,
-                                totalExpense = expenseToUse,
-                                currentFilter = state.currentFilter,
-                                balance = balanceToUse,
-                                periodStartDate = state.periodStartDate,
-                                periodEndDate = state.periodEndDate,
-                                isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
-                            )
+                        Timber.d("CompactLayout: Creating HomeGroupSummary with calculated data - transactions: ${transactionsToUse.size}, income: $actualIncome, expense: $actualExpense, balance: $actualBalance")
+                        Timber.d("CompactLayout: Transaction IDs being passed: ${transactionsToUse.map { it.id }}")
+
+                        HomeGroupSummary(
+                            filteredTransactions = transactionsToUse,
+                            totalIncome = Money(BigDecimal.valueOf(actualIncome), currency),
+                            totalExpense = Money(BigDecimal.valueOf(actualExpense), currency),
+                            currentFilter = state.currentFilter,
+                            balance = Money(BigDecimal.valueOf(actualBalance), currency),
+                            periodStartDate = state.periodStartDate,
+                            periodEndDate = state.periodEndDate,
+                            isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
+                        )
                         }
                     } else {
                         null
