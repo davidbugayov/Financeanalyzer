@@ -22,7 +22,9 @@ import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.ValidateTransactionUseCase
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.LocalDate
 
 /**
@@ -149,14 +151,11 @@ class SharedFacade {
 
     fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
         kotlinx.coroutines.flow.flow {
-            try {
-                val transactions = financeRepository.getTransactionsForPeriod(start, end)
-                // Debug logging removed for KMP compatibility
-                emit(transactions)
-            } catch (e: Exception) {
-                // Error logging removed for KMP compatibility
-                emit(emptyList())
-            }
+            val transactions = financeRepository.getTransactionsForPeriod(start, end)
+            emit(transactions)
+        }.catch { e ->
+            // Handle exceptions and emit empty list
+            emit(emptyList())
         }
 
     /**
