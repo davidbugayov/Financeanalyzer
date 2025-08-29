@@ -81,18 +81,27 @@ class HomeViewModel(
                 val s = _state.value
                 val (startDate, endDate) = getPeriodDates(s.currentFilter)
                 val pageSize = 50
-                if (s.currentFilter == TransactionFilter.ALL) {
+                Timber.d("HomeViewModel: Loading transactions with filter: ${s.currentFilter}, period: ${startDate} - ${endDate}")
+                val result = if (s.currentFilter == TransactionFilter.ALL) {
+                    Timber.d("HomeViewModel: Using getAllPaged")
                     repository.getAllPaged(pageSize)
                 } else {
+                    Timber.d("HomeViewModel: Using getByPeriodPaged with start=$startDate, end=$endDate")
                     repository.getByPeriodPaged(startDate, endDate, pageSize)
                 }
+                Timber.d("HomeViewModel: Created paging flow")
+                result
             }.cachedIn(viewModelScope)
 
     val pagedUiModels: Flow<PagingData<TransactionListItem>> =
         pagedTransactions
             .map { pagingData ->
+                Timber.d("HomeViewModel: Processing paging data")
                 pagingData
-                    .map { tx -> TransactionListItem.Item(tx) }
+                    .map { tx ->
+                        Timber.d("HomeViewModel: Processing transaction: ${tx.id}, amount: ${tx.amount}, category: ${tx.category}")
+                        TransactionListItem.Item(tx)
+                    }
                     .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
                         if (after == null) return@insertSeparators null
 
@@ -100,6 +109,7 @@ class HomeViewModel(
                         val afterDateKey = dayKey(after.transaction.date)
 
                         if (before == null || beforeDateKey != afterDateKey) {
+                            Timber.d("HomeViewModel: Adding header for date: $afterDateKey")
                             TransactionListItem.Header(afterDateKey)
                         } else {
                             null
@@ -159,11 +169,79 @@ class HomeViewModel(
     ) {
         when (event) {
             is HomeEvent.SetFilter -> {
-                // Обновляем только фильтр, не трогаем остальные данные, чтобы избежать мерцания
+                Timber.d("HomeViewModel: Starting filter switch to ${event.filter}")
+
+                // Получаем даты для нового фильтра
+                val (startDate, endDate) = getPeriodDates(event.filter)
+                Timber.d("HomeViewModel: Filter ${event.filter} - calculated dates: start=$startDate, end=$endDate")
+
+                // Синхронно обновляем фильтр в состоянии (без загрузки данных)
                 _state.update { it.copy(currentFilter = event.filter) }
 
-                // Плавно обновляем данные без очистки UI
-                updateDataSmoothly()
+                // Асинхронно обновляем данные состояния
+                viewModelScope.launch {
+                    try {
+                        // Получаем транзакции для нового периода
+                        Timber.d("HomeViewModel: Calling sharedFacade.transactionsForPeriodFlow with start=${startDate.toLocalDateKmp()}, end=${endDate.toLocalDateKmp()}")
+                        val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
+                        val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
+                        Timber.d("HomeViewModel: Got ${transactions.size} transactions from sharedFacade")
+
+                        // Фильтруем транзакции по диапазону дат
+                        val filteredTransactions = transactions.filter { tx ->
+                            val t = tx.date
+                            val inRange = !t.before(startDate) && !t.after(endDate)
+                            inRange
+                        }
+
+                        Timber.d("HomeViewModel: Filter ${event.filter} - loaded ${transactions.size} total, filtered ${filteredTransactions.size} transactions")
+                        Timber.d("HomeViewModel: Sample transactions: ${filteredTransactions.take(3).map { "${it.id}: ${it.amount} (${if (it.isExpense) "expense" else "income"})" }}")
+
+                        // Вычисляем статистику
+                        val currentCurrency = CurrencyProvider.getCurrency()
+                        val (filteredIncome, filteredExpense, filteredBalance) =
+                            if (event.filter == TransactionFilter.ALL) {
+                                val income = financialMetrics.getTotalIncomeAsMoney()
+                                val expense = financialMetrics.getTotalExpenseAsMoney()
+                                val balance = financialMetrics.getCurrentBalance()
+                                Timber.d("HomeViewModel: ALL filter stats - Income: $income, Expense: $expense, Balance: $balance")
+                                Triple(income, expense, balance)
+                            } else {
+                                Timber.d("HomeViewModel: Calculating stats for ${event.filter} with ${filteredTransactions.size} transactions")
+                                val stats = calculateStats(filteredTransactions)
+                                Timber.d("HomeViewModel: ${event.filter} filter stats - Income: ${stats.first}, Expense: ${stats.second}, Balance: ${stats.third}")
+                                stats
+                            }
+
+                        val transactionGroups = groupTransactionsByDate(filteredTransactions, currentCurrency)
+
+                        // Обновляем состояние с новыми данными
+                        _state.update {
+                            Timber.d("HomeViewModel: Updating state for filter ${event.filter} - transactions: ${filteredTransactions.size}, income: $filteredIncome, expense: $filteredExpense")
+                            it.copy(
+                                filteredTransactions = filteredTransactions,
+                                transactionGroups = transactionGroups,
+                                filteredIncome = filteredIncome,
+                                filteredExpense = filteredExpense,
+                                filteredBalance = filteredBalance,
+                                periodStartDate = startDate,
+                                periodEndDate = endDate,
+                                error = null,
+                            )
+                        }
+
+                        // Обновляем виджеты
+                        updateWidgetsUseCase()
+
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при обновлении данных фильтра: ${e.message}")
+                        _state.update { it.copy(error = e.message) }
+                    }
+                }
+
+                // Обновляем paging данные ПОСЛЕ обновления состояния
+                Timber.d("HomeViewModel: Calling reloadPaged for filter ${event.filter}")
+                reloadPaged()
             }
             is HomeEvent.LoadTransactions -> {
                 loadTransactions()
@@ -171,8 +249,15 @@ class HomeViewModel(
             is HomeEvent.GenerateTestData -> {
                 generateAndSaveTestData()
             }
+            is HomeEvent.CreateTestTransaction -> {
+                createTestTransaction()
+            }
             is HomeEvent.SetShowGroupSummary -> {
-                _state.update { it.copy(showGroupSummary = event.show) }
+                Timber.d("HomeViewModel: SetShowGroupSummary event received: ${event.show}")
+                _state.update {
+                    Timber.d("HomeViewModel: Updating showGroupSummary from ${it.showGroupSummary} to ${event.show}")
+                    it.copy(showGroupSummary = event.show)
+                }
             }
             is HomeEvent.ShowDeleteConfirmDialog -> {
                 _state.update { it.copy(transactionToDelete = event.transaction) }
@@ -298,24 +383,11 @@ class HomeViewModel(
 
     /**
      * Плавное обновление данных без полной перезагрузки
+     * Устарело: теперь используется только paging
      */
     private fun updateDataSmoothly() {
-        viewModelScope.launch {
-            try {
-                val currentState = _state.value
-                val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
-                val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
-                val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
-                updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
-
-                // Обновляем виджеты при изменении данных
-                updateWidgetsUseCase()
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при плавном обновлении: %s", e.message)
-                loadTransactions()
-                throw e
-            }
-        }
+        // Теперь используется только paging, этот метод больше не нужен
+        reloadPaged()
     }
 
     /**
@@ -363,7 +435,7 @@ class HomeViewModel(
             // Обновляем статистику по категориям в фоне
             updateCategoryStats(transactions)
         }
-        reloadPaged()
+        // reloadPaged() больше не нужен - paging обновляется автоматически через flow
     }
 
     /**
@@ -435,6 +507,39 @@ class HomeViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении статистики по категориям: ${e.message}")
                 throw e
+            }
+        }
+    }
+
+    /**
+     * Создает тестовые данные для проверки отображения
+     */
+    private fun createTestTransaction() {
+        viewModelScope.launch {
+            try {
+                Timber.d("HomeViewModel: Creating test transaction")
+                val testTransaction = com.davidbugayov.financeanalyzer.domain.model.Transaction(
+                    id = "test_${System.currentTimeMillis()}",
+                    amount = Money.fromMajor(100.0, CurrencyProvider.getCurrency()),
+                    category = "Тестовая категория",
+                    isExpense = true,
+                    date = java.util.Date(),
+                    note = "Тестовая транзакция",
+                    source = "Наличные",
+                    sourceColor = 0xFF4CAF50.toInt(),
+                    categoryId = "",
+                    title = "Тест"
+                )
+
+                val result = sharedFacade.addTransaction(testTransaction.toShared())
+                if (result) {
+                    Timber.d("HomeViewModel: Test transaction created successfully")
+                    // Данные обновятся автоматически через flow
+                } else {
+                    Timber.e("HomeViewModel: Failed to create test transaction")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "HomeViewModel: Error creating test transaction")
             }
         }
     }
@@ -528,7 +633,7 @@ class HomeViewModel(
                     expenseOptimizationRecommendations = recommendations, // сохраняем рекомендации
                 )
             }
-            reloadPaged()
+            // reloadPaged() больше не нужен - paging обновляется автоматически через flow
         }
     }
 
@@ -542,7 +647,10 @@ class HomeViewModel(
     private fun calculateStats(transactions: List<Transaction>): Triple<Money, Money, Money> {
         // Транзакции сюда передаются уже ОТФИЛЬТРОВАННЫМИ по текущему периоду в updateFilteredTransactions*
         val currentCurrency = CurrencyProvider.getCurrency()
+        Timber.d("calculateStats: Processing ${transactions.size} transactions")
+
         if (transactions.isEmpty()) {
+            Timber.d("calculateStats: No transactions, returning zeros")
             return Triple(Money.zero(currentCurrency), Money.zero(currentCurrency), Money.zero(currentCurrency))
         }
 
@@ -550,15 +658,22 @@ class HomeViewModel(
             transactions
                 .asSequence()
                 .filter { !it.isExpense }
-                .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount }
+                .fold(Money.zero(currentCurrency)) { acc, tx ->
+                    Timber.d("calculateStats: Adding income ${tx.id}: ${tx.amount}")
+                    acc + tx.amount
+                }
 
         val expense =
             transactions
                 .asSequence()
                 .filter { it.isExpense }
-                .fold(Money.zero(currentCurrency)) { acc, tx -> acc + tx.amount.abs() }
+                .fold(Money.zero(currentCurrency)) { acc, tx ->
+                    Timber.d("calculateStats: Adding expense ${tx.id}: ${tx.amount}")
+                    acc + tx.amount.abs()
+                }
 
         val balance = income - expense
+        Timber.d("calculateStats: Final result - Income: $income, Expense: $expense, Balance: $balance")
         return Triple(income, expense, balance)
     }
 
@@ -634,6 +749,7 @@ class HomeViewModel(
         calendar.set(Calendar.MILLISECOND, 999)
         val endDate = calendar.time
         val startCalendar = Calendar.getInstance()
+        Timber.d("HomeViewModel: Calculating period dates for filter $filter")
         when (filter) {
             TransactionFilter.TODAY -> {
                 startCalendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -662,6 +778,7 @@ class HomeViewModel(
             }
         }
         val startDate = startCalendar.time
+        Timber.d("HomeViewModel: Period dates calculated - start: $startDate, end: $endDate")
         return Pair(startDate, endDate)
     }
 }

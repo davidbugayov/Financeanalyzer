@@ -23,6 +23,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import timber.log.Timber
 
 /**
  * Реализация унифицированного репозитория транзакций.
@@ -109,11 +110,19 @@ class UnifiedTransactionRepositoryImpl(
         startDate: LocalDate,
         endDate: LocalDate,
     ): List<Transaction> {
-        // Преобразование LocalDate в java.util.Date
+        // Преобразование LocalDate в java.util.Date с правильными границами
         val startJavaDate = Date(startDate.toJavaLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
-        val endJavaDate =
-            Date(endDate.toJavaLocalDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() - 1)
 
+        // Устанавливаем endDate на конец дня (23:59:59.999) того же дня
+        val endCalendar = java.util.Calendar.getInstance()
+        endCalendar.time = Date(endDate.toJavaLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
+        endCalendar.set(java.util.Calendar.HOUR_OF_DAY, 23)
+        endCalendar.set(java.util.Calendar.MINUTE, 59)
+        endCalendar.set(java.util.Calendar.SECOND, 59)
+        endCalendar.set(java.util.Calendar.MILLISECOND, 999)
+        val endJavaDate = endCalendar.time
+
+        Timber.d("UnifiedTransactionRepositoryImpl: Querying transactions from $startJavaDate to $endJavaDate")
         return getTransactionsByDateRange(startJavaDate, endJavaDate)
     }
 
@@ -354,12 +363,30 @@ class UnifiedTransactionRepositoryImpl(
 
     override fun getAllPaged(pageSize: Int): Flow<PagingData<Transaction>> = Pager(
         config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
-        pagingSourceFactory = { transactionDao.pagingSourceAll() },
-    ).flow.map { pagingData -> pagingData.map { transactionMapper.mapFromEntity(it) } }
+        pagingSourceFactory = {
+            Timber.d("UnifiedTransactionRepositoryImpl: Creating pagingSourceAll")
+            transactionDao.pagingSourceAll()
+        },
+    ).flow.map { pagingData ->
+        Timber.d("UnifiedTransactionRepositoryImpl: Processing paging data")
+        pagingData.map { entity ->
+            Timber.d("UnifiedTransactionRepositoryImpl: Mapping entity ${entity.id} to domain object")
+            transactionMapper.mapFromEntity(entity)
+        }
+    }
 
     override fun getByPeriodPaged(startDate: Date, endDate: Date, pageSize: Int): Flow<PagingData<Transaction>> =
         Pager(
             config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
-            pagingSourceFactory = { transactionDao.pagingSourceByDateRange(startDate, endDate) },
-        ).flow.map { pagingData -> pagingData.map { transactionMapper.mapFromEntity(it) } }
+            pagingSourceFactory = {
+                Timber.d("UnifiedTransactionRepositoryImpl: Creating pagingSourceByDateRange from $startDate to $endDate")
+                transactionDao.pagingSourceByDateRange(startDate, endDate)
+            },
+        ).flow.map { pagingData ->
+            Timber.d("UnifiedTransactionRepositoryImpl: Processing paging data (period)")
+            pagingData.map { entity ->
+                Timber.d("UnifiedTransactionRepositoryImpl: Mapping entity ${entity.id} to domain object (period)")
+                transactionMapper.mapFromEntity(entity)
+            }
+        }
 } 

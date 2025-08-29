@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -81,6 +82,7 @@ import timber.log.Timber
 private fun HomeTopBar(
     modifier: Modifier = Modifier,
     onGenerateTestData: () -> Unit,
+    onCreateTestTransaction: () -> Unit,
     onNavigateToProfile: () -> Unit,
 ) {
     AppTopBar(
@@ -95,6 +97,16 @@ private fun HomeTopBar(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = stringResource(UiR.string.generate_test_data),
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        onCreateTestTransaction()
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Создать тестовую транзакцию",
                     )
                 }
             }
@@ -242,9 +254,22 @@ fun HomeScreen(
     userEventTracker: UserEventTracker = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(state.currentFilter, state.filteredTransactions.size) {
+        Timber.d("HomeScreen: State updated - filter: ${state.currentFilter}, transactions: ${state.filteredTransactions.size}, income: ${state.filteredIncome}, expense: ${state.filteredExpense}")
+    }
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
     val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
+
+    // Добавляем логирование для отладки
+    LaunchedEffect(pagingItems.loadState) {
+        Timber.d("HomeScreen: LoadState changed - Refresh: ${pagingItems.loadState.refresh}, Append: ${pagingItems.loadState.append}, ItemCount: ${pagingItems.itemCount}")
+        when (pagingItems.loadState.refresh) {
+            is androidx.paging.LoadState.Loading -> Timber.d("HomeScreen: Loading state")
+            is androidx.paging.LoadState.Error -> Timber.e("HomeScreen: Error state - ${(pagingItems.loadState.refresh as androidx.paging.LoadState.Error).error}")
+            is androidx.paging.LoadState.NotLoading -> Timber.d("HomeScreen: Not loading, itemCount: ${pagingItems.itemCount}")
+        }
+    }
 
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
@@ -357,7 +382,8 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         // Load persisted group summary toggle
-        val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
+        val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", true)
+        Timber.d("HomeScreen: Loading showGroupSummary from prefs: $savedShowSummary")
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(savedShowSummary))
 
         // Load persisted transaction filter (if any) so it survives navigation away and back
@@ -408,6 +434,7 @@ fun HomeScreen(
     val onToggleGroupSummary =
         remember<(Boolean) -> Unit> {
             { newValue ->
+                Timber.d("HomeScreen: onToggleGroupSummary called with value: $newValue")
                 viewModel.onEvent(HomeEvent.SetShowGroupSummary(newValue))
                 sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
             }
@@ -439,6 +466,12 @@ fun HomeScreen(
                         feedbackType = FeedbackType.SUCCESS
                         showFeedback = true
                     },
+                    onCreateTestTransaction = {
+                        viewModel.onEvent(HomeEvent.CreateTestTransaction)
+                        feedbackMessage = "Тестовая транзакция создана"
+                        feedbackType = FeedbackType.SUCCESS
+                        showFeedback = true
+                    },
                     onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
                     modifier = Modifier,
                 )
@@ -457,32 +490,8 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues),
             ) {
-                if (pagingItems.loadState.refresh is androidx.paging.LoadState.Loading) {
+                if (pagingItems.loadState.refresh is androidx.paging.LoadState.Loading && pagingItems.itemCount == 0) {
                     CenteredLoadingIndicator(message = stringResource(UiR.string.loading_data))
-                } else if (pagingItems.itemCount == 0) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(UiR.string.no_transactions),
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(UiR.string.add_first_transaction_description),
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) }
-                        ) {
-                            Text(stringResource(UiR.string.action_add_transaction))
-                        }
-                    }
                 } else {
                     HomeMainContent(
                         windowSizeIsCompact = windowSize.isCompact(),

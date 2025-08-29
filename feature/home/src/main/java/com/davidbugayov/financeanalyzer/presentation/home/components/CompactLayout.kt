@@ -38,6 +38,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import timber.log.Timber
 
 /**
  * Компактный макет для телефонов
@@ -198,19 +199,7 @@ fun CompactLayout(
     }
     // --- Конец добавления ---
 
-    var stablePagingItems by remember { mutableStateOf<LazyPagingItems<TransactionListItem>>(pagingItems) }
-
-    // Обновляем cache, когда пришли данные
-    if (pagingItems.itemCount > 0) {
-        stablePagingItems = pagingItems
-    }
-
-    val itemsToDisplay =
-        if (pagingItems.loadState.refresh is LoadState.Loading && pagingItems.itemCount == 0) {
-            stablePagingItems
-        } else {
-            pagingItems
-        }
+    val itemsToDisplay = pagingItems
 
     Column(
         modifier =
@@ -225,40 +214,72 @@ fun CompactLayout(
             onToggleGroupSummary = onToggleGroupSummary,
             showGroupSummary = showGroupSummary,
         )
-        when {
-            !state.isLoading && state.filteredTransactions.isEmpty() -> {
-                CompactEmptyState(onAddClick)
-            }
-            else -> {
-                val context = LocalContext.current
-                val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
 
-                val headerContent: (@Composable () -> Unit)? =
-                    if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+        // Определяем, показывать ли пустое состояние
+        val isEmptyState = pagingItems.itemCount == 0 && pagingItems.loadState.refresh is androidx.paging.LoadState.NotLoading
+
+        Timber.d("CompactLayout: isEmptyState=$isEmptyState, filteredTransactions.size=${state.filteredTransactions.size}, pagingItems.itemCount=${pagingItems.itemCount}, loadState=${pagingItems.loadState.refresh}")
+
+        if (isEmptyState) {
+            Timber.d("CompactLayout: Showing CompactEmptyState")
+            CompactEmptyState(onAddClick)
+        } else {
+            Timber.d("CompactLayout: Showing transaction list")
+            val context = LocalContext.current
+            val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+
+            val headerContent: (@Composable () -> Unit)? =
+                if (showGroupSummary) {
                         {
+                            // Извлекаем транзакции из pagingItems для гарантированно актуальных данных
+                            val transactionsFromPaging = (0 until pagingItems.itemCount).mapNotNull { index ->
+                                val item = pagingItems[index]
+                                when (item) {
+                                    is com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem.Item -> item.transaction
+                                    else -> null
+                                }
+                            }
+
+                            Timber.d("CompactLayout: Extracted ${transactionsFromPaging.size} transactions from pagingItems (total items: ${pagingItems.itemCount})")
+
+                            val transactionsToUse = if (transactionsFromPaging.isNotEmpty()) {
+                                Timber.d("CompactLayout: Using transactions from pagingItems")
+                                transactionsFromPaging
+                            } else {
+                                Timber.d("CompactLayout: Using transactions from state")
+                                state.filteredTransactions
+                            }
+
+                            val incomeToUse = state.filteredIncome
+                            val expenseToUse = state.filteredExpense
+                            val balanceToUse = state.filteredBalance
+
+                            Timber.d("CompactLayout: Creating HomeGroupSummary with data - transactions: ${transactionsToUse.size}, income: $incomeToUse, expense: $expenseToUse, balance: $balanceToUse")
+                            Timber.d("CompactLayout: HomeGroupSummary will calculate its own stats from ${transactionsToUse.size} transactions")
+                            Timber.d("CompactLayout: Transaction IDs being passed: ${transactionsToUse.map { it.id }}")
                             HomeGroupSummary(
-                                filteredTransactions = state.filteredTransactions,
-                                totalIncome = state.filteredIncome,
-                                totalExpense = state.filteredExpense,
+                                filteredTransactions = transactionsToUse,
+                                totalIncome = incomeToUse,
+                                totalExpense = expenseToUse,
                                 currentFilter = state.currentFilter,
-                                balance = state.filteredBalance,
+                                balance = balanceToUse,
                                 periodStartDate = state.periodStartDate,
                                 periodEndDate = state.periodEndDate,
+                                isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
                             )
                         }
                     } else {
                         null
                     }
 
-                com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
-                    items = itemsToDisplay,
-                    categoriesViewModel = categoriesViewModel,
-                    onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
-                    listState = listState,
-                    headerContent = headerContent,
-                )
-            }
+            com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList(
+                items = itemsToDisplay,
+                categoriesViewModel = categoriesViewModel,
+                onTransactionClick = onTransactionClick,
+                onTransactionLongClick = onTransactionLongClick,
+                listState = listState,
+                headerContent = headerContent,
+            )
         }
     }
 }

@@ -78,6 +78,7 @@ fun ExpandedLayout(
     ) {
         ExpandedLeftPanel(
             state = state,
+            pagingItems = pagingItems,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
@@ -99,6 +100,7 @@ fun ExpandedLayout(
 @Composable
 private fun ExpandedLeftPanel(
     state: HomeState,
+    pagingItems: LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -124,7 +126,7 @@ private fun ExpandedLeftPanel(
             onToggleGroupSummary = onToggleGroupSummary,
         )
 
-        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+        if (showGroupSummary) {
             HomeGroupSummary(
                 filteredTransactions = state.filteredTransactions,
                 totalIncome = state.filteredIncome,
@@ -133,6 +135,7 @@ private fun ExpandedLeftPanel(
                 balance = state.filteredBalance,
                 periodStartDate = state.periodStartDate,
                 periodEndDate = state.periodEndDate,
+                isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
             )
         }
     }
@@ -161,35 +164,38 @@ private fun ExpandedRightPanel(
                 .padding(start = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        when {
-            !state.isLoading && state.filteredTransactions.isEmpty() -> {
-                Timber.d("[UI] Показываем ExpandedEmptyState (пустое состояние)")
-                ExpandedEmptyState(onAddClick)
-            }
-            else -> {
-                transactionPagingList(
-                    items = pagingItems,
-                    categoriesViewModel = categoriesViewModel,
-                    onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
-                    listState = listState,
-                    headerContent = {
-                        // Показываем приветственную карточку только один раз (shared pref flag)
-                        val context = LocalContext.current
-                        val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
-                        var dismissed by remember { mutableStateOf(prefs.getBoolean("welcome_tips_dismissed", false)) }
-                        if (!dismissed) {
-                            HomeTipsCard(
-                                onClose = {
-                                    prefs.edit().putBoolean("welcome_tips_dismissed", true).commit()
-                                    dismissed = true
-                                },
-                                modifier = Modifier.padding(bottom = 8.dp),
-                            )
-                        }
-                    },
-                )
-            }
+        // Определяем, показывать ли пустое состояние
+        val isEmptyState = pagingItems.itemCount == 0 && pagingItems.loadState.refresh is androidx.paging.LoadState.NotLoading
+
+        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, filteredTransactions.size=${state.filteredTransactions.size}, pagingItems.itemCount=${pagingItems.itemCount}, loadState=${pagingItems.loadState.refresh}")
+
+        if (isEmptyState) {
+            Timber.d("ExpandedLayout: Showing ExpandedEmptyState")
+            ExpandedEmptyState(onAddClick)
+        } else {
+            Timber.d("ExpandedLayout: Showing transaction list")
+            transactionPagingList(
+                items = pagingItems,
+                categoriesViewModel = categoriesViewModel,
+                onTransactionClick = onTransactionClick,
+                onTransactionLongClick = onTransactionLongClick,
+                listState = listState,
+                headerContent = {
+                    // Показываем приветственную карточку только один раз (shared pref flag)
+                    val context = LocalContext.current
+                    val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+                    var dismissed by remember { mutableStateOf(prefs.getBoolean("welcome_tips_dismissed", false)) }
+                    if (!dismissed) {
+                        HomeTipsCard(
+                            onClose = {
+                                prefs.edit().putBoolean("welcome_tips_dismissed", true).commit()
+                                dismissed = true
+                            },
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                    }
+                },
+            )
         }
     }
 }

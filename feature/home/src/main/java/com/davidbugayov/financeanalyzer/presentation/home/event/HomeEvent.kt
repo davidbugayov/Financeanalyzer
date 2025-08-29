@@ -16,6 +16,8 @@ sealed class HomeEvent {
 
     data object GenerateTestData : HomeEvent()
 
+    data object CreateTestTransaction : HomeEvent()
+
     data class SetShowGroupSummary(
         val show: Boolean,
     ) : HomeEvent()
