@@ -7,14 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -166,7 +169,22 @@ private fun HomeMainContent(
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
     isFilterSwitching: Boolean = false,
+    showFilterLoading: Boolean = false,
 ) {
+    // Показываем loading overlay при переключении фильтров
+    if (showFilterLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        return
+    }
+
     if (windowSizeIsCompact) {
         CompactLayout(
             state = state,
@@ -266,31 +284,20 @@ fun HomeScreen(
     // Отслеживаем переключение фильтров для показа loading состояния
     var isFilterSwitching by remember { mutableStateOf(false) }
     var lastFilter by remember { mutableStateOf(state.currentFilter) }
-
-    // Определяем, нужно ли показывать пустое состояние при переключении
-    val shouldShowEmptyOnSwitch by remember(state.currentFilter, pagingItems.loadState.refresh, pagingItems.itemCount) {
-        derivedStateOf {
-            val isSwitching = state.currentFilter != lastFilter
-            val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
-            val hasItems = pagingItems.itemCount > 0
-
-            // Показываем пустое состояние только если:
-            // 1. Идет переключение фильтра
-            // 2. Данные еще загружаются
-            // 3. Нет элементов в списке
-            isSwitching && isLoading && !hasItems
-        }
-    }
+    var showFilterLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.currentFilter) {
         if (state.currentFilter != lastFilter) {
             Timber.d("HomeScreen: Filter switched from $lastFilter to ${state.currentFilter}")
             isFilterSwitching = true
+            showFilterLoading = true
             lastFilter = state.currentFilter
 
-            // Сбрасываем состояние после небольшой задержки
-            delay(50) // Минимальная задержка
+            // Быстрее сбрасываем isFilterSwitching, но дольше показываем loading overlay
+            delay(50) // Быстрый сброс isFilterSwitching
             isFilterSwitching = false
+            delay(100) // Дополнительная задержка для showFilterLoading
+            showFilterLoading = false
         }
     }
 
@@ -542,6 +549,7 @@ fun HomeScreen(
                         onTransactionLongClick = onTransactionLongClick,
                         onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
                         isFilterSwitching = isFilterSwitching,
+                        showFilterLoading = showFilterLoading,
                     )
                 }
                 HomeFeedback(
