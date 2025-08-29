@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -266,14 +267,29 @@ fun HomeScreen(
     var isFilterSwitching by remember { mutableStateOf(false) }
     var lastFilter by remember { mutableStateOf(state.currentFilter) }
 
+    // Определяем, нужно ли показывать пустое состояние при переключении
+    val shouldShowEmptyOnSwitch by remember(state.currentFilter, pagingItems.loadState.refresh, pagingItems.itemCount) {
+        derivedStateOf {
+            val isSwitching = state.currentFilter != lastFilter
+            val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
+            val hasItems = pagingItems.itemCount > 0
+
+            // Показываем пустое состояние только если:
+            // 1. Идет переключение фильтра
+            // 2. Данные еще загружаются
+            // 3. Нет элементов в списке
+            isSwitching && isLoading && !hasItems
+        }
+    }
+
     LaunchedEffect(state.currentFilter) {
         if (state.currentFilter != lastFilter) {
             Timber.d("HomeScreen: Filter switched from $lastFilter to ${state.currentFilter}")
             isFilterSwitching = true
             lastFilter = state.currentFilter
 
-            // Сбрасываем состояние через короткую задержку после переключения
-            delay(100) // Небольшая задержка для начала загрузки
+            // Сбрасываем состояние после небольшой задержки
+            delay(50) // Минимальная задержка
             isFilterSwitching = false
         }
     }
