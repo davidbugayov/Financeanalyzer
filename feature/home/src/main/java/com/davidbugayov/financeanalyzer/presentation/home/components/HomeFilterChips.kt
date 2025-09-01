@@ -56,6 +56,16 @@ fun PermissionUtilsHomeFilterChips(
                 Icons.Default.CalendarMonth,
             ),
             FilterChipData(
+                TransactionFilter.QUARTER,
+                stringResource(UiR.string.filter_quarter),
+                Icons.Default.DateRange,
+            ),
+            FilterChipData(
+                TransactionFilter.YEAR,
+                stringResource(UiR.string.filter_year),
+                Icons.Default.DateRange,
+            ),
+            FilterChipData(
                 TransactionFilter.ALL,
                 stringResource(UiR.string.filter_all),
                 Icons.Default.Timeline,

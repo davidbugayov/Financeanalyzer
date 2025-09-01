@@ -280,6 +280,8 @@ class HomeViewModel(
                         TransactionFilter.TODAY -> "DAY"
                         TransactionFilter.WEEK -> "WEEK"
                         TransactionFilter.MONTH -> "MONTH"
+                        TransactionFilter.QUARTER -> "QUARTER"
+                        TransactionFilter.YEAR -> "YEAR"
                         TransactionFilter.ALL -> "ALL"
                     }
 
@@ -805,6 +807,33 @@ class HomeViewModel(
                 startCalendar.set(Calendar.MILLISECOND, 0)
                 // Для MONTH фильтра устанавливаем endDate на конец месяца
                 calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            }
+            TransactionFilter.QUARTER -> {
+                // Устанавливаем начало текущего квартала
+                val currentMonth = startCalendar.get(Calendar.MONTH)
+                val quarterStartMonth = (currentMonth / 3) * 3
+                startCalendar.set(Calendar.MONTH, quarterStartMonth)
+                startCalendar.set(Calendar.DAY_OF_MONTH, 1)
+                startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                startCalendar.set(Calendar.MINUTE, 0)
+                startCalendar.set(Calendar.SECOND, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
+                // Для QUARTER фильтра устанавливаем endDate на конец квартала
+                val quarterEndMonth = quarterStartMonth + 2
+                calendar.set(Calendar.MONTH, quarterEndMonth)
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            }
+            TransactionFilter.YEAR -> {
+                // Устанавливаем начало текущего года
+                startCalendar.set(Calendar.MONTH, Calendar.JANUARY)
+                startCalendar.set(Calendar.DAY_OF_MONTH, 1)
+                startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                startCalendar.set(Calendar.MINUTE, 0)
+                startCalendar.set(Calendar.SECOND, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
+                // Для YEAR фильтра устанавливаем endDate на конец года
+                calendar.set(Calendar.MONTH, Calendar.DECEMBER)
+                calendar.set(Calendar.DAY_OF_MONTH, 31)
             }
             TransactionFilter.ALL -> {
                 startCalendar.set(2000, 0, 1, 0, 0, 0)
