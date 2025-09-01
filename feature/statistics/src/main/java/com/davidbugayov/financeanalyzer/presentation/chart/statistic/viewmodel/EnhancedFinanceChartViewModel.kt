@@ -115,9 +115,9 @@ class EnhancedFinanceChartViewModel :
     }
 
     private fun loadData() {
-        println("EnhancedFinanceChartViewModel: loadData() called")
+        Timber.d("EnhancedFinanceChartViewModel: loadData() called")
         viewModelScope.launch {
-            println("EnhancedFinanceChartViewModel: Starting data loading coroutine")
+            Timber.d("EnhancedFinanceChartViewModel: Starting data loading coroutine")
             _state.update { it.copy(isLoading = true, error = null) }
 
             Timber.d("EnhancedFinanceChartViewModel: Loading transactions for period ${_state.value.startDate.toLocalDateKmp()} - ${_state.value.endDate.toLocalDateKmp()}")

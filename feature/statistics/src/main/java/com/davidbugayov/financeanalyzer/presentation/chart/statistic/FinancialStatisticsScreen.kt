@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import timber.log.Timber
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -140,15 +141,15 @@ fun FinancialStatisticsScreen(
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
-        println("FinancialStatisticsScreen: LaunchedEffect triggered")
-        println("FinancialStatisticsScreen: periodType=$periodType, startDate=$startDate, endDate=$endDate")
+        Timber.d("FinancialStatisticsScreen: LaunchedEffect triggered")
+        Timber.d("FinancialStatisticsScreen: periodType=$periodType, startDate=$startDate, endDate=$endDate")
 
         // Триггер ачивки - просмотр статистики
         AchievementTrigger.onStatisticsViewed()
 
         // Если передан период с главного экрана, используем его
         if (periodType != null && startDate != null && endDate != null) {
-            println("FinancialStatisticsScreen: Using provided period")
+            Timber.d("FinancialStatisticsScreen: Using provided period")
             viewModel.handleIntent(
                 EnhancedFinanceChartIntent.ChangePeriod(
                     periodType = periodType,
@@ -157,7 +158,7 @@ fun FinancialStatisticsScreen(
                 ),
             )
         } else {
-            println("FinancialStatisticsScreen: Loading default data")
+            Timber.d("FinancialStatisticsScreen: Loading default data")
             viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData)
         }
     }
