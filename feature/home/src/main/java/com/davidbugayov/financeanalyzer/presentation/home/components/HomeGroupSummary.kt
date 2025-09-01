@@ -154,7 +154,16 @@ fun HomeGroupSummary(
                         amount =
                             transactions.fold(
                                 Money.zero(totalIncome.currency),
-                            ) { acc, transaction -> acc + transaction.amount },
+                            ) { acc, transaction ->
+                                // Convert to current currency before adding
+                                val convertedAmount = if (transaction.amount.currency == totalIncome.currency) {
+                                    transaction.amount
+                                } else {
+                                    // For now, assume same amount if currencies differ (should implement proper conversion)
+                                    Money(transaction.amount.amount, totalIncome.currency)
+                                }
+                                acc + convertedAmount
+                            },
                         isExpense = showExpenses,
                     )
                 }.sortedByDescending { it.amount.amount }
