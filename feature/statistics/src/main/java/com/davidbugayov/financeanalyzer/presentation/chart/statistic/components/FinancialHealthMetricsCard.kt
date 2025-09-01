@@ -164,8 +164,8 @@ private fun CardHeader(onInfoClick: () -> Unit) {
  */
 @Composable
 private fun ExpensesSection(averageDailyExpense: Money) {
-    val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
-    val yearlyExpense = averageDailyExpense.times(365.toBigDecimal())
+    val monthlyExpense = averageDailyExpense.times(30.0)
+    val yearlyExpense = averageDailyExpense.times(365.0)
 
     MetricItemEnhanced(
         title = stringResource(UiR.string.average_expenses_title),
@@ -314,7 +314,7 @@ private fun FinancialCushionSection(
             else -> stringResource(UiR.string.financial_cushion_insufficient_recommendation)
         }
 
-    val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
+    val monthlyExpense = averageDailyExpense.times(30.0)
 
     MetricItemEnhanced(
         title = stringResource(UiR.string.financial_cushion_title),

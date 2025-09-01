@@ -548,26 +548,14 @@ class TransactionHistoryViewModel(
 
                 // Вычисляем суммы для текущего и предыдущего периодов
                 val currentTotal =
-                    currentPeriodTransactions.fold(
-                        BigDecimal.ZERO,
-                    ) { acc, transaction -> acc.add(transaction.amount.amount) }
+                    currentPeriodTransactions.sumOf { it.amount.amount }
                 val previousTotal =
-                    previousPeriodTransactions.fold(
-                        BigDecimal.ZERO,
-                    ) { acc, transaction -> acc.add(transaction.amount.amount) }
+                    previousPeriodTransactions.sumOf { it.amount.amount }
 
                 // Вычисляем процентное изменение
                 val percentageChange =
-                    if (previousTotal != BigDecimal.ZERO) {
-                        (
-                            (
-                                currentTotal.subtract(
-                                    previousTotal,
-                                )
-                            ).multiply(
-                                BigDecimal.valueOf(100.0),
-                            )
-                        ).divide(previousTotal, 10, java.math.RoundingMode.HALF_EVEN)
+                    if (previousTotal != 0.0) {
+                        ((currentTotal - previousTotal) / previousTotal) * 100.0
                     } else {
                         null
                     }

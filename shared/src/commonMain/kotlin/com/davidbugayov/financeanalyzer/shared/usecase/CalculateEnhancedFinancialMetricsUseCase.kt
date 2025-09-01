@@ -5,9 +5,7 @@ import com.davidbugayov.financeanalyzer.shared.model.FinancialRecommendation
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationCategory
 import com.davidbugayov.financeanalyzer.shared.model.RecommendationPriority
-import java.math.BigDecimal
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
-import kotlin.math.max
 
 /**
  * Главный UseCase для расчета продвинутых метрик финансового здоровья.
@@ -120,7 +118,7 @@ class CalculateEnhancedFinancialMetricsUseCase(
         }
         
         // Рекомендации по пенсионным накоплениям
-        if (retirementForecast.savingsGap.amount > BigDecimal.ZERO) {
+        if (retirementForecast.savingsGap.amount > 0.0) {
             recommendations.add(
                 FinancialRecommendation(
                     code = "recommendation_increase_retirement_savings",

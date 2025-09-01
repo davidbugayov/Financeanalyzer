@@ -1,9 +1,10 @@
 package com.davidbugayov.financeanalyzer.shared.usecase
 
+import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.PeerComparison
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
-import java.math.BigDecimal
+import kotlin.math.abs
 
 class CalculatePeerComparisonUseCase {
     operator fun invoke(transactions: List<Transaction>, healthScore: Double): PeerComparison {
@@ -31,28 +32,28 @@ class CalculatePeerComparisonUseCase {
     private fun calculateAverageMonthlyIncome(transactions: List<Transaction>): Money {
         val monthly = transactions.filter { !it.isExpense }
             .groupBy { t -> "${t.date.year}-${t.date.month}" }
-            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) } }
+            .mapValues { (_, txs) -> txs.sumOf { it.amount.amount } }
         if (monthly.isEmpty()) return Money.zero()
-        val avg = monthly.values.fold(BigDecimal.ZERO) { acc, amount -> acc.add(amount) }.divide(BigDecimal.valueOf(monthly.size.toDouble()), 10, java.math.RoundingMode.HALF_EVEN)
-        return Money(avg)
+        val avg = monthly.values.average()
+        return Money(avg, transactions.firstOrNull()?.amount?.currency ?: Currency.RUB)
     }
 
     private fun determineIncomeRange(monthlyIncome: Money): String = when {
-        monthlyIncome.amount < BigDecimal.valueOf(30_000_00.0) -> "< 30k"
-        monthlyIncome.amount < BigDecimal.valueOf(50_000_00.0) -> "30-50k"
-        monthlyIncome.amount < BigDecimal.valueOf(75_000_00.0) -> "50-75k"
-        monthlyIncome.amount < BigDecimal.valueOf(100_000_00.0) -> "75-100k"
-        monthlyIncome.amount < BigDecimal.valueOf(150_000_00.0) -> "100-150k"
-        monthlyIncome.amount < BigDecimal.valueOf(200_000_00.0) -> "150-200k"
-        monthlyIncome.amount < BigDecimal.valueOf(300_000_00.0) -> "200-300k"
+        monthlyIncome.amount < 30000.0 -> "< 30k"
+        monthlyIncome.amount < 50000.0 -> "30-50k"
+        monthlyIncome.amount < 75000.0 -> "50-75k"
+        monthlyIncome.amount < 100000.0 -> "75-100k"
+        monthlyIncome.amount < 150000.0 -> "100-150k"
+        monthlyIncome.amount < 200000.0 -> "150-200k"
+        monthlyIncome.amount < 300000.0 -> "200-300k"
         else -> "300k+"
     }
 
     private fun calculateSavingsRate(transactions: List<Transaction>): Double {
         val byMonth = transactions.groupBy { t -> "${t.date.year}-${t.date.month}" }
         val rates = byMonth.values.map { monthTxs ->
-            val income = monthTxs.filter { !it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }.toDouble()
-            val expense = monthTxs.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble()
+            val income = monthTxs.filter { !it.isExpense }.sumOf { it.amount.amount }
+            val expense = monthTxs.filter { it.isExpense }.sumOf { abs(it.amount.amount) }
             if (income > 0.0) (income - expense) / income else 0.0
         }
         return if (rates.isNotEmpty()) rates.average() else 0.0
@@ -61,10 +62,10 @@ class CalculatePeerComparisonUseCase {
     private fun calculateExpenseBreakdown(transactions: List<Transaction>): Map<String, Double> {
         val expenses = transactions.filter { it.isExpense }
         if (expenses.isEmpty()) return emptyMap()
-        val total = expenses.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble()
+        val total = expenses.sumOf { abs(it.amount.amount) }
         if (total == 0.0) return emptyMap()
         return expenses.groupBy { it.category }
-            .mapValues { (_, txs) -> txs.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }.toDouble() / total }
+            .mapValues { (_, txs) -> txs.sumOf { abs(it.amount.amount) } / total }
     }
 
     private fun getIncomeRangeBenchmarks(incomeRange: String): IncomeBenchmarks {

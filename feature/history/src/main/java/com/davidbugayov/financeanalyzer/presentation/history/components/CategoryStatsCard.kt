@@ -48,10 +48,10 @@ fun CategoryStatsCard(
     category: String,
     currentTotal: Money,
     previousTotal: Money,
-    percentChange: BigDecimal?,
+    percentChange: Double?,
 ) {
-    val isPositiveChange = percentChange != null && percentChange > BigDecimal.ZERO
-    val isNegativeChange = percentChange != null && percentChange < BigDecimal.ZERO
+    val isPositiveChange = percentChange != null && percentChange > 0.0
+    val isNegativeChange = percentChange != null && percentChange < 0.0
 
     // Градиент для карточки в зависимости от изменения
     val cardGradient =
@@ -121,8 +121,8 @@ fun CategoryStatsCard(
                     if (percentChange != null) {
                         val trendIcon =
                             when {
-                                percentChange > BigDecimal.ZERO -> Icons.AutoMirrored.Filled.TrendingUp
-                                percentChange < BigDecimal.ZERO -> Icons.AutoMirrored.Filled.TrendingDown
+                                percentChange > 0.0 -> Icons.AutoMirrored.Filled.TrendingUp
+                                percentChange < 0.0 -> Icons.AutoMirrored.Filled.TrendingDown
                                 else -> null
                             }
 
@@ -132,8 +132,8 @@ fun CategoryStatsCard(
                                 contentDescription = null,
                                 tint =
                                     when {
-                                        percentChange > BigDecimal.ZERO -> MaterialTheme.colorScheme.error
-                                        percentChange < BigDecimal.ZERO -> MaterialTheme.colorScheme.primary
+                                        percentChange > 0.0 -> MaterialTheme.colorScheme.error
+                                        percentChange < 0.0 -> MaterialTheme.colorScheme.primary
                                         else -> MaterialTheme.colorScheme.onSurfaceVariant
                                     },
                                 modifier = Modifier.size(20.dp),
@@ -204,7 +204,7 @@ fun CategoryStatsCard(
                 if (percentChange != null) {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    val percentChangeInt = percentChange.setScale(0, java.math.RoundingMode.FLOOR).toInt()
+                    val percentChangeInt = percentChange.toInt()
                     val changeText =
                         when {
                             percentChangeInt > 0 -> "+$percentChangeInt%"

@@ -75,7 +75,7 @@ fun WalletSummaryCard(
 ) {
     // Вычисляем прогресс бюджета
     val rawProgress =
-        if (wallet.limit.amount > BigDecimal.ZERO) {
+        if (wallet.limit.amount > 0.0) {
             val progress = (wallet.spent.amount.toDouble() / wallet.limit.amount.toDouble()).toFloat()
             // Логируем значения для отладки
             timber.log.Timber.d(
@@ -84,7 +84,7 @@ fun WalletSummaryCard(
 
             // Триггер достижения бюджета только для значимых порогов
             // Проверяем ачивку "Экономный" если потратили менее 80% и есть значимые траты
-            if (progress > 0.1f && progress < 0.8f && wallet.spent.amount > BigDecimal.ZERO) {
+            if (progress > 0.1f && progress < 0.8f && wallet.spent.amount > 0.0) {
                 timber.log.Timber.d(
                     "🏆 Триггер budget_saver: прогресс $progress < 0.8, потрачено: ${wallet.spent.amount}",
                 )
@@ -101,7 +101,7 @@ fun WalletSummaryCard(
 
     // Для отладки - показываем реальный прогресс или тестовый
     val finalProgress =
-        if (rawProgress == 0f && wallet.limit.amount > BigDecimal.ZERO) {
+        if (rawProgress == 0f && wallet.limit.amount > 0.0) {
             // Если нет потраченной суммы, но есть лимит, показываем хотя бы минимальный прогресс для тестирования
             timber.log.Timber.d("Showing test progress for wallet ${wallet.name} with zero spent amount")
             0.15f // Показываем 15% для тестирования

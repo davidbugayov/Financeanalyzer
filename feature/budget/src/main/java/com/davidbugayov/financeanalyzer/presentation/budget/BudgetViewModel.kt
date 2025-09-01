@@ -190,7 +190,7 @@ class BudgetViewModel(
         // Находим кошельки с превышением лимита
         val overBudgetWallets =
             wallets
-                .filter { it.limit.amount > BigDecimal.ZERO && it.spent.amount > it.limit.amount }
+                .filter { it.limit.amount > 0.0 && it.spent.amount > it.limit.amount }
                 .map { it.name }
 
         _state.update {

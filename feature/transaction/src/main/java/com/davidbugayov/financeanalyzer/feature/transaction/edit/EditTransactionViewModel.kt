@@ -166,7 +166,7 @@ class EditTransactionViewModel(
         }
 
         // Check amount using parsed Money
-        if (amount.amount <= BigDecimal.ZERO) {
+        if (amount.amount <= 0.0) {
             validationBuilder.addAmountError()
             Timber.d(
                 "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
@@ -552,12 +552,12 @@ class EditTransactionViewModel(
         }
 
         // Используем уже распарсенную сумму (parsedMoney)
-        if (parsedMoney.amount <= BigDecimal.ZERO) {
+        if (parsedMoney.amount <= 0.0) {
             _state.update { it.copy(amountError = true) } // Ошибка, если после парсинга сумма <= 0
             Timber.e(
                 "ТРАНЗАКЦИЯ: prepareTransactionForEdit - Ошибка - некорректная сумма после парсинга: %s. Условие (parsedMoney.amount <= 0): %b",
                 parsedMoney.amount,
-                parsedMoney.amount <= BigDecimal.ZERO,
+                parsedMoney.amount <= 0.0,
             )
             return null
         }

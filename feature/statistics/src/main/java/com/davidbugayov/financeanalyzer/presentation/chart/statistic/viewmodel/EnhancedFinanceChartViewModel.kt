@@ -261,10 +261,10 @@ class EnhancedFinanceChartViewModel :
     ): List<UiCategory> {
         val filteredData =
             if (showExpenses) {
-                data.filter { it.value.amount != BigDecimal.ZERO }
+                data.filter { it.value.amount != 0.0 }
             } else {
                 // Для доходов фильтруем только положительные суммы
-                data.filter { it.value.amount > BigDecimal.ZERO }
+                data.filter { it.value.amount > 0.0 }
             }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val palette = if (showExpenses) ExpenseChartPalette else IncomeChartPalette

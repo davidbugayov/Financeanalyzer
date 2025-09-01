@@ -117,7 +117,7 @@ class AddTransactionViewModel(
         }
 
         // Используем уже распарсенный Money: ошибка, если сумма <= 0
-        if (amount.amount <= BigDecimal.ZERO) {
+        if (amount.amount <= 0.0) {
             validationBuilder.addAmountError()
             Timber.d(
                 GlobalContext.get().get<ResourceProvider>().getString(

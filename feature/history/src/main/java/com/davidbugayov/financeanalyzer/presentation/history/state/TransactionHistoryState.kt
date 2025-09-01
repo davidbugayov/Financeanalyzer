@@ -58,7 +58,7 @@ data class TransactionHistoryState(
     val periodType: PeriodType = PeriodType.ALL,
     val startDate: Date = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time,
     val endDate: Date = Calendar.getInstance().time,
-    val categoryStats: Triple<Money, Money, BigDecimal?>? = null,
+    val categoryStats: Triple<Money, Money, Double?>? = null,
     val showPeriodDialog: Boolean = false,
     val showCategoryDialog: Boolean = false,
     val showSourceDialog: Boolean = false,

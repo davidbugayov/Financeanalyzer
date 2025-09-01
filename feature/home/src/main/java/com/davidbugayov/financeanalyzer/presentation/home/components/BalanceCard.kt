@@ -43,7 +43,7 @@ private fun BalanceCardTitle(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val titleColor =
-        if (balance.amount >= BigDecimal.ZERO) {
+        if (balance.amount >= 0.0) {
             incomeColor.copy(alpha = 0.7f)
         } else {
             expenseColor.copy(alpha = 0.7f)
@@ -68,7 +68,7 @@ private fun BalanceCardAmount(balance: Money) {
                 UiR.dimen.enhanced_summary_card_balance_font_size,
             ).value.sp,
         fontWeight = FontWeight.Bold,
-        color = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
+        color = if (balance.amount >= 0.0) incomeColor else expenseColor,
     )
 }
 
@@ -82,7 +82,7 @@ fun BalanceCard(
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val cardColor = MaterialTheme.colorScheme.background
-    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    val balanceTextColor = if (balance.amount >= 0.0) incomeColor else expenseColor
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),

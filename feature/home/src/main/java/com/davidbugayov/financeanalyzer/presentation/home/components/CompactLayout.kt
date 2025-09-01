@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
 import androidx.compose.foundation.layout.Arrangement
+import kotlin.math.abs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -271,7 +272,7 @@ fun CompactLayout(
                             .sumOf { it.amount.amount.toDouble() }
                         val actualExpense = transactionsToUse
                             .filter { it.isExpense }
-                            .sumOf { it.amount.amount.abs().toDouble() }
+                            .sumOf { abs(it.amount.amount) }
                         val actualBalance = actualIncome - actualExpense
                         val currency = transactionsToUse.firstOrNull()?.amount?.currency ?: Currency.USD
 
@@ -280,10 +281,10 @@ fun CompactLayout(
 
                         HomeGroupSummary(
                             filteredTransactions = transactionsToUse,
-                            totalIncome = Money(BigDecimal.valueOf(actualIncome), currency),
-                            totalExpense = Money(BigDecimal.valueOf(actualExpense), currency),
+                            totalIncome = Money(actualIncome, currency),
+                            totalExpense = Money(actualExpense, currency),
                             currentFilter = state.currentFilter,
-                            balance = Money(BigDecimal.valueOf(actualBalance), currency),
+                            balance = Money(actualBalance, currency),
                             periodStartDate = state.periodStartDate,
                             periodEndDate = state.periodEndDate,
                             isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,

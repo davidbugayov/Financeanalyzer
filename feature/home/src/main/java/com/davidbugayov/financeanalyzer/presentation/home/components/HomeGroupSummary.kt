@@ -99,7 +99,7 @@ fun HomeGroupSummary(
     val transactionDataKey = if (filteredTransactions.isEmpty()) "empty" else filteredTransactions.joinToString { "${it.id}:${it.amount}" }
 
     // Используем переданные значения, если они корректны, иначе рассчитываем
-    val useCalculatedValues = totalIncome.amount == BigDecimal.ZERO && totalExpense.amount == BigDecimal.ZERO && filteredTransactions.isNotEmpty()
+    val useCalculatedValues = totalIncome.amount == 0.0 && totalExpense.amount == 0.0 && filteredTransactions.isNotEmpty()
 
     val computedIncome by remember(transactionDataKey) {
         derivedStateOf {
@@ -133,7 +133,7 @@ fun HomeGroupSummary(
         balance ?: computedIncome.minus(computedExpense)
     }
 
-    val balanceColor = if (calculatedBalance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    val balanceColor = if (calculatedBalance.amount >= 0.0) incomeColor else expenseColor
 
     Timber.d("HomeGroupSummary: Using calculated values: $useCalculatedValues, Income: $computedIncome, Expense: $computedExpense, Balance: $calculatedBalance")
     Timber.d("HomeGroupSummary: Transaction count: ${filteredTransactions.size}")
@@ -364,7 +364,7 @@ private fun SummaryTotals(
                     )
                 }
                 Text(
-                    text = "+${java.math.BigDecimal.valueOf(animatedIncome.toDouble()).abs().let { Money(it, totalIncome.currency).formatForDisplay(showCurrency = false) }}",
+                    text = "+${kotlin.math.abs(animatedIncome.toDouble()).let { Money(it, totalIncome.currency).formatForDisplay(showCurrency = false) }}",
                     fontSize = 16.sp,
                     color = incomeColor,
                     fontWeight = FontWeight.ExtraBold,
@@ -404,7 +404,7 @@ private fun SummaryTotals(
                     )
                 }
                 Text(
-                    text = "-${java.math.BigDecimal.valueOf(animatedExpense.toDouble()).abs().let { Money(it, totalExpense.currency).formatForDisplay(showCurrency = false) }}",
+                    text = "-${kotlin.math.abs(animatedExpense.toDouble()).let { Money(it, totalExpense.currency).formatForDisplay(showCurrency = false) }}",
                     fontSize = 16.sp,
                     color = expenseColor,
                     fontWeight = FontWeight.ExtraBold,
@@ -437,9 +437,9 @@ private fun SummaryTotals(
                 Text(
                     text =
                         if (animatedBalance >= 0f) {
-                            "+${java.math.BigDecimal.valueOf(animatedBalance.toDouble()).let { Money(it, balance.currency).formatForDisplay(showCurrency = false) }}"
+                            "+${Money(animatedBalance.toDouble(), balance.currency).formatForDisplay(showCurrency = false)}"
                         } else {
-                            "${java.math.BigDecimal.valueOf(animatedBalance.toDouble()).let { Money(it, balance.currency).formatForDisplay(showCurrency = false) }}"
+                            "${Money(animatedBalance.toDouble(), balance.currency).formatForDisplay(showCurrency = false)}"
                         },
                     fontSize = 18.sp,
                     color = balanceColor,

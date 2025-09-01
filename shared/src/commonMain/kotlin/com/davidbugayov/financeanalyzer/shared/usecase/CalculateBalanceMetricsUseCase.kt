@@ -6,7 +6,7 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
-import java.math.BigDecimal
+import kotlin.math.abs
 
 /**
  * KMP-реализация расчёта метрик баланса без JVM API.
@@ -19,12 +19,12 @@ class CalculateBalanceMetricsUseCase {
         startDate: LocalDate? = null,
         endDate: LocalDate? = null,
     ): BalanceMetrics {
-        val incomeAmount = transactions.filter { !it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount) }
-        val expenseAmount = transactions.filter { it.isExpense }.fold(BigDecimal.ZERO) { acc, transaction -> acc.add(transaction.amount.amount.abs()) }
-        val balanceAmount = incomeAmount.subtract(expenseAmount)
+        val incomeAmount = transactions.filter { !it.isExpense }.sumOf { it.amount.amount }
+        val expenseAmount = transactions.filter { it.isExpense }.sumOf { abs(it.amount.amount) }
+        val balanceAmount = incomeAmount - expenseAmount
 
-        val savingsRate = if (incomeAmount > BigDecimal.ZERO) {
-            ((balanceAmount.toDouble() / incomeAmount.toDouble()) * 100.0).coerceAtLeast(0.0)
+        val savingsRate = if (incomeAmount > 0.0) {
+            ((balanceAmount / incomeAmount) * 100.0).coerceAtLeast(0.0)
         } else 0.0
 
         val daysBetween = if (startDate != null && endDate != null) {
@@ -32,11 +32,11 @@ class CalculateBalanceMetricsUseCase {
         } else 0
 
         val averageDailyExpense = if (daysBetween > 0) {
-            Money(expenseAmount.divide(BigDecimal.valueOf(daysBetween.toDouble()), 10, java.math.RoundingMode.HALF_EVEN), currency)
+            Money(expenseAmount / daysBetween.toDouble(), currency)
         } else Money.zero(currency)
 
-        val monthsOfSavings = if (averageDailyExpense.amount > BigDecimal.ZERO) {
-            balanceAmount.toDouble() / (averageDailyExpense.amount.toDouble() * 30.0)
+        val monthsOfSavings = if (averageDailyExpense.amount > 0.0) {
+            balanceAmount / (averageDailyExpense.amount * 30.0)
         } else 0.0
 
         return BalanceMetrics(

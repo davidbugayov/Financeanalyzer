@@ -5,13 +5,12 @@ import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
-import java.math.BigDecimal
 
 class MoneyConverter {
     @TypeConverter
     fun fromMoney(money: Money?): String? {
         return money?.let {
-            "${it.amount.toPlainString()},${it.currency.code}"
+            "${it.amount},${it.currency.code}"
         }
     }
 
@@ -36,7 +35,7 @@ class MoneyConverter {
             }
 
             try {
-                Money(BigDecimal(amountStr), currency)
+                Money(amountStr.toDouble(), currency)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to parse amount: $amountStr")
                 CrashLoggerProvider.crashLogger.logException(e)

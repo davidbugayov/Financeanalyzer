@@ -947,7 +947,7 @@ fun WalletCard(
                 0,
                 100,
             )
-        } else if (wallet.limit.amount > BigDecimal.ZERO) {
+        } else if (wallet.limit.amount > 0.0) {
             ((wallet.spent.amount.toDouble() / wallet.limit.amount.toDouble()) * 100).toInt()
                 .coerceIn(0, 100)
         } else {
