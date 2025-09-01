@@ -140,11 +140,15 @@ fun FinancialStatisticsScreen(
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
+        println("FinancialStatisticsScreen: LaunchedEffect triggered")
+        println("FinancialStatisticsScreen: periodType=$periodType, startDate=$startDate, endDate=$endDate")
+
         // Триггер ачивки - просмотр статистики
         AchievementTrigger.onStatisticsViewed()
 
         // Если передан период с главного экрана, используем его
         if (periodType != null && startDate != null && endDate != null) {
+            println("FinancialStatisticsScreen: Using provided period")
             viewModel.handleIntent(
                 EnhancedFinanceChartIntent.ChangePeriod(
                     periodType = periodType,
@@ -153,6 +157,7 @@ fun FinancialStatisticsScreen(
                 ),
             )
         } else {
+            println("FinancialStatisticsScreen: Loading default data")
             viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData)
         }
     }
