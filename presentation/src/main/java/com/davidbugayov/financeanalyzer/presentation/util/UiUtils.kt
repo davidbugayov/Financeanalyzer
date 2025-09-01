@@ -25,10 +25,13 @@ object UiUtils {
         endDate: Date,
     ): String {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        val dayMonth = SimpleDateFormat("d MMMM", Locale.forLanguageTag("ru"))
+        val dayOfWeek = SimpleDateFormat("EEEE", Locale.forLanguageTag("ru"))
+        val monthYear = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
             PeriodType.ALL -> context.getString(UiR.string.period_all_time)
-            PeriodType.DAY -> context.getString(UiR.string.period_day, dateFormat.format(startDate))
+            PeriodType.DAY -> context.getString(UiR.string.period_day, dayMonth.format(startDate), dayOfWeek.format(startDate))
             PeriodType.WEEK ->
                 context.getString(
                     UiR.string.period_week,
@@ -36,19 +39,19 @@ object UiUtils {
                     dateFormat.format(endDate),
                 )
             PeriodType.MONTH ->
-                context.getString(
-                    UiR.string.period_month,
-                    dateFormat.format(startDate),
-                    dateFormat.format(endDate),
-                )
-            PeriodType.QUARTER ->
-                context.getString(UiR.string.period_quarter)
-            PeriodType.YEAR ->
-                context.getString(
-                    UiR.string.period_year,
-                    dateFormat.format(startDate),
-                    dateFormat.format(endDate),
-                )
+                context.getString(UiR.string.period_month, monthYear.format(startDate))
+            PeriodType.QUARTER -> {
+                val now = java.util.Calendar.getInstance()
+                val currentQuarter = ((now.get(java.util.Calendar.MONTH) / 3) + 1)
+                val quarterNames = arrayOf("", "I", "II", "III", "IV")
+                val currentYear = now.get(java.util.Calendar.YEAR)
+                context.getString(UiR.string.period_quarter, quarterNames[currentQuarter], currentYear)
+            }
+            PeriodType.YEAR -> {
+                val now = java.util.Calendar.getInstance()
+                val currentYear = now.get(java.util.Calendar.YEAR)
+                context.getString(UiR.string.period_year, currentYear)
+            }
             PeriodType.CUSTOM ->
                 context.getString(
                     UiR.string.period_custom,

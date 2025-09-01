@@ -800,12 +800,18 @@ class TransactionHistoryViewModel(
     }
 
     private fun updateStartDate(date: Date) {
+        println("TransactionHistoryViewModel: updateStartDate")
+        println("  Input date: $date (${date.time})")
         _state.update { it.copy(startDate = date) }
+        println("  State updated, new startDate: ${date}")
         updateFilteredAndGroupedTransactions()
     }
 
     private fun updateEndDate(date: Date) {
+        println("TransactionHistoryViewModel: updateEndDate")
+        println("  Input date: $date (${date.time})")
         _state.update { it.copy(endDate = date) }
+        println("  State updated, new endDate: ${date}")
         updateFilteredAndGroupedTransactions()
     }
 

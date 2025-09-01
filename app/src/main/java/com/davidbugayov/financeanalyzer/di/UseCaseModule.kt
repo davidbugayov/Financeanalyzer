@@ -12,6 +12,8 @@ import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthS
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculatePeerComparisonUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.PredictExpensesByCategoryUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -45,6 +47,8 @@ val useCaseModule =
         single { CalculateRetirementForecastUseCase() }
         single { CalculatePeerComparisonUseCase() }
         single { PredictFutureExpensesUseCase() }
+        single { PredictExpensesByCategoryUseCase() }
+        single { GetExpenseOptimizationRecommendationsUseCase() }
         single {
             CalculateEnhancedFinancialMetricsUseCase(
                 calculateFinancialHealthScore = get(),

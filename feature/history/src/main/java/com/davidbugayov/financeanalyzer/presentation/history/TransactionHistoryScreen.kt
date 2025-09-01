@@ -60,6 +60,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.ui.components.DateRangePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
@@ -224,6 +225,12 @@ fun TransactionHistoryScreen(
             onEndDateClick = {
                 viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
             },
+            onResetDatesToToday = {
+                // Сбрасываем даты на сегодняшний день
+                val today = java.util.Calendar.getInstance().time
+                viewModel.onEvent(TransactionHistoryEvent.SetStartDate(today))
+                viewModel.onEvent(TransactionHistoryEvent.SetEndDate(today))
+            },
             onConfirm = {
                 viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
             },
@@ -233,40 +240,45 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Диалоги выбора дат для кастомного периода
+    // Диалог выбора диапазона дат для кастомного периода
     if (state.showStartDatePicker) {
-        DatePickerDialog(
-            initialDate = state.startDate,
-            maxDate =
-                minOf(
-                    state.endDate,
-                    java.util.Calendar
-                        .getInstance()
-                        .time,
-                ),
-            onDateSelected = { date ->
-                viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
-                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
-            },
-            onDismiss = {
-                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
-            },
-        )
-    }
+        // Определяем начальные даты для DateRangePicker
+        val (initialStart, initialEnd) = remember(state.startDate, state.endDate) {
+            val today = java.util.Calendar.getInstance()
+            val startDateCal = java.util.Calendar.getInstance().apply { time = state.startDate }
+            val endDateCal = java.util.Calendar.getInstance().apply { time = state.endDate }
 
-    if (state.showEndDatePicker) {
-        DatePickerDialog(
-            initialDate = state.endDate,
-            minDate = state.startDate,
-            maxDate =
-                java.util.Calendar
-                    .getInstance()
-                    .time,
-            onDateSelected = { date ->
-                viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
+            // Если даты по умолчанию (5 лет назад), используем разумный диапазон
+            if (startDateCal.get(java.util.Calendar.YEAR) <= 2000 ||
+                java.util.Calendar.getInstance().apply { add(java.util.Calendar.YEAR, -4) }.time <= state.startDate) {
+                // Начало месяца назад, конец - сегодня
+                val startOfMonth = today.apply {
+                    set(java.util.Calendar.DAY_OF_MONTH, 1)
+                }.time
+                val todayEnd = today.time
+                startOfMonth to todayEnd
+            } else {
+                // Используем текущие даты из состояния
+                state.startDate to state.endDate
+            }
+        }
+
+        DateRangePickerDialog(
+            initialStartDate = initialStart,
+            initialEndDate = initialEnd,
+            maxDate = java.util.Calendar.getInstance().time,
+            onDateRangeSelected = { startDate, endDate ->
+                println("TransactionHistoryScreen: onDateRangeSelected called")
+                println("  Received startDate: $startDate (${startDate.time})")
+                println("  Received endDate: $endDate (${endDate.time})")
+
+                viewModel.onEvent(TransactionHistoryEvent.SetStartDate(startDate))
+                viewModel.onEvent(TransactionHistoryEvent.SetEndDate(endDate))
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
             },
             onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
             },
         )

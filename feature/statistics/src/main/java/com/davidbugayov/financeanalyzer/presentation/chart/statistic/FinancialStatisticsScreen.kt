@@ -69,6 +69,7 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.ui.components.DateRangePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
 import com.davidbugayov.financeanalyzer.ui.components.tips.FinancialTipsManager
@@ -345,6 +346,12 @@ fun FinancialStatisticsScreen(
                             },
                             onStartDateClick = { showStartDatePicker = true },
                             onEndDateClick = { showEndDatePicker = true },
+                            onResetDatesToToday = {
+                                // Сбрасываем даты на сегодняшний день
+                                val today = java.util.Calendar.getInstance().time
+                                currentStartDate = today
+                                currentEndDate = today
+                            },
                             onConfirm = {
                                 showPeriodDialog = false
                                 viewModel.handleIntent(
@@ -360,27 +367,45 @@ fun FinancialStatisticsScreen(
                     }
 
                     if (showStartDatePicker) {
-                        DatePickerDialog(
-                            initialDate = currentStartDate,
-                            maxDate = minOf(currentEndDate, Calendar.getInstance().time),
-                            onDateSelected = { d ->
-                                currentStartDate = d
-                                showStartDatePicker = false
-                            },
-                            onDismiss = { showStartDatePicker = false },
-                        )
-                    }
+                        // Определяем начальные даты для DateRangePicker
+                        val (initialStart, initialEnd) = remember(currentStartDate, currentEndDate) {
+                            val today = Calendar.getInstance()
+                            val startDateCal = Calendar.getInstance().apply { time = currentStartDate }
+                            val endDateCal = Calendar.getInstance().apply { time = currentEndDate }
 
-                    if (showEndDatePicker) {
-                        DatePickerDialog(
-                            initialDate = currentEndDate,
-                            minDate = currentStartDate,
+                            // Если даты по умолчанию (5 лет назад), используем разумный диапазон
+                            if (startDateCal.get(Calendar.YEAR) <= 2000 ||
+                                Calendar.getInstance().apply { add(Calendar.YEAR, -4) }.time <= currentStartDate) {
+                                // Начало месяца назад, конец - сегодня
+                                val startOfMonth = today.apply {
+                                    set(Calendar.DAY_OF_MONTH, 1)
+                                }.time
+                                val todayEnd = today.time
+                                startOfMonth to todayEnd
+                            } else {
+                                // Используем текущие даты из состояния
+                                currentStartDate to currentEndDate
+                            }
+                        }
+
+                        DateRangePickerDialog(
+                            initialStartDate = initialStart,
+                            initialEndDate = initialEnd,
                             maxDate = Calendar.getInstance().time,
-                            onDateSelected = { d ->
-                                currentEndDate = d
+                            onDateRangeSelected = { startDate, endDate ->
+                                println("FinancialStatisticsScreen: onDateRangeSelected called")
+                                println("  Received startDate: $startDate (${startDate.time})")
+                                println("  Received endDate: $endDate (${endDate.time})")
+
+                                currentStartDate = startDate
+                                currentEndDate = endDate
+                                showStartDatePicker = false
                                 showEndDatePicker = false
                             },
-                            onDismiss = { showEndDatePicker = false },
+                            onDismiss = {
+                                showStartDatePicker = false
+                                showEndDatePicker = false
+                            },
                         )
                     }
 

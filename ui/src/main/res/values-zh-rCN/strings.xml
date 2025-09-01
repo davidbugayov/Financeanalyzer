@@ -312,6 +312,9 @@
     <string name="insight_small_expenses_desc">小型日常支出的分析</string>
     <!-- 使用 plurals: insight_small_expenses_metric -->
     <string name="invalid_date">错误的日期</string>
+    <string name="invalid_date_range">无效的日期范围</string>
+    <string name="select_date_range">选择日期范围</string>
+    <string name="select_start_date">选择范围的开始日期</string>
     <string name="investment_tip_bonds">考虑稳定收入的债券：公司盈利能力的可靠发行人的债券。</string>
     <string name="investment_tip_business">通过股票或高收入中等风险的高收入来增加实际业务。</string>
     <string name="investment_tip_diversification">多样化公文包，避免高风险和杠杆作用。</string>
@@ -389,16 +392,17 @@
     <string name="optimize_category_impact">分析此类别中的所有废物</string>
     <string name="optimize_category_title">在类别 %1$s 中优化成本</string>
     <string name="path_copied">路径被复制</string>
-    <string name="period_all_time">一直</string>
+        <string name="period_all_time">全部时间</string>
+    <string name="period_select_custom">选择自定义期间</string>
     <string name="period_custom">%1$s - %1$s</string>
-    <string name="period_day">%1$s</string>
+    <string name="period_day">%1$s (%2$s)</string>
     <string name="period_duration_description">在几天内设置持续时间</string>
-    <string name="period_month">%1$s - %1$s</string>
-  <string name="period_quarter">季度</string>
+    <string name="period_month">%1$s</string>
+    <string name="period_quarter">%1$s季度 %2$d</string>
     <string name="period_settings">期间的设置</string>
     <string name="period_settings_title">期间的设置</string>
     <string name="period_week">%1$s - %1$s</string>
-    <string name="period_year">%1$s - %1$s</string>
+    <string name="period_year">%1$d 年</string>
     <string name="permission_rationale">对于申请的申请，需要许可。</string>
     <string name="permission_required">需要权限</string>
     <string name="permission_settings_rationale">对于申请的申请，需要许可。转到设置。</string>

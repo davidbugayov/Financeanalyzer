@@ -307,6 +307,9 @@
     <string name="insight_small_expenses_desc">Analysis of small everyday expenses</string>
   <!-- Use plurals: insight_small_expenses_metric -->
     <string name="invalid_date">The wrong date</string>
+    <string name="invalid_date_range">Invalid date range</string>
+    <string name="select_date_range">Select date range</string>
+    <string name="select_start_date">Select start date of range</string>
   <string name="investment_tip_bonds">Consider bonds for stable income: 14–16% yield from reliable issuers.</string>
     <string name="investment_tip_business">Increase in real business through shares or borrowings for high income with moderate risks.</string>
     <string name="investment_tip_diversification">Diversify the briefcase, avoiding high risks and leverage.</string>
@@ -384,16 +387,17 @@
     <string name="optimize_category_impact">Analyze every waste in this category</string>
     <string name="optimize_category_title">Optimize costs in category %s</string>
     <string name="path_copied">The path is copied</string>
-    <string name="period_all_time">For all the time</string>
+        <string name="period_all_time">For all time</string>
+    <string name="period_select_custom">Select custom period</string>
     <string name="period_custom">%1$s - %1$s</string>
-    <string name="period_day">%1$s</string>
+    <string name="period_day">%1$s (%2$s)</string>
     <string name="period_duration_description">Set the duration of the period in days</string>
-    <string name="period_month">%1$s - %1$s</string>
-  <string name="period_quarter">Quarter</string>
+    <string name="period_month">%1$s</string>
+    <string name="period_quarter">%1$s quarter %2$d</string>
     <string name="period_settings">Settings of the period</string>
     <string name="period_settings_title">Settings of the period</string>
     <string name="period_week">%1$s - %1$s</string>
-    <string name="period_year">%1$s - %1$s</string>
+    <string name="period_year">%1$d year</string>
     <string name="permission_rationale">For the application of the application, permission is necessary.</string>
     <string name="permission_required">Permission required</string>
     <string name="permission_settings_rationale">For the application of the application, permission is necessary.Go to the settings.</string>

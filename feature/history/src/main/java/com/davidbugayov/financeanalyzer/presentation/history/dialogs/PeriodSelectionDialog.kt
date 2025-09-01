@@ -13,6 +13,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -43,12 +45,40 @@ fun PeriodSelectionDialog(
     onPeriodSelected: (PeriodType) -> Unit,
     onStartDateClick: () -> Unit,
     onEndDateClick: () -> Unit,
+    onResetDatesToToday: () -> Unit = {},
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
+    // Определяем, был ли CUSTOM период выбран впервые
+    val isCustomPeriodNewlySelected = remember(selectedPeriod) {
+        selectedPeriod == PeriodType.CUSTOM
+    }
+
+    // Проверяем, являются ли даты значениями по умолчанию (5 лет назад)
+    val isDefaultStartDate = remember(startDate) {
+        val defaultStart = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
+        // Сравниваем даты с точностью до дня
+        val startCal = Calendar.getInstance().apply { time = startDate }
+        val defaultCal = Calendar.getInstance().apply { time = defaultStart }
+
+        startCal.get(Calendar.YEAR) == defaultCal.get(Calendar.YEAR) &&
+        startCal.get(Calendar.MONTH) == defaultCal.get(Calendar.MONTH) &&
+        startCal.get(Calendar.DAY_OF_MONTH) == defaultCal.get(Calendar.DAY_OF_MONTH)
+    }
+
+    // Также проверяем на дату 2000 года (используется в ALL периоде)
+    val is2000YearDate = remember(startDate) {
+        val startCal = Calendar.getInstance().apply { time = startDate }
+        startCal.get(Calendar.YEAR) == 2000
+    }
+
+    val today = remember { Calendar.getInstance().time }
     val ru = Locale("ru", "RU")
     val fullDate = SimpleDateFormat("dd.MM.yyyy", ru)
     val dayMonth = SimpleDateFormat("d MMMM", ru)
+    val dayOfWeek = SimpleDateFormat("EEEE", ru)
+    val monthYear = SimpleDateFormat("MMMM yyyy", ru)
+    val quarterYear = SimpleDateFormat("yyyy", ru)
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
         val now = java.util.Calendar.getInstance()
@@ -128,11 +158,10 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.DAY,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_day, dayMonth.format(s)),
+                        title = stringResource(UiR.string.period_day, dayMonth.format(s), dayOfWeek.format(s)),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
-
                 run {
                     val (s, e) = rangeFor(PeriodType.WEEK)
                     PeriodOption(
@@ -144,31 +173,60 @@ fun PeriodSelectionDialog(
                 }
 
                 run {
-                    val (s, e) = rangeFor(PeriodType.MONTH)
+                    val (s, _) = rangeFor(PeriodType.MONTH)
                     PeriodOption(
                         periodType = PeriodType.MONTH,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_month, dayMonth.format(s), dayMonth.format(e)),
+                        title = stringResource(UiR.string.period_month, monthYear.format(s)),
+                        onPeriodSelected = onPeriodSelected,
+                    )
+                }
+                run {
+                    val now = java.util.Calendar.getInstance()
+                    val currentQuarter = ((now.get(java.util.Calendar.MONTH) / 3) + 1)
+                    val quarterNames = arrayOf("", "I", "II", "III", "IV")
+                    val currentYear = now.get(java.util.Calendar.YEAR)
+                    PeriodOption(
+                        periodType = PeriodType.QUARTER,
+                        selectedPeriod = selectedPeriod,
+                        title = stringResource(UiR.string.period_quarter, quarterNames[currentQuarter], currentYear),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
 
-                PeriodOption(
-                    periodType = PeriodType.QUARTER,
-                    selectedPeriod = selectedPeriod,
-                    title = stringResource(UiR.string.period_quarter),
-                    onPeriodSelected = onPeriodSelected,
-                )
-
                 run {
-                    val (s, e) = rangeFor(PeriodType.YEAR)
+                    val now = java.util.Calendar.getInstance()
+                    val currentYear = now.get(java.util.Calendar.YEAR)
                     PeriodOption(
                         periodType = PeriodType.YEAR,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_year, fullDate.format(s), fullDate.format(e)),
+                        title = stringResource(UiR.string.period_year, currentYear),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
+
+                // Опция для выбора произвольного периода
+                PeriodOption(
+                    periodType = PeriodType.CUSTOM,
+                    selectedPeriod = selectedPeriod,
+                    title = if (selectedPeriod == PeriodType.CUSTOM) {
+                        stringResource(UiR.string.period_custom, fullDate.format(startDate), fullDate.format(endDate))
+                    } else {
+                        stringResource(UiR.string.period_select_custom)
+                    },
+                    onPeriodSelected = {
+                        onPeriodSelected(PeriodType.CUSTOM)
+                        // При выборе CUSTOM периода открываем date range picker
+                        if (it == PeriodType.CUSTOM) {
+                            // Если даты по умолчанию (5 лет назад) или 2000 год, сбрасываем их на сегодняшний день
+                            if (isDefaultStartDate || is2000YearDate) {
+                                onResetDatesToToday()
+                            }
+                            // Открываем date range picker вместо отдельных date picker'ов
+                            // onStartDateClick() - больше не нужен для последовательного выбора
+                        }
+                    },
+                )
             }
         },
         confirmButton = {

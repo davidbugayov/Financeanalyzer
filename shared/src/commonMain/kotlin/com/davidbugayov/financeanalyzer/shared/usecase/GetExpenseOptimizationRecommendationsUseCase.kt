@@ -1,59 +1,76 @@
 package com.davidbugayov.financeanalyzer.shared.usecase
 
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
 
 /**
- * UseCase для генерации рекомендаций по оптимизации расходов.
- * Анализирует транзакции и возвращает список рекомендаций.
+ * Use case для получения рекомендаций по оптимизации расходов на основе прогноза
  */
 class GetExpenseOptimizationRecommendationsUseCase {
-    
-    /**
-     * Генерирует рекомендации по оптимизации расходов.
-     * @param transactions Список транзакций пользователя.
-     * @return Список рекомендаций по оптимизации расходов.
-     */
-    fun invoke(transactions: List<Transaction>): List<String> {
-        val recommendations = mutableListOf<String>()
-        if (transactions.isEmpty()) return recommendations
 
-        // 1. Повторяющиеся траты (подписки)
-        val subscriptionKeywords = listOf("подписк", "subscription", "services", "music", "video", "netflix", "yandex", "apple", "google")
-        val subscriptions = transactions.filter { tx ->
-            tx.isExpense && subscriptionKeywords.any { key ->
-                tx.category.contains(key, true) || (tx.note?.contains(key, true) == true)
+    operator fun invoke(
+        transactions: List<Transaction>,
+        predictedExpenses: Map<String, Money>
+    ): List<ExpenseOptimizationRecommendation> {
+        val recommendations = mutableListOf<ExpenseOptimizationRecommendation>()
+
+        // Анализируем текущие расходы по категориям
+        val currentExpenses = transactions
+            .filter { it.isExpense }
+            .groupBy { it.category }
+            .mapValues { (_, txs) ->
+                txs.sumOf { it.amount.amount }
+            }
+
+        // Сравниваем прогнозы с текущими расходами
+        predictedExpenses.forEach { (category, predictedAmount) ->
+            val currentAmount = currentExpenses[category] ?: 0.0
+
+            if (currentAmount > 0) {
+                val growthRate = (predictedAmount.amount - currentAmount) / currentAmount
+
+                if (growthRate > 0.2) { // Рост более 20%
+                    recommendations.add(
+                        ExpenseOptimizationRecommendation(
+                            category = category,
+                            currentAmount = Money(currentAmount, predictedAmount.currency),
+                            predictedAmount = predictedAmount,
+                            growthRate = growthRate,
+                            priority = if (growthRate > 0.5) RecommendationPriority.HIGH else RecommendationPriority.MEDIUM,
+                            suggestion = generateSuggestion(category, growthRate)
+                        )
+                    )
+                }
             }
         }
-        if (subscriptions.isNotEmpty()) {
-            recommendations.add("Проверьте подписки - возможно, некоторые из них не используются")
-        }
 
-        // 2. Крупные разовые расходы
-        val largeExpenses = transactions.filter { it.isExpense && it.amount.toMajorDouble() > 10000.0 }
-        if (largeExpenses.isNotEmpty()) {
-            recommendations.add("Планируйте крупные покупки заранее и сравнивайте цены")
-        }
-
-        // 3. Частые расходы на кафе/рестораны
-        val foodKeywords = listOf("кафе", "cafe", "ресторан", "restaurant", "еда", "food", "coffee", "кофе", "бар")
-        val foodExpenses = transactions.filter { it.isExpense && foodKeywords.any { key -> it.category.contains(key, true) } }
-        if (foodExpenses.size > 5) {
-            recommendations.add("Рассмотрите возможность готовить дома чаще для экономии на питании")
-        }
-
-        // 4. Много мелких трат
-        val smallExpenses = transactions.filter { it.isExpense && it.amount.toMajorDouble() < 200.0 }
-        if (smallExpenses.size > 15) {
-            recommendations.add("Контролируйте мелкие расходы - они могут составлять значительную сумму")
-        }
-
-        // 5. Нет регулярных накоплений
-        val income = transactions.filter { !it.isExpense }.sumOf { it.amount.toMajorDouble() }
-        val savings = transactions.filter { !it.isExpense && it.category.contains("накоплен", true) }
-        if (income > 0.0 && savings.isEmpty()) {
-            recommendations.add("Рассмотрите возможность регулярных накоплений для финансовой стабильности")
-        }
-
-        return recommendations
+        return recommendations.sortedByDescending { it.growthRate }
     }
+
+    private fun generateSuggestion(category: String, growthRate: Double): String {
+        return when {
+            growthRate > 0.5 -> "Критический рост расходов в категории '$category'. Рекомендуется немедленно пересмотреть бюджет."
+            growthRate > 0.3 -> "Значительный рост расходов в категории '$category'. Рассмотрите возможности экономии."
+            else -> "Умеренный рост расходов в категории '$category'. Следите за трендом."
+        }
+    }
+}
+
+/**
+ * Рекомендация по оптимизации расходов
+ */
+data class ExpenseOptimizationRecommendation(
+    val category: String,
+    val currentAmount: Money,
+    val predictedAmount: Money,
+    val growthRate: Double,
+    val priority: RecommendationPriority,
+    val suggestion: String
+)
+
+/**
+ * Приоритет рекомендации
+ */
+enum class RecommendationPriority {
+    LOW, MEDIUM, HIGH, CRITICAL
 }

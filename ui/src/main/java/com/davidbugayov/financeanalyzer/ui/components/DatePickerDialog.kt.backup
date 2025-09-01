@@ -1,0 +1,569 @@
+package com.davidbugayov.financeanalyzer.ui.components
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DateRangePickerDefaults
+import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.ui.R
+import java.util.Date
+import kotlinx.coroutines.launch
+
+// Вспомогательная функция для конвертации Color в hex строку
+fun Color.toHexString(): String {
+    val argb = this.toArgb()
+    return String.format("#%08X", argb)
+}
+
+/**
+ * Диалог выбора даты.
+ *
+ * @param initialDate Начальная дата для отображения в календаре
+ * @param minDate Минимальная дата для ограничения выбора
+ * @param maxDate Максимальная дата для ограничения выбора
+ * @param onDateSelected Callback, вызываемый при выборе даты
+ * @param onDismiss Callback, вызываемый при закрытии диалога
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerDialog(
+    initialDate: Date,
+    minDate: Date? = null,
+    maxDate: Date? = null,
+    onDateSelected: (Date) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    // Логи для отладки timezone и цветов
+    val currentTimeZone = java.util.TimeZone.getDefault()
+    val calendar = java.util.Calendar.getInstance()
+    val today = calendar.time
+
+    println("DatePickerDialog DEBUG:")
+    println("  Current TimeZone: ${currentTimeZone.id} (${currentTimeZone.displayName})")
+    println("  Today: $today (${today.time})")
+    println("  Today formatted: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", java.util.Locale.getDefault()).format(today)}")
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val errorColor = MaterialTheme.colorScheme.error
+    val backgroundColor = MaterialTheme.colorScheme.background
+
+    println("  Colors:")
+    println("    Primary: ${primaryColor.toHexString()}")
+    println("    Surface: ${surfaceColor.toHexString()}")
+    println("    OnSurface: ${onSurfaceColor.toHexString()}")
+    println("    Error: ${errorColor.toHexString()}")
+    println("    Background: ${backgroundColor.toHexString()}")
+
+    // Логи для DatePickerDefaults
+    val defaultColors = DatePickerDefaults.colors()
+    println("  Default DatePicker Colors:")
+    println("    Container: ${defaultColors.containerColor.toHexString()}")
+    println("    Title: ${defaultColors.titleContentColor.toHexString()}")
+    println("    Selected Day: ${defaultColors.selectedDayContainerColor.toHexString()}")
+
+    val datePickerState =
+        rememberDatePickerState(
+            initialSelectedDateMillis = initialDate.time,
+        )
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    val dateBeforeMinimumMessage = stringResource(R.string.date_before_minimum)
+    val dateAfterMaximumMessage = stringResource(R.string.date_after_maximum)
+    val invalidDateMessage = stringResource(R.string.invalid_date)
+
+    // Показывать Snackbar сразу при выборе недопустимой даты
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        println("DatePicker State Update:")
+        println("  Selected: ${datePickerState.selectedDateMillis?.let { Date(it) }}")
+
+        datePickerState.selectedDateMillis?.let { millis ->
+            val selectedDate = Date(millis)
+            val isValid =
+                (minDate == null || selectedDate >= minDate) &&
+                    (maxDate == null || selectedDate <= maxDate)
+
+            println("  IsValid: $isValid")
+
+            if (!isValid) {
+                val message = if (minDate != null && selectedDate < minDate) {
+                        dateBeforeMinimumMessage
+                    } else if (maxDate != null && selectedDate > maxDate) {
+                        dateAfterMaximumMessage
+                    } else {
+                        invalidDateMessage
+                }
+                println("  Error: $message")
+                snackbarHostState.showSnackbar(message)
+            } else {
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
+        }
+    }
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        colors = androidx.compose.material3.DatePickerDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            headlineContentColor = MaterialTheme.colorScheme.onSurface,
+            weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+            subheadContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationContentColor = MaterialTheme.colorScheme.onSurface,
+            yearContentColor = MaterialTheme.colorScheme.onSurface,
+            currentYearContentColor = MaterialTheme.colorScheme.primary,
+            selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+            selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+            dayContentColor = MaterialTheme.colorScheme.onSurface,
+            selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+            selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+            todayContentColor = MaterialTheme.colorScheme.primary,
+            todayDateBorderColor = MaterialTheme.colorScheme.primary,
+            dayInSelectionRangeContentColor = MaterialTheme.colorScheme.onPrimary,
+            dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+            dividerColor = MaterialTheme.colorScheme.outline
+        ),
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        // Исправляем timezone проблему при обработке выбранной даты
+                        val selectedDate = java.util.Calendar.getInstance().apply {
+                            timeInMillis = millis
+                            // Устанавливаем время в начало дня в текущем timezone
+                            set(java.util.Calendar.HOUR_OF_DAY, 0)
+                            set(java.util.Calendar.MINUTE, 0)
+                            set(java.util.Calendar.SECOND, 0)
+                            set(java.util.Calendar.MILLISECOND, 0)
+                        }.time
+                        val isValid =
+                            (minDate == null || selectedDate >= minDate) &&
+                                (maxDate == null || selectedDate <= maxDate)
+                        if (isValid) {
+                            onDateSelected(selectedDate)
+                        } else {
+                            // Используем rememberCoroutineScope для обработки клика
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (minDate != null && selectedDate < minDate) {
+                                        dateBeforeMinimumMessage
+                                    } else if (maxDate != null && selectedDate > maxDate) {
+                                        dateAfterMaximumMessage
+                                    } else {
+                                        invalidDateMessage
+                                    },
+                                )
+                            }
+                        }
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+
+    ) {
+        androidx.compose.foundation.layout.Column {
+            DatePicker(
+                state = datePickerState,
+                modifier = Modifier.weight(1f),
+                colors = DatePickerDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                    weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+                    subheadContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationContentColor = MaterialTheme.colorScheme.onSurface,
+                    yearContentColor = MaterialTheme.colorScheme.onSurface,
+                    currentYearContentColor = MaterialTheme.colorScheme.primary,
+                    selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+                    dayContentColor = MaterialTheme.colorScheme.onSurface,
+                    selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+                    todayContentColor = MaterialTheme.colorScheme.primary,
+                    todayDateBorderColor = MaterialTheme.colorScheme.primary,
+                    dayInSelectionRangeContentColor = MaterialTheme.colorScheme.onPrimary,
+                    dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    dividerColor = MaterialTheme.colorScheme.outline
+                ),
+            )
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = MaterialTheme.shapes.medium,
+                        content = { Text(data.visuals.message) },
+                    )
+                },
+            )
+        }
+    }
+
+/**
+ * Диалог выбора диапазона дат.
+ *
+ * @param initialStartDate Начальная дата диапазона для отображения
+ * @param initialEndDate Конечная дата диапазона для отображения
+ * @param minDate Минимальная дата для ограничения выбора
+ * @param maxDate Максимальная дата для ограничения выбора
+ * @param onDateRangeSelected Callback, вызываемый при выборе диапазона дат
+ * @param onDismiss Callback, вызываемый при закрытии диалога
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateRangePickerDialog(
+    initialStartDate: Date? = null,
+    initialEndDate: Date? = null,
+    minDate: Date? = null,
+    maxDate: Date? = null,
+    onDateRangeSelected: (startDate: Date, endDate: Date) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    // Логи для отладки timezone и цветов в DateRangePicker
+    val currentTimeZone = java.util.TimeZone.getDefault()
+    val calendar = java.util.Calendar.getInstance()
+    val today = calendar.time
+
+    println("DateRangePickerDialog DEBUG:")
+    println("  Current TimeZone: ${currentTimeZone.id} (${currentTimeZone.displayName})")
+    println("  Today: $today (${today.time})")
+    println("  Today formatted: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z", java.util.Locale.getDefault()).format(today)}")
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val errorColor = MaterialTheme.colorScheme.error
+
+    println("  Colors:")
+    println("    Primary: ${primaryColor.toHexString()}")
+    println("    Surface: ${surfaceColor.toHexString()}")
+    println("    OnSurface: ${onSurfaceColor.toHexString()}")
+    println("    Error: ${errorColor.toHexString()}")
+    println("  Initial dates:")
+    println("    Start: $initialStartDate ${initialStartDate?.let { "(${it.time})" } ?: ""}")
+    println("    End: $initialEndDate ${initialEndDate?.let { "(${it.time})" } ?: ""}")
+
+    // Исправляем timezone проблему при инициализации дат
+    val initialStartMillis = initialStartDate?.let { date ->
+        val calendar = java.util.Calendar.getInstance().apply {
+            time = date
+            // Устанавливаем время в начало дня в текущем timezone
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        calendar.timeInMillis.also {
+            println("DateRangePicker: corrected initialStartMillis from ${date.time} to $it")
+        }
+    }
+
+    val initialEndMillis = initialEndDate?.let { date ->
+        val calendar = java.util.Calendar.getInstance().apply {
+            time = date
+            // Устанавливаем время в конец дня в текущем timezone
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 59)
+            set(java.util.Calendar.MILLISECOND, 999)
+        }
+        calendar.timeInMillis.also {
+            println("DateRangePicker: corrected initialEndMillis from ${date.time} to $it")
+        }
+    }
+
+    val dateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialStartMillis,
+        initialSelectedEndDateMillis = initialEndMillis,
+        initialDisplayMode = DisplayMode.Picker
+    )
+
+    // Логи для отслеживания состояния DateRangePicker
+    println("DateRangePickerState initialized:")
+    println("  initialSelectedStartDateMillis: ${dateRangePickerState.selectedStartDateMillis}")
+    println("  initialSelectedEndDateMillis: ${dateRangePickerState.selectedEndDateMillis}")
+
+    // Отслеживание изменений состояния
+    LaunchedEffect(dateRangePickerState.selectedStartDateMillis, dateRangePickerState.selectedEndDateMillis) {
+        println("DateRangePickerState changed:")
+        println("  selectedStartDateMillis: ${dateRangePickerState.selectedStartDateMillis}")
+        println("  selectedEndDateMillis: ${dateRangePickerState.selectedEndDateMillis}")
+
+        dateRangePickerState.selectedStartDateMillis?.let { millis ->
+            val date = Date(millis)
+            println("  selectedStartDate: $date (${date.time})")
+        }
+        dateRangePickerState.selectedEndDateMillis?.let { millis ->
+            val date = Date(millis)
+            println("  selectedEndDate: $date (${date.time})")
+        }
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    val dateBeforeMinimumMessage = stringResource(R.string.date_before_minimum)
+    val dateAfterMaximumMessage = stringResource(R.string.date_after_maximum)
+    val invalidDateMessage = stringResource(R.string.invalid_date)
+    val invalidRangeMessage = stringResource(R.string.invalid_date_range)
+
+    // Валидация выбранного диапазона
+    LaunchedEffect(dateRangePickerState.selectedStartDateMillis, dateRangePickerState.selectedEndDateMillis) {
+        val startMillis = dateRangePickerState.selectedStartDateMillis
+        val endMillis = dateRangePickerState.selectedEndDateMillis
+
+        println("DateRangePicker State Update:")
+        println("  Start: ${startMillis?.let { Date(it) }}")
+        println("  End: ${endMillis?.let { Date(it) }}")
+
+        if (startMillis != null && endMillis != null) {
+            val startDate = Date(startMillis)
+            val endDate = Date(endMillis)
+
+            val isValid = when {
+                // Проверяем границы диапазона
+                minDate != null && (startDate < minDate || endDate < minDate) -> false
+                maxDate != null && (startDate > maxDate || endDate > maxDate) -> false
+                // Проверяем что начальная дата не позже конечной
+                startDate > endDate -> false
+                else -> true
+            }
+
+            println("  Validation result: $isValid")
+
+            if (!isValid) {
+                val message = when {
+                    minDate != null && (startDate < minDate || endDate < minDate) -> dateBeforeMinimumMessage
+                    maxDate != null && (startDate > maxDate || endDate > maxDate) -> dateAfterMaximumMessage
+                    startDate > endDate -> invalidRangeMessage
+                    else -> invalidDateMessage
+                }
+
+                println("  Error message: $message")
+                snackbarHostState.showSnackbar(message)
+            } else {
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
+        }
+    }
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        colors = androidx.compose.material3.DatePickerDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            headlineContentColor = MaterialTheme.colorScheme.onSurface,
+            weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+            subheadContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationContentColor = MaterialTheme.colorScheme.onSurface,
+            yearContentColor = MaterialTheme.colorScheme.onSurface,
+            currentYearContentColor = MaterialTheme.colorScheme.primary,
+            selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+            selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+            dayContentColor = MaterialTheme.colorScheme.onSurface,
+            selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
+            selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+            todayContentColor = MaterialTheme.colorScheme.primary,
+            todayDateBorderColor = MaterialTheme.colorScheme.primary,
+            dayInSelectionRangeContentColor = MaterialTheme.colorScheme.onPrimary,
+            dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+            dividerColor = MaterialTheme.colorScheme.outline
+        ),
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val startMillis = dateRangePickerState.selectedStartDateMillis
+                    val endMillis = dateRangePickerState.selectedEndDateMillis
+
+                    println("DateRangePicker CONFIRM button clicked:")
+                    println("  Raw startMillis: $startMillis")
+                    println("  Raw endMillis: $endMillis")
+
+                    if (startMillis != null) {
+                        // Исправляем timezone проблему при обработке выбранных дат
+                        val startDate = java.util.Calendar.getInstance().apply {
+                            timeInMillis = startMillis
+                            // Устанавливаем время в начало дня в текущем timezone
+                            set(java.util.Calendar.HOUR_OF_DAY, 0)
+                            set(java.util.Calendar.MINUTE, 0)
+                            set(java.util.Calendar.SECOND, 0)
+                            set(java.util.Calendar.MILLISECOND, 0)
+                        }.time
+
+                        println("  Corrected startDate: $startDate")
+                        println("  StartDate time: ${startDate.time}")
+
+                        // Если конечная дата не выбрана, устанавливаем её автоматически
+                        val finalEndDate = if (endMillis != null) {
+                            java.util.Calendar.getInstance().apply {
+                                timeInMillis = endMillis
+                                // Устанавливаем время в конец дня в текущем timezone
+                                set(java.util.Calendar.HOUR_OF_DAY, 23)
+                                set(java.util.Calendar.MINUTE, 59)
+                                set(java.util.Calendar.SECOND, 59)
+                                set(java.util.Calendar.MILLISECOND, 999)
+                            }.time.also {
+                                println("  Corrected endDate: $it")
+                                println("  EndDate time: ${it.time}")
+                            }
+                        } else {
+                            // Автоматически устанавливаем конечную дату через 7 дней
+                            val calendar = java.util.Calendar.getInstance().apply {
+                                time = startDate
+                                add(java.util.Calendar.DAY_OF_MONTH, 7)
+                            }
+                            // Убеждаемся, что конечная дата не превышает максимальную
+                            val calculatedEndDate = if (maxDate != null && calendar.time > maxDate) {
+                                maxDate
+                            } else {
+                                calendar.time
+                            }
+                            println("  Auto-calculated endDate: $calculatedEndDate")
+                            calculatedEndDate
+                        }
+
+                        println("  Final dates to return:")
+                        println("    Start: $startDate (${startDate.time})")
+                        println("    End: $finalEndDate (${finalEndDate.time})")
+
+                        val isValid = when {
+                            minDate != null && (startDate < minDate || finalEndDate < minDate) -> {
+                                println("  Validation failed: dates before minDate")
+                                false
+                            }
+                            maxDate != null && (startDate > maxDate || finalEndDate > maxDate) -> {
+                                println("  Validation failed: dates after maxDate")
+                                false
+                            }
+                            startDate > finalEndDate -> {
+                                println("  Validation failed: start > end")
+                                false
+                            }
+                            else -> {
+                                println("  Validation passed")
+                                true
+                            }
+                        }
+
+                        if (isValid) {
+                            println("  Calling onDateRangeSelected with: $startDate - $finalEndDate")
+                            onDateRangeSelected(startDate, finalEndDate)
+                        } else {
+                            coroutineScope.launch {
+                                val message = when {
+                                    minDate != null && (startDate < minDate || finalEndDate < minDate) -> dateBeforeMinimumMessage
+                                    maxDate != null && (startDate > maxDate || finalEndDate > maxDate) -> dateAfterMaximumMessage
+                                    startDate > finalEndDate -> invalidRangeMessage
+                                    else -> invalidDateMessage
+                                }
+                                snackbarHostState.showSnackbar(message)
+                            }
+                        }
+                    }
+                },
+                enabled = dateRangePickerState.selectedStartDateMillis != null
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            DateRangePicker(
+                state = dateRangePickerState,
+                modifier = Modifier.weight(1f),
+                headline = {
+                    Row(
+                        modifier = Modifier.padding(
+                            start = 24.dp,
+                            end = 12.dp,
+                            bottom = 12.dp
+                        )
+                    ) {
+                        val startDate = dateRangePickerState.selectedStartDateMillis?.let { Date(it) }
+                        val endDate = dateRangePickerState.selectedEndDateMillis?.let { Date(it) }
+
+                        if (startDate != null && endDate != null) {
+                            Text(
+                                text = "${android.text.format.DateFormat.format("dd/MM/yyyy", startDate)} - " +
+                                      android.text.format.DateFormat.format("dd/MM/yyyy", endDate),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        } else if (startDate != null) {
+                            // Показываем предварительный диапазон
+                            val previewEndDate = java.util.Calendar.getInstance().apply {
+                                time = startDate
+                                add(java.util.Calendar.DAY_OF_MONTH, 7)
+                            }.time
+                            val adjustedEndDate = if (maxDate != null && previewEndDate > maxDate) maxDate else previewEndDate
+
+                            Text(
+                                text = "${android.text.format.DateFormat.format("dd/MM/yyyy", startDate)} - " +
+                                      "${android.text.format.DateFormat.format("dd/MM/yyyy", adjustedEndDate)} " +
+                                      "(можно изменить)",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        } else {
+                            Text(
+                                text = "Выберите начальную дату диапазона",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                    }
+                }
+            )
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        shape = MaterialTheme.shapes.medium,
+                        content = { Text(data.visuals.message) },
+                    )
+                },
+            )
+        }
+    }
+}

@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForeca
 import com.davidbugayov.financeanalyzer.shared.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetExpenseOptimizationRecommendationsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.PredictExpensesByCategoryUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetSmartExpenseTipsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GoalProgressUseCase
@@ -60,6 +61,7 @@ class SharedFacade {
         this.getTransactionByIdUseCase = GetTransactionByIdUseCase()
         this.goalProgressUseCase = GoalProgressUseCase()
         this.updateWalletBalancesUseCase = UpdateWalletBalancesUseCase()
+        this.predictExpensesByCategory = PredictExpensesByCategoryUseCase()
         this.getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
     }
 
@@ -91,6 +93,7 @@ class SharedFacade {
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase
     private val goalProgressUseCase: GoalProgressUseCase
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
+    private val predictExpensesByCategory: PredictExpensesByCategoryUseCase
     private val getExpenseOptimizationRecommendations: GetExpenseOptimizationRecommendationsUseCase
 
     /**
@@ -179,8 +182,16 @@ class SharedFacade {
     /**
      * Рекомендации по оптимизации расходов.
      */
-    fun expenseOptimizationRecommendations(transactions: List<Transaction>): List<String> =
-        getExpenseOptimizationRecommendations.invoke(transactions)
+    fun expenseOptimizationRecommendations(transactions: List<Transaction>): List<String> {
+        // Сначала рассчитываем прогнозы по категориям
+        val predictedExpenses = predictExpensesByCategory.invoke(transactions, monthsAhead = 1)
+
+        // Получаем рекомендации
+        val recommendations = getExpenseOptimizationRecommendations.invoke(transactions, predictedExpenses)
+
+        // Преобразуем в список строк
+        return recommendations.map { it.suggestion }
+    }
 
     /**
      * Получение категории по ID.

@@ -306,6 +306,8 @@
   <string name="insight_small_expenses_desc">Анализ мелких повседневных трат</string>
   <!-- Используются plurals: insight_small_expenses_metric -->
   <string name="invalid_date">Неверная дата</string>
+  <string name="invalid_date_range">Неверный диапазон дат</string>
+  <string name="select_date_range">Выберите диапазон дат</string>
   <string name="investment_tip_bonds">Рассмотрите облигации для стабильного дохода: корпоративные с доходностью 14-16% от надежных эмитентов.</string>
   <string name="investment_tip_business">Вложите в реальный бизнес через доли или займы для высокого дохода при умеренных рисках.</string>
   <string name="investment_tip_diversification">Диверсифицируйте портфель, избегая высоких рисков и кредитного плеча.</string>
@@ -383,16 +385,17 @@
   <string name="optimize_category_impact">Проанализируйте каждую трату в этой категории</string>
   <string name="optimize_category_title">Оптимизируйте расходы в категории %s</string>
   <string name="path_copied">Путь скопирован</string>
-  <string name="period_all_time">За все время</string>
+  <string name="period_all_time">За всё время</string>
+  <string name="period_select_custom">Выбрать свой период</string>
   <string name="period_custom">%1$s - %1$s</string>
-  <string name="period_day">%1$s</string>
+  <string name="period_day">%1$s (%2$s)</string>
   <string name="period_duration_description">Установите продолжительность периода в днях</string>
-  <string name="period_month">%1$s - %1$s</string>
-  <string name="period_quarter">Квартал</string>
+  <string name="period_month">%1$s</string>
+  <string name="period_quarter">%1$s квартал %2$d</string>
   <string name="period_settings">Настройки периода</string>
   <string name="period_settings_title">Настройки периода</string>
   <string name="period_week">%1$s - %1$s</string>
-  <string name="period_year">%1$s - %1$s</string>
+  <string name="period_year">%1$d год</string>
   <string name="permission_rationale">Для работы приложения необходимо разрешение.</string>
   <string name="permission_required">Требуется разрешение</string>
   <string name="permission_settings_rationale">Для работы приложения необходимо разрешение. Перейдите в настройки.</string>
