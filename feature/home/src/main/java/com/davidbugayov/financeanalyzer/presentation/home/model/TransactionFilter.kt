@@ -7,7 +7,5 @@ enum class TransactionFilter {
     TODAY,
     WEEK,
     MONTH,
-    QUARTER,
-    YEAR,
     ALL,
 }

@@ -921,8 +921,6 @@
     <string name="transactions_month">Transactions per month</string>
     <string name="transactions_today">Transactions for today</string>
     <string name="transactions_week">Transactions per week</string>
-    <string name="transactions_quarter">Transactions per quarter</string>
-    <string name="transactions_year">Transactions per year</string>
     <string name="welcome_subtitle">Study the possibilities of the application</string>
     <string name="welcome_title">🚀 Welcome!</string>
     <string name="onboarding_welcome_subtitle">Your personal assistant for financial management</string>

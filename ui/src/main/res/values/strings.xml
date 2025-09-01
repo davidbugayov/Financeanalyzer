@@ -922,8 +922,6 @@
   <string name="transactions_month">Транзакции за месяц</string>
   <string name="transactions_today">Транзакции за сегодня</string>
   <string name="transactions_week">Транзакции за неделю</string>
-  <string name="transactions_quarter">Транзакции за квартал</string>
-  <string name="transactions_year">Транзакции за год</string>
   <string name="welcome_subtitle">Изучите возможности приложения</string>
   <string name="welcome_title">🚀 Добро пожаловать!</string>
   <string name="onboarding_welcome_subtitle">Ваш личный помощник для управления финансами</string>

@@ -689,18 +689,6 @@ private fun periodTitleForFilter(
                 "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)}) • $transactionText"
             } ?: "${stringResource(UiR.string.filter_month)} • $transactionText"
         }
-        TransactionFilter.QUARTER -> {
-            startDate?.let {
-                val quarterFormat = java.text.SimpleDateFormat("MMMM yyyy", ruLocale)
-                "${stringResource(UiR.string.filter_quarter)} (${quarterFormat.format(it)}) • $transactionText"
-            } ?: "${stringResource(UiR.string.filter_quarter)} • $transactionText"
-        }
-        TransactionFilter.YEAR -> {
-            startDate?.let {
-                val yearFormat = java.text.SimpleDateFormat("yyyy", ruLocale)
-                "${stringResource(UiR.string.filter_year)} (${yearFormat.format(it)}) • $transactionText"
-            } ?: "${stringResource(UiR.string.filter_year)} • $transactionText"
-        }
         TransactionFilter.ALL -> "${stringResource(UiR.string.all_time)} • $transactionText"
     }
 }

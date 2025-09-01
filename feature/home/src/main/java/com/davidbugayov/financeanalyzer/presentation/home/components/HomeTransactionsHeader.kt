@@ -80,7 +80,5 @@ private fun headerTitleForFilter(filter: TransactionFilter): String =
         TransactionFilter.TODAY -> stringResource(UiR.string.transactions_today)
         TransactionFilter.WEEK -> stringResource(UiR.string.transactions_week)
         TransactionFilter.MONTH -> stringResource(UiR.string.transactions_month)
-        TransactionFilter.QUARTER -> stringResource(UiR.string.transactions_quarter)
-        TransactionFilter.YEAR -> stringResource(UiR.string.transactions_year)
         TransactionFilter.ALL -> stringResource(UiR.string.transactions_all)
     }
