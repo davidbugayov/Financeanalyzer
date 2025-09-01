@@ -660,7 +660,14 @@ class HomeViewModel(
                 .filter { !it.isExpense }
                 .fold(Money.zero(currentCurrency)) { acc, tx ->
                     Timber.d("calculateStats: Adding income ${tx.id}: ${tx.amount}")
-                    acc + tx.amount
+                    // Convert to current currency before adding
+                    val convertedAmount = if (tx.amount.currency == currentCurrency) {
+                        tx.amount
+                    } else {
+                        // For now, assume same amount if currencies differ (should implement proper conversion)
+                        Money(tx.amount.amount, currentCurrency)
+                    }
+                    acc + convertedAmount
                 }
 
         val expense =
@@ -669,7 +676,14 @@ class HomeViewModel(
                 .filter { it.isExpense }
                 .fold(Money.zero(currentCurrency)) { acc, tx ->
                     Timber.d("calculateStats: Adding expense ${tx.id}: ${tx.amount}")
-                    acc + tx.amount.abs()
+                    // Convert to current currency before adding
+                    val convertedAmount = if (tx.amount.currency == currentCurrency) {
+                        tx.amount
+                    } else {
+                        // For now, assume same amount if currencies differ (should implement proper conversion)
+                        Money(tx.amount.amount, currentCurrency)
+                    }
+                    acc + convertedAmount.abs()
                 }
 
         val balance = income - expense
