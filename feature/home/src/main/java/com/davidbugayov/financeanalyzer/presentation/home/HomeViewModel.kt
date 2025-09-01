@@ -771,6 +771,8 @@ class HomeViewModel(
                 startCalendar.set(Calendar.MINUTE, 0)
                 startCalendar.set(Calendar.SECOND, 0)
                 startCalendar.set(Calendar.MILLISECOND, 0)
+                // Для MONTH фильтра устанавливаем endDate на конец месяца
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
             }
             TransactionFilter.ALL -> {
                 startCalendar.set(2000, 0, 1, 0, 0, 0)
@@ -779,6 +781,7 @@ class HomeViewModel(
         }
         val startDate = startCalendar.time
         Timber.d("HomeViewModel: Period dates calculated - start: $startDate, end: $endDate")
+        Timber.d("HomeViewModel: Filter $filter - calculated dates: start=$startDate, end=$endDate")
         return Pair(startDate, endDate)
     }
 }
