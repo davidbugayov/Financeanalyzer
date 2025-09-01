@@ -3,10 +3,12 @@
   <string name="no_transactions">没有交易</string>
   <string name="add_first_transaction_description">添加第一笔交易以开始跟踪您的财务</string>
   <string name="empty_state_icon">空状态图标</string>
-  <string name="filter_all">全部</string>
+  <string name="filter_all">全部时间</string>
   <string name="filter_today">今天</string>
   <string name="filter_week">周</string>
   <string name="filter_month">月</string>
+  <string name="filter_quarter">季度</string>
+  <string name="filter_year">年</string>
   <string name="show_incomes">显示收入</string>
   <string name="show_expenses">显示支出</string>
   <string name="and_more_categories">还有 %1$d 个类别</string>

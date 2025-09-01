@@ -926,6 +926,8 @@
     <string name="transactions_month">每月交易</string>
     <string name="transactions_today">今天的交易</string>
     <string name="transactions_week">每周交易</string>
+    <string name="transactions_quarter">每季度交易</string>
+    <string name="transactions_year">每年交易</string>
     <string name="welcome_subtitle">研究应用程序的可能性</string>
     <string name="welcome_title">🚀欢迎！</string>
     <string name="onboarding_welcome_subtitle" />
