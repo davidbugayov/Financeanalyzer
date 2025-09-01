@@ -728,12 +728,30 @@ class HomeViewModel(
             val income =
                 transactionsForDate
                     .filter { !it.isExpense }
-                    .fold(Money.zero(currentCurrency)) { acc, transaction -> acc + transaction.amount }
+                    .fold(Money.zero(currentCurrency)) { acc, transaction ->
+                        // Convert to current currency before adding
+                        val convertedAmount = if (transaction.amount.currency == currentCurrency) {
+                            transaction.amount
+                        } else {
+                            // For now, assume same amount if currencies differ (should implement proper conversion)
+                            Money(transaction.amount.amount, currentCurrency)
+                        }
+                        acc + convertedAmount
+                    }
 
             val expense =
                 transactionsForDate
                     .filter { it.isExpense }
-                    .fold(Money.zero(currentCurrency)) { acc, transaction -> acc + transaction.amount.abs() }
+                    .fold(Money.zero(currentCurrency)) { acc, transaction ->
+                        // Convert to current currency before adding
+                        val convertedAmount = if (transaction.amount.currency == currentCurrency) {
+                            transaction.amount
+                        } else {
+                            // For now, assume same amount if currencies differ (should implement proper conversion)
+                            Money(transaction.amount.amount, currentCurrency)
+                        }
+                        acc + convertedAmount.abs()
+                    }
 
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
