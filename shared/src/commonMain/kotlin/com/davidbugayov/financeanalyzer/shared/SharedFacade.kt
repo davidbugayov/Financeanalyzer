@@ -151,8 +151,12 @@ class SharedFacade {
 
     fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
         kotlinx.coroutines.flow.flow {
+            println("SharedFacade: Starting to load transactions for period $start to $end")
             val transactions = financeRepository.getTransactionsForPeriod(start, end)
             println("SharedFacade: Loaded ${transactions.size} transactions for period $start to $end")
+            transactions.forEach { tx ->
+                println("SharedFacade: Transaction ${tx.id}: date=${tx.date}, amount=${tx.amount}, category=${tx.category}")
+            }
             emit(transactions)
         }.catch { e ->
             // Handle exceptions and emit empty list

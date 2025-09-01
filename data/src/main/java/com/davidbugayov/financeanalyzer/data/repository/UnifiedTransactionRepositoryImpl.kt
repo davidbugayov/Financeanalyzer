@@ -99,8 +99,15 @@ class UnifiedTransactionRepositoryImpl(
      * Получает транзакции за указанный период.
      */
     override suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): List<Transaction> {
+        Timber.d("UnifiedTransactionRepositoryImpl: Executing DAO query for date range: $startDate to $endDate")
         val entities = transactionDao.getTransactionsByDateRange(startDate, endDate)
-        return entities.map { transactionMapper.mapFromEntity(it) }
+        Timber.d("UnifiedTransactionRepositoryImpl: DAO returned ${entities.size} entities")
+        entities.forEach { entity ->
+            Timber.d("UnifiedTransactionRepositoryImpl: Entity ${entity.id}: date=${entity.date}, amount=${entity.amount}")
+        }
+        val transactions = entities.map { transactionMapper.mapFromEntity(it) }
+        Timber.d("UnifiedTransactionRepositoryImpl: Mapped to ${transactions.size} domain transactions")
+        return transactions
     }
 
     /**
@@ -123,7 +130,16 @@ class UnifiedTransactionRepositoryImpl(
         val endJavaDate = endCalendar.time
 
         Timber.d("UnifiedTransactionRepositoryImpl: Querying transactions from $startJavaDate to $endJavaDate")
-        return getTransactionsByDateRange(startJavaDate, endJavaDate)
+        Timber.d("UnifiedTransactionRepositoryImpl: LocalDate start: $startDate -> Java start: $startJavaDate")
+        Timber.d("UnifiedTransactionRepositoryImpl: LocalDate end: $endDate -> Java end: $endJavaDate")
+
+        val result = getTransactionsByDateRange(startJavaDate, endJavaDate)
+        Timber.d("UnifiedTransactionRepositoryImpl: Found ${result.size} transactions in database")
+        result.forEach { tx ->
+            Timber.d("UnifiedTransactionRepositoryImpl: Transaction ${tx.id}: date=${tx.date}, amount=${tx.amount}")
+        }
+
+        return result
     }
 
     /**
