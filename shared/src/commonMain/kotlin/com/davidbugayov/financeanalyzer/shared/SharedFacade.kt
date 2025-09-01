@@ -152,8 +152,22 @@ class SharedFacade {
     fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
         kotlinx.coroutines.flow.flow {
             println("SharedFacade: Starting to load transactions for period $start to $end")
-            val transactions = financeRepository.getTransactionsForPeriod(start, end)
-            println("SharedFacade: Loaded ${transactions.size} transactions for period $start to $end")
+            // Try FinanceRepository first, fallback to loadTransactions + filter
+            var transactions = financeRepository.getTransactionsForPeriod(start, end)
+            if (transactions.isEmpty()) {
+                println("SharedFacade: FinanceRepository returned empty, trying loadTransactions + filter")
+                try {
+                    val allTransactions = loadTransactions()
+                    transactions = allTransactions.filter { transaction ->
+                        val transactionDate = transaction.date
+                        transactionDate >= start && transactionDate <= end
+                    }
+                    println("SharedFacade: Filtered ${transactions.size} transactions from ${allTransactions.size} total")
+                } catch (e: Exception) {
+                    println("SharedFacade: loadTransactions also failed: ${e.message}")
+                }
+            }
+            println("SharedFacade: Final result - ${transactions.size} transactions for period $start to $end")
             transactions.forEach { tx ->
                 println("SharedFacade: Transaction ${tx.id}: date=${tx.date}, amount=${tx.amount}, category=${tx.category}")
             }
