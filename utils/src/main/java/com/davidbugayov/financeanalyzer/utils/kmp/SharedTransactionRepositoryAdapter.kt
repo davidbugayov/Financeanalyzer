@@ -13,6 +13,24 @@ class SharedTransactionRepositoryAdapter(
 
     override fun observeTransactions(): Flow<List<SharedTransaction>> = unifiedRepo.getAll().map { it.toShared() }
 
+    override suspend fun getTransactionsForPeriod(
+        startDate: kotlinx.datetime.LocalDate,
+        endDate: kotlinx.datetime.LocalDate
+    ): List<SharedTransaction> = unifiedRepo.getTransactionsByDateRange(startDate, endDate).toShared()
+
+    override suspend fun getTransactionById(id: String): com.davidbugayov.financeanalyzer.shared.model.Transaction? =
+        unifiedRepo.getTransactionById(id)?.toShared()
+
+    override suspend fun getTransactionsByCategory(categoryId: String): List<SharedTransaction> {
+        // Для простоты возвращаем пустой список - можно реализовать позже
+        return emptyList()
+    }
+
+    override suspend fun getTransactionsByType(isExpense: Boolean): List<SharedTransaction> {
+        // Для простоты возвращаем пустой список - можно реализовать позже
+        return emptyList()
+    }
+
     override suspend fun addTransaction(transaction: SharedTransaction) {
         unifiedRepo.add(transaction.toDomain())
     }
@@ -23,5 +41,9 @@ class SharedTransactionRepositoryAdapter(
 
     override suspend fun deleteTransaction(id: String) {
         unifiedRepo.delete(id)
+    }
+
+    override suspend fun clearAllTransactions() {
+        // Для простоты - можно реализовать позже
     }
 }

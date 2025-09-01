@@ -7,6 +7,7 @@ interface AchievementsRepository {
     fun getAllAchievements(): Flow<List<Achievement>>
     fun getAchievementById(id: String): Flow<Achievement?>
     suspend fun updateAchievement(achievement: Achievement)
+    suspend fun clearAllAchievements()
 }
 
 

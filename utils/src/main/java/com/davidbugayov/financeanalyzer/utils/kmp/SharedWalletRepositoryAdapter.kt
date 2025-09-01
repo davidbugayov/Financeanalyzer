@@ -13,8 +13,37 @@ class SharedWalletRepositoryAdapter(
 ) : SharedWalletRepository {
     override suspend fun getAllWallets(): List<SharedWallet> = domainRepo.getAllWallets().map { it.toShared() }
 
+    override suspend fun getWalletById(id: String): SharedWallet? = domainRepo.getWalletById(id)?.toShared()
+
+    override suspend fun createWallet(wallet: SharedWallet): String {
+        domainRepo.addWallet(wallet.toDomain())
+        return wallet.id
+    }
+
     override suspend fun updateWallet(wallet: SharedWallet) {
         domainRepo.updateWallet(wallet.toDomain())
+    }
+
+    override suspend fun deleteWallet(id: String) {
+        domainRepo.deleteWalletById(id)
+    }
+
+    override suspend fun getWalletsByType(type: com.davidbugayov.financeanalyzer.shared.model.WalletType): List<SharedWallet> {
+        // Для простоты возвращаем все кошельки - можно реализовать фильтрацию позже
+        return getAllWallets()
+    }
+
+    override suspend fun updateWalletBalance(walletId: String, newBalance: com.davidbugayov.financeanalyzer.shared.model.Money) {
+        // Обновляем баланс кошелька через updateWallet
+        val existingWallet = domainRepo.getWalletById(walletId)
+        if (existingWallet != null) {
+            val updatedWallet = existingWallet.copy(balance = newBalance)
+            domainRepo.updateWallet(updatedWallet)
+        }
+    }
+
+    override suspend fun clearAllWallets() {
+        domainRepo.deleteAllWallets()
     }
 }
 

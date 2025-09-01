@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.shared.model.Transaction
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepository
 import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepositoryFactory
+import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepositoryAdapter
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseDisciplineIndexUseCase
@@ -62,7 +63,7 @@ class SharedFacade {
         this.getExpenseOptimizationRecommendations = GetExpenseOptimizationRecommendationsUseCase()
     }
 
-    // Legacy constructor for backward compatibility
+    // Constructor that creates FinanceRepository from provided repositories
     constructor(
         transactionRepository: com.davidbugayov.financeanalyzer.shared.repository.TransactionRepository? = null,
         walletRepository: com.davidbugayov.financeanalyzer.shared.repository.WalletRepository? = null,
@@ -70,7 +71,12 @@ class SharedFacade {
         achievementsRepository: com.davidbugayov.financeanalyzer.shared.repository.AchievementsRepository? = null,
         appScope: kotlinx.coroutines.CoroutineScope? = null
     ) : this(
-        financeRepository = FinanceRepositoryFactory.create(),
+        financeRepository = FinanceRepositoryAdapter(
+            transactionRepository,
+            walletRepository,
+            subcategoryRepository,
+            achievementsRepository
+        ),
         appScope = appScope
     )
 
@@ -151,30 +157,22 @@ class SharedFacade {
 
     fun transactionsForPeriodFlow(start: LocalDate, end: LocalDate): kotlinx.coroutines.flow.Flow<List<Transaction>> =
         kotlinx.coroutines.flow.flow {
-            println("SharedFacade: Starting to load transactions for period $start to $end")
             // Try FinanceRepository first, fallback to loadTransactions + filter
             var transactions = financeRepository.getTransactionsForPeriod(start, end)
             if (transactions.isEmpty()) {
-                println("SharedFacade: FinanceRepository returned empty, trying loadTransactions + filter")
                 try {
                     val allTransactions = loadTransactions()
                     transactions = allTransactions.filter { transaction ->
                         val transactionDate = transaction.date
                         transactionDate >= start && transactionDate <= end
                     }
-                    println("SharedFacade: Filtered ${transactions.size} transactions from ${allTransactions.size} total")
                 } catch (e: Exception) {
-                    println("SharedFacade: loadTransactions also failed: ${e.message}")
+                    // Handle exceptions and emit empty list
                 }
-            }
-            println("SharedFacade: Final result - ${transactions.size} transactions for period $start to $end")
-            transactions.forEach { tx ->
-                println("SharedFacade: Transaction ${tx.id}: date=${tx.date}, amount=${tx.amount}, category=${tx.category}")
             }
             emit(transactions)
         }.catch { e ->
             // Handle exceptions and emit empty list
-            println("SharedFacade: Error loading transactions: ${e.message}")
             emit(emptyList())
         }
 

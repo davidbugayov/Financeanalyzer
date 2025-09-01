@@ -23,6 +23,10 @@ class SharedAchievementsRepositoryAdapter(
     override suspend fun updateAchievement(achievement: SharedAchievement) {
         domainRepo.updateAchievement(achievement.toDomain())
     }
+
+    override suspend fun clearAllAchievements() {
+        // Not implemented - can be added later if needed
+    }
 }
 
 private fun DomainAchievement.toShared(): SharedAchievement =
