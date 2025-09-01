@@ -22,7 +22,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.IncomeChartPalette
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
-import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -127,6 +126,11 @@ class EnhancedFinanceChartViewModel :
                 )
             val filteredTransactions = flow.first()
             Timber.d("EnhancedFinanceChartViewModel: Loaded ${filteredTransactions.size} transactions for analytics")
+            Timber.d("EnhancedFinanceChartViewModel: Sample transactions: ${filteredTransactions.take(3).map { "id=${it.id}, amount=${it.amount}, date=${it.date}, category=${it.category}" }}")
+
+            if (filteredTransactions.isEmpty()) {
+                Timber.w("EnhancedFinanceChartViewModel: No transactions loaded - this will cause 'no data' message")
+            }
             allTransactions = filteredTransactions
 
             val currentCurrency = CurrencyProvider.getCurrency()
@@ -184,7 +188,11 @@ class EnhancedFinanceChartViewModel :
             // --- Новое: подготовка данных для PieChart ---
             val showExpenses = _state.value.showExpenses
             val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
+            Timber.d("EnhancedFinanceChartViewModel: Preparing pie chart data for ${if (showExpenses) "expenses" else "income"}")
+            Timber.d("EnhancedFinanceChartViewModel: Category data size: ${categoryData.size}")
             val pieChartData = preparePieChartData(categoryData, showExpenses)
+            Timber.d("EnhancedFinanceChartViewModel: Pie chart data size: ${pieChartData.size}")
+            Timber.d("EnhancedFinanceChartViewModel: Pie chart data sample: ${pieChartData.take(2).map { "name=${it.name}, money=${it.money}" }}")
 
             // --- Новое: получаем рекомендации ---
             val financialMetrics = calculateEnhancedFinancialMetricsUseCase.invoke(filteredTransactions)
@@ -259,6 +267,9 @@ class EnhancedFinanceChartViewModel :
         data: Map<String, com.davidbugayov.financeanalyzer.shared.model.Money>,
         showExpenses: Boolean,
     ): List<UiCategory> {
+        Timber.d("preparePieChartData: Input data size: ${data.size}")
+        Timber.d("preparePieChartData: Input data sample: ${data.entries.take(3).map { "${it.key}=${it.value.amount}" }}")
+
         val filteredData =
             if (showExpenses) {
                 data.filter { it.value.amount != 0.0 }
@@ -266,6 +277,9 @@ class EnhancedFinanceChartViewModel :
                 // Для доходов фильтруем только положительные суммы
                 data.filter { it.value.amount > 0.0 }
             }
+
+        Timber.d("preparePieChartData: Filtered data size: ${filteredData.size}")
+        Timber.d("preparePieChartData: Filtered data sample: ${filteredData.entries.take(3).map { "${it.key}=${it.value.amount}" }}")
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val palette = if (showExpenses) ExpenseChartPalette else IncomeChartPalette
         val pieChartDataList =
