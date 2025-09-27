@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
 import androidx.compose.foundation.layout.Arrangement
-import kotlin.math.abs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,14 +15,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,15 +31,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.paging.transactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Currency
+import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import kotlin.math.abs
 import timber.log.Timber
-import java.math.BigDecimal
 
 /**
  * Компактный макет для телефонов
@@ -222,19 +216,22 @@ fun CompactLayout(
         )
 
         // Извлекаем реальные транзакции из pagingItems для определения пустого состояния
-        val realTransactionsCount = (0 until pagingItems.itemCount).count { index ->
-            val item = pagingItems[index]
-            item is com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem.Item
-        }
+        val realTransactionsCount =
+            (0 until pagingItems.itemCount).count { index ->
+                val item = pagingItems[index]
+                item is TransactionListItem.Item
+            }
 
         // Определяем, показывать ли пустое состояние
-        val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
+        val isLoading = pagingItems.loadState.refresh is LoadState.Loading
         val isEmptyState = realTransactionsCount == 0 && !isLoading
 
-        Timber.d("CompactLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
+        Timber.d(
+            "CompactLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading",
+        )
 
         // Используем ключ для оптимизации перерисовки
-        val contentKey = "${state.currentFilter}_${isEmptyState}_${realTransactionsCount}"
+        val contentKey = "${state.currentFilter}_${isEmptyState}_$realTransactionsCount"
 
         if (isEmptyState) {
             Timber.d("CompactLayout: Showing CompactEmptyState")
@@ -242,23 +239,27 @@ fun CompactLayout(
         } else {
             Timber.d("CompactLayout: Showing transaction list")
             val context = LocalContext.current
-            val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+            remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
 
             val headerContent: (@Composable () -> Unit)? =
                 if (showGroupSummary) {
-                        {
-                            // Извлекаем транзакции из pagingItems для гарантированно актуальных данных
-                            val transactionsFromPaging = (0 until pagingItems.itemCount).mapNotNull { index ->
+                    {
+                        // Извлекаем транзакции из pagingItems для гарантированно актуальных данных
+                        val transactionsFromPaging =
+                            (0 until pagingItems.itemCount).mapNotNull { index ->
                                 val item = pagingItems[index]
                                 when (item) {
-                                    is com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem.Item -> item.transaction
+                                    is TransactionListItem.Item -> item.transaction
                                     else -> null
                                 }
                             }
 
-                            Timber.d("CompactLayout: Extracted ${transactionsFromPaging.size} transactions from pagingItems (total items: ${pagingItems.itemCount})")
+                        Timber.d(
+                            "CompactLayout: Extracted ${transactionsFromPaging.size} transactions from pagingItems (total items: ${pagingItems.itemCount})",
+                        )
 
-                            val transactionsToUse = if (transactionsFromPaging.isNotEmpty()) {
+                        val transactionsToUse =
+                            if (transactionsFromPaging.isNotEmpty()) {
                                 Timber.d("CompactLayout: Using transactions from pagingItems")
                                 transactionsFromPaging
                             } else {
@@ -266,17 +267,21 @@ fun CompactLayout(
                                 state.filteredTransactions
                             }
 
-                                                    // Рассчитываем актуальные суммы на основе реальных транзакций
-                        val actualIncome = transactionsToUse
-                            .filter { !it.isExpense }
-                            .sumOf { it.amount.amount.toDouble() }
-                        val actualExpense = transactionsToUse
-                            .filter { it.isExpense }
-                            .sumOf { abs(it.amount.amount) }
+                        // Рассчитываем актуальные суммы на основе реальных транзакций
+                        val actualIncome =
+                            transactionsToUse
+                                .filter { !it.isExpense }
+                                .sumOf { it.amount.amount.toDouble() }
+                        val actualExpense =
+                            transactionsToUse
+                                .filter { it.isExpense }
+                                .sumOf { abs(it.amount.amount) }
                         val actualBalance = actualIncome - actualExpense
                         val currency = transactionsToUse.firstOrNull()?.amount?.currency ?: Currency.USD
 
-                        Timber.d("CompactLayout: Creating HomeGroupSummary with calculated data - transactions: ${transactionsToUse.size}, income: $actualIncome, expense: $actualExpense, balance: $actualBalance")
+                        Timber.d(
+                            "CompactLayout: Creating HomeGroupSummary with calculated data - transactions: ${transactionsToUse.size}, income: $actualIncome, expense: $actualExpense, balance: $actualBalance",
+                        )
                         Timber.d("CompactLayout: Transaction IDs being passed: ${transactionsToUse.map { it.id }}")
 
                         HomeGroupSummary(
@@ -287,12 +292,12 @@ fun CompactLayout(
                             balance = Money(actualBalance, currency),
                             periodStartDate = state.periodStartDate,
                             periodEndDate = state.periodEndDate,
-                            isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
+                            isLoading = pagingItems.loadState.refresh is LoadState.Loading,
                         )
-                        }
-                    } else {
-                        null
                     }
+                } else {
+                    null
+                }
 
             // Оборачиваем в key для предотвращения полной перерисовки
             key(contentKey) {

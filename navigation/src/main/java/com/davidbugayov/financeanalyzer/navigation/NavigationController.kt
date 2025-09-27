@@ -9,9 +9,8 @@ import timber.log.Timber
  * with compile-time safety and better error handling.
  */
 class NavigationController(
-    private val navController: NavController
+    private val navController: NavController,
 ) {
-
     /**
      * Navigate to a screen
      */
@@ -31,7 +30,11 @@ class NavigationController(
     /**
      * Navigate to a screen with popup to specific destination
      */
-    fun navigateTo(screen: Screen, popupTo: Screen, inclusive: Boolean = false) {
+    fun navigateTo(
+        screen: Screen,
+        popupTo: Screen,
+        inclusive: Boolean = false,
+    ) {
         try {
             navController.navigate(screen.route) {
                 popUpTo(popupTo.route) {
@@ -61,7 +64,10 @@ class NavigationController(
     /**
      * Navigate back to specific screen
      */
-    fun navigateBackTo(screen: Screen, inclusive: Boolean = false) {
+    fun navigateBackTo(
+        screen: Screen,
+        inclusive: Boolean = false,
+    ) {
         try {
             navController.popBackStack(screen.route, inclusive)
             Timber.d("Navigated back to: ${screen.route}")
@@ -109,11 +115,9 @@ class NavigationController(
 
     fun navigateToAddTransaction() = navigateTo(Screen.AddTransaction)
 
-    fun navigateToEditTransaction(transactionId: Long) =
-        navigateTo(Screen.EditTransaction(transactionId))
+    fun navigateToEditTransaction(transactionId: Long) = navigateTo(Screen.EditTransaction(transactionId))
 
-    fun navigateToTransactionDetails(transactionId: Long) =
-        navigateTo(Screen.TransactionDetails(transactionId))
+    fun navigateToTransactionDetails(transactionId: Long) = navigateTo(Screen.TransactionDetails(transactionId))
 
     fun navigateToCategories() = navigateTo(Screen.Categories)
 
@@ -135,7 +139,7 @@ class NavigationController(
 
     fun navigateToAndComplete(
         screen: Screen,
-        onComplete: () -> Unit
+        onComplete: () -> Unit,
     ) {
         navigateTo(screen)
         onComplete()
@@ -154,7 +158,10 @@ class NavigationController(
         }
     }
 
-    fun navigateToIf(condition: Boolean, screen: Screen) {
+    fun navigateToIf(
+        condition: Boolean,
+        screen: Screen,
+    ) {
         if (condition) {
             navigateTo(screen)
         }
@@ -185,26 +192,39 @@ fun NavController.toNavigationController(): NavigationController {
  * DSL for navigation actions
  */
 class NavigationActions(private val controller: NavigationController) {
-
     fun home() = controller.navigateToHome()
+
     fun statistics() = controller.navigateToStatistics()
+
     fun profile() = controller.navigateToProfile()
+
     fun settings() = controller.navigateToSettings()
 
     fun addTransaction() = controller.navigateToAddTransaction()
+
     fun editTransaction(id: Long) = controller.navigateToEditTransaction(id)
+
     fun transactionDetails(id: Long) = controller.navigateToTransactionDetails(id)
 
     fun categories() = controller.navigateToCategories()
+
     fun wallets() = controller.navigateToWallets()
+
     fun history() = controller.navigateToTransactionHistory()
+
     fun achievements() = controller.navigateToAchievements()
+
     fun budget() = controller.navigateToBudget()
 
     fun back() = controller.navigateBack()
-    fun backTo(screen: Screen, inclusive: Boolean = false) = controller.navigateBackTo(screen, inclusive)
+
+    fun backTo(
+        screen: Screen,
+        inclusive: Boolean = false,
+    ) = controller.navigateBackTo(screen, inclusive)
 
     fun canGoBack() = controller.canNavigateBack()
+
     fun currentScreen() = controller.getCurrentScreen()
 }
 
@@ -220,7 +240,9 @@ fun NavigationController.actions(): NavigationActions {
  */
 sealed class NavigationResult {
     object Success : NavigationResult()
+
     data class Error(val message: String) : NavigationResult()
+
     object Cancelled : NavigationResult()
 }
 
@@ -229,24 +251,37 @@ sealed class NavigationResult {
  */
 class NavigationMiddleware(
     private val analyticsTracker: com.davidbugayov.financeanalyzer.core.middleware.AnalyticsMiddleware,
-    private val logger: com.davidbugayov.financeanalyzer.core.middleware.LoggerMiddleware
+    private val logger: com.davidbugayov.financeanalyzer.core.middleware.LoggerMiddleware,
 ) {
 
-    fun onNavigateTo(screen: Screen, fromScreen: Screen?) {
+    fun onNavigateTo(
+        screen: Screen,
+        fromScreen: Screen?,
+    ) {
         logger.i("Navigation: ${fromScreen?.route ?: "unknown"} -> ${screen.route}")
         analyticsTracker.trackScreenView(
             screenName = Screen.getDisplayName(screen),
-            screenClass = screen::class.simpleName
+            screenClass = screen::class.simpleName,
         )
     }
 
-    fun onNavigateBack(fromScreen: Screen?, toScreen: Screen?) {
+    fun onNavigateBack(
+        fromScreen: Screen?,
+        toScreen: Screen?,
+    ) {
         logger.i("Navigation back: ${fromScreen?.route ?: "unknown"} <- ${toScreen?.route ?: "unknown"}")
     }
 
-    fun onNavigationError(error: Exception, attemptedScreen: Screen?) {
-        logger.logError(error, "Navigation", mapOf(
-            "attempted_screen" to (attemptedScreen?.route ?: "unknown")
-        ))
+    fun onNavigationError(
+        error: Exception,
+        attemptedScreen: Screen?,
+    ) {
+        logger.logError(
+            error,
+            "Navigation",
+            mapOf(
+                "attempted_screen" to (attemptedScreen?.route ?: "unknown"),
+            ),
+        )
     }
 }

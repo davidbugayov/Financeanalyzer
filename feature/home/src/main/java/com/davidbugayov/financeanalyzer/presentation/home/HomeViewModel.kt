@@ -81,14 +81,17 @@ class HomeViewModel(
                 val s = _state.value
                 val (startDate, endDate) = getPeriodDates(s.currentFilter)
                 val pageSize = 50
-                Timber.d("HomeViewModel: Loading transactions with filter: ${s.currentFilter}, period: ${startDate} - ${endDate}")
-                val result = if (s.currentFilter == TransactionFilter.ALL) {
-                    Timber.d("HomeViewModel: Using getAllPaged")
-                    repository.getAllPaged(pageSize)
-                } else {
-                    Timber.d("HomeViewModel: Using getByPeriodPaged with start=$startDate, end=$endDate")
-                    repository.getByPeriodPaged(startDate, endDate, pageSize)
-                }
+                Timber.d(
+                    "HomeViewModel: Loading transactions with filter: ${s.currentFilter}, period: $startDate - $endDate",
+                )
+                val result =
+                    if (s.currentFilter == TransactionFilter.ALL) {
+                        Timber.d("HomeViewModel: Using getAllPaged")
+                        repository.getAllPaged(pageSize)
+                    } else {
+                        Timber.d("HomeViewModel: Using getByPeriodPaged with start=$startDate, end=$endDate")
+                        repository.getByPeriodPaged(startDate, endDate, pageSize)
+                    }
                 Timber.d("HomeViewModel: Created paging flow")
                 result
             }.cachedIn(viewModelScope)
@@ -99,7 +102,9 @@ class HomeViewModel(
                 Timber.d("HomeViewModel: Processing paging data")
                 pagingData
                     .map { tx ->
-                        Timber.d("HomeViewModel: Processing transaction: ${tx.id}, amount: ${tx.amount}, category: ${tx.category}")
+                        Timber.d(
+                            "HomeViewModel: Processing transaction: ${tx.id}, amount: ${tx.amount}, category: ${tx.category}",
+                        )
                         TransactionListItem.Item(tx)
                     }
                     .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
@@ -182,20 +187,35 @@ class HomeViewModel(
                 viewModelScope.launch {
                     try {
                         // Получаем транзакции для нового периода
-                        Timber.d("HomeViewModel: Calling sharedFacade.transactionsForPeriodFlow with start=${startDate.toLocalDateKmp()}, end=${endDate.toLocalDateKmp()}")
-                        val flow = sharedFacade.transactionsForPeriodFlow(startDate.toLocalDateKmp(), endDate.toLocalDateKmp())
+                        Timber.d(
+                            "HomeViewModel: Calling sharedFacade.transactionsForPeriodFlow with start=${startDate.toLocalDateKmp()}, end=${endDate.toLocalDateKmp()}",
+                        )
+                        val flow =
+                            sharedFacade.transactionsForPeriodFlow(
+                                startDate.toLocalDateKmp(),
+                                endDate.toLocalDateKmp(),
+                            )
                         val transactions = (flow?.first() ?: emptyList()).map { it.toDomain() }
                         Timber.d("HomeViewModel: Got ${transactions.size} transactions from sharedFacade")
 
                         // Фильтруем транзакции по диапазону дат
-                        val filteredTransactions = transactions.filter { tx ->
-                            val t = tx.date
-                            val inRange = !t.before(startDate) && !t.after(endDate)
-                            inRange
-                        }
+                        val filteredTransactions =
+                            transactions.filter { tx ->
+                                val t = tx.date
+                                val inRange = !t.before(startDate) && !t.after(endDate)
+                                inRange
+                            }
 
-                        Timber.d("HomeViewModel: Filter ${event.filter} - loaded ${transactions.size} total, filtered ${filteredTransactions.size} transactions")
-                        Timber.d("HomeViewModel: Sample transactions: ${filteredTransactions.take(3).map { "${it.id}: ${it.amount} (${if (it.isExpense) "expense" else "income"})" }}")
+                        Timber.d(
+                            "HomeViewModel: Filter ${event.filter} - loaded ${transactions.size} total, filtered ${filteredTransactions.size} transactions",
+                        )
+                        Timber.d(
+                            "HomeViewModel: Sample transactions: ${
+                                filteredTransactions.take(
+                                    3,
+                                ).map { "${it.id}: ${it.amount} (${if (it.isExpense) "expense" else "income"})" }
+                            }",
+                        )
 
                         // Вычисляем статистику
                         val currentCurrency = CurrencyProvider.getCurrency()
@@ -204,12 +224,18 @@ class HomeViewModel(
                                 val income = financialMetrics.getTotalIncomeAsMoney()
                                 val expense = financialMetrics.getTotalExpenseAsMoney()
                                 val balance = financialMetrics.getCurrentBalance()
-                                Timber.d("HomeViewModel: ALL filter stats - Income: $income, Expense: $expense, Balance: $balance")
+                                Timber.d(
+                                    "HomeViewModel: ALL filter stats - Income: $income, Expense: $expense, Balance: $balance",
+                                )
                                 Triple(income, expense, balance)
                             } else {
-                                Timber.d("HomeViewModel: Calculating stats for ${event.filter} with ${filteredTransactions.size} transactions")
+                                Timber.d(
+                                    "HomeViewModel: Calculating stats for ${event.filter} with ${filteredTransactions.size} transactions",
+                                )
                                 val stats = calculateStats(filteredTransactions)
-                                Timber.d("HomeViewModel: ${event.filter} filter stats - Income: ${stats.first}, Expense: ${stats.second}, Balance: ${stats.third}")
+                                Timber.d(
+                                    "HomeViewModel: ${event.filter} filter stats - Income: ${stats.first}, Expense: ${stats.second}, Balance: ${stats.third}",
+                                )
                                 stats
                             }
 
@@ -217,7 +243,9 @@ class HomeViewModel(
 
                         // Обновляем состояние с новыми данными
                         _state.update {
-                            Timber.d("HomeViewModel: Updating state for filter ${event.filter} - transactions: ${filteredTransactions.size}, income: $filteredIncome, expense: $filteredExpense")
+                            Timber.d(
+                                "HomeViewModel: Updating state for filter ${event.filter} - transactions: ${filteredTransactions.size}, income: $filteredIncome, expense: $filteredExpense",
+                            )
                             it.copy(
                                 filteredTransactions = filteredTransactions,
                                 transactionGroups = transactionGroups,
@@ -232,7 +260,6 @@ class HomeViewModel(
 
                         // Обновляем виджеты
                         updateWidgetsUseCase()
-
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка при обновлении данных фильтра: ${e.message}")
                         _state.update { it.copy(error = e.message) }
@@ -518,18 +545,19 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 Timber.d("HomeViewModel: Creating test transaction")
-                val testTransaction = com.davidbugayov.financeanalyzer.domain.model.Transaction(
-                    id = "test_${System.currentTimeMillis()}",
-                    amount = Money.fromMajor(100.0, CurrencyProvider.getCurrency()),
-                    category = "Тестовая категория",
-                    isExpense = true,
-                    date = java.util.Date(),
-                    note = "Тестовая транзакция",
-                    source = "Наличные",
-                    sourceColor = 0xFF4CAF50.toInt(),
-                    categoryId = "",
-                    title = "Тест"
-                )
+                val testTransaction =
+                    Transaction(
+                        id = "test_${System.currentTimeMillis()}",
+                        amount = Money.fromMajor(100.0, CurrencyProvider.getCurrency()),
+                        category = "Тестовая категория",
+                        isExpense = true,
+                        date = java.util.Date(),
+                        note = "Тестовая транзакция",
+                        source = "Наличные",
+                        sourceColor = 0xFF4CAF50.toInt(),
+                        categoryId = "",
+                        title = "Тест",
+                    )
 
                 val result = sharedFacade.addTransaction(testTransaction.toShared())
                 if (result) {
@@ -661,12 +689,13 @@ class HomeViewModel(
                 .fold(Money.zero(currentCurrency)) { acc, tx ->
                     Timber.d("calculateStats: Adding income ${tx.id}: ${tx.amount}")
                     // Convert to current currency before adding
-                    val convertedAmount = if (tx.amount.currency == currentCurrency) {
-                        tx.amount
-                    } else {
-                        // For now, assume same amount if currencies differ (should implement proper conversion)
-                        Money(tx.amount.amount, currentCurrency)
-                    }
+                    val convertedAmount =
+                        if (tx.amount.currency == currentCurrency) {
+                            tx.amount
+                        } else {
+                            // For now, assume same amount if currencies differ (should implement proper conversion)
+                            Money(tx.amount.amount, currentCurrency)
+                        }
                     acc + convertedAmount
                 }
 
@@ -677,12 +706,13 @@ class HomeViewModel(
                 .fold(Money.zero(currentCurrency)) { acc, tx ->
                     Timber.d("calculateStats: Adding expense ${tx.id}: ${tx.amount}")
                     // Convert to current currency before adding
-                    val convertedAmount = if (tx.amount.currency == currentCurrency) {
-                        tx.amount
-                    } else {
-                        // For now, assume same amount if currencies differ (should implement proper conversion)
-                        Money(tx.amount.amount, currentCurrency)
-                    }
+                    val convertedAmount =
+                        if (tx.amount.currency == currentCurrency) {
+                            tx.amount
+                        } else {
+                            // For now, assume same amount if currencies differ (should implement proper conversion)
+                            Money(tx.amount.amount, currentCurrency)
+                        }
                     acc + convertedAmount.abs()
                 }
 
@@ -730,12 +760,13 @@ class HomeViewModel(
                     .filter { !it.isExpense }
                     .fold(Money.zero(currentCurrency)) { acc, transaction ->
                         // Convert to current currency before adding
-                        val convertedAmount = if (transaction.amount.currency == currentCurrency) {
-                            transaction.amount
-                        } else {
-                            // For now, assume same amount if currencies differ (should implement proper conversion)
-                            Money(transaction.amount.amount, currentCurrency)
-                        }
+                        val convertedAmount =
+                            if (transaction.amount.currency == currentCurrency) {
+                                transaction.amount
+                            } else {
+                                // For now, assume same amount if currencies differ (should implement proper conversion)
+                                Money(transaction.amount.amount, currentCurrency)
+                            }
                         acc + convertedAmount
                     }
 
@@ -744,12 +775,13 @@ class HomeViewModel(
                     .filter { it.isExpense }
                     .fold(Money.zero(currentCurrency)) { acc, transaction ->
                         // Convert to current currency before adding
-                        val convertedAmount = if (transaction.amount.currency == currentCurrency) {
-                            transaction.amount
-                        } else {
-                            // For now, assume same amount if currencies differ (should implement proper conversion)
-                            Money(transaction.amount.amount, currentCurrency)
-                        }
+                        val convertedAmount =
+                            if (transaction.amount.currency == currentCurrency) {
+                                transaction.amount
+                            } else {
+                                // For now, assume same amount if currencies differ (should implement proper conversion)
+                                Money(transaction.amount.amount, currentCurrency)
+                            }
                         acc + convertedAmount.abs()
                     }
 

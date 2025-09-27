@@ -5,12 +5,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +56,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryExpense
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryIncome
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextPrimary
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextSecondary
-import java.math.BigDecimal
 import timber.log.Timber
 
 /**
@@ -82,9 +79,13 @@ fun HomeGroupSummary(
     isLoading: Boolean = false,
 ) {
     androidx.compose.runtime.LaunchedEffect(filteredTransactions.size) {
-        Timber.d("HomeGroupSummary: Created/Updated with filteredTransactions.size=${filteredTransactions.size}, totalIncome=$totalIncome, totalExpense=$totalExpense, balance=$balance")
+        Timber.d(
+            "HomeGroupSummary: Created/Updated with filteredTransactions.size=${filteredTransactions.size}, totalIncome=$totalIncome, totalExpense=$totalExpense, balance=$balance",
+        )
         Timber.d("HomeGroupSummary: Transaction IDs: ${filteredTransactions.map { it.id }}")
-        Timber.d("HomeGroupSummary: Transaction details: ${filteredTransactions.map { "${it.id}: ${it.amount} (${if (it.isExpense) "expense" else "income"})" }}")
+        Timber.d(
+            "HomeGroupSummary: Transaction details: ${filteredTransactions.map { "${it.id}: ${it.amount} (${if (it.isExpense) "expense" else "income"})" }}",
+        )
     }
 
     val cardBg = LocalSummaryCardBackground.current
@@ -96,7 +97,14 @@ fun HomeGroupSummary(
 
     // Пересчитываем суммы строго по переданным filteredTransactions,
     // используя derivedStateOf для реактивности
-    val transactionDataKey = if (filteredTransactions.isEmpty()) "empty" else filteredTransactions.joinToString { "${it.id}:${it.amount}" }
+    val transactionDataKey =
+        if (filteredTransactions.isEmpty()) {
+            "empty"
+        } else {
+            filteredTransactions.joinToString {
+                "${it.id}:${it.amount}"
+            }
+        }
 
     // Используем переданные значения, если они корректны, иначе рассчитываем
     val useCalculatedValues = totalIncome.amount == 0.0 && totalExpense.amount == 0.0 && filteredTransactions.isNotEmpty()
@@ -127,15 +135,18 @@ fun HomeGroupSummary(
         }
     }
 
-    val calculatedBalance = if (useCalculatedValues) {
-        computedIncome.minus(computedExpense)
-    } else {
-        balance ?: computedIncome.minus(computedExpense)
-    }
+    val calculatedBalance =
+        if (useCalculatedValues) {
+            computedIncome.minus(computedExpense)
+        } else {
+            balance ?: computedIncome.minus(computedExpense)
+        }
 
     val balanceColor = if (calculatedBalance.amount >= 0.0) incomeColor else expenseColor
 
-    Timber.d("HomeGroupSummary: Using calculated values: $useCalculatedValues, Income: $computedIncome, Expense: $computedExpense, Balance: $calculatedBalance")
+    Timber.d(
+        "HomeGroupSummary: Using calculated values: $useCalculatedValues, Income: $computedIncome, Expense: $computedExpense, Balance: $calculatedBalance",
+    )
     Timber.d("HomeGroupSummary: Transaction count: ${filteredTransactions.size}")
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
     var showExpenses by rememberSaveable { mutableStateOf(true) }
@@ -156,12 +167,13 @@ fun HomeGroupSummary(
                                 Money.zero(totalIncome.currency),
                             ) { acc, transaction ->
                                 // Convert to current currency before adding
-                                val convertedAmount = if (transaction.amount.currency == totalIncome.currency) {
-                                    transaction.amount
-                                } else {
-                                    // For now, assume same amount if currencies differ (should implement proper conversion)
-                                    Money(transaction.amount.amount, totalIncome.currency)
-                                }
+                                val convertedAmount =
+                                    if (transaction.amount.currency == totalIncome.currency) {
+                                        transaction.amount
+                                    } else {
+                                        // For now, assume same amount if currencies differ (should implement proper conversion)
+                                        Money(transaction.amount.amount, totalIncome.currency)
+                                    }
                                 acc + convertedAmount
                             },
                         isExpense = showExpenses,
@@ -172,7 +184,7 @@ fun HomeGroupSummary(
     AnimatedVisibility(
         visible = true,
         enter = fadeIn(animationSpec = tween(durationMillis = 300)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 200))
+        exit = fadeOut(animationSpec = tween(durationMillis = 200)),
     ) {
         Card(
             modifier =
@@ -187,68 +199,69 @@ fun HomeGroupSummary(
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
                 ),
         ) {
-        Column(
-            modifier = Modifier.padding(6.dp),
-        ) {
-            SummaryHeader(periodTitle, textPrimary)
-            if (isLoading) {
-                // Показываем индикатор загрузки вместо данных
-                androidx.compose.foundation.layout.Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
-                    contentAlignment = androidx.compose.ui.Alignment.Center,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(32.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            } else {
-                SummaryTotals(
-                    computedIncome,
-                    computedExpense,
-                    calculatedBalance,
-                    incomeColor,
-                    expenseColor,
-                    balanceColor,
-                    textSecondary,
-                    currentFilter,
-                    periodStartDate,
-                    periodEndDate,
-                )
-            }
-            HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), color = dividerColor)
-            SummaryCategorySwitcher(
-                showExpenses,
-                onSwitch = { showExpenses = !showExpenses },
-                textSecondary = textSecondary,
-            )
-            val visibleCount =
-                if (showAllGroups) {
-                    categoryGroups.size
+            Column(
+                modifier = Modifier.padding(6.dp),
+            ) {
+                SummaryHeader(periodTitle, textPrimary)
+                if (isLoading) {
+                    // Показываем индикатор загрузки вместо данных
+                    androidx.compose.foundation.layout.Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(120.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 } else {
-                    minOf(
-                        5,
-                        categoryGroups.size,
+                    SummaryTotals(
+                        computedIncome,
+                        computedExpense,
+                        calculatedBalance,
+                        incomeColor,
+                        expenseColor,
+                        balanceColor,
+                        textSecondary,
+                        currentFilter,
+                        periodStartDate,
+                        periodEndDate,
                     )
                 }
-            val visibleCategories = categoryGroups.take(visibleCount)
-            SummaryCategoryList(
-                visibleCategories = visibleCategories,
-                incomeColor = incomeColor,
-                expenseColor = expenseColor,
-                textSecondary = textSecondary,
-            )
-            if (visibleCategories.isEmpty()) {
-                SummaryEmptyState(showExpenses, textSecondary)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 2.dp), color = dividerColor)
+                SummaryCategorySwitcher(
+                    showExpenses,
+                    onSwitch = { showExpenses = !showExpenses },
+                    textSecondary = textSecondary,
+                )
+                val visibleCount =
+                    if (showAllGroups) {
+                        categoryGroups.size
+                    } else {
+                        minOf(
+                            5,
+                            categoryGroups.size,
+                        )
+                    }
+                val visibleCategories = categoryGroups.take(visibleCount)
+                SummaryCategoryList(
+                    visibleCategories = visibleCategories,
+                    incomeColor = incomeColor,
+                    expenseColor = expenseColor,
+                    textSecondary = textSecondary,
+                )
+                if (visibleCategories.isEmpty()) {
+                    SummaryEmptyState(showExpenses, textSecondary)
+                }
+                if (categoryGroups.size > 5 && !showAllGroups) {
+                    SummaryShowMoreButton(categoryGroups.size - 5, textSecondary) { showAllGroups = true }
+                } else if (showAllGroups && categoryGroups.size > 5) {
+                    SummaryHideButton(textSecondary) { showAllGroups = false }
+                }
             }
-            if (categoryGroups.size > 5 && !showAllGroups) {
-                SummaryShowMoreButton(categoryGroups.size - 5, textSecondary) { showAllGroups = true }
-            } else if (showAllGroups && categoryGroups.size > 5) {
-                SummaryHideButton(textSecondary) { showAllGroups = false }
-            }
-        }
         }
     }
 }
@@ -314,19 +327,19 @@ private fun SummaryTotals(
     val animatedIncome by animateFloatAsState(
         targetValue = totalIncome.amount.toFloat(),
         animationSpec = tween(durationMillis = 400),
-        label = "income_animation"
+        label = "income_animation",
     )
 
     val animatedExpense by animateFloatAsState(
         targetValue = totalExpense.amount.toFloat(),
         animationSpec = tween(durationMillis = 400),
-        label = "expense_animation"
+        label = "expense_animation",
     )
 
     val animatedBalance by animateFloatAsState(
         targetValue = balance.amount.toFloat(),
         animationSpec = tween(durationMillis = 400),
-        label = "balance_animation"
+        label = "balance_animation",
     )
 
     Column(
@@ -373,7 +386,11 @@ private fun SummaryTotals(
                     )
                 }
                 Text(
-                    text = "+${kotlin.math.abs(animatedIncome.toDouble()).let { Money(it, totalIncome.currency).formatForDisplay(showCurrency = false) }}",
+                    text = "+${
+                        kotlin.math.abs(
+                            animatedIncome.toDouble(),
+                        ).let { Money(it, totalIncome.currency).formatForDisplay(showCurrency = false) }
+                    }",
                     fontSize = 16.sp,
                     color = incomeColor,
                     fontWeight = FontWeight.ExtraBold,
@@ -413,7 +430,11 @@ private fun SummaryTotals(
                     )
                 }
                 Text(
-                    text = "-${kotlin.math.abs(animatedExpense.toDouble()).let { Money(it, totalExpense.currency).formatForDisplay(showCurrency = false) }}",
+                    text = "-${
+                        kotlin.math.abs(
+                            animatedExpense.toDouble(),
+                        ).let { Money(it, totalExpense.currency).formatForDisplay(showCurrency = false) }
+                    }",
                     fontSize = 16.sp,
                     color = expenseColor,
                     fontWeight = FontWeight.ExtraBold,
@@ -446,9 +467,19 @@ private fun SummaryTotals(
                 Text(
                     text =
                         if (animatedBalance >= 0f) {
-                            "+${Money(animatedBalance.toDouble(), balance.currency).formatForDisplay(showCurrency = false)}"
+                            "+${
+                                Money(
+                                    animatedBalance.toDouble(),
+                                    balance.currency,
+                                ).formatForDisplay(showCurrency = false)
+                            }"
                         } else {
-                            "${Money(animatedBalance.toDouble(), balance.currency).formatForDisplay(showCurrency = false)}"
+                            "${
+                                Money(
+                                    animatedBalance.toDouble(),
+                                    balance.currency,
+                                ).formatForDisplay(showCurrency = false)
+                            }"
                         },
                     fontSize = 18.sp,
                     color = balanceColor,
@@ -648,23 +679,24 @@ private fun periodTitleForFilter(
 ): String {
     // Используем русскую локаль для корректного отображения месяцев/дат
     val ruLocale = java.util.Locale("ru", "RU")
-    val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
-    val transactionText = when {
-        // Для английского языка всегда используем одну форму
-        java.util.Locale.getDefault().language == "en" -> {
-            "$transactionCount ${stringResource(UiR.string.transactions).lowercase()}"
+    java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
+    val transactionText =
+        when {
+            // Для английского языка всегда используем одну форму
+            java.util.Locale.getDefault().language == "en" -> {
+                "$transactionCount ${stringResource(UiR.string.transactions).lowercase()}"
+            }
+            // Для русского языка используем правильные формы плюрализации
+            transactionCount == 1 -> {
+                "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
+            }
+            transactionCount in 2..4 -> {
+                "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
+            }
+            else -> {
+                "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
+            }
         }
-        // Для русского языка используем правильные формы плюрализации
-        transactionCount == 1 -> {
-            "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
-        }
-        transactionCount in 2..4 -> {
-            "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
-        }
-        else -> {
-            "$transactionCount ${stringResource(UiR.string.transactions_many).lowercase()}"
-        }
-    }
 
     return when (filter) {
         TransactionFilter.TODAY -> {

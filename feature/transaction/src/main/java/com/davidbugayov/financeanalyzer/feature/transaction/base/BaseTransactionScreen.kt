@@ -917,7 +917,9 @@ fun <E> baseTransactionScreen(
                             TextButton(
                                 onClick = {
                                     viewModel.onEvent(
-                                        eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(categoryName)),
+                                        eventFactory(
+                                            BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(categoryName),
+                                        ),
                                         context,
                                     )
                                     categoryActionsFor = null

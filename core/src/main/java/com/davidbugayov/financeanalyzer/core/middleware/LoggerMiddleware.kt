@@ -7,86 +7,142 @@ import timber.log.Timber
  * Provides centralized logging with different levels and contexts.
  */
 interface LoggerMiddleware {
-
     /**
      * Log verbose message
      */
-    fun v(message: String, vararg args: Any?)
+    fun v(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log verbose message with throwable
      */
-    fun v(t: Throwable?, message: String, vararg args: Any?)
+    fun v(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log debug message
      */
-    fun d(message: String, vararg args: Any?)
+    fun d(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log debug message with throwable
      */
-    fun d(t: Throwable?, message: String, vararg args: Any?)
+    fun d(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log info message
      */
-    fun i(message: String, vararg args: Any?)
+    fun i(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log info message with throwable
      */
-    fun i(t: Throwable?, message: String, vararg args: Any?)
+    fun i(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log warning message
      */
-    fun w(message: String, vararg args: Any?)
+    fun w(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log warning message with throwable
      */
-    fun w(t: Throwable?, message: String, vararg args: Any?)
+    fun w(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log error message
      */
-    fun e(message: String, vararg args: Any?)
+    fun e(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log error message with throwable
      */
-    fun e(t: Throwable?, message: String, vararg args: Any?)
+    fun e(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log wtf (what a terrible failure) message
      */
-    fun wtf(message: String, vararg args: Any?)
+    fun wtf(
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log wtf message with throwable
      */
-    fun wtf(t: Throwable?, message: String, vararg args: Any?)
+    fun wtf(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    )
 
     /**
      * Log performance timing
      */
-    fun logTiming(operation: String, durationMs: Long, context: String? = null)
+    fun logTiming(
+        operation: String,
+        durationMs: Long,
+        context: String? = null,
+    )
 
     /**
      * Log user action
      */
-    fun logUserAction(action: String, context: String? = null, metadata: Map<String, Any>? = null)
+    fun logUserAction(
+        action: String,
+        context: String? = null,
+        metadata: Map<String, Any>? = null,
+    )
 
     /**
      * Log feature usage
      */
-    fun logFeatureUsage(feature: String, context: String? = null)
+    fun logFeatureUsage(
+        feature: String,
+        context: String? = null,
+    )
 
     /**
      * Log error with context
      */
-    fun logError(error: Throwable, context: String? = null, metadata: Map<String, Any>? = null)
+    fun logError(
+        error: Throwable,
+        context: String? = null,
+        metadata: Map<String, Any>? = null,
+    )
 }
 
 /**
@@ -94,71 +150,128 @@ interface LoggerMiddleware {
  */
 class DefaultLoggerMiddleware : LoggerMiddleware {
 
-    override fun v(message: String, vararg args: Any?) {
+    override fun v(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.v(message, *args)
     }
 
-    override fun v(t: Throwable?, message: String, vararg args: Any?) {
+    override fun v(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.v(t, message, *args)
     }
 
-    override fun d(message: String, vararg args: Any?) {
+    override fun d(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.d(message, *args)
     }
 
-    override fun d(t: Throwable?, message: String, vararg args: Any?) {
+    override fun d(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.d(t, message, *args)
     }
 
-    override fun i(message: String, vararg args: Any?) {
+    override fun i(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.i(message, *args)
     }
 
-    override fun i(t: Throwable?, message: String, vararg args: Any?) {
+    override fun i(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.i(t, message, *args)
     }
 
-    override fun w(message: String, vararg args: Any?) {
+    override fun w(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.w(message, *args)
     }
 
-    override fun w(t: Throwable?, message: String, vararg args: Any?) {
+    override fun w(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.w(t, message, *args)
     }
 
-    override fun e(message: String, vararg args: Any?) {
+    override fun e(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.e(message, *args)
     }
 
-    override fun e(t: Throwable?, message: String, vararg args: Any?) {
+    override fun e(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.e(t, message, *args)
     }
 
-    override fun wtf(message: String, vararg args: Any?) {
+    override fun wtf(
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.wtf(message, *args)
     }
 
-    override fun wtf(t: Throwable?, message: String, vararg args: Any?) {
+    override fun wtf(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         Timber.wtf(t, message, *args)
     }
 
-    override fun logTiming(operation: String, durationMs: Long, context: String?) {
+    override fun logTiming(
+        operation: String,
+        durationMs: Long,
+        context: String?,
+    ) {
         val contextMsg = context?.let { " [$it]" } ?: ""
         Timber.i("TIMING: $operation took ${durationMs}ms$contextMsg")
     }
 
-    override fun logUserAction(action: String, context: String?, metadata: Map<String, Any>?) {
+    override fun logUserAction(
+        action: String,
+        context: String?,
+        metadata: Map<String, Any>?,
+    ) {
         val contextMsg = context?.let { " in $it" } ?: ""
         val metadataMsg = metadata?.let { " with metadata: $it" } ?: ""
         Timber.i("USER_ACTION: $action$contextMsg$metadataMsg")
     }
 
-    override fun logFeatureUsage(feature: String, context: String?) {
+    override fun logFeatureUsage(
+        feature: String,
+        context: String?,
+    ) {
         val contextMsg = context?.let { " in $it" } ?: ""
         Timber.i("FEATURE_USAGE: $feature$contextMsg")
     }
 
-    override fun logError(error: Throwable, context: String?, metadata: Map<String, Any>?) {
+    override fun logError(
+        error: Throwable,
+        context: String?,
+        metadata: Map<String, Any>?,
+    ) {
         val contextMsg = context?.let { " in $it" } ?: ""
         val metadataMsg = metadata?.let { " with metadata: $it" } ?: ""
         Timber.e(error, "ERROR: ${error.message}$contextMsg$metadataMsg")
@@ -170,67 +283,124 @@ class DefaultLoggerMiddleware : LoggerMiddleware {
  */
 class NoOpLoggerMiddleware : LoggerMiddleware {
 
-    override fun v(message: String, vararg args: Any?) {
+    override fun v(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun v(t: Throwable?, message: String, vararg args: Any?) {
+    override fun v(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun d(message: String, vararg args: Any?) {
+    override fun d(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun d(t: Throwable?, message: String, vararg args: Any?) {
+    override fun d(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun i(message: String, vararg args: Any?) {
+    override fun i(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun i(t: Throwable?, message: String, vararg args: Any?) {
+    override fun i(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun w(message: String, vararg args: Any?) {
+    override fun w(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun w(t: Throwable?, message: String, vararg args: Any?) {
+    override fun w(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun e(message: String, vararg args: Any?) {
+    override fun e(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun e(t: Throwable?, message: String, vararg args: Any?) {
+    override fun e(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun wtf(message: String, vararg args: Any?) {
+    override fun wtf(
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun wtf(t: Throwable?, message: String, vararg args: Any?) {
+    override fun wtf(
+        t: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         // No operation
     }
 
-    override fun logTiming(operation: String, durationMs: Long, context: String?) {
+    override fun logTiming(
+        operation: String,
+        durationMs: Long,
+        context: String?,
+    ) {
         // No operation
     }
 
-    override fun logUserAction(action: String, context: String?, metadata: Map<String, Any>?) {
+    override fun logUserAction(
+        action: String,
+        context: String?,
+        metadata: Map<String, Any>?,
+    ) {
         // No operation
     }
 
-    override fun logFeatureUsage(feature: String, context: String?) {
+    override fun logFeatureUsage(
+        feature: String,
+        context: String?,
+    ) {
         // No operation
     }
 
-    override fun logError(error: Throwable, context: String?, metadata: Map<String, Any>?) {
+    override fun logError(
+        error: Throwable,
+        context: String?,
+        metadata: Map<String, Any>?,
+    ) {
         // No operation
     }
 }
@@ -239,9 +409,8 @@ class NoOpLoggerMiddleware : LoggerMiddleware {
  * Performance monitoring middleware
  */
 class PerformanceMiddleware(
-    private val logger: LoggerMiddleware
+    private val logger: LoggerMiddleware,
 ) {
-
     companion object {
         private const val PERFORMANCE_TAG = "PERFORMANCE"
     }
@@ -252,7 +421,7 @@ class PerformanceMiddleware(
     suspend fun <T> measureTime(
         operation: String,
         context: String? = null,
-        block: suspend () -> T
+        block: suspend () -> T,
     ): T {
         val startTime = System.currentTimeMillis()
         return try {
@@ -269,7 +438,7 @@ class PerformanceMiddleware(
     fun <T> measureTimeSync(
         operation: String,
         context: String? = null,
-        block: () -> T
+        block: () -> T,
     ): T {
         val startTime = System.currentTimeMillis()
         return try {
@@ -283,7 +452,10 @@ class PerformanceMiddleware(
     /**
      * Create a performance tracer
      */
-    fun createTracer(operation: String, context: String? = null): PerformanceTracer {
+    fun createTracer(
+        operation: String,
+        context: String? = null,
+    ): PerformanceTracer {
         return PerformanceTracer(operation, context, logger)
     }
 }
@@ -294,7 +466,7 @@ class PerformanceMiddleware(
 class PerformanceTracer(
     private val operation: String,
     private val context: String?,
-    private val logger: LoggerMiddleware
+    private val logger: LoggerMiddleware,
 ) {
     private var startTime: Long = 0
 

@@ -90,8 +90,8 @@ import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 
 /**
  * Экран достижений с современным дизайном
@@ -130,9 +130,9 @@ private fun AchievementsScreenContent(
 
     // Аналитика: отслеживаем посещение экрана достижений
     LaunchedEffect(achievements) {
-        val unlockedCount = achievements.count { it.isUnlocked }
-        val lockedCount = achievements.count { !it.isUnlocked }
-        val totalCoinsEarned = achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
+        achievements.count { it.isUnlocked }
+        achievements.count { !it.isUnlocked }
+        achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
 
         // Отправляем аналитику в AnalyticsUtils
         AnalyticsUtils.logAchievementsScreenViewed()
@@ -188,12 +188,11 @@ private fun AchievementsScreenContent(
                 selectedCategory = category
 
                 // Аналитика: фильтр по категории
-                val categoryFilter = category?.name?.lowercase()
-                val resultCount =
-                    achievements
-                        .filter { achievement ->
-                            category?.let { achievement.category == it } ?: true
-                        }.size
+                category?.name?.lowercase()
+                achievements
+                    .filter { achievement ->
+                        category?.let { achievement.category == it } ?: true
+                    }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
@@ -211,15 +210,14 @@ private fun AchievementsScreenContent(
                         AchievementFilter.LOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_LOCKED
                     }
 
-                val resultCount =
-                    achievements
-                        .filter { achievement ->
-                            when (filter) {
-                                AchievementFilter.ALL -> true
-                                AchievementFilter.UNLOCKED -> achievement.isUnlocked
-                                AchievementFilter.LOCKED -> !achievement.isUnlocked
-                            }
-                        }.size
+                achievements
+                    .filter { achievement ->
+                        when (filter) {
+                            AchievementFilter.ALL -> true
+                            AchievementFilter.UNLOCKED -> achievement.isUnlocked
+                            AchievementFilter.LOCKED -> !achievement.isUnlocked
+                        }
+                    }.size
 
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = filterType,
@@ -596,7 +594,8 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                                         )
                                     },
                                 shape = CircleShape,
-                            ).clip(CircleShape),
+                            )
+                            .clip(CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -615,7 +614,8 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                                     .background(
                                         Color.Transparent,
                                         CircleShape,
-                                    ).clip(CircleShape),
+                                    )
+                                    .clip(CircleShape),
                         ) {
                             // Добавим свечение
                         }

@@ -21,7 +21,6 @@ import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
-import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

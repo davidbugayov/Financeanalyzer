@@ -112,8 +112,6 @@ sealed class Screen(
     /** Экран мастера создания кошелька */
     data object WalletSetup : Screen("wallet_setup")
 
-
-
     data class SubWallets(
         val parentWalletId: String,
     ) : Screen("sub_wallets/{parentWalletId}") {

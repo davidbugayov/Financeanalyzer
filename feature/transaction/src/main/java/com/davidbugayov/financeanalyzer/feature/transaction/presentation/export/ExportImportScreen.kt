@@ -56,10 +56,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.davidbugayov.financeanalyzer.shared.model.ExportAction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.shared.model.ExportAction
 
 /**
  * Экран экспорта/импорта транзакций.

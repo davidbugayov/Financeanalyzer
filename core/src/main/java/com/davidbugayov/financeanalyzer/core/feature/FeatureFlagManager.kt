@@ -13,9 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class FeatureFlagManager(
     private val context: Context,
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("feature_flags", Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(
+            "feature_flags",
+            Context.MODE_PRIVATE,
+        ),
 ) {
-
     private val _featureFlags = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val featureFlags: Flow<Map<String, Boolean>> = _featureFlags.asStateFlow()
 
@@ -64,7 +67,10 @@ class FeatureFlagManager(
     /**
      * Set a feature flag to a specific value
      */
-    fun setFlag(flag: FeatureFlag, enabled: Boolean) {
+    fun setFlag(
+        flag: FeatureFlag,
+        enabled: Boolean,
+    ) {
         val currentFlags = _featureFlags.value.toMutableMap()
         currentFlags[flag.key] = enabled
         _featureFlags.value = currentFlags
@@ -130,7 +136,10 @@ class FeatureFlagManager(
         return stored
     }
 
-    private fun storeFlag(key: String, value: Boolean) {
+    private fun storeFlag(
+        key: String,
+        value: Boolean,
+    ) {
         sharedPreferences.edit {
             putBoolean(key, value)
         }
@@ -154,19 +163,29 @@ class FeatureFlagManager(
 /**
  * DSL for conditional feature flag execution
  */
-inline fun FeatureFlagManager.ifEnabled(flag: FeatureFlag, block: () -> Unit) {
+inline fun FeatureFlagManager.ifEnabled(
+    flag: FeatureFlag,
+    block: () -> Unit,
+) {
     if (isEnabled(flag)) {
         block()
     }
 }
 
-inline fun FeatureFlagManager.ifDisabled(flag: FeatureFlag, block: () -> Unit) {
+inline fun FeatureFlagManager.ifDisabled(
+    flag: FeatureFlag,
+    block: () -> Unit,
+) {
     if (!isEnabled(flag)) {
         block()
     }
 }
 
-inline fun <T> FeatureFlagManager.whenEnabled(flag: FeatureFlag, defaultValue: T, block: () -> T): T {
+inline fun <T> FeatureFlagManager.whenEnabled(
+    flag: FeatureFlag,
+    defaultValue: T,
+    block: () -> T,
+): T {
     return if (isEnabled(flag)) {
         block()
     } else {

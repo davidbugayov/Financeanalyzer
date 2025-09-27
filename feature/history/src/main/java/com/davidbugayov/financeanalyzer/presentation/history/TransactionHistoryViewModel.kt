@@ -27,7 +27,6 @@ import com.davidbugayov.financeanalyzer.utils.DateUtils
 import com.davidbugayov.financeanalyzer.utils.kmp.toDomain
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -803,7 +802,7 @@ class TransactionHistoryViewModel(
         println("TransactionHistoryViewModel: updateStartDate")
         println("  Input date: $date (${date.time})")
         _state.update { it.copy(startDate = date) }
-        println("  State updated, new startDate: ${date}")
+        println("  State updated, new startDate: $date")
         updateFilteredAndGroupedTransactions()
     }
 
@@ -811,7 +810,7 @@ class TransactionHistoryViewModel(
         println("TransactionHistoryViewModel: updateEndDate")
         println("  Input date: $date (${date.time})")
         _state.update { it.copy(endDate = date) }
-        println("  State updated, new endDate: ${date}")
+        println("  State updated, new endDate: $date")
         updateFilteredAndGroupedTransactions()
     }
 

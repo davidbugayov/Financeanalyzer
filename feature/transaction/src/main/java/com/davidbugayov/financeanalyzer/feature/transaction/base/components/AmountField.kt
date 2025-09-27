@@ -253,20 +253,21 @@ fun amountField(
                         if (isFocused && !validatedRaw.contains(Regex("[+\\-×÷]"))) {
                             // Форматируем число с разделителями групп, без символа валюты
                             val numeric = validatedRaw.toDoubleOrNull()
-                            val formattedForTyping = if (numeric != null) {
-                                val moneyObject = Money.fromMajor(numeric, currentCurrency)
-                                val withSymbol =
-                                    moneyObject.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
-                                // Удаляем .00 только визуально при вводе, если нет дробной части в raw
-                                val sep = '.'
-                                if (!validatedRaw.contains('.') && !validatedRaw.contains(',')) {
-                                    withSymbol.substringBefore(sep)
+                            val formattedForTyping =
+                                if (numeric != null) {
+                                    val moneyObject = Money.fromMajor(numeric, currentCurrency)
+                                    val withSymbol =
+                                        moneyObject.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
+                                    // Удаляем .00 только визуально при вводе, если нет дробной части в raw
+                                    val sep = '.'
+                                    if (!validatedRaw.contains('.') && !validatedRaw.contains(',')) {
+                                        withSymbol.substringBefore(sep)
+                                    } else {
+                                        withSymbol
+                                    }
                                 } else {
-                                    withSymbol
+                                    validatedRaw
                                 }
-                            } else {
-                                validatedRaw
-                            }
 
                             // Сохраняем относительную позицию курсора, учитывая добавленные пробелы как разделители
                             val originalSelection = newTextFieldValue.selection
@@ -274,11 +275,14 @@ fun amountField(
                                 validatedRaw.take(originalSelection.start.coerceIn(0, validatedRaw.length))
                             // Строим формат заново для части до каретки, чтобы понять, сколько пробелов будет добавлено
                             val partialNumber = rawBeforeCaret.toDoubleOrNull()
-                            val formattedBeforeCaret = if (partialNumber != null) {
-                                val m = Money.fromMajor(partialNumber, currentCurrency)
-                                m.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
-                                    .substringBefore('.')
-                            } else rawBeforeCaret
+                            val formattedBeforeCaret =
+                                if (partialNumber != null) {
+                                    val m = Money.fromMajor(partialNumber, currentCurrency)
+                                    m.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
+                                        .substringBefore('.')
+                                } else {
+                                    rawBeforeCaret
+                                }
 
                             val addedSpacesBefore =
                                 formattedBeforeCaret.count { it == ' ' } - rawBeforeCaret.count { it == ' ' }

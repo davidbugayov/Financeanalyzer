@@ -5,51 +5,69 @@ package com.davidbugayov.financeanalyzer.navigation.model
  * Provides type safety for navigation and prevents navigation to non-existent screens.
  */
 sealed class Screen(val route: String) {
-
     // Main screens
     object Home : Screen("home")
+
     object Statistics : Screen("statistics")
+
     object Profile : Screen("profile")
+
     object Settings : Screen("settings")
 
     // Transaction screens
     object AddTransaction : Screen("add_transaction")
+
     data class EditTransaction(val transactionId: Long) : Screen("edit_transaction/$transactionId")
+
     data class TransactionDetails(val transactionId: Long) : Screen("transaction_details/$transactionId")
 
     // Category screens
     object Categories : Screen("categories")
+
     data class CategoryDetails(val categoryId: Long) : Screen("category_details/$categoryId")
+
     data class AddCategory(val transactionType: String) : Screen("add_category/$transactionType")
 
     // Wallet screens
     object Wallets : Screen("wallets")
+
     data class WalletDetails(val walletId: Long) : Screen("wallet_details/$walletId")
+
     data class AddWallet(val walletType: String? = null) : Screen("add_wallet/${walletType ?: "default"}")
 
     // History screens
     object TransactionHistory : Screen("transaction_history")
+
     data class FilteredHistory(val filter: String) : Screen("filtered_history/$filter")
 
     // Budget screens
     object Budget : Screen("budget")
+
     data class BudgetDetails(val budgetId: Long) : Screen("budget_details/$budgetId")
 
     // Achievement screens
     object Achievements : Screen("achievements")
+
     data class AchievementDetails(val achievementId: String) : Screen("achievement_details/$achievementId")
 
     // Onboarding screens
     object Welcome : Screen("welcome")
+
     object OnboardingStep1 : Screen("onboarding_step1")
+
     object OnboardingStep2 : Screen("onboarding_step2")
+
     object OnboardingComplete : Screen("onboarding_complete")
 
     // Utility screens
     object Search : Screen("search")
+
     data class WebView(val url: String) : Screen("webview/$url")
+
     object About : Screen("about")
+
     object PrivacyPolicy : Screen("privacy_policy")
+
     object TermsOfService : Screen("terms_of_service")
 
     companion object {
@@ -123,11 +141,12 @@ sealed class Screen(val route: String) {
         /**
          * Get all main navigation screens
          */
-        fun mainScreens(): List<Screen> = listOf(
-            Home,
-            Statistics,
-            Profile
-        )
+        fun mainScreens(): List<Screen> =
+            listOf(
+                Home,
+                Statistics,
+                Profile,
+            )
 
         /**
          * Check if screen requires authentication
@@ -139,7 +158,8 @@ sealed class Screen(val route: String) {
                 is Wallets, is WalletDetails, is AddWallet,
                 is TransactionHistory, is FilteredHistory,
                 is Budget, is BudgetDetails,
-                is Achievements, is AchievementDetails -> true
+                is Achievements, is AchievementDetails,
+                    -> true
                 else -> false
             }
         }

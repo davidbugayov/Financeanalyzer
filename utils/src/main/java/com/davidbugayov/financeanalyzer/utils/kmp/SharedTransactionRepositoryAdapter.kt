@@ -15,10 +15,10 @@ class SharedTransactionRepositoryAdapter(
 
     override suspend fun getTransactionsForPeriod(
         startDate: kotlinx.datetime.LocalDate,
-        endDate: kotlinx.datetime.LocalDate
+        endDate: kotlinx.datetime.LocalDate,
     ): List<SharedTransaction> = unifiedRepo.getTransactionsByDateRange(startDate, endDate).toShared()
 
-    override suspend fun getTransactionById(id: String): com.davidbugayov.financeanalyzer.shared.model.Transaction? =
+    override suspend fun getTransactionById(id: String): Transaction? =
         unifiedRepo.getTransactionById(id)?.toShared()
 
     override suspend fun getTransactionsByCategory(categoryId: String): List<SharedTransaction> {

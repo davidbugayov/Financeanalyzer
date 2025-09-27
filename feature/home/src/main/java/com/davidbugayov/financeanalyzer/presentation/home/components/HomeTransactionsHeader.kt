@@ -67,7 +67,9 @@ fun HomeTransactionsHeader(
                     .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f))
                     .padding(horizontal = 8.dp, vertical = 4.dp)
                     .clickable {
-                        Timber.d("HomeTransactionsHeader: Toggle clicked, current: $showGroupSummary, new: ${!showGroupSummary}")
+                        Timber.d(
+                            "HomeTransactionsHeader: Toggle clicked, current: $showGroupSummary, new: ${!showGroupSummary}",
+                        )
                         onToggleGroupSummary(!showGroupSummary)
                     },
         )

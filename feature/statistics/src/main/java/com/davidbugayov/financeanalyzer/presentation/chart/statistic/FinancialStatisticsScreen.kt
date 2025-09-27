@@ -375,25 +375,28 @@ fun FinancialStatisticsScreen(
 
                     if (showStartDatePicker) {
                         // Определяем начальные даты для DateRangePicker
-                        val (initialStart, initialEnd) = remember(currentStartDate, currentEndDate) {
-                            val today = Calendar.getInstance()
-                            val startDateCal = Calendar.getInstance().apply { time = currentStartDate }
-                            Calendar.getInstance().apply { time = currentEndDate }
+                        val (initialStart, initialEnd) =
+                            remember(currentStartDate, currentEndDate) {
+                                val today = Calendar.getInstance()
+                                val startDateCal = Calendar.getInstance().apply { time = currentStartDate }
+                                Calendar.getInstance().apply { time = currentEndDate }
 
-                            // Если даты по умолчанию (5 лет назад), используем разумный диапазон
-                            if (startDateCal.get(Calendar.YEAR) <= 2000 ||
-                                Calendar.getInstance().apply { add(Calendar.YEAR, -4) }.time <= currentStartDate) {
-                                // Начало месяца назад, конец - сегодня
-                                val startOfMonth = today.apply {
-                                    set(Calendar.DAY_OF_MONTH, 1)
-                                }.time
-                                val todayEnd = today.time
-                                startOfMonth to todayEnd
-                            } else {
-                                // Используем текущие даты из состояния
-                                currentStartDate to currentEndDate
+                                // Если даты по умолчанию (5 лет назад), используем разумный диапазон
+                                if (startDateCal.get(Calendar.YEAR) <= 2000 ||
+                                    Calendar.getInstance().apply { add(Calendar.YEAR, -4) }.time <= currentStartDate
+                                ) {
+                                    // Начало месяца назад, конец - сегодня
+                                    val startOfMonth =
+                                        today.apply {
+                                            set(Calendar.DAY_OF_MONTH, 1)
+                                        }.time
+                                    val todayEnd = today.time
+                                    startOfMonth to todayEnd
+                                } else {
+                                    // Используем текущие даты из состояния
+                                    currentStartDate to currentEndDate
+                                }
                             }
-                        }
 
                         DateRangePickerDialog(
                             initialStartDate = initialStart,
@@ -848,7 +851,10 @@ fun FinancialStatisticsScreen(
                                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                                     )
                                                     Text(
-                                                        text = stringResource(id = UiR.string.expense_statistics_subtitle),
+                                                        text =
+                                                            stringResource(
+                                                                id = UiR.string.expense_statistics_subtitle,
+                                                            ),
                                                         style = MaterialTheme.typography.labelSmall,
                                                         color =
                                                             MaterialTheme.colorScheme.onPrimaryContainer.copy(
@@ -936,9 +942,7 @@ private fun calculateExpenseGrowth(
  * Компонент для отображения статистики расходов
  */
 @Composable
-private fun ExpenseStatisticsContent(
-    expenseStatistics: ExpenseStatistics,
-) {
+private fun ExpenseStatisticsContent(expenseStatistics: ExpenseStatistics) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -951,10 +955,11 @@ private fun ExpenseStatisticsContent(
             StatisticItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(id = UiR.string.expense_statistics_average_monthly),
-                value = Money(expenseStatistics.averageMonthly, expenseStatistics.currency).formatForDisplay(
-                    showCurrency = true,
-                    useMinimalDecimals = true,
-                ),
+                value =
+                    Money(expenseStatistics.averageMonthly, expenseStatistics.currency).formatForDisplay(
+                        showCurrency = true,
+                        useMinimalDecimals = true,
+                    ),
                 icon = Icons.Filled.Analytics,
             )
 
@@ -962,10 +967,11 @@ private fun ExpenseStatisticsContent(
             StatisticItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(id = UiR.string.expense_statistics_max_monthly),
-                value = Money(expenseStatistics.maxMonthly, expenseStatistics.currency).formatForDisplay(
-                    showCurrency = true,
-                    useMinimalDecimals = true,
-                ),
+                value =
+                    Money(expenseStatistics.maxMonthly, expenseStatistics.currency).formatForDisplay(
+                        showCurrency = true,
+                        useMinimalDecimals = true,
+                    ),
                 icon = Icons.Filled.Analytics,
             )
         }
@@ -1008,9 +1014,10 @@ private fun StatisticItem(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+            ),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -1047,23 +1054,27 @@ private fun TrendIndicator(
     trend: TrendDirection,
     modifier: Modifier = Modifier,
 ) {
-    val (text, icon, color) = when (trend) {
-        TrendDirection.INCREASING -> Triple(
-            stringResource(id = UiR.string.expense_statistics_trend_increasing),
-            Icons.Filled.TrendingUp,
-            MaterialTheme.colorScheme.error,
-        )
-        TrendDirection.DECREASING -> Triple(
-            stringResource(id = UiR.string.expense_statistics_trend_decreasing),
-            Icons.Filled.TrendingDown,
-            MaterialTheme.colorScheme.primary,
-        )
-        TrendDirection.STABLE -> Triple(
-            stringResource(id = UiR.string.expense_statistics_trend_stable),
-            Icons.Filled.TrendingFlat,
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-        )
-    }
+    val (text, icon, color) =
+        when (trend) {
+            TrendDirection.INCREASING ->
+                Triple(
+                    stringResource(id = UiR.string.expense_statistics_trend_increasing),
+                    Icons.Filled.TrendingUp,
+                    MaterialTheme.colorScheme.error,
+                )
+            TrendDirection.DECREASING ->
+                Triple(
+                    stringResource(id = UiR.string.expense_statistics_trend_decreasing),
+                    Icons.Filled.TrendingDown,
+                    MaterialTheme.colorScheme.primary,
+                )
+            TrendDirection.STABLE ->
+                Triple(
+                    stringResource(id = UiR.string.expense_statistics_trend_stable),
+                    Icons.Filled.TrendingFlat,
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                )
+        }
 
     Row(
         modifier = modifier,

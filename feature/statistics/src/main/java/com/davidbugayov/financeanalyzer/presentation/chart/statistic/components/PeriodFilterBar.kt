@@ -23,7 +23,6 @@ import com.davidbugayov.financeanalyzer.feature.statistics.dialogs.PeriodSelecti
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.ui.R as UiR
-import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.DateRangePickerDialog
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.util.Calendar
@@ -84,12 +83,13 @@ fun PeriodFilterBar(
             onEndDateClick = { showEndDatePicker = true },
             onResetDatesToToday = {
                 // Сбрасываем даты на сегодняшний день, если они по умолчанию
-                val startCal = java.util.Calendar.getInstance().apply { time = currentStart }
-                val isDefaultOr2000 = startCal.get(java.util.Calendar.YEAR) <= 2000 ||
-                    java.util.Calendar.getInstance().apply { add(java.util.Calendar.YEAR, -5) }.time == currentStart
+                val startCal = Calendar.getInstance().apply { time = currentStart }
+                val isDefaultOr2000 =
+                    startCal.get(Calendar.YEAR) <= 2000 ||
+                        Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time == currentStart
 
                 if (isDefaultOr2000) {
-                    val today = java.util.Calendar.getInstance().time
+                    val today = Calendar.getInstance().time
                     currentStart = today
                     currentEnd = today
                 }
@@ -104,25 +104,28 @@ fun PeriodFilterBar(
 
     if (showStartDatePicker) {
         // Определяем начальные даты для DateRangePicker
-        val (initialStart, initialEnd) = remember(currentStart, currentEnd) {
-            val today = Calendar.getInstance()
-            val startDateCal = Calendar.getInstance().apply { time = currentStart }
-            val endDateCal = Calendar.getInstance().apply { time = currentEnd }
+        val (initialStart, initialEnd) =
+            remember(currentStart, currentEnd) {
+                val today = Calendar.getInstance()
+                val startDateCal = Calendar.getInstance().apply { time = currentStart }
+                Calendar.getInstance().apply { time = currentEnd }
 
-            // Если даты по умолчанию (5 лет назад), используем разумный диапазон
-            if (startDateCal.get(Calendar.YEAR) <= 2000 ||
-                Calendar.getInstance().apply { add(Calendar.YEAR, -4) }.time <= currentStart) {
-                // Начало месяца назад, конец - сегодня
-                val startOfMonth = today.apply {
-                    set(Calendar.DAY_OF_MONTH, 1)
-                }.time
-                val todayEnd = today.time
-                startOfMonth to todayEnd
-            } else {
-                // Используем текущие даты из состояния
-                currentStart to currentEnd
+                // Если даты по умолчанию (5 лет назад), используем разумный диапазон
+                if (startDateCal.get(Calendar.YEAR) <= 2000 ||
+                    Calendar.getInstance().apply { add(Calendar.YEAR, -4) }.time <= currentStart
+                ) {
+                    // Начало месяца назад, конец - сегодня
+                    val startOfMonth =
+                        today.apply {
+                            set(Calendar.DAY_OF_MONTH, 1)
+                        }.time
+                    val todayEnd = today.time
+                    startOfMonth to todayEnd
+                } else {
+                    // Используем текущие даты из состояния
+                    currentStart to currentEnd
+                }
             }
-        }
 
         DateRangePickerDialog(
             initialStartDate = initialStart,

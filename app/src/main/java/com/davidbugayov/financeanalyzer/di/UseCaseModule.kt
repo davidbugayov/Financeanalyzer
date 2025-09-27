@@ -36,8 +36,6 @@ val useCaseModule =
         // Transactions
         single { LoadTransactionsUseCase(get()) }
 
-
-
         // Analytics
         single { CalculateBalanceMetricsUseCase() }
         single { CalculateCategoryStatsUseCase() }

@@ -31,7 +31,6 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import java.math.BigDecimal
 
 /**
  * Компонент для отображения текущего баланса пользователя.

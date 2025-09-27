@@ -1,22 +1,15 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 import android.os.SystemClock
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -42,7 +34,6 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.presentation.categories.PersistentCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
@@ -52,18 +43,18 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.Notificatio
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
+import com.davidbugayov.financeanalyzer.ui.components.achievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
@@ -164,7 +155,6 @@ private fun HomeMainContent(
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
 ) {
-
     if (windowSizeIsCompact) {
         CompactLayout(
             state = state,
@@ -270,16 +260,26 @@ fun HomeScreen(
     }
 
     androidx.compose.runtime.LaunchedEffect(state.currentFilter, state.filteredTransactions.size) {
-        Timber.d("HomeScreen: State updated - filter: ${state.currentFilter}, transactions: ${state.filteredTransactions.size}, income: ${state.filteredIncome}, expense: ${state.filteredExpense}")
+        Timber.d(
+            "HomeScreen: State updated - filter: ${state.currentFilter}, transactions: ${state.filteredTransactions.size}, income: ${state.filteredIncome}, expense: ${state.filteredExpense}",
+        )
     }
 
     // Добавляем логирование для отладки
     LaunchedEffect(pagingItems.loadState) {
-        Timber.d("HomeScreen: LoadState changed - Refresh: ${pagingItems.loadState.refresh}, Append: ${pagingItems.loadState.append}, ItemCount: ${pagingItems.itemCount}")
+        Timber.d(
+            "HomeScreen: LoadState changed - Refresh: ${pagingItems.loadState.refresh}, Append: ${pagingItems.loadState.append}, ItemCount: ${pagingItems.itemCount}",
+        )
         when (pagingItems.loadState.refresh) {
             is androidx.paging.LoadState.Loading -> Timber.d("HomeScreen: Loading state")
-            is androidx.paging.LoadState.Error -> Timber.e("HomeScreen: Error state - ${(pagingItems.loadState.refresh as androidx.paging.LoadState.Error).error}")
-            is androidx.paging.LoadState.NotLoading -> Timber.d("HomeScreen: Not loading, itemCount: ${pagingItems.itemCount}")
+            is androidx.paging.LoadState.Error ->
+                Timber.e(
+                    "HomeScreen: Error state - ${(pagingItems.loadState.refresh as androidx.paging.LoadState.Error).error}",
+                )
+            is androidx.paging.LoadState.NotLoading ->
+                Timber.d(
+                    "HomeScreen: Not loading, itemCount: ${pagingItems.itemCount}",
+                )
         }
     }
 
@@ -289,7 +289,6 @@ fun HomeScreen(
     var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransactionForDetail by remember { mutableStateOf<Transaction?>(null) }
-    var showDetailDialog by remember { mutableStateOf(false) }
 
     // Состояние для подкатегории и иконки категории
     val sharedFacade = remember { SharedFacade() }

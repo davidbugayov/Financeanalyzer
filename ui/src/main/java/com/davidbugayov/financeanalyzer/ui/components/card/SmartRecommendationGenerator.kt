@@ -2,7 +2,24 @@ package com.davidbugayov.financeanalyzer.ui.components.card
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.AutoMode
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Compare
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Percent
+import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.PriorityHigh
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
@@ -56,8 +73,6 @@ object SmartRecommendationGenerator {
                 ),
             )
         }
-
-
 
         // ⚠️ ВАЖНЫЕ рекомендации (требуют внимания в ближайшее время)
 

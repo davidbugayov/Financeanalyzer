@@ -166,19 +166,22 @@ private fun ExpandedRightPanel(
         contentAlignment = Alignment.Center,
     ) {
         // Извлекаем реальные транзакции из pagingItems для определения пустого состояния
-        val realTransactionsCount = (0 until pagingItems.itemCount).count { index ->
-            val item = pagingItems[index]
-            item is TransactionListItem.Item
-        }
+        val realTransactionsCount =
+            (0 until pagingItems.itemCount).count { index ->
+                val item = pagingItems[index]
+                item is TransactionListItem.Item
+            }
 
         // Определяем, показывать ли пустое состояние
         val isLoading = pagingItems.loadState.refresh is LoadState.Loading
         val isEmptyState = realTransactionsCount == 0 && !isLoading
 
-        Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
+        Timber.d(
+            "ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading",
+        )
 
         // Используем ключ для оптимизации перерисовки
-        val contentKey = "${state.currentFilter}_${isEmptyState}_${realTransactionsCount}"
+        val contentKey = "${state.currentFilter}_${isEmptyState}_$realTransactionsCount"
 
         if (isEmptyState) {
             Timber.d("ExpandedLayout: Showing ExpandedEmptyState")
@@ -188,26 +191,26 @@ private fun ExpandedRightPanel(
             // Оборачиваем в key для предотвращения полной перерисовки
             key(contentKey) {
                 transactionPagingList(
-                items = pagingItems,
-                categoriesViewModel = categoriesViewModel,
-                onTransactionClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
-                listState = listState,
-                headerContent = {
-                    // Показываем приветственную карточку только один раз (shared pref flag)
-                    val context = LocalContext.current
-                    val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
-                    var dismissed by remember { mutableStateOf(prefs.getBoolean("welcome_tips_dismissed", false)) }
-                    if (!dismissed) {
-                        HomeTipsCard(
-                            onClose = {
-                                prefs.edit().putBoolean("welcome_tips_dismissed", true).apply()
-                                dismissed = true
-                            },
-                            modifier = Modifier.padding(bottom = 8.dp),
-                        )
-                    }
-                },
+                    items = pagingItems,
+                    categoriesViewModel = categoriesViewModel,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick,
+                    listState = listState,
+                    headerContent = {
+                        // Показываем приветственную карточку только один раз (shared pref flag)
+                        val context = LocalContext.current
+                        val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+                        var dismissed by remember { mutableStateOf(prefs.getBoolean("welcome_tips_dismissed", false)) }
+                        if (!dismissed) {
+                            HomeTipsCard(
+                                onClose = {
+                                    prefs.edit().putBoolean("welcome_tips_dismissed", true).apply()
+                                    dismissed = true
+                                },
+                                modifier = Modifier.padding(bottom = 8.dp),
+                            )
+                        }
+                    },
                 )
             }
         }

@@ -88,7 +88,6 @@ fun appNavHostImpl(
         onBudgetScreen = {
             BudgetScreen()
         },
-
         onFinancialStatisticsScreen = { startDate, endDate, periodTypeStr ->
             // Преобразуем строковое представление PeriodType в enum
             val periodType =
@@ -196,7 +195,6 @@ fun appNavHostImpl(
                 viewModel = koinViewModel(),
             )
         },
-
         startDestination = startDestination,
     )
 }

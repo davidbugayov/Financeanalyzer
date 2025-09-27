@@ -52,9 +52,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
-import java.math.BigDecimal
 import kotlin.math.min
-import timber.log.Timber
 
 /**
  * Современная карточка сводной информации о кошельке с улучшенным дизайном

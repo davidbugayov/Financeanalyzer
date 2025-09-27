@@ -48,9 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryLocalization
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -67,7 +67,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
 import timber.log.Timber
 
 object Formatters {
@@ -279,7 +278,8 @@ fun transactionItem(
                 .padding(
                     horizontal = dimensionResource(id = UiR.dimen.card_horizontal_padding),
                     vertical = dimensionResource(id = UiR.dimen.card_vertical_padding),
-                ).graphicsLayer {
+                )
+                .graphicsLayer {
                     alpha = animatedAlpha
                     translationY = animatedTranslationY
                 },
@@ -301,7 +301,8 @@ fun transactionItem(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = ripple(bounded = true),
                         onClick = { onClick(transaction) },
-                    ).padding(dimensionResource(id = UiR.dimen.card_content_padding_medium)),
+                    )
+                    .padding(dimensionResource(id = UiR.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar

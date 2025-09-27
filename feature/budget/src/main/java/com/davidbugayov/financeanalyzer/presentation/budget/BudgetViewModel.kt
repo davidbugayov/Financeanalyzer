@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.shared.model.Money
-import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +49,7 @@ class BudgetViewModel(
 
     fun onNavigateToWalletSetup() {
         navigationManager.navigate(
-            NavigationManager.Command.Navigate(com.davidbugayov.financeanalyzer.navigation.Screen.WalletSetup.route),
+            NavigationManager.Command.Navigate(Screen.WalletSetup.route),
         )
     }
 

@@ -14,12 +14,13 @@ class SharedSubcategoryRepositoryAdapter(
     private val domainRepo: DomainSubcategoryRepository,
 ) : SharedSubcategoryRepository {
     // Category methods - simplified implementations
-    override fun getAllCategories(): kotlinx.coroutines.flow.Flow<List<com.davidbugayov.financeanalyzer.shared.model.Category>> =
+    override fun getAllCategories(): Flow<List<com.davidbugayov.financeanalyzer.shared.model.Category>> =
         kotlinx.coroutines.flow.flow { emit(emptyList()) }
 
     override suspend fun getCategoryById(id: Long): com.davidbugayov.financeanalyzer.shared.model.Category? = null
 
-    override suspend fun createCategory(category: com.davidbugayov.financeanalyzer.shared.model.Category): Long = category.id
+    override suspend fun createCategory(category: com.davidbugayov.financeanalyzer.shared.model.Category): Long =
+        category.id
 
     override suspend fun updateCategory(category: com.davidbugayov.financeanalyzer.shared.model.Category) {
         // Not implemented
@@ -29,7 +30,9 @@ class SharedSubcategoryRepositoryAdapter(
         // Not implemented
     }
 
-    override suspend fun getCategoriesByType(isExpense: Boolean): List<com.davidbugayov.financeanalyzer.shared.model.Category> = emptyList()
+    override suspend fun getCategoriesByType(
+        isExpense: Boolean,
+    ): List<com.davidbugayov.financeanalyzer.shared.model.Category> = emptyList()
 
     override suspend fun clearAllCategories() {
         // Not implemented

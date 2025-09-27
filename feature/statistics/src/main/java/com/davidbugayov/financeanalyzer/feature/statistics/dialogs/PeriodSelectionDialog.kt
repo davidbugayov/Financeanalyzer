@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -38,22 +39,24 @@ fun PeriodSelectionDialog(
     onDismiss: () -> Unit,
 ) {
     // Проверяем, являются ли даты значениями по умолчанию (5 лет назад)
-    val isDefaultStartDate = remember(startDate) {
-        val defaultStart = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
-        // Сравниваем даты с точностью до дня
-        val startCal = Calendar.getInstance().apply { time = startDate }
-        val defaultCal = Calendar.getInstance().apply { time = defaultStart }
+    val isDefaultStartDate =
+        remember(startDate) {
+            val defaultStart = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
+            // Сравниваем даты с точностью до дня
+            val startCal = Calendar.getInstance().apply { time = startDate }
+            val defaultCal = Calendar.getInstance().apply { time = defaultStart }
 
-        startCal.get(Calendar.YEAR) == defaultCal.get(Calendar.YEAR) &&
-        startCal.get(Calendar.MONTH) == defaultCal.get(Calendar.MONTH) &&
-        startCal.get(Calendar.DAY_OF_MONTH) == defaultCal.get(Calendar.DAY_OF_MONTH)
-    }
+            startCal.get(Calendar.YEAR) == defaultCal.get(Calendar.YEAR) &&
+                startCal.get(Calendar.MONTH) == defaultCal.get(Calendar.MONTH) &&
+                startCal.get(Calendar.DAY_OF_MONTH) == defaultCal.get(Calendar.DAY_OF_MONTH)
+        }
 
     // Также проверяем на дату 2000 года (используется в ALL периоде)
-    val is2000YearDate = remember(startDate) {
-        val startCal = Calendar.getInstance().apply { time = startDate }
-        startCal.get(Calendar.YEAR) == 2000
-    }
+    val is2000YearDate =
+        remember(startDate) {
+            val startCal = Calendar.getInstance().apply { time = startDate }
+            startCal.get(Calendar.YEAR) == 2000
+        }
 
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val dayMonth = SimpleDateFormat("d MMMM", Locale.getDefault())
@@ -180,7 +183,12 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.YEAR,
                         selectedPeriod = selectedPeriod,
-                        title = pluralStringResource(UiR.plurals.period_year, currentYear, currentYear),
+                        title =
+                            LocalContext.current.resources.getQuantityString(
+                                UiR.plurals.period_year,
+                                currentYear,
+                                currentYear,
+                            ),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -189,11 +197,16 @@ fun PeriodSelectionDialog(
                 PeriodOption(
                     periodType = PeriodType.CUSTOM,
                     selectedPeriod = selectedPeriod,
-                    title = if (selectedPeriod == PeriodType.CUSTOM) {
-                        stringResource(UiR.string.period_custom, dateFormat.format(startDate), dateFormat.format(endDate))
-                    } else {
-                        stringResource(UiR.string.period_select_custom)
-                    },
+                    title =
+                        if (selectedPeriod == PeriodType.CUSTOM) {
+                            stringResource(
+                                UiR.string.period_custom,
+                                dateFormat.format(startDate),
+                                dateFormat.format(endDate),
+                            )
+                        } else {
+                            stringResource(UiR.string.period_select_custom)
+                        },
                     onPeriodSelected = {
                         onPeriodSelected(PeriodType.CUSTOM)
                         // При выборе CUSTOM периода открываем date picker для начальной даты

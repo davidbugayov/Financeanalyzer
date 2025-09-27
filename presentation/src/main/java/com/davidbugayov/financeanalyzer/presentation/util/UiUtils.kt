@@ -31,7 +31,12 @@ object UiUtils {
 
         return when (periodType) {
             PeriodType.ALL -> context.getString(UiR.string.period_all_time)
-            PeriodType.DAY -> context.getString(UiR.string.period_day, dayMonth.format(startDate), dayOfWeek.format(startDate))
+            PeriodType.DAY ->
+                context.getString(
+                    UiR.string.period_day,
+                    dayMonth.format(startDate),
+                    dayOfWeek.format(startDate),
+                )
             PeriodType.WEEK ->
                 context.getString(
                     UiR.string.period_week,

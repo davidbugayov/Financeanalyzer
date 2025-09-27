@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.shared.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
@@ -78,7 +77,6 @@ val appModule =
                 get<ImportTransactionsManager>(),
             )
         }
-
 
         // App-level coroutine scope
         single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }

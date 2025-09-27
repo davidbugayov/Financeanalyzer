@@ -22,7 +22,6 @@ import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction as SharedTransaction
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
-import java.math.BigDecimal
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
@@ -219,12 +218,11 @@ class AddTransactionViewModel(
                 parsedMoney
             }
 
-        val selectedWalletIds =
-            getWalletIdsForTransaction(
-                isExpense = currentState.isExpense,
-                addToWallet = currentState.addToWallet,
-                selectedWallets = currentState.selectedWallets,
-            )
+        getWalletIdsForTransaction(
+            isExpense = currentState.isExpense,
+            addToWallet = currentState.addToWallet,
+            selectedWallets = currentState.selectedWallets,
+        )
 
         // Получаем ID сабкатегории, если она выбрана
         val subcategoryId =

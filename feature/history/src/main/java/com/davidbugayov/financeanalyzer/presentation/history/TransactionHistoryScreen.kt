@@ -41,7 +41,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -56,10 +55,10 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelec
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import com.davidbugayov.financeanalyzer.shared.SharedFacade
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.DateRangePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
@@ -69,7 +68,6 @@ import com.davidbugayov.financeanalyzer.ui.components.TransactionDetailDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
@@ -243,25 +241,28 @@ fun TransactionHistoryScreen(
     // Диалог выбора диапазона дат для кастомного периода
     if (state.showStartDatePicker) {
         // Определяем начальные даты для DateRangePicker
-        val (initialStart, initialEnd) = remember(state.startDate, state.endDate) {
-            val today = java.util.Calendar.getInstance()
-            val startDateCal = java.util.Calendar.getInstance().apply { time = state.startDate }
-            val endDateCal = java.util.Calendar.getInstance().apply { time = state.endDate }
+        val (initialStart, initialEnd) =
+            remember(state.startDate, state.endDate) {
+                val today = java.util.Calendar.getInstance()
+                val startDateCal = java.util.Calendar.getInstance().apply { time = state.startDate }
+                java.util.Calendar.getInstance().apply { time = state.endDate }
 
-            // Если даты по умолчанию (5 лет назад), используем разумный диапазон
-            if (startDateCal.get(java.util.Calendar.YEAR) <= 2000 ||
-                java.util.Calendar.getInstance().apply { add(java.util.Calendar.YEAR, -4) }.time <= state.startDate) {
-                // Начало месяца назад, конец - сегодня
-                val startOfMonth = today.apply {
-                    set(java.util.Calendar.DAY_OF_MONTH, 1)
-                }.time
-                val todayEnd = today.time
-                startOfMonth to todayEnd
-            } else {
-                // Используем текущие даты из состояния
-                state.startDate to state.endDate
+                // Если даты по умолчанию (5 лет назад), используем разумный диапазон
+                if (startDateCal.get(java.util.Calendar.YEAR) <= 2000 ||
+                    java.util.Calendar.getInstance().apply { add(java.util.Calendar.YEAR, -4) }.time <= state.startDate
+                ) {
+                    // Начало месяца назад, конец - сегодня
+                    val startOfMonth =
+                        today.apply {
+                            set(java.util.Calendar.DAY_OF_MONTH, 1)
+                        }.time
+                    val todayEnd = today.time
+                    startOfMonth to todayEnd
+                } else {
+                    // Используем текущие даты из состояния
+                    state.startDate to state.endDate
+                }
             }
-        }
 
         DateRangePickerDialog(
             initialStartDate = initialStart,
