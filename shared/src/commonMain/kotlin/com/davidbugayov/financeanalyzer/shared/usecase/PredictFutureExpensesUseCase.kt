@@ -102,10 +102,28 @@ class PredictFutureExpensesUseCase {
         val seasonalAdjusted = trendAdjusted * seasonalFactor
 
         // 7. Ограничиваем прогноз разумными пределами
-        val minPrediction = lastAmount * 0.5  // Не менее 50% от последнего месяца
-        val maxPrediction = lastAmount * 2.0  // Не более 200% от последнего месяца
+        val minPrediction = if (lastAmount >= 0) {
+            lastAmount * 0.5  // Не менее 50% от последнего месяца
+        } else {
+            lastAmount * 2.0  // Для отрицательных значений (расходы) - не более 200%
+        }
+        
+        val maxPrediction = if (lastAmount >= 0) {
+            lastAmount * 2.0  // Не более 200% от последнего месяца
+        } else {
+            lastAmount * 0.5  // Для отрицательных значений (расходы) - не менее 50%
+        }
 
-        return seasonalAdjusted.coerceIn(minPrediction, maxPrediction)
+        // Дополнительная защита от некорректных значений
+        return if (minPrediction <= maxPrediction) {
+            seasonalAdjusted.coerceIn(minPrediction, maxPrediction)
+        } else {
+            // Если логика ограничений дала некорректный результат, возвращаем скорректированное значение
+            seasonalAdjusted.coerceIn(
+                minOf(minPrediction, maxPrediction),
+                maxOf(minPrediction, maxPrediction)
+            )
+        }
     }
 
     /**
