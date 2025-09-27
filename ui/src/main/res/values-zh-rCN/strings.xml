@@ -314,7 +314,6 @@
     <string name="invalid_date">错误的日期</string>
     <string name="invalid_date_range">无效的日期范围</string>
     <string name="select_date_range">选择日期范围</string>
-    <string name="select_start_date">选择范围的开始日期</string>
     <string name="investment_tip_bonds">考虑稳定收入的债券：公司盈利能力的可靠发行人的债券。</string>
     <string name="investment_tip_business">通过股票或高收入中等风险的高收入来增加实际业务。</string>
     <string name="investment_tip_diversification">多样化公文包，避免高风险和杠杆作用。</string>
@@ -402,14 +401,14 @@
     <string name="period_settings">期间的设置</string>
     <string name="period_settings_title">期间的设置</string>
     <string name="period_week">%1$s - %1$s</string>
-    <string name="period_year">%1$d 年</string>
+  <plurals name="period_year">
+    <item quantity="other">%1$d 年</item>
+  </plurals>
     <string name="permission_rationale">对于申请的申请，需要许可。</string>
     <string name="permission_required">需要权限</string>
     <string name="permission_settings_rationale">对于申请的申请，需要许可。转到设置。</string>
     <string name="personalized_tip">私人理事会</string>
-    <string name="prediction_next_month">下个月的预期费用：%1$s</string>
-    <string name="prediction_savings">可预测的节省：%1$s</string>
-    <string name="prediction_title">预测费用</string>
+  <string name="expense_statistics_title">支出统计</string>
     <string name="preview_empty_subtitle">没有数据</string>
     <string name="preview_empty_title">空卡</string>
     <string name="preview_enhanced_subtitle">数据的示例</string>

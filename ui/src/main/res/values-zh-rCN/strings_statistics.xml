@@ -49,7 +49,15 @@
 
   <string name="financial_health_recommended_values_title">推荐值</string>
   <string name="financial_health_tooltip_description">点击查看详细信息与建议</string>
-  <string name="prediction_subtitle">基于近期交易与趋势</string>
+  <string name="expense_statistics_subtitle">分析您过去12个月的支出</string>
+  <string name="expense_statistics_average_monthly">月平均支出</string>
+  <string name="expense_statistics_max_monthly">月最大支出</string>
+  <string name="expense_statistics_min_monthly">月最小支出</string>
+  <string name="expense_statistics_trend_increasing">趋势：支出增长</string>
+  <string name="expense_statistics_trend_decreasing">趋势：支出下降</string>
+  <string name="expense_statistics_trend_stable">趋势：支出稳定</string>
+  <string name="expense_statistics_top_categories">支出类别排行</string>
+  <string name="expense_statistics_total_expenses">总支出</string>
   <string name="financial_health_title">财务健康</string>
   <string name="financial_health_explanation">财务健康是评估您当前财务状况与稳定性的综合指标。它考虑储蓄率、支出控制以及应急金是否充足。</string>
   <string name="financial_health_savings_rate_title">储蓄率</string>

@@ -41,6 +41,7 @@ fun SourcePickerDialog(
     onAddCustomSource: () -> Unit,
     onDismiss: () -> Unit,
     onDeleteSource: (String) -> Unit,
+    onEditSource: (Source) -> Unit = {},
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -60,7 +61,8 @@ fun SourcePickerDialog(
                                             Timber.d("Long press on source: ${source.name}")
                                             onDeleteSource(source.name)
                                         },
-                                    ).padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
+                                    )
+                                    .padding(vertical = dimensionResource(UiR.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
@@ -76,16 +78,21 @@ fun SourcePickerDialog(
                                 modifier = Modifier.weight(1f),
                             )
 
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(UiR.string.delete),
-                                tint = Color.Gray.copy(alpha = 0.5f),
-                                modifier =
-                                    Modifier
-                                        .padding(start = 8.dp)
-                                        .size(18.dp)
-                                        .clickable { onDeleteSource(source.name) },
-                            )
+                            Row {
+                                TextButton(onClick = { onEditSource(source) }) {
+                                    Text(stringResource(UiR.string.edit))
+                                }
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(UiR.string.delete),
+                                    tint = Color.Gray.copy(alpha = 0.5f),
+                                    modifier =
+                                        Modifier
+                                            .padding(start = 8.dp)
+                                            .size(18.dp)
+                                            .clickable { onDeleteSource(source.name) },
+                                )
+                            }
                         }
                     }
                     item {

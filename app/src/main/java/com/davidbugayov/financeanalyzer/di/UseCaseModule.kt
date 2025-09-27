@@ -8,11 +8,10 @@ import com.davidbugayov.financeanalyzer.shared.usecase.CalculateBalanceMetricsUs
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseDisciplineIndexUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseStatisticsUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateFinancialHealthScoreUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculatePeerComparisonUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.CalculateRetirementForecastUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
-import com.davidbugayov.financeanalyzer.shared.usecase.PredictExpensesByCategoryUseCase
 import com.davidbugayov.financeanalyzer.shared.usecase.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher
 import org.koin.android.ext.koin.androidContext
@@ -46,8 +45,7 @@ val useCaseModule =
         single { CalculateExpenseDisciplineIndexUseCase() }
         single { CalculateRetirementForecastUseCase() }
         single { CalculatePeerComparisonUseCase() }
-        single { PredictFutureExpensesUseCase() }
-        single { PredictExpensesByCategoryUseCase() }
+        single { CalculateExpenseStatisticsUseCase() }
         single { GetExpenseOptimizationRecommendationsUseCase() }
         single {
             CalculateEnhancedFinancialMetricsUseCase(

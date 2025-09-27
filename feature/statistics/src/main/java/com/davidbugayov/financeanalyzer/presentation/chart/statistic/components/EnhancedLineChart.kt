@@ -115,8 +115,8 @@ fun EnhancedLineChart(
             else -> String.format(Locale.getDefault(), "%.0f", value)
         }
     },
-    modifier: Modifier = Modifier,
     onPointSelected: (LineChartPoint?) -> Unit = {},
+    modifier: Modifier = Modifier,
     chartHeight: Dp = DefaultChartHeight,
     selectionThresholdDp: Dp = DefaultSelectionThreshold,
 ) {
@@ -452,7 +452,8 @@ fun EnhancedLineChart(
                                         }
                                     }
                                 }
-                            }.drawBehind {
+                            }
+                            .drawBehind {
                                 val width = size.width
                                 val height = size.height
                                 val yLabelStyle =

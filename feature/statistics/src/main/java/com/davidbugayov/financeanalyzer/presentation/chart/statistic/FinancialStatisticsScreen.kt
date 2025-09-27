@@ -21,6 +21,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.TrendingDown
+import androidx.compose.material.icons.filled.TrendingFlat
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,10 +48,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import timber.log.Timber
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,11 +67,13 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.Enhan
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.EnhancedFinanceChartViewModel
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
-import com.davidbugayov.financeanalyzer.shared.usecase.PredictFutureExpensesUseCase
+import com.davidbugayov.financeanalyzer.shared.model.Money
+import com.davidbugayov.financeanalyzer.shared.usecase.CalculateExpenseStatisticsUseCase
+import com.davidbugayov.financeanalyzer.shared.usecase.ExpenseStatistics
+import com.davidbugayov.financeanalyzer.shared.usecase.TrendDirection
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.DateRangePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.tips.EnhancedTipCard
@@ -80,6 +85,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -130,7 +136,7 @@ fun FinancialStatisticsScreen(
             val expenseGrowth = calculateExpenseGrowth(state.expenseLineChartData)
 
             val totalIncome = state.income?.toMajorDouble() ?: 0.0
-            val totalExpense = state.expense?.toMajorDouble() ?: 0.0
+            state.expense?.toMajorDouble() ?: 0.0
 
             FinancialTipsManager.getPersonalizedTips(
                 savingsRate = state.savingsRate,
@@ -290,7 +296,8 @@ fun FinancialStatisticsScreen(
                                 .padding(
                                     horizontal = dimensionResource(UiR.dimen.finance_chart_screen_padding),
                                     vertical = 12.dp,
-                                ).clickable { showPeriodDialog = true },
+                                )
+                                .clickable { showPeriodDialog = true },
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -348,7 +355,7 @@ fun FinancialStatisticsScreen(
                             onEndDateClick = { showEndDatePicker = true },
                             onResetDatesToToday = {
                                 // Сбрасываем даты на сегодняшний день
-                                val today = java.util.Calendar.getInstance().time
+                                val today = Calendar.getInstance().time
                                 currentStartDate = today
                                 currentEndDate = today
                             },
@@ -371,7 +378,7 @@ fun FinancialStatisticsScreen(
                         val (initialStart, initialEnd) = remember(currentStartDate, currentEndDate) {
                             val today = Calendar.getInstance()
                             val startDateCal = Calendar.getInstance().apply { time = currentStartDate }
-                            val endDateCal = Calendar.getInstance().apply { time = currentEndDate }
+                            Calendar.getInstance().apply { time = currentEndDate }
 
                             // Если даты по умолчанию (5 лет назад), используем разумный диапазон
                             if (startDateCal.get(Calendar.YEAR) <= 2000 ||
@@ -585,7 +592,8 @@ fun FinancialStatisticsScreen(
                                                         dimensionResource(
                                                             UiR.dimen.finance_chart_screen_piechart_height,
                                                         ),
-                                                    ).padding(
+                                                    )
+                                                    .padding(
                                                         top =
                                                             dimensionResource(
                                                                 UiR.dimen.finance_chart_screen_padding,
@@ -799,14 +807,15 @@ fun FinancialStatisticsScreen(
                                         )
                                     }
 
-                                    // Оставляем предсказания
-                                    val predictExpensesUseCase = koinComponent.get<PredictFutureExpensesUseCase>()
-                                    val predictedExpenses =
+                                    // Статистика расходов
+                                    val expenseStatisticsUseCase =
+                                        koinComponent.get<CalculateExpenseStatisticsUseCase>()
+                                    val expenseStatistics =
                                         remember(
                                             state.transactions,
-                                        ) { predictExpensesUseCase(state.transactions) }
+                                        ) { expenseStatisticsUseCase(state.transactions) }
 
-                                    // В UI, добавляем карточку предсказаний (тональная)
+                                    // Карточка статистики расходов
                                     Card(
                                         modifier =
                                             Modifier
@@ -833,13 +842,13 @@ fun FinancialStatisticsScreen(
                                                 )
                                                 Column(modifier = Modifier.weight(1f)) {
                                                     Text(
-                                                        text = stringResource(id = UiR.string.prediction_title),
+                                                        text = stringResource(id = UiR.string.expense_statistics_title),
                                                         style = MaterialTheme.typography.titleMedium,
                                                         fontWeight = FontWeight.Bold,
                                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                                     )
                                                     Text(
-                                                        text = stringResource(id = UiR.string.prediction_subtitle),
+                                                        text = stringResource(id = UiR.string.expense_statistics_subtitle),
                                                         style = MaterialTheme.typography.labelSmall,
                                                         color =
                                                             MaterialTheme.colorScheme.onPrimaryContainer.copy(
@@ -849,25 +858,10 @@ fun FinancialStatisticsScreen(
                                                 }
                                             }
 
-                                            Spacer(Modifier.height(6.dp))
+                                            Spacer(Modifier.height(12.dp))
 
-                                            // Форматируем сумму с валютой
-                                            // Форматируем сумму через Money.formatForDisplay (единый формат приложения)
-                                            val amountText =
-                                                predictedExpenses.formatForDisplay(
-                                                    showCurrency = true,
-                                                    useMinimalDecimals = true,
-                                                )
-
-                                            Text(
-                                                text =
-                                                    stringResource(
-                                                        id = UiR.string.prediction_next_month,
-                                                        amountText,
-                                                    ),
-                                                style = MaterialTheme.typography.titleSmall,
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                            )
+                                            // Основные показатели статистики
+                                            ExpenseStatisticsContent(expenseStatistics = expenseStatistics)
                                         }
                                     }
 
@@ -936,4 +930,183 @@ private fun calculateExpenseGrowth(
 
     // Ограничиваем значение в разумных пределах (-1 до 1)
     return growth.coerceIn(-1.0, 1.0)
+}
+
+/**
+ * Компонент для отображения статистики расходов
+ */
+@Composable
+private fun ExpenseStatisticsContent(
+    expenseStatistics: ExpenseStatistics,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // Основные показатели в сетке
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // Средние расходы
+            StatisticItem(
+                modifier = Modifier.weight(1f),
+                title = stringResource(id = UiR.string.expense_statistics_average_monthly),
+                value = Money(expenseStatistics.averageMonthly, expenseStatistics.currency).formatForDisplay(
+                    showCurrency = true,
+                    useMinimalDecimals = true,
+                ),
+                icon = Icons.Filled.Analytics,
+            )
+
+            // Максимальные расходы
+            StatisticItem(
+                modifier = Modifier.weight(1f),
+                title = stringResource(id = UiR.string.expense_statistics_max_monthly),
+                value = Money(expenseStatistics.maxMonthly, expenseStatistics.currency).formatForDisplay(
+                    showCurrency = true,
+                    useMinimalDecimals = true,
+                ),
+                icon = Icons.Filled.Analytics,
+            )
+        }
+
+        // Тренд
+        TrendIndicator(
+            trend = expenseStatistics.trendDirection,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        // Топ категории (если есть)
+        if (expenseStatistics.topCategories.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(id = UiR.string.expense_statistics_top_categories),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+
+            expenseStatistics.topCategories.take(3).forEach { category ->
+                CategoryStatisticItem(
+                    category = category,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Элемент статистики
+ */
+@Composable
+private fun StatisticItem(
+    title: String,
+    value: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+        ),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            )
+        }
+    }
+}
+
+/**
+ * Индикатор тренда
+ */
+@Composable
+private fun TrendIndicator(
+    trend: TrendDirection,
+    modifier: Modifier = Modifier,
+) {
+    val (text, icon, color) = when (trend) {
+        TrendDirection.INCREASING -> Triple(
+            stringResource(id = UiR.string.expense_statistics_trend_increasing),
+            Icons.Filled.TrendingUp,
+            MaterialTheme.colorScheme.error,
+        )
+        TrendDirection.DECREASING -> Triple(
+            stringResource(id = UiR.string.expense_statistics_trend_decreasing),
+            Icons.Filled.TrendingDown,
+            MaterialTheme.colorScheme.primary,
+        )
+        TrendDirection.STABLE -> Triple(
+            stringResource(id = UiR.string.expense_statistics_trend_stable),
+            Icons.Filled.TrendingFlat,
+            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        )
+    }
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(16.dp),
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            color = color,
+        )
+    }
+}
+
+/**
+ * Элемент категории
+ */
+@Composable
+private fun CategoryStatisticItem(
+    category: com.davidbugayov.financeanalyzer.shared.usecase.CategoryStatistic,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = category.category,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = "${category.percentage.roundToInt()}%",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+        )
+    }
 }

@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
@@ -237,51 +236,74 @@ fun amountField(
                         val rawTextWithoutSpaces = newTextFieldValue.text.replace(" ", "")
 
                         // Валидация: разрешаем только числа, точки, запятые и арифметические операторы
-                        val validatedText =
+                        val validatedRaw =
                             if (rawTextWithoutSpaces.contains(Regex("[+\\-×÷]"))) {
-                                // Если есть арифметические операторы, разрешаем как есть (для выражений)
+                                // Если есть арифметические операторы, оставляем как есть (не форматируем)
                                 rawTextWithoutSpaces
                             } else {
                                 // Для простых чисел ограничиваем формат x.xx или x,xx
                                 validateMoneyInput(rawTextWithoutSpaces)
                             }
 
-                        // Обновляем internalRawAmount и вызываем onAmountChange с валидированным текстом.
-                        internalRawAmount = validatedText
+                        // Обновляем internalRawAmount и уведомляем ViewModel сырым значением без пробелов
+                        internalRawAmount = validatedRaw
                         onAmountChange(internalRawAmount)
 
-                        // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
-                        // с валидированным текстом для мгновенной обратной связи при вводе.
-                        if (isFocused) {
-                            // Важно сохранить позицию курсора относительно валидированного текста
+                        // Если поле в фокусе и это не выражение — показываем отформатированный текст с разделителями
+                        if (isFocused && !validatedRaw.contains(Regex("[+\\-×÷]"))) {
+                            // Форматируем число с разделителями групп, без символа валюты
+                            val numeric = validatedRaw.toDoubleOrNull()
+                            val formattedForTyping = if (numeric != null) {
+                                val moneyObject = Money.fromMajor(numeric, currentCurrency)
+                                val withSymbol =
+                                    moneyObject.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
+                                // Удаляем .00 только визуально при вводе, если нет дробной части в raw
+                                val sep = '.'
+                                if (!validatedRaw.contains('.') && !validatedRaw.contains(',')) {
+                                    withSymbol.substringBefore(sep)
+                                } else {
+                                    withSymbol
+                                }
+                            } else {
+                                validatedRaw
+                            }
+
+                            // Сохраняем относительную позицию курсора, учитывая добавленные пробелы как разделители
                             val originalSelection = newTextFieldValue.selection
-                            val newSelectionStart =
-                                originalSelection.start -
-                                    newTextFieldValue.text
-                                        .substring(
-                                            0,
-                                            originalSelection.start,
-                                        ).count { it == ' ' }
-                            val newSelectionEnd =
-                                originalSelection.end -
-                                    newTextFieldValue.text
-                                        .substring(
-                                            0,
-                                            originalSelection.end,
-                                        ).count { it == ' ' }
+                            val rawBeforeCaret =
+                                validatedRaw.take(originalSelection.start.coerceIn(0, validatedRaw.length))
+                            // Строим формат заново для части до каретки, чтобы понять, сколько пробелов будет добавлено
+                            val partialNumber = rawBeforeCaret.toDoubleOrNull()
+                            val formattedBeforeCaret = if (partialNumber != null) {
+                                val m = Money.fromMajor(partialNumber, currentCurrency)
+                                m.formatForDisplay(showCurrency = false, useMinimalDecimals = false)
+                                    .substringBefore('.')
+                            } else rawBeforeCaret
+
+                            val addedSpacesBefore =
+                                formattedBeforeCaret.count { it == ' ' } - rawBeforeCaret.count { it == ' ' }
+                            val newCaret =
+                                (originalSelection.start + addedSpacesBefore).coerceIn(0, formattedForTyping.length)
 
                             textFieldValueForDisplay =
                                 TextFieldValue(
-                                    text = validatedText,
+                                    text = formattedForTyping,
+                                    selection = TextRange(newCaret),
+                                )
+                        } else if (isFocused) {
+                            // Для выражений оставляем как есть, без форматирования, но корректируем позицию
+                            val originalSelection = newTextFieldValue.selection
+                            textFieldValueForDisplay =
+                                TextFieldValue(
+                                    text = validatedRaw,
                                     selection =
                                         TextRange(
-                                            start = newSelectionStart.coerceIn(0, validatedText.length),
-                                            end = newSelectionEnd.coerceIn(0, validatedText.length),
+                                            start = originalSelection.start.coerceIn(0, validatedRaw.length),
+                                            end = originalSelection.end.coerceIn(0, validatedRaw.length),
                                         ),
                                 )
                         }
-                        // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
-                        // позаботится о форматировании и обновлении textFieldValueForDisplay.
+                        // Если поле теряет фокус, LaunchedEffect(amount, isFocused) выполнит финальное форматирование.
                     },
                     modifier =
                         Modifier

@@ -49,7 +49,7 @@
 
   <string name="financial_health_recommended_values_title">Recommended values</string>
   <string name="financial_health_tooltip_description">Tap to see detailed information and tips</string>
-  <string name="prediction_subtitle">Based on your recent transactions and trends</string>
+  <string name="expense_statistics_subtitle">Analysis of your expenses over the last 12 months</string>
   <string name="financial_health_title">Financial health</string>
   <string name="financial_health_explanation">Financial health is a comprehensive indicator that evaluates your current financial condition and resilience. It takes into account your savings rate, expense control, and the presence of an emergency fund.</string>
   <string name="financial_health_savings_rate_title">Savings rate</string>
@@ -58,6 +58,14 @@
   <string name="financial_health_financial_cushion_title">Emergency fund</string>
   <string name="financial_health_financial_cushion_content">An emergency fund is the amount that allows you to live without income for 3–6 months. It is calculated as average monthly expenses × number of months. This is your safety buffer for unforeseen events.</string>
   <string name="financial_health_tips_title">Financial health tips</string>
+  <string name="expense_statistics_average_monthly">Average monthly expenses</string>
+  <string name="expense_statistics_max_monthly">Maximum monthly expenses</string>
+  <string name="expense_statistics_min_monthly">Minimum monthly expenses</string>
+  <string name="expense_statistics_trend_increasing">Trend: expenses increasing</string>
+  <string name="expense_statistics_trend_decreasing">Trend: expenses decreasing</string>
+  <string name="expense_statistics_trend_stable">Trend: expenses stable</string>
+  <string name="expense_statistics_top_categories">Top expense categories</string>
+  <string name="expense_statistics_total_expenses">Total expenses</string>
 </resources>
 
 

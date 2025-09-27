@@ -50,7 +50,7 @@ object UiUtils {
             PeriodType.YEAR -> {
                 val now = java.util.Calendar.getInstance()
                 val currentYear = now.get(java.util.Calendar.YEAR)
-                context.getString(UiR.string.period_year, currentYear)
+                context.resources.getQuantityString(UiR.plurals.period_year, currentYear, currentYear)
             }
             PeriodType.CUSTOM ->
                 context.getString(

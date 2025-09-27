@@ -309,7 +309,6 @@
     <string name="invalid_date">The wrong date</string>
     <string name="invalid_date_range">Invalid date range</string>
     <string name="select_date_range">Select date range</string>
-    <string name="select_start_date">Select start date of range</string>
   <string name="investment_tip_bonds">Consider bonds for stable income: 14–16% yield from reliable issuers.</string>
     <string name="investment_tip_business">Increase in real business through shares or borrowings for high income with moderate risks.</string>
     <string name="investment_tip_diversification">Diversify the briefcase, avoiding high risks and leverage.</string>
@@ -397,14 +396,17 @@
     <string name="period_settings">Settings of the period</string>
     <string name="period_settings_title">Settings of the period</string>
     <string name="period_week">%1$s - %1$s</string>
-    <string name="period_year">%1$d year</string>
+  <plurals name="period_year">
+    <item quantity="one">%1$d year</item>
+    <item quantity="other">%1$d years</item>
+  </plurals>
     <string name="permission_rationale">For the application of the application, permission is necessary.</string>
     <string name="permission_required">Permission required</string>
     <string name="permission_settings_rationale">For the application of the application, permission is necessary.Go to the settings.</string>
     <string name="personalized_tip">Personal Council</string>
     <string name="prediction_next_month">Expected expenses for the next month: %1$s</string>
     <string name="prediction_savings">Predictable savings: %1$s</string>
-    <string name="prediction_title">Predictions of expenses</string>
+  <string name="expense_statistics_title">Expense Statistics</string>
     <string name="preview_empty_subtitle">Without data</string>
     <string name="preview_empty_title">Empty card</string>
     <string name="preview_enhanced_subtitle">An example with data</string>
@@ -422,7 +424,7 @@
     <string name="rec_budget_track_desc">Regularly check the compliance of expenses to the budget.</string>
     <string name="rec_budget_track_impact">Weekly control</string>
     <string name="rec_budget_track_title">Track the budget</string>
-  
+
     <string name="rec_critical_emergency_desc">You do not have a reserve fund.This is critical for financial security.</string>
     <string name="rec_critical_emergency_impact">Create a fund for 3-6 months of expenses</string>
     <string name="rec_critical_emergency_title">Create a reserve fund</string>

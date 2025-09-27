@@ -136,7 +136,7 @@ private fun ExpandedLeftPanel(
                 balance = state.filteredBalance,
                 periodStartDate = state.periodStartDate,
                 periodEndDate = state.periodEndDate,
-                isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading,
+                isLoading = pagingItems.loadState.refresh is LoadState.Loading,
             )
         }
     }
@@ -168,11 +168,11 @@ private fun ExpandedRightPanel(
         // Извлекаем реальные транзакции из pagingItems для определения пустого состояния
         val realTransactionsCount = (0 until pagingItems.itemCount).count { index ->
             val item = pagingItems[index]
-            item is com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem.Item
+            item is TransactionListItem.Item
         }
 
         // Определяем, показывать ли пустое состояние
-        val isLoading = pagingItems.loadState.refresh is androidx.paging.LoadState.Loading
+        val isLoading = pagingItems.loadState.refresh is LoadState.Loading
         val isEmptyState = realTransactionsCount == 0 && !isLoading
 
         Timber.d("ExpandedLayout: isEmptyState=$isEmptyState, realTransactionsCount=$realTransactionsCount, totalItems=${pagingItems.itemCount}, isLoading=$isLoading")
@@ -201,7 +201,7 @@ private fun ExpandedRightPanel(
                     if (!dismissed) {
                         HomeTipsCard(
                             onClose = {
-                                prefs.edit().putBoolean("welcome_tips_dismissed", true).commit()
+                                prefs.edit().putBoolean("welcome_tips_dismissed", true).apply()
                                 dismissed = true
                             },
                             modifier = Modifier.padding(bottom = 8.dp),

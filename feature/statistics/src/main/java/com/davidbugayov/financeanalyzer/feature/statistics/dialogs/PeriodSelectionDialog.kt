@@ -61,54 +61,54 @@ fun PeriodSelectionDialog(
     val monthYear = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
-        val now = java.util.Calendar.getInstance()
+        val now = Calendar.getInstance()
         val end =
             now.apply {
-                set(java.util.Calendar.HOUR_OF_DAY, 23)
-                set(java.util.Calendar.MINUTE, 59)
-                set(java.util.Calendar.SECOND, 59)
-                set(java.util.Calendar.MILLISECOND, 999)
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
             }.time
 
-        val startCal = java.util.Calendar.getInstance()
+        val startCal = Calendar.getInstance()
         when (type) {
             PeriodType.DAY -> {
-                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                startCal.set(java.util.Calendar.MINUTE, 0)
-                startCal.set(java.util.Calendar.SECOND, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.WEEK -> {
-                startCal.add(java.util.Calendar.DAY_OF_MONTH, -6)
-                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                startCal.set(java.util.Calendar.MINUTE, 0)
-                startCal.set(java.util.Calendar.SECOND, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.add(Calendar.DAY_OF_MONTH, -6)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.MONTH -> {
-                startCal.add(java.util.Calendar.DAY_OF_MONTH, -29)
-                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                startCal.set(java.util.Calendar.MINUTE, 0)
-                startCal.set(java.util.Calendar.SECOND, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.add(Calendar.DAY_OF_MONTH, -29)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.QUARTER -> {
-                startCal.add(java.util.Calendar.DAY_OF_MONTH, -89)
-                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                startCal.set(java.util.Calendar.MINUTE, 0)
-                startCal.set(java.util.Calendar.SECOND, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.add(Calendar.DAY_OF_MONTH, -89)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.YEAR -> {
-                startCal.add(java.util.Calendar.DAY_OF_YEAR, -364)
-                startCal.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                startCal.set(java.util.Calendar.MINUTE, 0)
-                startCal.set(java.util.Calendar.SECOND, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.add(Calendar.DAY_OF_YEAR, -364)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.ALL -> {
                 startCal.set(2000, 0, 1, 0, 0, 0)
-                startCal.set(java.util.Calendar.MILLISECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
             }
             PeriodType.CUSTOM -> return startDate to endDate
         }
@@ -162,10 +162,10 @@ fun PeriodSelectionDialog(
                     )
                 }
                 run {
-                    val now = java.util.Calendar.getInstance()
-                    val currentQuarter = ((now.get(java.util.Calendar.MONTH) / 3) + 1)
+                    val now = Calendar.getInstance()
+                    val currentQuarter = ((now.get(Calendar.MONTH) / 3) + 1)
                     val quarterNames = arrayOf("", "I", "II", "III", "IV")
-                    val currentYear = now.get(java.util.Calendar.YEAR)
+                    val currentYear = now.get(Calendar.YEAR)
                     PeriodOption(
                         periodType = PeriodType.QUARTER,
                         selectedPeriod = selectedPeriod,
@@ -175,12 +175,12 @@ fun PeriodSelectionDialog(
                 }
 
                 run {
-                    val now = java.util.Calendar.getInstance()
-                    val currentYear = now.get(java.util.Calendar.YEAR)
+                    val now = Calendar.getInstance()
+                    val currentYear = now.get(Calendar.YEAR)
                     PeriodOption(
                         periodType = PeriodType.YEAR,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_year, currentYear),
+                        title = pluralStringResource(UiR.plurals.period_year, currentYear, currentYear),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }

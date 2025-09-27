@@ -3,8 +3,6 @@ package com.davidbugayov.financeanalyzer.shared.usecase
 import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Улучшенный use case для прогнозирования будущих расходов.
@@ -42,7 +40,7 @@ class PredictFutureExpensesUseCase {
      * Подготавливает месячные данные для анализа
      */
     private fun prepareMonthlyData(expenses: List<Transaction>): List<MonthlyExpenseData> {
-        val now = kotlin.time.TimeSource.Monotonic.markNow()
+        kotlin.time.TimeSource.Monotonic.markNow()
 
         // Группируем по месяцам и рассчитываем сумму расходов
         val monthlyExpenses = expenses
@@ -170,14 +168,5 @@ class PredictFutureExpensesUseCase {
 
 
 
-/**
- * Вспомогательная data class для хранения месячных данных о расходах
- */
-private data class MonthlyExpenseData(
-    val month: Int,
-    val year: Int,
-    val amount: Double,
-    val monthIndex: Int
-)
 
 

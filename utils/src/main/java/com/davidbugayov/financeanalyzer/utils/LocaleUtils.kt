@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -30,6 +31,7 @@ object LocaleUtils {
             val config = Configuration(base.resources.configuration)
             if (Build.VERSION.SDK_INT >= 24) {
                 val list = LocaleList(locale)
+                @SuppressLint("AppBundleLocaleChanges")
                 config.setLocales(list)
             } else {
                 @Suppress("DEPRECATION")

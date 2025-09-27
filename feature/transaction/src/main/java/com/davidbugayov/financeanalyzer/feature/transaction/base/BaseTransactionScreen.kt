@@ -352,6 +352,18 @@ fun <E> baseTransactionScreen(
                     .fillMaxSize()
                     .padding(paddingValues),
         ) {
+            // Локальные состояния для действий (редактирование категории/источника)
+            var categoryActionsFor by remember { mutableStateOf<String?>(null) }
+            var sourceActionsFor by remember {
+                mutableStateOf<com.davidbugayov.financeanalyzer.domain.model.Source?>(
+                    null,
+                )
+            }
+            var isEditingCategory by remember { mutableStateOf(false) }
+            var editingCategoryOldName by remember { mutableStateOf("") }
+            var isEditingSource by remember { mutableStateOf(false) }
+            var editingSourceOldName by remember { mutableStateOf("") }
+
             Column(
                 modifier =
                     Modifier
@@ -445,14 +457,7 @@ fun <E> baseTransactionScreen(
                         },
                         onSourceLongClick = { selectedSource ->
                             Timber.d("Source long clicked: %s", selectedSource.name)
-                            viewModel.onEvent(
-                                eventFactory(
-                                    BaseTransactionEvent.ShowDeleteSourceConfirmDialog(
-                                        selectedSource.name,
-                                    ),
-                                ),
-                                context,
-                            )
+                            sourceActionsFor = selectedSource
                         },
                         isError = state.sourceError,
                     )
@@ -482,21 +487,8 @@ fun <E> baseTransactionScreen(
                                 "Category long click in BaseTransactionScreen: %s",
                                 selectedCategory.name,
                             )
-                            // Don't allow long press on "Другое" and "Переводы"
                             if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
-                                viewModel.onEvent(
-                                    eventFactory(
-                                        BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(
-                                            selectedCategory.name,
-                                        ),
-                                    ),
-                                    context,
-                                )
-                            } else {
-                                Timber.d(
-                                    "Ignoring long press on protected category: %s",
-                                    selectedCategory.name,
-                                )
+                                categoryActionsFor = selectedCategory.name
                             }
                         },
                         isError = state.categoryError,
@@ -536,21 +528,8 @@ fun <E> baseTransactionScreen(
                                 "Category long click in BaseTransactionScreen: %s",
                                 selectedCategory.name,
                             )
-                            // Don't allow long press on "Другое" and "Переводы"
                             if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
-                                viewModel.onEvent(
-                                    eventFactory(
-                                        BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(
-                                            selectedCategory.name,
-                                        ),
-                                    ),
-                                    context,
-                                )
-                            } else {
-                                Timber.d(
-                                    "Ignoring long press on protected category: %s",
-                                    selectedCategory.name,
-                                )
+                                categoryActionsFor = selectedCategory.name
                             }
                         },
                         isError = state.categoryError,
@@ -787,12 +766,27 @@ fun <E> baseTransactionScreen(
                         )
                     },
                     onConfirm = {
-                        viewModel.onEvent(
-                            eventFactory(
-                                BaseTransactionEvent.AddCustomCategory(state.customCategory),
-                            ),
-                            context,
-                        )
+                        if (isEditingCategory) {
+                            viewModel.onEvent(
+                                eventFactory(BaseTransactionEvent.DeleteCategory(editingCategoryOldName)),
+                                context,
+                            )
+                            viewModel.onEvent(
+                                eventFactory(
+                                    BaseTransactionEvent.AddCustomCategory(state.customCategory),
+                                ),
+                                context,
+                            )
+                            isEditingCategory = false
+                            editingCategoryOldName = ""
+                        } else {
+                            viewModel.onEvent(
+                                eventFactory(
+                                    BaseTransactionEvent.AddCustomCategory(state.customCategory),
+                                ),
+                                context,
+                            )
+                        }
                     },
                     onDismiss = {
                         viewModel.onEvent(
@@ -897,6 +891,86 @@ fun <E> baseTransactionScreen(
                 }
             }
 
+            // Диалог действий для категории (Редактировать / Удалить)
+            categoryActionsFor?.let { categoryName ->
+                AlertDialog(
+                    onDismissRequest = { categoryActionsFor = null },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    title = { Text(stringResource(UiR.string.category)) },
+                    text = {
+                        Column {
+                            TextButton(
+                                onClick = {
+                                    isEditingCategory = true
+                                    editingCategoryOldName = categoryName
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.SetCustomCategory(categoryName)),
+                                        context,
+                                    )
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog),
+                                        context,
+                                    )
+                                    categoryActionsFor = null
+                                },
+                            ) { Text(stringResource(UiR.string.edit)) }
+                            TextButton(
+                                onClick = {
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(categoryName)),
+                                        context,
+                                    )
+                                    categoryActionsFor = null
+                                },
+                            ) { Text(stringResource(UiR.string.delete)) }
+                        }
+                    },
+                    confirmButton = {},
+                )
+            }
+
+            // Диалог действий для источника (Редактировать / Удалить)
+            sourceActionsFor?.let { source ->
+                AlertDialog(
+                    onDismissRequest = { sourceActionsFor = null },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    title = { Text(stringResource(UiR.string.source)) },
+                    text = {
+                        Column {
+                            TextButton(
+                                onClick = {
+                                    editingSourceOldName = source.name
+                                    isEditingSource = true
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.SetCustomSource(source.name)),
+                                        context,
+                                    )
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.SetSourceColor(source.color)),
+                                        context,
+                                    )
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowCustomSourceDialog),
+                                        context,
+                                    )
+                                    sourceActionsFor = null
+                                },
+                            ) { Text(stringResource(UiR.string.edit)) }
+                            TextButton(
+                                onClick = {
+                                    viewModel.onEvent(
+                                        eventFactory(BaseTransactionEvent.ShowDeleteSourceConfirmDialog(source.name)),
+                                        context,
+                                    )
+                                    sourceActionsFor = null
+                                },
+                            ) { Text(stringResource(UiR.string.delete)) }
+                        }
+                    },
+                    confirmButton = {},
+                )
+            }
+
             if (state.showSourcePicker) {
                 SourcePickerDialog(
                     sources = state.sources,
@@ -927,6 +1001,13 @@ fun <E> baseTransactionScreen(
                             context,
                         )
                     },
+                    onEditSource = { source ->
+                        editingSourceOldName = source.name
+                        isEditingSource = true
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCustomSource(source.name)), context)
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetSourceColor(source.color)), context)
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomSourceDialog), context)
+                    },
                 )
             }
 
@@ -947,15 +1028,33 @@ fun <E> baseTransactionScreen(
                         )
                     },
                     onConfirm = {
-                        viewModel.onEvent(
-                            eventFactory(
-                                BaseTransactionEvent.AddCustomSource(
-                                    state.customSource,
-                                    state.sourceColor,
+                        if (isEditingSource) {
+                            viewModel.onEvent(
+                                eventFactory(BaseTransactionEvent.DeleteSource(editingSourceOldName)),
+                                context,
+                            )
+                            viewModel.onEvent(
+                                eventFactory(
+                                    BaseTransactionEvent.AddCustomSource(
+                                        state.customSource,
+                                        state.sourceColor,
+                                    ),
                                 ),
-                            ),
-                            context,
-                        )
+                                context,
+                            )
+                            isEditingSource = false
+                            editingSourceOldName = ""
+                        } else {
+                            viewModel.onEvent(
+                                eventFactory(
+                                    BaseTransactionEvent.AddCustomSource(
+                                        state.customSource,
+                                        state.sourceColor,
+                                    ),
+                                ),
+                                context,
+                            )
+                        }
                     },
                     onDismiss = {
                         viewModel.onEvent(

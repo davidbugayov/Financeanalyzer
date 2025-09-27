@@ -395,14 +395,19 @@
   <string name="period_settings">Настройки периода</string>
   <string name="period_settings_title">Настройки периода</string>
   <string name="period_week">%1$s - %1$s</string>
-  <string name="period_year">%1$d год</string>
+  <plurals name="period_year">
+    <item quantity="one">%1$d год</item>
+    <item quantity="few">%1$d года</item>
+    <item quantity="many">%1$d лет</item>
+    <item quantity="other">%1$d лет</item>
+  </plurals>
   <string name="permission_rationale">Для работы приложения необходимо разрешение.</string>
   <string name="permission_required">Требуется разрешение</string>
   <string name="permission_settings_rationale">Для работы приложения необходимо разрешение. Перейдите в настройки.</string>
   <string name="personalized_tip">Персональный совет</string>
   <string name="prediction_next_month">Ожидаемые расходы на следующий месяц: %1$s</string>
   <string name="prediction_savings">Прогнозируемые сбережения: %1$s</string>
-  <string name="prediction_title">Предсказания расходов</string>
+  <string name="expense_statistics_title">Статистика расходов</string>
   <string name="preview_empty_subtitle">Без данных</string>
   <string name="preview_empty_title">Пустая карточка</string>
   <string name="preview_enhanced_subtitle">Пример с данными</string>
