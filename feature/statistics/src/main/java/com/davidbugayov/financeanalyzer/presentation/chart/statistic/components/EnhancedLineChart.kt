@@ -310,7 +310,7 @@ fun EnhancedLineChart(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = fullDateFormatter.format(selectedPoint.date),
+                        text = selectedPoint.date.toString(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                     )
