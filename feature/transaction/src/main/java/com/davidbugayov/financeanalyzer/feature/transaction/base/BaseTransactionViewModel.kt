@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.LastSelectionPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -53,6 +54,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     // Add sourceUsagePreferences property
     protected val sourceUsagePreferences: SourceUsagePreferences by lazy {
         SourceUsagePreferences.getInstance(getApplication())
+    }
+
+    // Last selection preferences for restoring user's last picks
+    protected val lastSelectionPreferences: LastSelectionPreferences by lazy {
+        LastSelectionPreferences.getInstance(getApplication())
     }
 
     // Add categoryUsagePreferences property
@@ -291,6 +297,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
                 // Загружаем сабкатегории для выбранной категории
                 loadSubcategoriesForCurrentCategory()
+                // Сохраняем последний выбор категории
+                try {
+                    if (_state.value.isExpense) {
+                        lastSelectionPreferences.setLastExpenseCategory(event.category)
+                    } else {
+                        lastSelectionPreferences.setLastIncomeCategory(event.category)
+                    }
+                } catch (e: Exception) {
+                    // ignore
+                }
             }
 
             is BaseTransactionEvent.SetNote ->
@@ -392,6 +408,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                             source = selectedSource.name,
                             sourceColor = selectedSource.color,
                         )
+                    }
+                    // Сохраняем последний источник
+                    try {
+                        lastSelectionPreferences.setLastSource(selectedSource.name, selectedSource.color)
+                    } catch (e: Exception) {
+                        // ignore
                     }
                 }
             }
@@ -846,7 +868,15 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(
                         state,
                         expenseCategories = sortedCategories,
-                        category = firstCategory,
+                        category = if (state.category.isBlank()) {
+                            // Try restore last category based on type
+                            val last = if (state.isExpense) {
+                                lastSelectionPreferences.getLastExpenseCategory()
+                            } else {
+                                lastSelectionPreferences.getLastIncomeCategory()
+                            }
+                            if (last.isNotBlank()) last else firstCategory
+                        } else state.category,
                         showDatePicker = false,
                         showCategoryPicker = false,
                         showCustomCategoryDialog = false,
@@ -857,9 +887,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         isLoading = false,
                         isSuccess = false,
                         successMessage = "",
-                        sourceColor = 0,
-                        customSource = "",
-                        source = "",
+                        // don't reset user's source here; it will be restored from preferences below
+                        sourceColor = state.sourceColor,
+                        customSource = state.customSource,
+                        source = state.source,
                         addToWallet = false,
                         selectedWallets = emptyList(),
                         showWalletSelector = false,
@@ -914,6 +945,24 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
         // Загружаем источники с учетом сортировки по частоте использования
         loadSources()
+        // После загрузки источников попробуем восстановить последний выбранный источник
+        viewModelScope.launch {
+            val lastSourceName = lastSelectionPreferences.getLastSourceName()
+            if (lastSourceName.isNotBlank()) {
+                val match = _state.value.sources.find { it.name == lastSourceName }
+                if (match != null) {
+                    _state.update { s ->
+                        copyState(s, source = match.name, sourceColor = match.color)
+                    }
+                } else {
+                    // если источник был кастомным и его ещё нет — выставим имя и цвет из преференсов
+                    val color = lastSelectionPreferences.getLastSourceColor()
+                    _state.update { s ->
+                        copyState(s, source = lastSourceName, sourceColor = color)
+                    }
+                }
+            }
+        }
 
         // Подписываемся на изменения валюты для обновления AmountField
         viewModelScope.launch {

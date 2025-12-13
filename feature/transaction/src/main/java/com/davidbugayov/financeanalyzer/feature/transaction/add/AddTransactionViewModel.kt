@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.LastSelectionPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
@@ -176,6 +177,18 @@ class AddTransactionViewModel(
                     // TODO: Реализовать через domain модель
                     incrementCategoryUsage(transactionToSave.category.toString(), transactionToSave.isExpense)
                     incrementSourceUsage(transactionToSave.source)
+                    // Persist last selections
+                    try {
+                        val last = LastSelectionPreferences.getInstance(context)
+                        if (transactionToSave.isExpense) {
+                            last.setLastExpenseCategory(transactionToSave.category)
+                        } else {
+                            last.setLastIncomeCategory(transactionToSave.category)
+                        }
+                        last.setLastSource(transactionToSave.source, _state.value.sourceColor)
+                    } catch (e: Exception) {
+                        // не критично
+                    }
                     updateWidgetsUseCase()
 
                     // Триггер достижения за добавление транзакции
