@@ -54,11 +54,11 @@ subprojects {
 tasks.register("lintAll") {
     group = "verification"
     description = "Runs lint for all modules"
-    
+
     // Делаем задачу зависимой от lint задач всех модулей
     dependsOn(
         ":app:lintRustoreDebug",
-        ":core:lintDebug", 
+        ":core:lintDebug",
         ":data:lintDebug",
         ":domain:lintDebug",
         ":ui:lintDebug",
@@ -75,7 +75,7 @@ tasks.register("lintAll") {
         ":feature:onboarding:lintDebug",
 
     )
-    
+
     doLast {
         println("✅ Lint проверка завершена для всех модулей!")
     }
@@ -85,17 +85,17 @@ tasks.register("lintAll") {
 tasks.register("resetLintBaseline") {
     group = "verification"
     description = "Resets all lint baseline files by deleting them and running fresh lint"
-    
+
     doLast {
         println("Resetting lint baseline files...")
-        
+
         val modules = listOf(
             "app", "core", "data", "domain", "ui", "utils", "navigation", "presentation",
-            "feature", "feature:home", "feature:budget", "feature:transaction", 
-            "feature:history", "feature:statistics", "feature:profile", 
+            "feature", "feature:home", "feature:budget", "feature:transaction",
+            "feature:history", "feature:statistics", "feature:profile",
             "feature:onboarding"
         )
-        
+
         modules.forEach { module ->
             val baselineFile = file("$module/lint-baseline.xml")
             if (baselineFile.exists()) {
@@ -103,9 +103,36 @@ tasks.register("resetLintBaseline") {
                 println("Deleted baseline for $module")
             }
         }
-        
+
         println("All lint baseline files have been reset!")
         println("Run './gradlew lintAll' to generate fresh baselines")
+    }
+}
+
+// Add a simple helper task to list included modules. This is low-risk and only prints configuration from settings.
+tasks.register("listModules") {
+    group = "help"
+    description = "Prints the list of included Gradle modules (from settings.gradle.kts)"
+    doLast {
+        // Read settings.gradle.kts and extract include lines as a fallback if settingsModel is not available
+        val settingsFile = rootProject.file("settings.gradle.kts")
+        if (settingsFile.exists()) {
+            println("Included modules:")
+            settingsFile.readLines()
+                .map { it.trim() }
+                .filter { it.startsWith("include(") || it.startsWith("include(\"") }
+                .forEach { line ->
+                    // Simple parsing to extract module names
+                    val modules = line.substringAfter("include(").substringBeforeLast(")")
+                    modules.split(',')
+                        .map { it.trim().trim('"', '\'') }
+                        .forEach { module ->
+                            if (module.isNotEmpty()) println("- $module")
+                        }
+                }
+        } else {
+            println("settings.gradle.kts not found; unable to list modules")
+        }
     }
 }
 

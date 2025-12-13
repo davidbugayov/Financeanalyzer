@@ -91,3 +91,10 @@ kotlin-compiler*
 # Binary files for F-Droid compatibility
 tools/pepk.jar
 tools/pepk_out.zip
+
+# Local environment files
+.env
+.env.*
+
+# macOS Terminal history
+.history
