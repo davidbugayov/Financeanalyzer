@@ -1,11 +1,6 @@
 [versions]
-# SDK versions
-compileSdk = "36"
-minSdk = "26"
-javaVersion = "17"
-
 # Plugins
-androidGradlePlugin = "8.13.0"
+androidGradlePlugin = "8.13.2"
 kotlin = "2.2.0"
 kotlin-multiplatform = "2.2.0"
 googleServices = "4.4.3"
@@ -40,7 +35,7 @@ firebasePerfPlugin = "1.4.2"
 koin = "4.1.0"
 
 # Testing
-junit = "4.13.2"
+junit = { group = "junit", name = "junit", version = "4.13.1" }
 
 # Logging
 timber = "5.0.1"
