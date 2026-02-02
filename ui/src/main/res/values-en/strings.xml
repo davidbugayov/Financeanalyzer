@@ -140,6 +140,8 @@
     <string name="category_other">Other</string>
     <string name="category_other_expense">Other expenses</string>
     <string name="category_other_income">Other income</string>
+    <string name="category_business">Business</string>
+    <string name="category_investments">Investments</string>
     <string name="category_pet">Pets</string>
     <string name="category_rental">Rent</string>
     <string name="category_restaurant">Restaurants</string>
@@ -475,6 +477,13 @@
   <!-- Use plurals: reward_coins -->
     <string name="save">Save</string>
     <string name="savings_category">Saving</string>
+    <string name="auto_savings_title">Automatic savings</string>
+    <string name="auto_savings_description">Set a percentage of each income that will be automatically set aside as savings</string>
+    <string name="auto_savings_enabled">Enable automatic savings</string>
+    <string name="auto_savings_percentage">Savings percentage: %d%%</string>
+    <string name="auto_savings_set_percentage">Set percentage</string>
+    <string name="auto_savings_apply_message">When creating income, %1$d%% will be automatically set aside as savings in the category "%2$s"</string>
+    <string name="auto_savings_success">Savings set to %d%%</string>
     <string name="savings_rate">Savings rate</string>
     <string name="savings_rate_critical_description">Your savings are critically low.This threatens financial stability.</string>
     <string name="savings_rate_critical_impact">Immediately increase the savings</string>

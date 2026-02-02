@@ -462,55 +462,69 @@ class EditTransactionViewModel(
     // Загрузка транзакции для редактирования по ID
     fun loadTransactionForEditById(transactionId: String) {
         Timber.d("ТРАНЗАКЦИЯ: Начало загрузки транзакции ID=%s", transactionId)
-        _state.update { it.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true, error = null) }
+
         // Загружаем категории и источники для актуальности
         loadInitialData()
         loadSources()
+
         viewModelScope.launch {
             try {
-                Timber.d("ТРАНЗАКЦИЯ: Вызов loadTransaction для ID=%s", transactionId)
-                loadTransaction(transactionId)
+                Timber.d("ТРАНЗАКЦИЯ: Загрузка всех транзакций из SharedFacade")
+                val allTransactions = sharedFacade.loadTransactions()
+                Timber.d("ТРАНЗАКЦИЯ: Всего транзакций загружено: ${allTransactions.size}")
 
-                // Добавляем задержку для завершения асинхронной загрузки транзакции
-                kotlinx.coroutines.delay(500)
-
-                val transaction = _state.value.transactionToEdit
-                Timber.d(
-                    "ТРАНЗАКЦИЯ: Результат загрузки transaction=%s, state.editMode=%b",
-                    transaction?.id,
-                    _state.value.editMode,
-                )
+                val transaction = sharedFacade.getTransactionById(allTransactions, transactionId)
+                Timber.d("ТРАНЗАКЦИЯ: Результат поиска по ID=$transactionId: ${transaction?.id}")
 
                 if (transaction != null) {
+                    val domainTransaction = transaction.toDomain()
                     Timber.d(
-                        "ТРАНЗАКЦИЯ: Загружена, id=%s, сумма=%s, категория=%s",
-                        transaction.id,
-                        transaction.amount,
-                        transaction.category,
+                        "ТРАНЗАКЦИЯ: Транзакция найдена - id=%s, сумма=%s, категория=%s, isExpense=%b",
+                        domainTransaction.id,
+                        domainTransaction.amount,
+                        domainTransaction.category,
+                        domainTransaction.isExpense,
                     )
-                    loadTransactionForEdit(transaction)
-                    // Обязательно отключаем индикатор загрузки после успешной загрузки
-                    _state.update { it.copy(isLoading = false) }
-                    Timber.d(
-                        "ТРАНЗАКЦИЯ: После loadTransactionForEdit, editMode=%b, сумма=%s",
-                        _state.value.editMode,
-                        _state.value.amount,
-                    )
-                } else {
-                    Timber.e("ТРАНЗАКЦИЯ: НЕ НАЙДЕНА с ID=%s", transactionId)
+
+                    // Устанавливаем транзакцию и режим редактирования
                     _state.update {
                         it.copy(
-                            error = "Транзакция не найдена",
+                            transactionToEdit = domainTransaction,
+                            editMode = true,
+                        )
+                    }
+
+                    // Загружаем данные транзакции в форму
+                    loadTransactionForEdit(domainTransaction)
+
+                    // Отключаем индикатор загрузки после успешной загрузки
+                    _state.update { it.copy(isLoading = false) }
+
+                    Timber.d(
+                        "ТРАНЗАКЦИЯ: Загрузка завершена успешно - editMode=%b, сумма=%s, категория=%s",
+                        _state.value.editMode,
+                        _state.value.amount,
+                        _state.value.category,
+                    )
+                } else {
+                    Timber.e("ТРАНЗАКЦИЯ: НЕ НАЙДЕНА с ID=%s среди %d транзакций", transactionId, allTransactions.size)
+                    _state.update {
+                        it.copy(
+                            error = "Транзакция не найдена (ID: $transactionId)",
                             isLoading = false,
+                            editMode = false,
                         )
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при загрузке транзакции: %s", e.message)
+                Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при загрузке транзакции ID=%s: %s", transactionId, e.message)
+                CrashLoggerProvider.crashLogger.logException(e)
                 _state.update {
                     it.copy(
-                        error = "Ошибка при загрузке транзакции: %s",
+                        error = "Ошибка при загрузке транзакции: ${e.message}",
                         isLoading = false,
+                        editMode = false,
                     )
                 }
             }

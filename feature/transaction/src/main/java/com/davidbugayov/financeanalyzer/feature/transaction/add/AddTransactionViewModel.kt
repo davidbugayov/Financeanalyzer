@@ -8,12 +8,15 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.LastSelectionPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SavingsAllocationPreferences
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.feature.transaction.base.usecases.AutoSavingsUseCase
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -171,8 +174,44 @@ class AddTransactionViewModel(
             val transactionToSave = prepareTransactionForAdd(moneyFromExpression)
 
             try {
-                val result = sharedFacade.addTransaction(transactionToSave)
-                if (result) {
+                // Проверяем, нужно ли применить автоматические сбережения для доходов
+                val transactionsToProcess = if (!transactionToSave.isExpense) {
+                    val savingsConfig = SavingsAllocationPreferences.getInstance(context).getSavingsConfig()
+                    val categoryName = savingsConfig.category
+                    if (savingsConfig.enabled && categoryName != null && categoryName.isNotEmpty()) {
+                        val autoSavingsUseCase = AutoSavingsUseCase()
+                        val domainTx = transactionToSave.copy(id = UUID.randomUUID().toString())
+                        val result = autoSavingsUseCase.calculateSavings(
+                            domainTx.toDomainTransaction(),
+                            savingsConfig.percentage,
+                            categoryName
+                        )
+                        if (result != null) {
+                            val (modified, savings) = result
+                            listOf(modified.toSharedTransaction(), savings.toSharedTransaction())
+                        } else {
+                            listOf(transactionToSave)
+                        }
+                    } else {
+                        listOf(transactionToSave)
+                    }
+                } else {
+                    listOf(transactionToSave)
+                }
+
+                // Сохраняем все транзакции
+                var allSuccess = true
+                for (tx in transactionsToProcess) {
+                    val result = sharedFacade.addTransaction(tx)
+                    if (result) {
+                        incrementCategoryUsage(tx.category, tx.isExpense)
+                        incrementSourceUsage(tx.source)
+                    } else {
+                        allSuccess = false
+                    }
+                }
+
+                if (allSuccess) {
                     // Обновление балансов кошельков не поддерживается в shared модели
                     // TODO: Реализовать через domain модель
                     incrementCategoryUsage(transactionToSave.category.toString(), transactionToSave.isExpense)
@@ -215,7 +254,7 @@ class AddTransactionViewModel(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message,
+                        error = e.message ?: "Unknown error",
                     )
                 }
             }
@@ -477,4 +516,30 @@ class AddTransactionViewModel(
             else -> super.handleBaseEvent(event, context)
         }
     }
+}
+
+// Расширяющие функции для конвертации между SharedTransaction и Transaction
+private fun SharedTransaction.toDomainTransaction(): Transaction {
+    return Transaction(
+        id = this.id.hashCode().toString(),
+        amount = this.amount,
+        category = this.category,
+        note = this.note,
+        date = Date(),
+        isExpense = this.isExpense,
+        source = this.source,
+        sourceColor = 0,
+    )
+}
+
+private fun Transaction.toSharedTransaction(): SharedTransaction {
+    return SharedTransaction(
+        id = this.id.toString(),
+        amount = this.amount,
+        category = this.category,
+        note = this.note,
+        date = this.date.toLocalDateKmp(),
+        isExpense = this.isExpense,
+        source = this.source,
+    )
 }

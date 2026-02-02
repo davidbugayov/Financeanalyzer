@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
-    alias(libs.plugins.firebase.perf) apply false
+    alias(libs.plugins.agcp) apply false
 }
 
 subprojects {
@@ -22,7 +22,6 @@ subprojects {
                 jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
                 freeCompilerArgs.addAll(
                     listOf(
-                        "-Xcontext-parameters",
                         "-opt-in=kotlin.RequiresOptIn",
                         "-Xjvm-default=all",
                     )
@@ -136,15 +135,3 @@ tasks.register("listModules") {
     }
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://developer.huawei.com/repo/")
-    }
-    dependencies {
-        classpath(libs.agconnect.gradle.plugin)
-        // AGConnect plugin expects explicit AGP classpath
-        classpath("com.android.tools.build:gradle:${libs.versions.androidGradlePlugin.get()}")
-    }
-}

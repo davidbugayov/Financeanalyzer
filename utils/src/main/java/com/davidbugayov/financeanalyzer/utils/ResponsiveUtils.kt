@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -60,10 +60,10 @@ fun getWindowHeightType(height: Dp): WindowType =
  */
 @Composable
 fun rememberWindowSize(): WindowSize {
-    val windowInfo = LocalWindowInfo.current
+    val configuration = LocalConfiguration.current
     val density = LocalDensity.current
-    val screenWidth = with(density) { windowInfo.containerSize.width.toDp() }
-    val screenHeight = with(density) { windowInfo.containerSize.height.toDp() }
+    val screenWidth = with(density) { configuration.screenWidthDp.dp }
+    val screenHeight = with(density) { configuration.screenHeightDp.dp }
 
     return remember(screenWidth, screenHeight) {
         WindowSize(

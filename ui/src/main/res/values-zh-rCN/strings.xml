@@ -144,6 +144,8 @@
     <string name="category_other">其他</string>
     <string name="category_other_expense">其他费用</string>
     <string name="category_other_income">其他收入</string>
+    <string name="category_business">商业</string>
+    <string name="category_investments">投资</string>
     <string name="category_pet">宠物</string>
     <string name="category_rental">租</string>
     <string name="category_restaurant">餐馆</string>
@@ -477,6 +479,13 @@
     <!-- Используется plurals: reward_coins -->
     <string name="save">保存</string>
     <string name="savings_category">保存</string>
+    <string name="auto_savings_title">自动储蓄</string>
+    <string name="auto_savings_description">设置每笔收入的百分比，将自动作为储蓄预留</string>
+    <string name="auto_savings_enabled">启用自动储蓄</string>
+    <string name="auto_savings_percentage">储蓄百分比：%d%%</string>
+    <string name="auto_savings_set_percentage">设置百分比</string>
+    <string name="auto_savings_apply_message">创建收入时，%1$d%%将自动作为储蓄预留在"%2$s"类别中</string>
+    <string name="auto_savings_success">储蓄设置为%d%%</string>
     <string name="savings_rate">储蓄率</string>
     <string name="savings_rate_critical_description">您的积蓄非常低。这威胁到财务稳定。</string>
     <string name="savings_rate_critical_impact">立即增加节省</string>

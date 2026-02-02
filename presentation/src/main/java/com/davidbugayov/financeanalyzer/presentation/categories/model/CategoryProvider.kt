@@ -112,6 +112,8 @@ object CategoryProvider {
             "interest" -> context.getString(UiR.string.category_interest)
             "rental" -> context.getString(UiR.string.category_rental)
             "other_income" -> context.getString(UiR.string.category_other_income)
+            "business" -> context.getString(UiR.string.category_business)
+            "investments" -> context.getString(UiR.string.category_investments)
             else -> context.getString(UiR.string.category_other)
         }
 

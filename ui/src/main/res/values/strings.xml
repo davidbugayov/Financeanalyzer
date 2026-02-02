@@ -139,6 +139,8 @@
   <string name="category_other">Другое</string>
   <string name="category_other_expense">Другие расходы</string>
   <string name="category_other_income">Другие доходы</string>
+  <string name="category_business">Бизнес</string>
+  <string name="category_investments">Инвестиции</string>
   <string name="category_pet">Питомцы</string>
   <string name="category_rental">Аренда</string>
   <string name="category_restaurant">Рестораны</string>
@@ -476,6 +478,13 @@
   <string name="reward_coins">%d монет</string>
   <string name="save">Сохранить</string>
   <string name="savings_category">Сбережения</string>
+  <string name="auto_savings_title">Автоматические сбережения</string>
+  <string name="auto_savings_description">Установите процент от каждого дохода, который будет автоматически откладываться как сбережения</string>
+  <string name="auto_savings_enabled">Включить автоматические сбережения</string>
+  <string name="auto_savings_percentage">Процент сбережений: %d%%</string>
+  <string name="auto_savings_set_percentage">Установить процент</string>
+  <string name="auto_savings_apply_message">При создании дохода %1$d%% будет автоматически отложено как сбережения в категорию "%2$s"</string>
+  <string name="auto_savings_success">Сбережения установлены на %d%%</string>
   <string name="savings_rate">Норма сбережений</string>
   <string name="savings_rate_critical_description">Ваши сбережения критически низкие. Это угрожает финансовой стабильности.</string>
   <string name="savings_rate_critical_impact">Немедленно увеличьте сбережения</string>

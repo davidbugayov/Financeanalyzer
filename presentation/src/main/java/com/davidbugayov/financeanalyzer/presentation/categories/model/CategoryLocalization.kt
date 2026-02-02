@@ -98,6 +98,8 @@ object CategoryLocalization {
                 "gifts" -> context.getString(UiR.string.category_gifts)
                 "interest" -> context.getString(UiR.string.category_interest)
                 "rental" -> context.getString(UiR.string.category_rental)
+                "business" -> context.getString(UiR.string.category_business)
+                "investments" -> context.getString(UiR.string.category_investments)
                 "other_income" -> context.getString(UiR.string.category_other_income)
                 "transaction" -> context.getString(UiR.string.transaction)
                 else -> context.getString(UiR.string.category_other)

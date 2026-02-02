@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.shared.model.BalanceMetrics
 import com.davidbugayov.financeanalyzer.shared.model.Currency
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.shared.model.Transaction
+import com.davidbugayov.financeanalyzer.shared.util.currentTimeMillis
 import com.davidbugayov.financeanalyzer.shared.analytics.AnalyticsProviderBridge
 import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepository
 import com.davidbugayov.financeanalyzer.shared.repository.FinanceRepositoryFactory
@@ -278,7 +279,7 @@ class SharedFacade {
     suspend fun allocateIncome(income: com.davidbugayov.financeanalyzer.shared.model.Money): Boolean =
         financeRepository.createWallet(
             com.davidbugayov.financeanalyzer.shared.model.Wallet(
-                id = "income_allocation_${System.currentTimeMillis()}",
+                id = "income_allocation_${currentTimeMillis()}",
                 name = "Income Allocation",
                 type = com.davidbugayov.financeanalyzer.shared.model.WalletType.CASH,
                 balance = income,

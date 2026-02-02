@@ -1,29 +1,23 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    // For iOS frameworks publishing
-    id("com.android.library")
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
-    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
+    }
 
+    // iOS targets configuration
     val iosX64Target = iosX64()
     val iosArm64Target = iosArm64()
     val iosSimArm64Target = iosSimulatorArm64()
 
-    cocoapods {
-        version = "1.0.0"
-        summary = "FinanceAnalyzer shared logic"
-        homepage = "https://github.com/davidbugayov/FinanceAnalyzer"
-        ios.deploymentTarget = "14.0"
-        framework {
-            baseName = "shared"
-            isStatic = false
-        }
-    }
 
     // Configure iOS frameworks + XCFramework
     val xcf = XCFramework()
@@ -65,6 +59,11 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 

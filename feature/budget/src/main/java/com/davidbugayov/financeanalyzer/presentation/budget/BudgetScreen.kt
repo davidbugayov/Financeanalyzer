@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -86,7 +87,7 @@ import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsState()

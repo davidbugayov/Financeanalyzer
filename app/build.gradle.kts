@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.agcp) apply false
 }
 
 fun getKeystoreProperties(): Properties {
@@ -223,7 +224,6 @@ android {
             )
             freeCompilerArgs.addAll(
                 listOf(
-                    "-Xcontext-parameters",
                     "-opt-in=kotlin.RequiresOptIn",
                     "-Xjvm-default=all",
                     "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
@@ -475,9 +475,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
 }
 
-// Apply Huawei AGConnect plugin only when building Huawei variants to avoid noise for other flavors
+// Apply Huawei AGConnect plugin only when building Huawei variants
 if (gradle.startParameter.taskNames.any { it.contains("Huawei", ignoreCase = true) }) {
-    apply(plugin = "com.huawei.agconnect")
+    pluginManager.apply(libs.plugins.agcp.get().pluginId)
 }
 
 composeCompiler {

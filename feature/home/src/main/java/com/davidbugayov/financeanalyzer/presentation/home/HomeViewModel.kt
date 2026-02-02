@@ -329,8 +329,17 @@ class HomeViewModel(
                 )
             }
             is HomeEvent.EditTransaction -> {
+                val transactionId = event.transaction.id
+                val route = Screen.EditTransaction.createRoute(transactionId)
+                Timber.d(
+                    "HomeViewModel: Навигация к редактированию транзакции - ID=%s, route=%s, amount=%s, category=%s",
+                    transactionId,
+                    route,
+                    event.transaction.amount,
+                    event.transaction.category,
+                )
                 navigationManager.navigate(
-                    NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)),
+                    NavigationManager.Command.Navigate(route),
                 )
             }
             else -> {}

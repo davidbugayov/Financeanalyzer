@@ -92,12 +92,12 @@ class CalculateRetirementForecastUseCase {
 
         when (riskLevel) {
             "CRITICAL" -> {
-                recommendations.add("Увеличьте ежемесячные сбережения на ${String.format("%.2f", monthlyNeeded)}")
+                recommendations.add("Увеличьте ежемесячные сбережения на ${monthlyNeeded}")
                 recommendations.add("Рассмотрите возможность дополнительного дохода")
                 recommendations.add("Пересмотрите пенсионный возраст")
             }
             "HIGH" -> {
-                recommendations.add("Увеличьте сбережения на ${String.format("%.2f", monthlyNeeded)} в месяц")
+                recommendations.add("Увеличьте сбережения на ${monthlyNeeded} в месяц")
                 recommendations.add("Оптимизируйте расходы")
             }
             "MEDIUM" -> {

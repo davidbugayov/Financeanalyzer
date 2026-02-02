@@ -546,7 +546,9 @@ fun HomeScreen(
                 selectedTransactionForActions = null
             },
             onEditTransaction = { transaction ->
+                Timber.d("HomeScreen: Редактирование транзакции ID=${transaction.id}")
                 viewModel.onEvent(HomeEvent.EditTransaction(transaction))
+                // Закрываем диалог сразу - навигация отработает корректно
                 showActionsDialog = false
                 selectedTransactionForActions = null
             },

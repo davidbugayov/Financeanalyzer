@@ -48,7 +48,7 @@ data class Money(
     fun isZero(): Boolean = amount == 0.0
 
     fun toMajorDouble(): Double = amount
-    fun toPlainString(): String = String.format("%.2f", amount)
+    fun toPlainString(): String = amount.toString()
 
     // Для обратной совместимости
     val formatted: String get() = toPlainString()

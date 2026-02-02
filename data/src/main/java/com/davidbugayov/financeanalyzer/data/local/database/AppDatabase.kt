@@ -16,7 +16,7 @@ import com.davidbugayov.financeanalyzer.data.local.dao.SubcategoryDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.SubcategoryEntity
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
- 
+
 import timber.log.Timber
 
 /**
@@ -643,7 +643,7 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_18_19,
                         MIGRATION_19_20,
                     )
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration()
                     .addCallback(
                         object : Callback() {
                             override fun onCreate(db: SupportSQLiteDatabase) {

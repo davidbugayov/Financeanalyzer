@@ -32,6 +32,8 @@ object DefaultCategoryLocalization {
             "gifts" to listOf("подарки", "gifts", "礼物"),
             "interest" to listOf("проценты", "interest", "利息"),
             "rental" to listOf("аренда", "rental", "rent", "租金"),
+            "business" to listOf("бизнес", "business", "商业"),
+            "investments" to listOf("инвестиции", "investments", "investment", "投资"),
             "other_income" to listOf("другие доходы", "other income", "其他收入"),
             "other_expense" to listOf("другие расходы", "прочие", "other expenses", "other expense", "其他支出"),
             "other" to listOf("другое", "other", "其他"),
@@ -76,6 +78,8 @@ object DefaultCategoryLocalization {
             "gifts" -> context.getString(R.string.category_gifts)
             "interest" -> context.getString(R.string.category_interest)
             "rental" -> context.getString(R.string.category_rental)
+            "business" -> context.getString(R.string.category_business)
+            "investments" -> context.getString(R.string.category_investments)
             "other_income" -> context.getString(R.string.category_other_income)
             "other_expense" -> context.getString(R.string.category_other_expense)
             "other" -> context.getString(R.string.category_other)
