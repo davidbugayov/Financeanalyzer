@@ -395,16 +395,16 @@
     <string name="path_copied">路径被复制</string>
         <string name="period_all_time">全部时间</string>
     <string name="period_select_custom">选择自定义期间</string>
-    <string name="period_custom">%1$s - %1$s</string>
-    <string name="period_day">%1$s (%2$s)</string>
-    <string name="period_duration_description">在几天内设置持续时间</string>
-    <string name="period_month">%1$s</string>
+    <string name="period_custom">%1$s – %2$s</string>
+    <string name="period_day">今天，%1$s (%2$s)</string>
+    <string name="period_duration_description">设置期间的天数</string>
+    <string name="period_month">本月：%1$s</string>
     <string name="period_quarter">%1$s季度 %2$d</string>
-    <string name="period_settings">期间的设置</string>
-    <string name="period_settings_title">期间的设置</string>
-    <string name="period_week">%1$s - %1$s</string>
+    <string name="period_settings">期间设置</string>
+    <string name="period_settings_title">期间设置</string>
+    <string name="period_week">本周：%1$s – %2$s</string>
   <plurals name="period_year">
-    <item quantity="other">%1$d 年</item>
+    <item quantity="other">今年（%1$d 年）</item>
   </plurals>
     <string name="permission_rationale">对于申请的申请，需要许可。</string>
     <string name="permission_required">需要权限</string>
@@ -496,7 +496,7 @@
     <string name="select_color">选择颜色</string>
     <string name="select_date_button">选择日期</string>
     <string name="select_icon">选择图标</string>
-    <string name="select_period">选择一个时期</string>
+    <string name="select_period">选择期间</string>
     <string name="select_source">选择一个来源</string>
     <string name="select_wallets">选择钱包</string>
     <string name="selected_wallet">选择：%1$s</string>

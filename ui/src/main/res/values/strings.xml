@@ -389,19 +389,19 @@
   <string name="path_copied">Путь скопирован</string>
   <string name="period_all_time">За всё время</string>
   <string name="period_select_custom">Выбрать свой период</string>
-  <string name="period_custom">%1$s - %1$s</string>
-  <string name="period_day">%1$s (%2$s)</string>
+  <string name="period_custom">%1$s — %2$s</string>
+  <string name="period_day">Сегодня, %1$s (%2$s)</string>
   <string name="period_duration_description">Установите продолжительность периода в днях</string>
-  <string name="period_month">%1$s</string>
+  <string name="period_month">Этот месяц: %1$s</string>
   <string name="period_quarter">%1$s квартал %2$d</string>
   <string name="period_settings">Настройки периода</string>
   <string name="period_settings_title">Настройки периода</string>
-  <string name="period_week">%1$s - %1$s</string>
+  <string name="period_week">Эта неделя: %1$s — %2$s</string>
   <plurals name="period_year">
-    <item quantity="one">%1$d год</item>
-    <item quantity="few">%1$d года</item>
-    <item quantity="many">%1$d лет</item>
-    <item quantity="other">%1$d лет</item>
+    <item quantity="one">Этот год (%1$d год)</item>
+    <item quantity="few">Этот год (%1$d года)</item>
+    <item quantity="many">Этот год (%1$d лет)</item>
+    <item quantity="other">Этот год (%1$d лет)</item>
   </plurals>
   <string name="permission_rationale">Для работы приложения необходимо разрешение.</string>
   <string name="permission_required">Требуется разрешение</string>
