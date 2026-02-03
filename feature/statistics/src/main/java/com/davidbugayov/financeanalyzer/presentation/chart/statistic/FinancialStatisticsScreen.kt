@@ -398,11 +398,9 @@ fun FinancialStatisticsScreen(
                                 currentStartDate = startDate
                                 currentEndDate = endDate
                                 showStartDatePicker = false
-                                showEndDatePicker = false
                             },
                             onDismiss = {
                                 showStartDatePicker = false
-                                showEndDatePicker = false
                             },
                         )
                     }
