@@ -47,7 +47,6 @@ fun PeriodFilterBar(
 ) {
     var showPeriodDialog by remember { mutableStateOf(false) }
     var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
 
     var selectedPeriod by remember { mutableStateOf(periodType) }
     var currentStart by remember { mutableStateOf(startDate) }
@@ -80,7 +79,6 @@ fun PeriodFilterBar(
                 }
             },
             onStartDateClick = { showStartDatePicker = true },
-            onEndDateClick = { showEndDatePicker = true },
             onResetDatesToToday = {
                 // Сбрасываем даты на сегодняшний день, если они по умолчанию
                 val startCal = Calendar.getInstance().apply { time = currentStart }
@@ -93,10 +91,6 @@ fun PeriodFilterBar(
                     currentStart = today
                     currentEnd = today
                 }
-            },
-            onConfirm = {
-                onChangePeriod(PeriodType.CUSTOM, currentStart, currentEnd)
-                showPeriodDialog = false
             },
             onDismiss = { showPeriodDialog = false },
         )
@@ -139,11 +133,9 @@ fun PeriodFilterBar(
                 currentStart = startDate
                 currentEnd = endDate
                 showStartDatePicker = false
-                showEndDatePicker = false
             },
             onDismiss = {
                 showStartDatePicker = false
-                showEndDatePicker = false
             },
         )
     }

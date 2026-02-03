@@ -230,7 +230,6 @@ fun FinancialStatisticsScreen(
     // Локальное управление выбором периода (UI/UX как в подробной статистике)
     var showPeriodDialog by remember { mutableStateOf(false) }
     var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
     var selectedPeriodType by remember { mutableStateOf(state.periodType ?: PeriodType.MONTH) }
     var currentStartDate by remember { mutableStateOf(state.startDate) }
     var currentEndDate by remember { mutableStateOf(state.endDate) }
@@ -352,22 +351,11 @@ fun FinancialStatisticsScreen(
                                 }
                             },
                             onStartDateClick = { showStartDatePicker = true },
-                            onEndDateClick = { showEndDatePicker = true },
                             onResetDatesToToday = {
                                 // Сбрасываем даты на сегодняшний день
                                 val today = Calendar.getInstance().time
                                 currentStartDate = today
                                 currentEndDate = today
-                            },
-                            onConfirm = {
-                                showPeriodDialog = false
-                                viewModel.handleIntent(
-                                    EnhancedFinanceChartIntent.ChangePeriod(
-                                        PeriodType.CUSTOM,
-                                        currentStartDate,
-                                        currentEndDate,
-                                    ),
-                                )
                             },
                             onDismiss = { showPeriodDialog = false },
                         )
