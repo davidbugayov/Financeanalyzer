@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -33,9 +32,7 @@ fun PeriodSelectionDialog(
     endDate: Date,
     onPeriodSelected: (PeriodType) -> Unit,
     onStartDateClick: () -> Unit,
-    onEndDateClick: () -> Unit,
     onResetDatesToToday: () -> Unit = {},
-    onConfirm: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     // Проверяем, являются ли даты значениями по умолчанию (5 лет назад)
@@ -58,10 +55,11 @@ fun PeriodSelectionDialog(
             startCal.get(Calendar.YEAR) == 2000
         }
 
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val dayMonth = SimpleDateFormat("d MMMM", Locale.getDefault())
-    val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault())
-    val monthYear = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+    val ruLocale = Locale("ru", "RU")
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", ruLocale)
+    val dayMonth = SimpleDateFormat("d MMMM", ruLocale)
+    val dayOfWeek = SimpleDateFormat("EEEE", ruLocale)
+    val monthYear = SimpleDateFormat("MMMM yyyy", ruLocale)
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
         val now = Calendar.getInstance()
@@ -167,12 +165,11 @@ fun PeriodSelectionDialog(
                 run {
                     val now = Calendar.getInstance()
                     val currentQuarter = ((now.get(Calendar.MONTH) / 3) + 1)
-                    val quarterNames = arrayOf("", "I", "II", "III", "IV")
                     val currentYear = now.get(Calendar.YEAR)
                     PeriodOption(
                         periodType = PeriodType.QUARTER,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_quarter, quarterNames[currentQuarter], currentYear),
+                        title = stringResource(UiR.string.period_quarter, currentQuarter, currentYear),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -183,12 +180,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.YEAR,
                         selectedPeriod = selectedPeriod,
-                        title =
-                            LocalContext.current.resources.getQuantityString(
-                                UiR.plurals.period_year,
-                                currentYear,
-                                currentYear,
-                            ),
+                        title = stringResource(UiR.string.period_year_current, currentYear),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }

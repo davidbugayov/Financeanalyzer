@@ -399,12 +399,13 @@
     <string name="period_day">今天，%1$s (%2$s)</string>
     <string name="period_duration_description">设置期间的天数</string>
     <string name="period_month">本月：%1$s</string>
-    <string name="period_quarter">%1$s季度 %2$d</string>
+    <string name="period_quarter">第%1$d季度 %2$d年</string>
     <string name="period_settings">期间设置</string>
     <string name="period_settings_title">期间设置</string>
     <string name="period_week">本周：%1$s – %2$s</string>
+    <string name="period_year_current">今年（%1$d）</string>
   <plurals name="period_year">
-    <item quantity="other">今年（%1$d 年）</item>
+    <item quantity="other">%1$d 年</item>
   </plurals>
     <string name="permission_rationale">对于申请的申请，需要许可。</string>
     <string name="permission_required">需要权限</string>

@@ -394,13 +394,14 @@
     <string name="period_day">Today, %1$s (%2$s)</string>
     <string name="period_duration_description">Set the duration of the period in days</string>
     <string name="period_month">This month: %1$s</string>
-    <string name="period_quarter">%1$s Quarter %2$d</string>
+    <string name="period_quarter">Q%1$d %2$d</string>
     <string name="period_settings">Period settings</string>
     <string name="period_settings_title">Period settings</string>
     <string name="period_week">This week: %1$s – %2$s</string>
+    <string name="period_year_current">This year (%1$d)</string>
   <plurals name="period_year">
-    <item quantity="one">This year (%1$d year)</item>
-    <item quantity="other">This year (%1$d years)</item>
+    <item quantity="one">%1$d year</item>
+    <item quantity="other">%1$d years</item>
   </plurals>
     <string name="permission_rationale">For the application of the application, permission is necessary.</string>
     <string name="permission_required">Permission required</string>
