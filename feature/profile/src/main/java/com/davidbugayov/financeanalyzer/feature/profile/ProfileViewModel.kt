@@ -51,16 +51,14 @@ class ProfileViewModel(
         syncNotificationState()
         syncSecurityState()
 
-        val langLabel =
-            GlobalContext.get().get<ResourceProvider>().getString(
-                UiR.string.settings_language_current_value,
-            )
+        // Store the saved language code, not the translated label
+        val savedLangCode = preferencesManager.getAppLanguage()
 
         _state.update {
             it.copy(
                 themeMode = preferencesManager.getThemeMode(),
                 selectedCurrency = preferencesManager.getCurrency(),
-                selectedLanguage = langLabel,
+                selectedLanguage = savedLangCode,
             )
         }
         preferencesManager.themeModeFlow
@@ -154,11 +152,7 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeLanguage -> {
                 preferencesManager.setAppLanguage(event.language)
-                val label =
-                    GlobalContext.get().get<ResourceProvider>().getString(
-                        UiR.string.settings_language_current_value,
-                    )
-                _state.update { it.copy(selectedLanguage = label, showLanguageDialog = false) }
+                _state.update { it.copy(selectedLanguage = event.language, showLanguageDialog = false) }
             }
             is ProfileEvent.ChangeCurrency -> {
                 viewModelScope.launch {

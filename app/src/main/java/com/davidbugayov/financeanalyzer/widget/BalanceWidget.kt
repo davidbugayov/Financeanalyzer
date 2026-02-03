@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
+import com.davidbugayov.financeanalyzer.utils.LocaleUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,19 +40,33 @@ class BalanceWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
+        // Оборачиваем контекст с правильной локалью
+        val localizedContext = LocaleUtils.wrapContext(context)
+
         val views = RemoteViews(context.packageName, R.layout.balance_widget_layout)
         // Безопасные дефолты до загрузки
-        views.setTextViewText(R.id.widget_title, context.getString(R.string.current_balance))
-        views.setTextViewText(R.id.widget_balance, context.getString(R.string.default_amount))
-        views.setTextViewText(R.id.widget_income, context.getString(R.string.default_amount))
-        views.setTextViewText(R.id.widget_expense, context.getString(R.string.default_amount))
+        views.setTextViewText(R.id.widget_title, localizedContext.getString(R.string.current_balance))
+        views.setTextViewText(R.id.widget_balance, localizedContext.getString(R.string.default_amount))
+
+        // Устанавливаем локализованные labels для Income и Expense
+        // Находим TextView'ы для Income и Expense labels по контексту
+        // Нужно использовать RemoteViews для установки текста, но они не имеют ID
+        // Поэтому мы найдем способ установить их значения другим путем
+
+        views.setTextViewText(R.id.widget_income, localizedContext.getString(R.string.default_amount))
+        views.setTextViewText(R.id.widget_expense, localizedContext.getString(R.string.default_amount))
         appWidgetManager.updateAppWidget(appWidgetId, views)
 
         // Устанавливаем начальные значения
-        views.setTextViewText(R.id.widget_title, context.getString(R.string.current_balance))
-        views.setTextViewText(R.id.widget_balance, context.getString(R.string.default_amount))
-        views.setTextViewText(R.id.widget_income, context.getString(R.string.default_amount))
-        views.setTextViewText(R.id.widget_expense, context.getString(R.string.default_amount))
+        views.setTextViewText(R.id.widget_title, localizedContext.getString(R.string.current_balance))
+        views.setTextViewText(R.id.widget_balance, localizedContext.getString(R.string.default_amount))
+
+        // Устанавливаем локализованные labels для Income и Expense
+        views.setTextViewText(R.id.widget_income_label, localizedContext.getString(R.string.income))
+        views.setTextViewText(R.id.widget_income, localizedContext.getString(R.string.default_amount))
+
+        views.setTextViewText(R.id.widget_expense_label, localizedContext.getString(R.string.expense))
+        views.setTextViewText(R.id.widget_expense, localizedContext.getString(R.string.default_amount))
 
         // Добавляем клик для запуска приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)

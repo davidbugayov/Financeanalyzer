@@ -20,7 +20,7 @@ data class ProfileState(
     // Настройки приложения
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val isEditingTheme: Boolean = false,
-    val selectedLanguage: String = "Русский",
+    val selectedLanguage: String = "ru",  // Language code: "ru", "en", or "zh"
     val showLanguageDialog: Boolean = false,
     val selectedCurrency: Currency = Currency.RUB,
     val showCurrencyDialog: Boolean = false,

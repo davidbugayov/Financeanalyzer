@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.util
 
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.utils.AppLocale
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,10 +25,11 @@ object UiUtils {
         startDate: Date,
         endDate: Date,
     ): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
-        val dayMonth = SimpleDateFormat("d MMMM", Locale.forLanguageTag("ru"))
-        val dayOfWeek = SimpleDateFormat("EEEE", Locale.forLanguageTag("ru"))
-        val monthYear = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
+        val locale = AppLocale.getCurrentLocale()
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", locale)
+        val dayMonth = SimpleDateFormat("d MMMM", locale)
+        val dayOfWeek = SimpleDateFormat("EEEE", locale)
+        val monthYear = SimpleDateFormat("MMMM yyyy", locale)
 
         return when (periodType) {
             PeriodType.ALL -> context.getString(UiR.string.period_all_time)
@@ -80,7 +82,8 @@ object UiUtils {
         startDate: Date,
         endDate: Date,
     ): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        val locale = AppLocale.getCurrentLocale()
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", locale)
 
         return when (periodType) {
             PeriodType.ALL -> context.getString(UiR.string.period_all_time)
@@ -94,7 +97,7 @@ object UiUtils {
      * Форматирует дату для отображения в формате дд.мм.гггг
      */
     fun formatDate(date: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         return dateFormat.format(date)
     }
 
@@ -102,7 +105,7 @@ object UiUtils {
      * Форматирует дату для отображения в формате дд.мм.гггг
      */
     fun formatDateTime(date: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         return dateFormat.format(date)
     }
 }

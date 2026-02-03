@@ -95,11 +95,18 @@ fun SettingsSection(
             )
         }
         AnimatedVisibility(visible = true, enter = fadeIn()) {
+            // Convert language code to display label
+            val languageLabel = when (languageSubtitle.lowercase()) {
+                "ru" -> stringResource(UiR.string.settings_language_ru)
+                "en" -> stringResource(UiR.string.settings_language_en)
+                "zh" -> stringResource(UiR.string.settings_language_zh)
+                else -> stringResource(UiR.string.settings_language_ru)
+            }
             SettingsActionCard(
                 icon = Icons.Default.Language,
                 iconBackground = MaterialTheme.colorScheme.secondary,
                 title = stringResource(UiR.string.settings_language_title),
-                subtitle = languageSubtitle,
+                subtitle = languageLabel,
                 onClick = onLanguageClick,
             )
         }

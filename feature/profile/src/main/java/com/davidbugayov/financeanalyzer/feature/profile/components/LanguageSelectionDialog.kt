@@ -40,19 +40,13 @@ import com.davidbugayov.financeanalyzer.utils.AppLocale
 
 @Composable
 fun LanguageSelectionDialog(
-    currentLanguage: String,
+    currentLanguage: String,  // Language code: "ru", "en", "zh"
     onLanguageSelected: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     var selectedCode by remember {
-        mutableStateOf(
-            when (currentLanguage) {
-                "English" -> "en"
-                "中文" -> "zh"
-                else -> "ru"
-            },
-        )
+        mutableStateOf(currentLanguage.lowercase().takeIf { it in listOf("ru", "en", "zh") } ?: "ru")
     }
 
     AlertDialog(

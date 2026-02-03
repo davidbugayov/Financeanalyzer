@@ -22,7 +22,7 @@ object DateUtils {
         date: Date,
         pattern: String = "dd.MM.yyyy",
     ): String {
-        val format = SimpleDateFormat(pattern, Locale.forLanguageTag("ru"))
+        val format = SimpleDateFormat(pattern, Locale.getDefault())
         return format.format(date)
     }
 

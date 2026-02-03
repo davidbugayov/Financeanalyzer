@@ -439,7 +439,7 @@ private fun ModernFilters(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            AchievementFilter.values().forEach { filter ->
+            AchievementFilter.entries.forEach { filter ->
                 FilterChip(
                     selected = selectedFilter == filter,
                     onClick = { onFilterSelected(filter) },
@@ -500,7 +500,7 @@ private fun ModernFilters(
                 },
             )
 
-            AchievementCategory.values().forEach { category ->
+            AchievementCategory.entries.forEach { category ->
                 FilterChip(
                     selected = selectedCategory == category,
                     onClick = { onCategorySelected(category) },
@@ -630,7 +630,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = achievement.title,
+                            text = getLocalizedString(achievement.titleResName),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color =
@@ -671,7 +671,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = achievement.description,
+                        text = getLocalizedString(achievement.descriptionResName),
                         style = MaterialTheme.typography.bodyMedium,
                         color =
                             if (achievement.isUnlocked) {
@@ -971,3 +971,24 @@ private fun getRarityGradient(rarity: AchievementRarity): List<Color> =
                 Color(0xFF06B6D4), // Cyan
             )
     }
+
+/**
+ * Resolves a string resource by name with proper locale support
+ */
+@Composable
+@Suppress("DiscouragedApi")
+private fun getLocalizedString(resourceName: String): String {
+    val context = LocalContext.current
+    val resourceId = remember {
+        try {
+            context.resources.getIdentifier(resourceName, "string", context.packageName)
+        } catch (_: Exception) {
+            0
+        }
+    }
+    return if (resourceId != 0) {
+        stringResource(id = resourceId)
+    } else {
+        resourceName
+    }
+}

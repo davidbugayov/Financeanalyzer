@@ -47,8 +47,8 @@ private fun DomainAchievement.toShared(): SharedAchievement =
 private fun SharedAchievement.toDomain(): DomainAchievement =
     DomainAchievement(
         id = this.id,
-        title = this.title,
-        description = this.description,
+        titleResName = "", // SharedAchievement doesn't have resource names, using empty
+        descriptionResName = "", // SharedAchievement doesn't have resource names, using empty
         iconRes = 0,
         category = this.category.toDomain(),
         rarity = this.rarity.toDomain(),
@@ -58,6 +58,8 @@ private fun SharedAchievement.toDomain(): DomainAchievement =
         targetProgress = this.targetProgress,
         rewardCoins = this.rewardCoins,
         isHidden = this.isHidden,
+        title = this.title, // Keep for backward compatibility
+        description = this.description, // Keep for backward compatibility
     )
 
 private fun DomainCategory.toShared(): SharedCategory =

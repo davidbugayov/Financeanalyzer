@@ -47,14 +47,13 @@ val viewModelModule =
         viewModel { WalletTransactionsViewModel(get(), get(), get(), get()) }
 
         viewModelOf(::WalletSetupViewModel)
-
         viewModel { parameters -> SubWalletsViewModel(parameters.get(), get()) }
 
         viewModelOf(::ImportTransactionsViewModel)
 
         viewModel { OnboardingViewModel(get(), get()) }
 
-        viewModel { AchievementsViewModel(get(), get()) }
+        viewModelOf(::AchievementsViewModel)
 
         viewModel { parameters ->
             FinancialDetailStatisticsViewModel(

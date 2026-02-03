@@ -80,8 +80,8 @@ class TransactionHistoryViewModel(
             }.cachedIn(viewModelScope)
 
     // ---------- Helpers для заголовков ----------
-    private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
-    private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.forLanguageTag("ru"))
+    private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+    private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.getDefault())
 
     private fun headerKey(
         date: Date,

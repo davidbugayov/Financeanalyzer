@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.shared.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.shared.model.Money
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
+import com.davidbugayov.financeanalyzer.utils.LocaleUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,11 +40,14 @@ class SmallBalanceWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
+        // Оборачиваем контекст с правильной локалью
+        val localizedContext = LocaleUtils.wrapContext(context)
+
         val views = RemoteViews(context.packageName, R.layout.small_balance_widget_layout)
 
         // Устанавливаем начальные значения
-        views.setTextViewText(R.id.small_widget_title, context.getString(R.string.current_balance))
-        views.setTextViewText(R.id.small_widget_balance, context.getString(R.string.default_small_amount))
+        views.setTextViewText(R.id.small_widget_title, localizedContext.getString(R.string.current_balance))
+        views.setTextViewText(R.id.small_widget_balance, localizedContext.getString(R.string.default_small_amount))
 
         // Добавляем клик для запуска приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)

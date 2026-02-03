@@ -5,7 +5,7 @@ package com.davidbugayov.financeanalyzer.domain.model
  */
 enum class AchievementCategory {
     TRANSACTIONS,    // Транзакции
-    BUDGET,         // Бюджетирование  
+    BUDGET,         // Бюджетирование
     SAVINGS,        // Накопления
     HABITS,         // Привычки
     STATISTICS,     // Статистика
@@ -30,8 +30,8 @@ enum class AchievementRarity {
  */
 data class Achievement(
     val id: String,
-    val title: String,
-    val description: String,
+    val titleResName: String, // Имя строкового ресурса для заголовка (напр. "achievement_first_steps_title")
+    val descriptionResName: String, // Имя строкового ресурса для описания (напр. "achievement_first_steps_description")
     val iconRes: Int,
     val category: AchievementCategory,
     val rarity: AchievementRarity = AchievementRarity.COMMON,
@@ -41,6 +41,9 @@ data class Achievement(
     val targetProgress: Int = 1,
     val rewardCoins: Int = 10,  // Виртуальная валюта за достижение
     val isHidden: Boolean = false,  // Скрытые достижения (показываются только после разблокировки)
+    // Для обратной совместимости с сохраненными данными
+    val title: String = "", // Больше не используется, только для совместимости
+    val description: String = "", // Больше не используется, только для совместимости
 ) {
     /**
      * Вычисляет прогресс достижения в процентах (0.0 - 1.0)
@@ -55,4 +58,4 @@ data class Achievement(
      */
     val isReadyToUnlock: Boolean
         get() = !isUnlocked && currentProgress >= targetProgress
-} 
+}

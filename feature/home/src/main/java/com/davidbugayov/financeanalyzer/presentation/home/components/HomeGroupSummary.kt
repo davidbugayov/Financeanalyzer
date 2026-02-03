@@ -677,13 +677,13 @@ private fun periodTitleForFilter(
     endDate: java.util.Date? = null,
     transactionCount: Int = 0,
 ): String {
-    // Используем русскую локаль для корректного отображения месяцев/дат
-    val ruLocale = java.util.Locale("ru", "RU")
-    java.text.SimpleDateFormat("dd.MM.yyyy", ruLocale)
+    // Получаем текущую локаль устройства
+    val currentLocale = java.util.Locale.getDefault()
+
     val transactionText =
         when {
             // Для английского языка всегда используем одну форму
-            java.util.Locale.getDefault().language == "en" -> {
+            currentLocale.language == "en" -> {
                 "$transactionCount ${stringResource(UiR.string.transactions).lowercase()}"
             }
             // Для русского языка используем правильные формы плюрализации
@@ -701,13 +701,13 @@ private fun periodTitleForFilter(
     return when (filter) {
         TransactionFilter.TODAY -> {
             startDate?.let {
-                val dayMonthFormat = java.text.SimpleDateFormat("d MMMM", ruLocale)
+                val dayMonthFormat = java.text.SimpleDateFormat("d MMMM", currentLocale)
                 "${stringResource(UiR.string.filter_today)} (${dayMonthFormat.format(it)}) • $transactionText"
             } ?: "${stringResource(UiR.string.filter_today)} • $transactionText"
         }
         TransactionFilter.WEEK -> {
             if (startDate != null && endDate != null) {
-                val dayMonth = java.text.SimpleDateFormat("d MMMM", ruLocale)
+                val dayMonth = java.text.SimpleDateFormat("d MMMM", currentLocale)
                 val startStr = dayMonth.format(startDate)
                 val endStr = dayMonth.format(endDate)
                 "${stringResource(UiR.string.filter_week)} ($startStr - $endStr) • $transactionText"
@@ -717,7 +717,7 @@ private fun periodTitleForFilter(
         }
         TransactionFilter.MONTH -> {
             startDate?.let {
-                val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", ruLocale)
+                val monthFormat = java.text.SimpleDateFormat("MMMM yyyy", currentLocale)
                 "${stringResource(UiR.string.filter_month)} (${monthFormat.format(it)}) • $transactionText"
             } ?: "${stringResource(UiR.string.filter_month)} • $transactionText"
         }

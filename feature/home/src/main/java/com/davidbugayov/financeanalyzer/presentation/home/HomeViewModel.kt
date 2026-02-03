@@ -126,7 +126,7 @@ class HomeViewModel(
         pagerTrigger.tryEmit(Unit)
     }
 
-    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
     private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
 

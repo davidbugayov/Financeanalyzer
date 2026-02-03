@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.StringRes
 import com.davidbugayov.financeanalyzer.core.util.ResourceProvider
@@ -14,24 +15,24 @@ class AndroidResourceProvider(
         @StringRes id: Int,
         vararg args: Any?,
     ): String {
-        val ctx = context.applicationContext
-        return if (args.isNotEmpty()) ctx.getString(id, *args) else ctx.getString(id)
+        // Use the context directly to preserve locale configuration set by AppCompatDelegate
+        return if (args.isNotEmpty()) context.getString(id, *args) else context.getString(id)
     }
 
+    @SuppressLint("DiscouragedApi")
     override fun getStringByName(
         name: String,
         vararg args: Any?,
     ): String {
-        val ctx = context.applicationContext
-        // Используем прямую карту ресурсов вместо getIdentifier для оптимизации
+        // Use the context directly to preserve locale configuration set by AppCompatDelegate
         val resourceId =
             try {
-                ctx.resources.getIdentifier(name, "string", ctx.packageName)
-            } catch (e: Exception) {
+                context.resources.getIdentifier(name, "string", context.packageName)
+            } catch (_: Exception) {
                 0
             }
         return if (resourceId != 0) {
-            if (args.isNotEmpty()) ctx.getString(resourceId, *args) else ctx.getString(resourceId)
+            if (args.isNotEmpty()) context.getString(resourceId, *args) else context.getString(resourceId)
         } else {
             name // fallback to name if resource not found
         }

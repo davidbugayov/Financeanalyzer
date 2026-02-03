@@ -38,4 +38,22 @@ object AppLocale {
             AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag))
         }
     }
+
+    /**
+     * Получает текущую локаль приложения, установленную через AppCompatDelegate.
+     * Если локаль не установлена, возвращает системную локаль по умолчанию.
+     */
+    fun getCurrentLocale(): Locale {
+        return try {
+            val localeList = AppCompatDelegate.getApplicationLocales()
+            if (localeList.isEmpty) {
+                Locale.getDefault()
+            } else {
+                localeList[0] ?: Locale.getDefault()
+            }
+        } catch (e: Exception) {
+            Timber.tag("LANG").w(e, "Failed to get application locale")
+            Locale.getDefault()
+        }
+    }
 }
