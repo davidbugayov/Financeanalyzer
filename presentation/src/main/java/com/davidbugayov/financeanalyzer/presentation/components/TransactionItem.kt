@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
@@ -104,6 +105,7 @@ fun transactionItem(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current // Триггер рекомпозиции при смене конфига (языка)
 
     // Получаем SharedFacade для работы с данными
     val sharedFacade = remember { SharedFacade() }
@@ -193,16 +195,16 @@ fun transactionItem(
         }
 
     val formattedDate =
-        remember(transaction.date) {
-            val calendar = Calendar.getInstance()
+        remember(transaction.date, configuration) {
+            val locale = androidx.core.os.ConfigurationCompat.getLocales(configuration)[0]
+                ?: java.util.Locale.getDefault()
+            val calendar = Calendar.getInstance(locale)
             val currentYear = calendar.get(Calendar.YEAR)
             calendar.time = transaction.date
             val transactionYear = calendar.get(Calendar.YEAR)
-            if (transactionYear == currentYear) {
-                getDayMonthFormatter().format(transaction.date)
-            } else {
-                getDayMonthYearFormatter().format(transaction.date)
-            }
+
+            val pattern = if (transactionYear == currentYear) "d MMM" else "d MMM yyyy"
+            SimpleDateFormat(pattern, locale).format(transaction.date)
         }
 
     val currentCurrency by CurrencyProvider.getCurrencyFlow().collectAsState()

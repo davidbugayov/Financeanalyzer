@@ -26,7 +26,8 @@ androidxSplashscreen = "1.2.0-alpha02"
 androidxAppcompat = "1.7.0"
 material = "1.12.0"
 customView = "1.2.0"
-customViewPoolingContainer = "1.1.0"
+customViewPoolingContainer = "1.0.0"
+tracing = "1.2.0"
 
 # Accompanist
 accompanist = "0.36.0"
@@ -94,6 +95,7 @@ androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", v
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
 androidx-customview = { group = "androidx.customview", name = "customview", version.ref = "customView" }
 androidx-customview-poolingcontainer = { group = "androidx.customview", name = "customview-poolingcontainer", version.ref = "customViewPoolingContainer" }
+androidx-tracing = { group = "androidx.tracing", name = "tracing", version.ref = "tracing" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # Compose

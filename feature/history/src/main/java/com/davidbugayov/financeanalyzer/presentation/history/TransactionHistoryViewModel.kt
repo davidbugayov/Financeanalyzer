@@ -112,9 +112,40 @@ class TransactionHistoryViewModel(
                     .map { tx -> TransactionListItem.Item(tx) }
                     .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
                         if (after == null) return@insertSeparators null
+
                         val beforeKey = before?.transaction?.date?.let { headerKey(it, grouping) }
                         val afterKey = headerKey(after.transaction.date, grouping)
-                        if (before == null || beforeKey != afterKey) TransactionListItem.Header(afterKey) else null
+
+                        if (before == null || beforeKey != afterKey) {
+                            // Нормализуем дату для заголовка в зависимости от группировки
+                            val headerDate =
+                                when (grouping) {
+                                    GroupingType.DAY -> after.transaction.date
+                                    GroupingType.WEEK -> {
+                                        // Для недели берем начало недели (или просто дату, если UI форматирует как "Week 34")
+                                        // Calendar.getInstance()... но пока оставим дату транзакции,
+                                        // так как форматтер в UI должен сам разобраться или мы должны передать startOfWeek.
+                                        // Учитывая текущую реализацию UI ("dd MMMM yyyy"), лучше оставить дату транзакции для DAY
+                                        // и подумать над WEEK/MONTH.
+                                        // Для MONTH берем 1 число месяца
+                                        after.transaction.date
+                                    }
+                                    GroupingType.MONTH -> {
+                                        // Сбрасываем дату на 1 число месяца для корректного отображения "Сентябрь 2023"
+                                        val cal = Calendar.getInstance()
+                                        cal.time = after.transaction.date
+                                        cal.set(Calendar.DAY_OF_MONTH, 1)
+                                        cal.set(Calendar.HOUR_OF_DAY, 0)
+                                        cal.set(Calendar.MINUTE, 0)
+                                        cal.set(Calendar.SECOND, 0)
+                                        cal.set(Calendar.MILLISECOND, 0)
+                                        cal.time
+                                    }
+                                }
+                            TransactionListItem.Header(headerDate)
+                        } else {
+                            null
+                        }
                     }
             }.cachedIn(viewModelScope)
 

@@ -3,8 +3,10 @@ package com.davidbugayov.financeanalyzer.presentation.home.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -78,7 +80,9 @@ fun PermissionUtilsHomeFilterChips(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp),
+                .padding(vertical = 12.dp)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         filters.forEach { filterData ->
@@ -89,7 +93,6 @@ fun PermissionUtilsHomeFilterChips(
                     Timber.d("Выбран фильтр ${filterData.filter}")
                     onFilterSelected(filterData.filter)
                 },
-                modifier = Modifier.weight(1f),
             )
         }
     }

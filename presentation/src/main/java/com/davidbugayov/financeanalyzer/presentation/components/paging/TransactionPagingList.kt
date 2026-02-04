@@ -32,7 +32,7 @@ fun transactionPagingList(
     items: LazyPagingItems<TransactionListItem>,
     categoriesViewModel: CategoriesViewModel,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
+    // onTransactionLongClick removed as it was unused
     listState: LazyListState? = null,
     /**
      * Optional content that will be displayed **before** the list of transactions and will
@@ -60,8 +60,16 @@ fun transactionPagingList(
         items(count = items.itemCount) { index ->
             when (val model = items[index]) {
                 is TransactionListItem.Header -> {
+                    // Используем текущую локаль для форматирования заголовка
+                    // LocalConfiguration.current используется для триггера рекомпозиции при смене языка
+                    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+                    val locale = androidx.core.os.ConfigurationCompat.getLocales(configuration)[0]
+                        ?: java.util.Locale.getDefault()
+                    val formatter = java.text.SimpleDateFormat("dd MMMM yyyy", locale)
+                    val title = formatter.format(model.date)
+
                     Text(
-                        text = model.title,
+                        text = title,
                         style = MaterialTheme.typography.titleMedium,
                         modifier =
                             Modifier
@@ -104,7 +112,7 @@ fun transactionPagingList(
                 }
                 loadState.append is LoadState.Error -> {
                     val e = (loadState.append as LoadState.Error).error
-                    Timber.e(e, errorLoadingAdditionalData)
+                    Timber.e(e, "%s", errorLoadingAdditionalData)
                     CrashLoggerProvider.crashLogger.logException(e)
                 }
             }

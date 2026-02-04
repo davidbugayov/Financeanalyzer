@@ -392,6 +392,7 @@ dependencies {
     // Explicit dependency for Layout Inspector
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
+    implementation(libs.androidx.tracing)
 
     // Koin
     implementation(libs.koin.android)

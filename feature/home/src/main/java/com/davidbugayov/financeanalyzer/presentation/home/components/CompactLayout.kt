@@ -137,33 +137,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun CompactTransactionList(
-    state: HomeState,
-    categoriesViewModel: CategoriesViewModel,
-    showGroupSummary: Boolean,
-    onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
-) {
-    val lazyListState = rememberLazyListState()
-
-    // Логируем изменения состояния
-    LaunchedEffect(state.isLoading) {
-    }
-
-    LaunchedEffect(state.filteredTransactions.size) {
-    }
-
-    LaunchedEffect(showGroupSummary) {
-        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-            lazyListState.animateScrollToItem(0)
-        }
-    }
-
-    // Отслеживаем количество транзакций для анимации новых элементов
-    remember { mutableIntStateOf(0) }
-    state.filteredTransactions.size
-}
+// CompactTransactionList removed as it was unused
 
 @Composable
 fun CompactLayout(
@@ -174,7 +148,7 @@ fun CompactLayout(
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
+    // onTransactionLongClick removed
     onAddClick: () -> Unit,
 ) {
     val listState: LazyListState = rememberLazyListState()
@@ -305,7 +279,7 @@ fun CompactLayout(
                     items = itemsToDisplay,
                     categoriesViewModel = categoriesViewModel,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
+                    // onTransactionLongClick removed
                     listState = listState,
                     headerContent = headerContent,
                 )

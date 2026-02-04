@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic.components
+
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -32,6 +33,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -97,6 +99,7 @@ private const val X_AXIS_STEPS = 4
 fun EnhancedLineChart(
     incomeData: List<LineChartPoint>,
     expenseData: List<LineChartPoint>,
+    modifier: Modifier = Modifier,
     showIncome: Boolean = true,
     showExpense: Boolean = true,
     title: String = "Динамика",
@@ -116,7 +119,6 @@ fun EnhancedLineChart(
         }
     },
     onPointSelected: (LineChartPoint?) -> Unit = {},
-    modifier: Modifier = Modifier,
     chartHeight: Dp = DefaultChartHeight,
     selectionThresholdDp: Dp = DefaultSelectionThreshold,
 ) {
@@ -203,8 +205,8 @@ fun EnhancedLineChart(
             if (allPoints.isEmpty()) {
                 System.currentTimeMillis() to System.currentTimeMillis()
             } else {
-                val minTime = allPoints.minOf { it.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 }
-                val maxTime = allPoints.maxOf { it.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 }
+                val minTime = allPoints.minOf { it.date.toEpochDays() * 86400000L }
+                val maxTime = allPoints.maxOf { it.date.toEpochDays() * 86400000L }
                 if (minTime == maxTime) {
                     // Для одной точки создаем диапазон +/- 1 день
                     val calendar = Calendar.getInstance().apply { timeInMillis = minTime }
@@ -231,15 +233,16 @@ fun EnhancedLineChart(
     // Текстовый измеритель для осей
     val textMeasurer = rememberTextMeasurer()
 
+    val configuration = LocalConfiguration.current
+
     // Форматтеры дат
-    val shortDateFormatter = remember { SimpleDateFormat("dd MMM", Locale.forLanguageTag("ru-RU")) }
-    val fullDateFormatter =
-        remember {
-            SimpleDateFormat(
-                "dd MMMM yyyy",
-                Locale.forLanguageTag("ru-RU"),
-            )
+    val shortDateFormatter =
+        remember(configuration) {
+            val locale = androidx.core.os.ConfigurationCompat.getLocales(configuration)[0]
+                ?: Locale.getDefault()
+            SimpleDateFormat("dd MMM", locale)
         }
+
 
     // Получаем стандартные размеры из ресурсов
     val cardCornerRadius = dimensionResource(id = UiR.dimen.chart_card_corner_radius)
@@ -660,7 +663,7 @@ private fun calculateDistance(
     animatedProgress: Float,
 ): Float {
     if (endDate <= startDate || maxValue <= minValue) return Float.MAX_VALUE // Avoid division by zero
-    val normalizedX = (point.date.toEpochDays().toLong() * 24 * 60 * 60 * 1000 - startDate).toFloat() / (endDate - startDate).toFloat()
+    val normalizedX = (point.date.toEpochDays() * 86400000L - startDate).toFloat() / (endDate - startDate).toFloat()
     val normalizedY = 1f - (point.value.toMajorDouble().toFloat() - minValue) / (maxValue - minValue)
 
     if (!normalizedX.isFinite() || !normalizedY.isFinite()) return Float.MAX_VALUE // Check for NaN/Infinity

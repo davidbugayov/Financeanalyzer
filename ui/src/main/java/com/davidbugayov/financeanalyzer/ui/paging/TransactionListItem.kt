@@ -4,7 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
 sealed interface TransactionListItem {
     data class Header(
-        val title: String,
+        val date: java.util.Date,
     ) : TransactionListItem
 
     data class Item(

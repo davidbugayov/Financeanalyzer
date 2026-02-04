@@ -55,7 +55,7 @@ fun ExpandedLayout(
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
+    // onTransactionLongClick removed
     onAddClick: () -> Unit,
 ) {
     val listState: LazyListState = rememberLazyListState()
@@ -90,7 +90,7 @@ fun ExpandedLayout(
             categoriesViewModel = categoriesViewModel,
             pagingItems = pagingItems,
             onTransactionClick = onTransactionClick,
-            onTransactionLongClick = onTransactionLongClick,
+            // onTransactionLongClick removed
             onAddClick = onAddClick,
             modifier = Modifier.weight(1f),
             listState = listState,
@@ -148,7 +148,7 @@ private fun ExpandedRightPanel(
     categoriesViewModel: CategoriesViewModel,
     pagingItems: LazyPagingItems<TransactionListItem>,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
+    // onTransactionLongClick removed
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState,
@@ -194,7 +194,6 @@ private fun ExpandedRightPanel(
                     items = pagingItems,
                     categoriesViewModel = categoriesViewModel,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
                     listState = listState,
                     headerContent = {
                         // Показываем приветственную карточку только один раз (shared pref flag)
@@ -216,6 +215,8 @@ private fun ExpandedRightPanel(
         }
     }
 }
+
+// Helper function removed
 
 @Composable
 private fun ExpandedEmptyState(onAddClick: () -> Unit) {

@@ -109,12 +109,23 @@ class HomeViewModel(
                     .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
                         if (after == null) return@insertSeparators null
 
-                        val beforeDateKey = before?.transaction?.date?.let { dayKey(it) }
-                        val afterDateKey = dayKey(after.transaction.date)
+                        val beforeDateKey = before?.transaction?.date
+                        val afterDateKey = after.transaction.date
 
-                        if (before == null || beforeDateKey != afterDateKey) {
+                        // Сравниваем даты на предмет разницы (простой способ для java.util.Date - сбросить время и сравнить)
+                        val beforeCal = if (beforeDateKey != null) Calendar.getInstance().apply { time = beforeDateKey } else null
+                        val afterCal = Calendar.getInstance().apply { time = afterDateKey }
+
+                        val isDifferentDay = if (beforeCal != null) {
+                            beforeCal.get(Calendar.YEAR) != afterCal.get(Calendar.YEAR) ||
+                                beforeCal.get(Calendar.DAY_OF_YEAR) != afterCal.get(Calendar.DAY_OF_YEAR)
+                        } else {
+                            true
+                        }
+
+                        if (isDifferentDay) {
                             Timber.d("HomeViewModel: Adding header for date: $afterDateKey")
-                            TransactionListItem.Header(afterDateKey)
+                            TransactionListItem.Header(after.transaction.date)
                         } else {
                             null
                         }

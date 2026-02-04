@@ -599,9 +599,6 @@ fun TransactionHistoryScreen(
                                         selectedTransaction = transaction
                                         showActionsDialog = true
                                     },
-                                    onTransactionLongClick = { _ ->
-                                        // long tap отключён
-                                    },
                                 )
                             }
                         }

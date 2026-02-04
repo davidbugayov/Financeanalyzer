@@ -152,7 +152,7 @@ private fun HomeMainContent(
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
+    // onTransactionLongClick removed
     onAddClick: () -> Unit,
 ) {
     if (windowSizeIsCompact) {
@@ -164,7 +164,7 @@ private fun HomeMainContent(
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
             onTransactionClick = onTransactionClick,
-            onTransactionLongClick = onTransactionLongClick,
+            // onTransactionLongClick removed
             onAddClick = onAddClick,
         )
     } else {
@@ -176,7 +176,7 @@ private fun HomeMainContent(
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
             onTransactionClick = onTransactionClick,
-            onTransactionLongClick = onTransactionLongClick,
+            // onTransactionLongClick removed
             onAddClick = onAddClick,
         )
     }
@@ -439,8 +439,10 @@ fun HomeScreen(
         selectedTransactionForActions = transaction
         showActionsDialog = true
     }
-    val onTransactionLongClick = { _: Transaction ->
-        // long tap отключён
+    val onFilterSelected = { filter: TransactionFilter ->
+        // Persist selected filter so it can be restored later
+        sharedPreferences.edit { putString("current_filter", filter.name) }
+        viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
     val onToggleGroupSummary =
         remember<(Boolean) -> Unit> {
@@ -450,11 +452,6 @@ fun HomeScreen(
                 sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
             }
         }
-    val onFilterSelected = { filter: TransactionFilter ->
-        // Persist selected filter so it can be restored later
-        sharedPreferences.edit { putString("current_filter", filter.name) }
-        viewModel.onEvent(HomeEvent.SetFilter(filter))
-    }
     achievementNotificationManager(
         achievementEngine = AchievementEngineProvider.get(),
         onAchievementUnlocked = { achievement ->
@@ -510,7 +507,7 @@ fun HomeScreen(
                     onToggleGroupSummary = onToggleGroupSummary,
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
+                    // onTransactionLongClick removed
                     onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
                 )
                 HomeFeedback(

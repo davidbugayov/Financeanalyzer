@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -677,8 +678,10 @@ private fun periodTitleForFilter(
     endDate: java.util.Date? = null,
     transactionCount: Int = 0,
 ): String {
-    // Получаем текущую локаль приложения (с учетом выбора пользователя)
-    val currentLocale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
+    // Получаем текущую локаль приложения из конфигурации, чтобы она обновлялась при смене языка
+    val configuration = LocalConfiguration.current
+    val currentLocale = androidx.core.os.ConfigurationCompat.getLocales(configuration)[0]
+        ?: java.util.Locale.getDefault()
 
     val transactionText =
         when {
@@ -687,10 +690,10 @@ private fun periodTitleForFilter(
                 "$transactionCount ${stringResource(UiR.string.transactions).lowercase()}"
             }
             // Для русского языка используем правильные формы плюрализации
-            transactionCount == 1 -> {
+            transactionCount % 10 == 1 && transactionCount % 100 != 11 -> {
                 "$transactionCount ${stringResource(UiR.string.transaction).lowercase()}"
             }
-            transactionCount in 2..4 -> {
+            transactionCount % 10 in 2..4 && (transactionCount % 100 !in 10..<20) -> {
                 "$transactionCount ${stringResource(UiR.string.transactions_few).lowercase()}"
             }
             else -> {
@@ -707,6 +710,8 @@ private fun periodTitleForFilter(
         }
         TransactionFilter.WEEK -> {
             if (startDate != null && endDate != null) {
+                // Если даты в одном году, то год показываем только один раз или в конце?
+                // Обычно для недели год не показывают если он текущий, но пусть будет просто d MMMM
                 val dayMonth = java.text.SimpleDateFormat("d MMMM", currentLocale)
                 val startStr = dayMonth.format(startDate)
                 val endStr = dayMonth.format(endDate)
