@@ -46,7 +46,7 @@ class PredictFutureExpensesUseCase {
         val monthlyExpenses = expenses
             .groupBy { transaction ->
                 // Создаем ключ месяц-год
-                "${transaction.date.year}-${transaction.date.monthNumber.toString().padStart(2, '0')}"
+                "${transaction.date.year}-${(transaction.date.month.ordinal + 1).toString().padStart(2, '0')}"
             }
             .mapValues { (_, transactions) ->
                 transactions.sumOf { it.amount.amount }
@@ -107,7 +107,7 @@ class PredictFutureExpensesUseCase {
         } else {
             lastAmount * 2.0  // Для отрицательных значений (расходы) - не более 200%
         }
-        
+
         val maxPrediction = if (lastAmount >= 0) {
             lastAmount * 2.0  // Не более 200% от последнего месяца
         } else {

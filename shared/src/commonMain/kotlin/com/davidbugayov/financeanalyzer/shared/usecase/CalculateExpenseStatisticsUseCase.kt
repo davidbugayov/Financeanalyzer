@@ -49,7 +49,7 @@ class CalculateExpenseStatisticsUseCase {
     private fun prepareMonthlyData(expenses: List<Transaction>): List<MonthlyExpenseData> {
         val monthlyExpenses = expenses
             .groupBy { transaction ->
-                "${transaction.date.year}-${transaction.date.monthNumber.toString().padStart(2, '0')}"
+                "${transaction.date.year}-${(transaction.date.month.ordinal + 1).toString().padStart(2, '0')}"
             }
             .mapValues { (_, transactions) ->
                 transactions.sumOf { it.amount.amount }

@@ -5,7 +5,7 @@ minSdk = "26"
 javaVersion = "21"
 
 # Plugins
-androidGradlePlugin = "8.7.3"
+androidGradlePlugin = "8.8.0"
 kotlin = "2.1.0"
 kotlin-multiplatform = "2.1.0"
 googleServices = "4.4.2"

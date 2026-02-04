@@ -24,6 +24,7 @@ subprojects {
                     listOf(
                         "-opt-in=kotlin.RequiresOptIn",
                         "-Xjvm-default=all",
+                        "-Xexpect-actual-classes",
                     )
                 )
             }
@@ -134,4 +135,3 @@ tasks.register("listModules") {
         }
     }
 }
-

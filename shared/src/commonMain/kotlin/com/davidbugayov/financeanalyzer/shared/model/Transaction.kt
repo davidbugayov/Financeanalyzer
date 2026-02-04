@@ -28,7 +28,7 @@ data class Transaction(
     fun toTimestamp(): Long {
         // Упрощенная конвертация: год * 365 + месяц * 30 + день
         // Это не точный timestamp, но достаточно для базовой функциональности
-        return (date.year * 365L + date.monthNumber * 30L + date.dayOfMonth) * 24 * 60 * 60 * 1000
+        return (date.year * 365L + (date.month.ordinal + 1) * 30L + date.day) * 24 * 60 * 60 * 1000
     }
 
 
