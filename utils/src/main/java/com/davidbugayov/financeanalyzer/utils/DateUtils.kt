@@ -4,7 +4,6 @@ import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import timber.log.Timber
 
 /**
@@ -22,7 +21,7 @@ object DateUtils {
         date: Date,
         pattern: String = "dd.MM.yyyy",
     ): String {
-        val format = SimpleDateFormat(pattern, Locale.getDefault())
+        val format = SimpleDateFormat(pattern, AppLocale.getCurrentLocale())
         return format.format(date)
     }
 

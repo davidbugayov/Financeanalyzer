@@ -30,7 +30,6 @@ import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -80,23 +79,29 @@ class TransactionHistoryViewModel(
             }.cachedIn(viewModelScope)
 
     // ---------- Helpers для заголовков ----------
-    private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-    private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.getDefault())
-
     private fun headerKey(
         date: Date,
         grouping: GroupingType,
-    ): String =
-        when (grouping) {
-            GroupingType.DAY -> dayFormatter.format(date)
+    ): String {
+        val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
+
+        return when (grouping) {
+            GroupingType.DAY -> {
+                val formatter = SimpleDateFormat("dd MMMM yyyy", locale)
+                formatter.format(date)
+            }
             GroupingType.WEEK -> {
-                val cal = Calendar.getInstance().apply { time = date }
+                val cal = Calendar.getInstance(locale).apply { time = date }
                 val week = cal.get(Calendar.WEEK_OF_YEAR)
                 val year = cal.get(Calendar.YEAR)
-                "Неделя $week, $year" // TODO: Вынести в ресурсы
+                "Неделя $week, $year"
             }
-            GroupingType.MONTH -> monthFormatter.format(date)
+            GroupingType.MONTH -> {
+                val formatter = SimpleDateFormat("LLLL yyyy", locale)
+                formatter.format(date)
+            }
         }
+    }
 
     /** PagingData с Header/Item согласно выбранной группировке */
     val pagedUiModels: Flow<PagingData<TransactionListItem>> =

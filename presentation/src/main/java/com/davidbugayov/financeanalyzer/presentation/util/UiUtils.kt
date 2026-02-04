@@ -5,7 +5,6 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import com.davidbugayov.financeanalyzer.utils.AppLocale
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
  * Утилитарный класс для работы с UI компонентами
@@ -97,7 +96,7 @@ object UiUtils {
      * Форматирует дату для отображения в формате дд.мм.гггг
      */
     fun formatDate(date: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", AppLocale.getCurrentLocale())
         return dateFormat.format(date)
     }
 
@@ -105,7 +104,7 @@ object UiUtils {
      * Форматирует дату для отображения в формате дд.мм.гггг
      */
     fun formatDateTime(date: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", AppLocale.getCurrentLocale())
         return dateFormat.format(date)
     }
 }

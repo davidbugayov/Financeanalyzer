@@ -677,8 +677,8 @@ private fun periodTitleForFilter(
     endDate: java.util.Date? = null,
     transactionCount: Int = 0,
 ): String {
-    // Получаем текущую локаль устройства
-    val currentLocale = java.util.Locale.getDefault()
+    // Получаем текущую локаль приложения (с учетом выбора пользователя)
+    val currentLocale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
 
     val transactionText =
         when {

@@ -69,7 +69,11 @@ class EnhancedFinanceChartViewModel :
         startDate: java.util.Date,
         endDate: java.util.Date,
     ): String {
-        val df = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+        val df =
+            java.text.SimpleDateFormat(
+                "dd.MM.yyyy",
+                com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale(),
+            )
         return when (periodType) {
             com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL -> ""
             else -> df.format(startDate) + " - " + df.format(endDate)

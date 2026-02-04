@@ -83,7 +83,6 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -137,7 +136,8 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
     var editWalletName by remember { mutableStateOf("") }
     var editWalletLimit by remember { mutableStateOf("") }
     var showDatePickerDialog by remember { mutableStateOf(false) }
-    val dateFormatter = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
+    val dateFormatter =
+        SimpleDateFormat("dd.MM.yyyy", com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale())
 
     Scaffold(
         topBar = {

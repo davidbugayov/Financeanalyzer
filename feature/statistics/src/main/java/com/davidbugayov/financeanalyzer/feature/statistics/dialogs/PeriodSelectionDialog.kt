@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -24,7 +23,6 @@ import com.davidbugayov.financeanalyzer.ui.R as UiR
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 @Composable
 fun PeriodSelectionDialog(
@@ -56,16 +54,13 @@ fun PeriodSelectionDialog(
             startCal.get(Calendar.YEAR) == 2000
         }
 
-    // Get current locale from configuration
-    val locale = LocalConfiguration.current.locales[0]
+    // Получаем текущую локаль приложения
+    val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
 
-    // ...existing code...
-
-    val ruLocale = locale
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", ruLocale)
-    val dayMonth = SimpleDateFormat("d MMMM", ruLocale)
-    val dayOfWeek = SimpleDateFormat("EEEE", ruLocale)
-    val monthYear = SimpleDateFormat("MMMM yyyy", ruLocale)
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", locale)
+    val dayMonth = SimpleDateFormat("d MMMM", locale)
+    val dayOfWeek = SimpleDateFormat("EEEE", locale)
+    val monthYear = SimpleDateFormat("MMMM yyyy", locale)
 
     fun rangeFor(type: PeriodType): Pair<Date, Date> {
         val now = Calendar.getInstance()

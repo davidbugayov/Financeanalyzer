@@ -29,7 +29,6 @@ import com.davidbugayov.financeanalyzer.utils.kmp.toLocalDateKmp
 import com.davidbugayov.financeanalyzer.utils.kmp.toShared
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -126,9 +125,12 @@ class HomeViewModel(
         pagerTrigger.tryEmit(Unit)
     }
 
-    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-
-    private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
+    private fun dayKey(date: java.util.Date): String {
+        val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
+        val formatter = SimpleDateFormat("dd MMMM yyyy", locale)
+        formatter.applyPattern("dd MMMM yyyy")
+        return formatter.format(date)
+    }
 
     init {
         // Первичная инициализация Paging
@@ -798,7 +800,8 @@ class HomeViewModel(
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
 
             // Форматируем дату для отображения в UI
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val dateFormat =
+                SimpleDateFormat("dd.MM.yyyy", com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale())
             dateFormat.format(date)
 
             // Вычисляем общий баланс (доходы - расходы)

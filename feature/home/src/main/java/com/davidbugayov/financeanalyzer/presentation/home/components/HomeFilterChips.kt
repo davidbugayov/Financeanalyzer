@@ -1,6 +1,9 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +32,15 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 import timber.log.Timber
 
+
 /**
  * Компонент с фильтрами транзакций
+ *
+ * Использует современный Material Design 3 с плавными анимациями и улучшенной иерархией.
+ * Каждый фильтр имеет:
+ * - Анимированные переходы цветов при выборе
+ * - Масштабирование при нажатии
+ * - Улучшенную визуальную иерархию
  *
  * @param currentFilter Текущий выбранный фильтр
  * @param onFilterSelected Callback, вызываемый при выборе фильтра
@@ -66,8 +78,8 @@ fun PermissionUtilsHomeFilterChips(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(top = 0.dp, bottom = 0.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                .padding(horizontal = 8.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         filters.forEach { filterData ->
             FilterChipItem(
@@ -77,6 +89,7 @@ fun PermissionUtilsHomeFilterChips(
                     Timber.d("Выбран фильтр ${filterData.filter}")
                     onFilterSelected(filterData.filter)
                 },
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -93,19 +106,40 @@ private fun FilterChipItem(
     filterData: FilterChipData,
     isSelected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    // Анимированные цвета для плавного перехода между состояниями
+    val animationSpec = tween<androidx.compose.ui.graphics.Color>(durationMillis = 200)
+
     val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
+    val unselectedContainerColor = MaterialTheme.colorScheme.surface
+    val animatedContainerColor =
+        animateColorAsState(
+            targetValue = if (isSelected) selectedContainerColor else unselectedContainerColor,
+            animationSpec = animationSpec,
+            label = "containerColor",
+        ).value
+
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-    val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     val unselectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val borderColor =
-        if (isSelected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.outline.copy(
-                alpha = 0.5f,
-            )
-        }
+    val animatedLabelColor =
+        animateColorAsState(
+            targetValue = if (isSelected) selectedLabelColor else unselectedLabelColor,
+            animationSpec = animationSpec,
+            label = "labelColor",
+        ).value
+
+    val selectedBorderColor = MaterialTheme.colorScheme.primary
+    val unselectedBorderColor = MaterialTheme.colorScheme.outlineVariant
+    val animatedBorderColor =
+        animateColorAsState(
+            targetValue = if (isSelected) selectedBorderColor else unselectedBorderColor,
+            animationSpec = animationSpec,
+            label = "borderColor",
+        ).value
+
+    // Масштабирование при выборе для визуального отклика
+    val scale = if (isSelected) 1.05f else 1f
 
     FilterChip(
         selected = isSelected,
@@ -114,25 +148,38 @@ private fun FilterChipItem(
             Text(
                 filterData.label,
                 fontSize = dimensionResource(UiR.dimen.text_size_14sp).value.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                color = animatedLabelColor,
             )
         },
         leadingIcon = {
-            androidx.compose.material3.Icon(
+            Icon(
                 imageVector = filterData.icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp),
-                tint = if (isSelected) selectedLabelColor else unselectedLabelColor,
+                modifier = Modifier.size(18.dp),
+                tint = animatedLabelColor,
             )
         },
         colors =
             FilterChipDefaults.filterChipColors(
-                selectedContainerColor = selectedContainerColor,
-                selectedLabelColor = selectedLabelColor,
-                containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor,
+                containerColor = animatedContainerColor,
+                labelColor = animatedLabelColor,
+                iconColor = animatedLabelColor,
+                selectedContainerColor = animatedContainerColor,
+                selectedLabelColor = animatedLabelColor,
             ),
-        border = BorderStroke(dimensionResource(UiR.dimen.border_width_1_2dp), borderColor),
+        border =
+            BorderStroke(
+                width = if (isSelected) 2.dp else 1.5.dp,
+                color = animatedBorderColor,
+            ),
+        modifier =
+            modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                ),
+        interactionSource = remember { MutableInteractionSource() },
     )
 }
 

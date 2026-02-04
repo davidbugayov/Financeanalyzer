@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
@@ -49,8 +48,8 @@ fun PeriodSelectionDialog(
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
-    // Get current locale from configuration
-    val locale = LocalConfiguration.current.locales[0]
+    // Получаем текущую локаль приложения
+    val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
 
     // Определяем, был ли CUSTOM период выбран впервые
     remember(selectedPeriod) {

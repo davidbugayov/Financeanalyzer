@@ -65,7 +65,6 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.utils.CurrencyProvider
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -77,9 +76,11 @@ object Formatters {
     ): String = money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
 }
 
-private fun getDayMonthFormatter(): SimpleDateFormat = SimpleDateFormat("d MMM", Locale.getDefault())
+private fun getDayMonthFormatter(): SimpleDateFormat =
+    SimpleDateFormat("d MMM", com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale())
 
-private fun getDayMonthYearFormatter(): SimpleDateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+private fun getDayMonthYearFormatter(): SimpleDateFormat =
+    SimpleDateFormat("d MMM yyyy", com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale())
 
 /**
  * Элемент списка транзакций с улучшенным дизайном и интеграцией ViewModel.
@@ -125,7 +126,9 @@ fun transactionItem(
         }
     }
 
-    val transferCategoryString = context.getString(UiR.string.transaction_transfers).lowercase(Locale.getDefault())
+    val transferCategoryString =
+        context.getString(UiR.string.transaction_transfers)
+            .lowercase(com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale())
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
