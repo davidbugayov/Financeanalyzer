@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
+import androidx.compose.ui.platform.LocalConfiguration
+
 /**
  * Диалог выбора периода для фильтрации транзакций.
  *
@@ -48,8 +50,11 @@ fun PeriodSelectionDialog(
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit,
 ) {
-    // Получаем текущую локаль приложения
-    val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
+    // Получаем текущую локаль приложения через LocalConfiguration для отслеживания изменений
+    val configuration = LocalConfiguration.current
+    val locale = remember(configuration) {
+        androidx.core.os.ConfigurationCompat.getLocales(configuration)[0] ?: java.util.Locale.getDefault()
+    }
 
     // Определяем, был ли CUSTOM период выбран впервые
     remember(selectedPeriod) {
@@ -160,7 +165,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.DAY,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_day, dayMonth.format(s), dayOfWeek.format(s)),
+                        title = stringResource(UiR.string.period_day_simple),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -179,7 +184,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.MONTH,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_month, monthYear.format(s)),
+                        title = stringResource(UiR.string.period_month_simple),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }

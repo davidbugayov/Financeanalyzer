@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
+import androidx.compose.ui.platform.LocalConfiguration
+
 @Composable
 fun PeriodSelectionDialog(
     selectedPeriod: PeriodType,
@@ -54,8 +56,11 @@ fun PeriodSelectionDialog(
             startCal.get(Calendar.YEAR) == 2000
         }
 
-    // Получаем текущую локаль приложения
-    val locale = com.davidbugayov.financeanalyzer.utils.AppLocale.getCurrentLocale()
+    // Получаем текущую локаль приложения через LocalConfiguration для отслеживания изменений
+    val configuration = LocalConfiguration.current
+    val locale = remember(configuration) {
+        androidx.core.os.ConfigurationCompat.getLocales(configuration)[0] ?: java.util.Locale.getDefault()
+    }
 
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", locale)
     val dayMonth = SimpleDateFormat("d MMMM", locale)
@@ -140,7 +145,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.DAY,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_day, dayMonth.format(s), dayOfWeek.format(s)),
+                        title = stringResource(UiR.string.period_day_simple),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }
@@ -159,7 +164,7 @@ fun PeriodSelectionDialog(
                     PeriodOption(
                         periodType = PeriodType.MONTH,
                         selectedPeriod = selectedPeriod,
-                        title = stringResource(UiR.string.period_month, monthYear.format(s)),
+                        title = stringResource(UiR.string.period_month_simple),
                         onPeriodSelected = onPeriodSelected,
                     )
                 }

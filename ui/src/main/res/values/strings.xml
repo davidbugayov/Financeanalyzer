@@ -391,8 +391,10 @@
   <string name="period_select_custom">Выбрать свой период</string>
   <string name="period_custom">%1$s — %2$s</string>
   <string name="period_day">Сегодня, %1$s (%2$s)</string>
+  <string name="period_day_simple">Сегодня</string>
   <string name="period_duration_description">Установите продолжительность периода в днях</string>
   <string name="period_month">Этот месяц: %1$s</string>
+  <string name="period_month_simple">Этот месяц</string>
   <string name="period_quarter">%1$d квартал %2$d г.</string>
   <string name="period_settings">Настройки периода</string>
   <string name="period_settings_title">Настройки периода</string>
