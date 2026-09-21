@@ -1,0 +1,6 @@
+{
+  "name": "Finance Analyzer",
+  "description": "Personal finance manager for tracking income, expenses, budgets, wallets, and financial health statistics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
