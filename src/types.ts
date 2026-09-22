@@ -27,6 +27,8 @@ export interface Wallet {
   autoSavingsPercent?: number; // % of income automatically routed here
 }
 
+export type RecurrenceInterval = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
+
 export interface Transaction {
   id: string;
   amount: number;
@@ -46,10 +48,23 @@ export interface Transaction {
   exchangeRate?: number; // exchange rate used to convert to base currency
   country?: string; // e.g. 'Турция 🇹🇷', 'Таиланд 🇹🇭', etc.
   city?: string; // e.g. 'Стамбул', 'Бангкок'
+  tags?: string[]; // Custom tags for projects, trips, or interests (e.g. ['отпуск', 'ремонт', 'проект-х'])
+  // Recurring transaction fields
+  isRecurring?: boolean;
+  recurrenceInterval?: RecurrenceInterval;
+  recurrenceNextDate?: string; // YYYY-MM-DD
+  recurrenceEndDate?: string; // YYYY-MM-DD
+  recurrenceLastProcessed?: string; // YYYY-MM-DD
+  parentRecurringId?: string; // links auto-generated instances to the recurring template
+}
+
+export interface CategoryBudget {
+  categoryId: string;
+  limit: number;
 }
 
 export type PeriodType = 'day' | 'week' | 'month' | 'year' | 'all';
-export type GroupingType = 'date' | 'month' | 'category' | 'wallet';
+export type GroupingType = 'date' | 'month' | 'category' | 'wallet' | 'tag';
 
 export type AchievementCategory = 'GENERAL' | 'TRANSACTIONS' | 'ANALYTICS' | 'BUDGET' | 'EXPORT_IMPORT' | 'SECURITY';
 export type AchievementRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';

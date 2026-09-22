@@ -1,7 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { X, Check, Plus, ArrowRightLeft, Globe, MapPin, SlidersHorizontal, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  X,
+  Check,
+  Plus,
+  ArrowRightLeft,
+  Globe,
+  MapPin,
+  SlidersHorizontal,
+  RotateCcw,
+  Tag,
+  Repeat,
+  Calendar,
+  Clock,
+} from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
-import { Transaction, TransactionType } from '../types';
+import { Transaction, TransactionType, RecurrenceInterval } from '../types';
 import { DynamicIcon } from '../utils/iconHelper';
 import {
   EXTENDED_CURRENCIES,
@@ -10,6 +23,10 @@ import {
   convertCurrency,
   getCurrencyInfo,
 } from '../utils/currencyRates';
+import {
+  calculateNextRecurrenceDate,
+  getIntervalLabel,
+} from '../utils/recurringProcessor';
 
 export interface InitialForeignData {
   baseAmount: number;
@@ -18,6 +35,19 @@ export interface InitialForeignData {
   exchangeRate: number;
   country?: string;
 }
+
+const PRESET_TAG_SUGGESTIONS = [
+  'отпуск',
+  'поездка',
+  'ремонт',
+  'работа',
+  'проект',
+  'подарок',
+  'здоровье',
+  'хобби',
+  'авто',
+  'дом',
+];
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -32,7 +62,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   initialTransaction,
   initialForeignData,
 }) => {
-  const { categories, wallets, addTransaction, updateTransaction, currency, addSubcategory } = useFinance();
+  const { categories, wallets, transactions, addTransaction, updateTransaction, currency, addSubcategory } = useFinance();
 
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState<string>('');
@@ -44,7 +74,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   const [targetWalletId, setTargetWalletId] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [note, setNote] = useState<string>('');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>('');
   const [error, setError] = useState<string>('');
+
+  // Recurring transaction states
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [recurrenceInterval, setRecurrenceInterval] = useState<RecurrenceInterval>('monthly');
+  const [hasEndDate, setHasEndDate] = useState<boolean>(false);
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState<string>('');
 
   // Foreign currency / Travel states
   const [isForeign, setIsForeign] = useState<boolean>(false);
@@ -64,6 +102,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setTargetWalletId(initialTransaction.targetWalletId || '');
       setDate(initialTransaction.date);
       setNote(initialTransaction.note || '');
+      setTags(initialTransaction.tags || []);
+      setTagInput('');
+
+      // Recurring fields
+      setIsRecurring(Boolean(initialTransaction.isRecurring));
+      setRecurrenceInterval(initialTransaction.recurrenceInterval || 'monthly');
+      setHasEndDate(Boolean(initialTransaction.recurrenceEndDate));
+      setRecurrenceEndDate(initialTransaction.recurrenceEndDate || '');
 
       if (initialTransaction.isForeignCurrency) {
         setIsForeign(true);
@@ -90,6 +136,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setTargetWalletId(wallets[1]?.id || wallets[0]?.id || '');
       setDate(new Date().toISOString().split('T')[0]);
       setNote('');
+      setTags(['отпуск']);
+      setTagInput('');
+
+      setIsRecurring(false);
+      setRecurrenceInterval('monthly');
+      setHasEndDate(false);
+      setRecurrenceEndDate('');
 
       setIsForeign(true);
       setForeignAmount(initialForeignData.originalAmount.toString());
@@ -107,6 +160,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setTargetWalletId(wallets[1]?.id || wallets[0]?.id || '');
       setDate(new Date().toISOString().split('T')[0]);
       setNote('');
+      setTags([]);
+      setTagInput('');
+
+      setIsRecurring(false);
+      setRecurrenceInterval('monthly');
+      setHasEndDate(false);
+      setRecurrenceEndDate('');
 
       setIsForeign(false);
       setForeignAmount('');
@@ -118,6 +178,27 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     }
     setError('');
   }, [initialTransaction, initialForeignData, isOpen, categories, wallets, currency.code]);
+
+  const handleAddTag = (rawTag: string) => {
+    const clean = rawTag.trim().replace(/^#+/, '').toLowerCase();
+    if (clean && !tags.includes(clean)) {
+      setTags((prev) => [...prev, clean]);
+    }
+    setTagInput('');
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags((prev) => prev.filter((t) => t !== tagToRemove));
+  };
+
+  const suggestedTags = useMemo(() => {
+    const set = new Set<string>();
+    PRESET_TAG_SUGGESTIONS.forEach((s) => set.add(s));
+    transactions.forEach((t) => {
+      t.tags?.forEach((tag) => set.add(tag));
+    });
+    return Array.from(set).filter((s) => !tags.includes(s));
+  }, [transactions, tags]);
 
   if (!isOpen) return null;
 
@@ -212,6 +293,22 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       return;
     }
 
+    const recurringData = isRecurring
+      ? {
+          isRecurring: true,
+          recurrenceInterval,
+          recurrenceNextDate: calculateNextRecurrenceDate(date, recurrenceInterval),
+          recurrenceEndDate: hasEndDate && recurrenceEndDate ? recurrenceEndDate : undefined,
+          recurrenceLastProcessed: date,
+        }
+      : {
+          isRecurring: false,
+          recurrenceInterval: undefined,
+          recurrenceNextDate: undefined,
+          recurrenceEndDate: undefined,
+          recurrenceLastProcessed: undefined,
+        };
+
     if (type === 'transfer') {
       if (!targetWalletId || targetWalletId === walletId) {
         setError('Выберите другой кошелек для перевода');
@@ -228,6 +325,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           targetWalletId,
           date,
           note,
+          tags: tags.length > 0 ? tags : undefined,
+          ...recurringData,
         });
       } else {
         addTransaction({
@@ -238,6 +337,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           targetWalletId,
           date,
           note,
+          tags: tags.length > 0 ? tags : undefined,
+          ...recurringData,
         });
       }
       onClose();
@@ -276,7 +377,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         walletId,
         date,
         note,
+        tags: tags.length > 0 ? tags : undefined,
         ...foreignData,
+        ...recurringData,
       });
     } else {
       addTransaction({
@@ -288,7 +391,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         walletId,
         date,
         note,
+        tags: tags.length > 0 ? tags : undefined,
         ...foreignData,
+        ...recurringData,
       });
     }
 
@@ -808,6 +913,218 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
+          </div>
+
+          {/* Recurring Transaction Configuration */}
+          <div
+            id="recurring_section_container"
+            className={`p-3.5 rounded-2xl border transition-all ${
+              isRecurring
+                ? 'bg-gradient-to-r from-emerald-50/80 to-teal-50/80 border-emerald-300 shadow-2xs'
+                : 'bg-slate-50/70 border-slate-200/80 hover:bg-slate-50'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="tx_recurring_toggle"
+                className="flex items-center gap-2.5 cursor-pointer select-none"
+              >
+                <div
+                  className={`w-7 h-7 rounded-xl flex items-center justify-center transition-colors ${
+                    isRecurring
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
+                  <Repeat size={15} />
+                </div>
+                <div>
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>Регулярная операция</span>
+                    {isRecurring && (
+                      <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md bg-emerald-200/80 text-emerald-800">
+                        {getIntervalLabel(recurrenceInterval)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Автоматически повторять списание или начисление по расписанию
+                  </p>
+                </div>
+              </label>
+
+              {/* Toggle switch */}
+              <input
+                id="tx_recurring_toggle"
+                type="checkbox"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="w-5 h-5 accent-emerald-600 rounded cursor-pointer shrink-0"
+              />
+            </div>
+
+            {/* Recurring Settings when active */}
+            {isRecurring && (
+              <div className="mt-3.5 pt-3 border-t border-emerald-200/70 space-y-3 animate-in fade-in duration-200">
+                {/* Interval selection buttons */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Периодичность повтора
+                  </label>
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                    {(
+                      [
+                        { id: 'daily', label: 'Каждый день' },
+                        { id: 'weekly', label: 'Еженедельно' },
+                        { id: 'biweekly', label: '2 недели' },
+                        { id: 'monthly', label: 'Ежемесячно' },
+                        { id: 'yearly', label: 'Ежегодно' },
+                      ] as const
+                    ).map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setRecurrenceInterval(item.id)}
+                        className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all text-center ${
+                          recurrenceInterval === item.id
+                            ? 'bg-emerald-600 text-white shadow-2xs'
+                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Next scheduled run date indicator */}
+                <div className="flex items-center justify-between text-xs bg-white/90 p-2.5 rounded-xl border border-emerald-200/60">
+                  <div className="flex items-center gap-1.5 text-slate-700">
+                    <Clock size={13} className="text-emerald-600 shrink-0" />
+                    <span className="text-[11px] font-medium text-slate-600">
+                      Следующее автопроведение:
+                    </span>
+                    <strong className="text-emerald-800 font-bold">
+                      {calculateNextRecurrenceDate(date, recurrenceInterval)}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Duration / End Date */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="recurrence_has_end_date"
+                      type="checkbox"
+                      checked={hasEndDate}
+                      onChange={(e) => setHasEndDate(e.target.checked)}
+                      className="w-4 h-4 accent-emerald-600 rounded cursor-pointer"
+                    />
+                    <label
+                      htmlFor="recurrence_has_end_date"
+                      className="text-xs font-semibold text-slate-700 cursor-pointer select-none"
+                    >
+                      Ограничить дату окончания
+                    </label>
+                  </div>
+
+                  {hasEndDate && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-slate-500 shrink-0 font-medium">До:</span>
+                      <input
+                        id="tx_recurrence_end_date"
+                        type="date"
+                        min={date}
+                        value={recurrenceEndDate}
+                        onChange={(e) => setRecurrenceEndDate(e.target.value)}
+                        className="w-full text-xs font-semibold px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Tags section for project, trip, or interest */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Tag size={13} className="text-emerald-600" />
+                <span>Теги (проект, поездка, интерес)</span>
+              </label>
+              <span className="text-[11px] text-slate-400">Enter или запятая</span>
+            </div>
+
+            {/* Active Tags */}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs"
+                  >
+                    <span>#{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tag)}
+                      className="hover:text-rose-600 rounded-full p-0.5 transition-colors"
+                      title="Удалить тег"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Tag input row */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold select-none">
+                  #
+                </span>
+                <input
+                  id="tx_tag_input"
+                  type="text"
+                  placeholder="отпуск, ремонт, проект-х..."
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault();
+                      handleAddTag(tagInput);
+                    }
+                  }}
+                  className="w-full text-sm pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+              <button
+                type="button"
+                id="tx_add_tag_btn"
+                onClick={() => handleAddTag(tagInput)}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors shrink-0"
+              >
+                + Тег
+              </button>
+            </div>
+
+            {/* Suggested quick tags */}
+            {suggestedTags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                <span className="text-[11px] text-slate-400 font-medium">Подсказки:</span>
+                {suggestedTags.slice(0, 8).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => handleAddTag(s)}
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200/70 transition-colors"
+                  >
+                    #{s}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Actions */}

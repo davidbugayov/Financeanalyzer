@@ -8,29 +8,76 @@ import {
   Edit2,
   ArrowRightLeft,
   X,
+  Globe,
+  Tag,
+  Repeat,
+  Zap,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { Transaction, GroupingType, TransactionType } from '../types';
 import { formatCurrency } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
+import { getIntervalLabel } from '../utils/recurringProcessor';
 
 interface HistoryViewProps {
   onEditTransaction: (tx: Transaction) => void;
   onOpenAddModal: () => void;
+  onOpenConverterModal?: () => void;
 }
 
 export const HistoryView: React.FC<HistoryViewProps> = ({
   onEditTransaction,
   onOpenAddModal,
+  onOpenConverterModal,
 }) => {
   const { transactions, categories, wallets, currency, deleteTransaction } = useFinance();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState<TransactionType | 'all'>('all');
+  const [selectedType, setSelectedType] = useState<TransactionType | 'all' | 'foreign' | 'recurring'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedWallet, setSelectedWallet] = useState<string>('all');
+  const [selectedTag, setSelectedTag] = useState<string>('all');
+  const [recurrenceFilter, setRecurrenceFilter] = useState<'all' | 'one_time' | 'recurring'>('all');
+  const [recurringSubType, setRecurringSubType] = useState<'all' | 'templates' | 'auto'>('all');
   const [grouping, setGrouping] = useState<GroupingType>('date');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  // Available unique tags with counts
+  const availableTagsWithCount = useMemo(() => {
+    const map: { [tag: string]: number } = {};
+    transactions.forEach((t) => {
+      t.tags?.forEach((tag) => {
+        map[tag] = (map[tag] || 0) + 1;
+      });
+    });
+    return Object.entries(map)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  }, [transactions]);
+
+  // Recurrence counts for quick-toggle badges
+  const recurrenceCounts = useMemo(() => {
+    let oneTime = 0;
+    let recurring = 0;
+    let templates = 0;
+    let auto = 0;
+    transactions.forEach((t) => {
+      if (t.isRecurring || t.parentRecurringId) {
+        recurring++;
+        if (t.isRecurring) templates++;
+        if (t.parentRecurringId) auto++;
+      } else {
+        oneTime++;
+      }
+    });
+    return {
+      total: transactions.length,
+      oneTime,
+      recurring,
+      templates,
+      auto,
+    };
+  }, [transactions]);
 
   // Filtered transactions
   const filtered = useMemo(() => {
@@ -41,11 +88,37 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
         const matchCat = t.category.toLowerCase().includes(q);
         const matchSub = (t.subcategory || '').toLowerCase().includes(q);
         const matchNote = (t.note || '').toLowerCase().includes(q);
-        if (!matchCat && !matchSub && !matchNote) return false;
+        const matchCountry = (t.country || '').toLowerCase().includes(q);
+        const matchCity = (t.city || '').toLowerCase().includes(q);
+        const matchCurr = (t.originalCurrency || '').toLowerCase().includes(q);
+        const matchTag = t.tags
+          ? t.tags.some((tag) => tag.toLowerCase().includes(q) || `#${tag}`.toLowerCase().includes(q))
+          : false;
+        if (!matchCat && !matchSub && !matchNote && !matchCountry && !matchCity && !matchCurr && !matchTag) return false;
+      }
+
+      // Tag filter
+      if (selectedTag !== 'all') {
+        if (!t.tags || !t.tags.includes(selectedTag)) return false;
+      }
+
+      // Recurrence filter (One-time vs Recurring series)
+      if (recurrenceFilter === 'one_time') {
+        if (t.isRecurring || t.parentRecurringId) return false;
+      } else if (recurrenceFilter === 'recurring') {
+        if (!t.isRecurring && !t.parentRecurringId) return false;
+        if (recurringSubType === 'templates' && !t.isRecurring) return false;
+        if (recurringSubType === 'auto' && !t.parentRecurringId) return false;
       }
 
       // Type
-      if (selectedType !== 'all' && t.type !== selectedType) return false;
+      if (selectedType === 'foreign') {
+        if (!t.isForeignCurrency) return false;
+      } else if (selectedType === 'recurring') {
+        if (!t.isRecurring && !t.parentRecurringId) return false;
+      } else if (selectedType !== 'all' && t.type !== selectedType) {
+        return false;
+      }
 
       // Category
       if (selectedCategory !== 'all' && t.category !== selectedCategory) return false;
@@ -57,13 +130,29 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
       return true;
     });
-  }, [transactions, searchQuery, selectedType, selectedCategory, selectedWallet]);
+  }, [transactions, searchQuery, selectedTag, recurrenceFilter, recurringSubType, selectedType, selectedCategory, selectedWallet]);
 
   // Grouped transactions
   const groupedData = useMemo(() => {
     const groups: { [key: string]: Transaction[] } = {};
 
     filtered.forEach((t) => {
+      if (grouping === 'tag') {
+        if (t.tags && t.tags.length > 0) {
+          t.tags.forEach((tag) => {
+            const tagKey = `#${tag}`;
+            if (!groups[tagKey]) groups[tagKey] = [];
+            groups[tagKey].push(t);
+          });
+          return;
+        } else {
+          const key = 'Без тегов';
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(t);
+          return;
+        }
+      }
+
       let key = '';
       if (grouping === 'date') {
         key = t.date; // YYYY-MM-DD
@@ -84,6 +173,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
     return Object.keys(groups)
       .sort((a, b) => {
         if (grouping === 'date' || grouping === 'month') return b.localeCompare(a);
+        if (grouping === 'tag') {
+          if (a === 'Без тегов') return 1;
+          if (b === 'Без тегов') return -1;
+          return a.localeCompare(b);
+        }
         return a.localeCompare(b);
       })
       .map((key) => ({
@@ -112,41 +206,63 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           <p className="text-xs text-slate-500">Поиск, фильтры и группировка расходов и доходов</p>
         </div>
 
-        {/* Grouping switcher */}
-        <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl text-xs font-bold text-slate-600 self-start sm:self-auto">
-          <Layers size={14} className="ml-1 text-slate-400" />
-          <button
-            onClick={() => setGrouping('date')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
-              grouping === 'date' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
-            }`}
-          >
-            По дням
-          </button>
-          <button
-            onClick={() => setGrouping('month')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
-              grouping === 'month' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
-            }`}
-          >
-            По месяцам
-          </button>
-          <button
-            onClick={() => setGrouping('category')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
-              grouping === 'category' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
-            }`}
-          >
-            По категории
-          </button>
-          <button
-            onClick={() => setGrouping('wallet')}
-            className={`px-2.5 py-1 rounded-lg transition-all ${
-              grouping === 'wallet' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
-            }`}
-          >
-            По счету
-          </button>
+        {/* Grouping switcher and converter */}
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          {onOpenConverterModal && (
+            <button
+              id="history_open_converter_btn"
+              onClick={onOpenConverterModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-xs font-bold transition-colors border border-blue-200 shadow-2xs"
+            >
+              <Globe size={14} />
+              <span>Конвертер валют</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl text-xs font-bold text-slate-600">
+            <Layers size={14} className="ml-1 text-slate-400" />
+            <button
+              onClick={() => setGrouping('date')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                grouping === 'date' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+              }`}
+            >
+              По дням
+            </button>
+            <button
+              onClick={() => setGrouping('month')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                grouping === 'month' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+              }`}
+            >
+              По месяцам
+            </button>
+            <button
+              onClick={() => setGrouping('category')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                grouping === 'category' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+              }`}
+            >
+              По категории
+            </button>
+            <button
+              onClick={() => setGrouping('wallet')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                grouping === 'wallet' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+              }`}
+            >
+              По счету
+            </button>
+            <button
+              id="history_group_by_tag_btn"
+              onClick={() => setGrouping('tag')}
+              className={`px-2.5 py-1 rounded-lg transition-all ${
+                grouping === 'tag' ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
+              }`}
+            >
+              По тегам
+            </button>
+          </div>
         </div>
       </div>
 
@@ -157,7 +273,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           <input
             id="history_search_input"
             type="text"
-            placeholder="Поиск по категории, подкатегории, заметке..."
+            placeholder="Поиск по категории, подкатегории, заметке, стране, #тегу..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full text-xs sm:text-sm pl-10 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -172,19 +288,149 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           )}
         </div>
 
+        {/* Recurrence Mode Filter Bar (One-time vs Recurring Series) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 pb-1">
+          <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-bold text-slate-600">
+            <button
+              id="history_filter_recurrence_all"
+              onClick={() => {
+                setRecurrenceFilter('all');
+                setRecurringSubType('all');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                recurrenceFilter === 'all'
+                  ? 'bg-white text-slate-900 shadow-2xs font-extrabold'
+                  : 'hover:text-slate-900'
+              }`}
+            >
+              <span>Все операции</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  recurrenceFilter === 'all'
+                    ? 'bg-slate-200 text-slate-800 font-bold'
+                    : 'bg-slate-200/60 text-slate-500'
+                }`}
+              >
+                {recurrenceCounts.total}
+              </span>
+            </button>
+
+            <button
+              id="history_filter_recurrence_onetime"
+              onClick={() => {
+                setRecurrenceFilter('one_time');
+                setRecurringSubType('all');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                recurrenceFilter === 'one_time'
+                  ? 'bg-white text-blue-900 shadow-2xs font-extrabold'
+                  : 'hover:text-slate-900'
+              }`}
+            >
+              <Zap
+                size={13}
+                className={recurrenceFilter === 'one_time' ? 'text-blue-600' : 'text-slate-400'}
+              />
+              <span>Разовые</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  recurrenceFilter === 'one_time'
+                    ? 'bg-blue-100 text-blue-800 font-bold'
+                    : 'bg-slate-200/60 text-slate-500'
+                }`}
+              >
+                {recurrenceCounts.oneTime}
+              </span>
+            </button>
+
+            <button
+              id="history_filter_recurrence_recurring"
+              onClick={() => {
+                setRecurrenceFilter('recurring');
+              }}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                recurrenceFilter === 'recurring'
+                  ? 'bg-teal-700 text-white shadow-2xs font-extrabold'
+                  : 'hover:text-slate-900'
+              }`}
+            >
+              <Repeat
+                size={13}
+                className={recurrenceFilter === 'recurring' ? 'text-teal-200' : 'text-slate-400'}
+              />
+              <span>Регулярные серии</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  recurrenceFilter === 'recurring'
+                    ? 'bg-teal-800 text-teal-100 font-bold'
+                    : 'bg-slate-200/60 text-slate-500'
+                }`}
+              >
+                {recurrenceCounts.recurring}
+              </span>
+            </button>
+          </div>
+
+          {/* Sub-pills when recurring series is selected */}
+          {recurrenceFilter === 'recurring' && (
+            <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 self-start sm:self-auto animate-in fade-in duration-150">
+              <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mr-1">
+                Серии:
+              </span>
+              <button
+                id="history_recurring_sub_all"
+                onClick={() => setRecurringSubType('all')}
+                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                  recurringSubType === 'all'
+                    ? 'bg-teal-100 text-teal-900 font-bold'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                }`}
+              >
+                Все ({recurrenceCounts.recurring})
+              </button>
+              <button
+                id="history_recurring_sub_templates"
+                onClick={() => setRecurringSubType('templates')}
+                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                  recurringSubType === 'templates'
+                    ? 'bg-teal-100 text-teal-900 font-bold'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                }`}
+                title="Только исходные шаблоны расписаний"
+              >
+                Шаблоны ({recurrenceCounts.templates})
+              </button>
+              <button
+                id="history_recurring_sub_auto"
+                onClick={() => setRecurringSubType('auto')}
+                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                  recurringSubType === 'auto'
+                    ? 'bg-teal-100 text-teal-900 font-bold'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                }`}
+                title="Только выполненные автоплатежи"
+              >
+                Автоплатежи ({recurrenceCounts.auto})
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Filters Grid */}
-        <div className="grid grid-cols-3 gap-2 text-xs font-semibold">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-semibold">
           {/* Type Filter */}
           <select
             id="history_filter_type"
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value as any)}
-            className="px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate"
           >
             <option value="all">Все типы</option>
             <option value="expense">Расходы</option>
             <option value="income">Доходы</option>
             <option value="transfer">Переводы</option>
+            <option value="recurring">🔄 Регулярные</option>
+            <option value="foreign">🌐 За границей (в валюте)</option>
           </select>
 
           {/* Category Filter */}
@@ -216,7 +462,136 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
               </option>
             ))}
           </select>
+
+          {/* Tag Filter */}
+          <select
+            id="history_filter_tag"
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+            className={`px-2.5 py-2 border rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-500 truncate ${
+              selectedTag !== 'all'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold'
+                : 'bg-slate-50 border-slate-200 text-slate-700'
+            }`}
+          >
+            <option value="all">Все теги ({availableTagsWithCount.length})</option>
+            {availableTagsWithCount.map(({ tag, count }) => (
+              <option key={tag} value={tag}>
+                #{tag} ({count})
+              </option>
+            ))}
+          </select>
         </div>
+
+        {/* Quick Tag Chips Selector */}
+        {availableTagsWithCount.length > 0 && (
+          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 overflow-x-auto pb-1 text-xs">
+            <div className="flex items-center gap-1 text-slate-400 font-semibold shrink-0 mr-1 select-none">
+              <Tag size={13} className="text-emerald-600" />
+              <span>Теги:</span>
+            </div>
+            <button
+              id="history_tag_chip_all"
+              onClick={() => setSelectedTag('all')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 transition-all ${
+                selectedTag === 'all'
+                  ? 'bg-slate-900 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              Все ({transactions.length})
+            </button>
+            {availableTagsWithCount.map(({ tag, count }) => {
+              const isSelected = selectedTag === tag;
+              return (
+                <button
+                  key={tag}
+                  id={`history_tag_chip_${tag}`}
+                  onClick={() => setSelectedTag(isSelected ? 'all' : tag)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/70'
+                  }`}
+                >
+                  <span>#{tag}</span>
+                  <span
+                    className={`text-[10px] px-1 rounded-full ${
+                      isSelected
+                        ? 'bg-emerald-700 text-emerald-100'
+                        : 'bg-emerald-200/70 text-emerald-800'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                  {isSelected && <X size={12} className="ml-0.5" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Active Tag Filter Status Banner */}
+        {selectedTag !== 'all' && (
+          <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-emerald-900">Фильтр по тегу:</span>
+              <span className="px-2 py-0.5 bg-emerald-600 text-white rounded-md font-bold">
+                #{selectedTag}
+              </span>
+              <span className="text-emerald-700 font-medium">
+                (найдено: {filtered.length})
+              </span>
+            </div>
+            <button
+              onClick={() => setSelectedTag('all')}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline cursor-pointer"
+            >
+              Сбросить
+            </button>
+          </div>
+        )}
+
+        {/* Active Recurrence Filter Status Banner */}
+        {recurrenceFilter !== 'all' && (
+          <div className="flex items-center justify-between px-3 py-2 bg-teal-50/90 border border-teal-200 rounded-xl text-xs">
+            <div className="flex items-center gap-2">
+              {recurrenceFilter === 'one_time' ? (
+                <Zap size={14} className="text-blue-600" />
+              ) : (
+                <Repeat size={14} className="text-teal-700" />
+              )}
+              <span className="font-semibold text-teal-950">
+                {recurrenceFilter === 'one_time' ? 'Фильтр по периодичности:' : 'Режим серий:'}
+              </span>
+              <span
+                className={`px-2 py-0.5 rounded-md font-bold text-white ${
+                  recurrenceFilter === 'one_time' ? 'bg-blue-600' : 'bg-teal-700'
+                }`}
+              >
+                {recurrenceFilter === 'one_time'
+                  ? '⚡ Только разовые операции'
+                  : recurringSubType === 'templates'
+                  ? '🔁 Только шаблоны расписаний'
+                  : recurringSubType === 'auto'
+                  ? '🔁 Только автоплатежи'
+                  : '🔁 Все регулярные серии'}
+              </span>
+              <span className="text-teal-800 font-medium">
+                (найдено: {filtered.length})
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                setRecurrenceFilter('all');
+                setRecurringSubType('all');
+              }}
+              className="text-xs font-bold text-teal-800 hover:text-teal-950 underline cursor-pointer"
+            >
+              Сбросить
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Grouped Transaction Lists */}
@@ -235,7 +610,13 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
               {/* Group Header */}
               <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Calendar size={14} className="text-slate-400" />
+                  {grouping === 'tag' ? (
+                    <Tag size={14} className="text-emerald-600" />
+                  ) : grouping === 'category' || grouping === 'wallet' ? (
+                    <Layers size={14} className="text-slate-400" />
+                  ) : (
+                    <Calendar size={14} className="text-slate-400" />
+                  )}
                   <span className="text-xs sm:text-sm font-extrabold text-slate-800">
                     {group.key}
                   </span>
@@ -295,6 +676,31 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                                 {t.subcategory}
                               </span>
                             )}
+                            {t.isForeignCurrency && (
+                              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                                <Globe size={11} className="text-blue-500" />
+                                <span>{t.originalAmount} {t.originalCurrency}</span>
+                                {t.country && <span className="opacity-80">({t.country})</span>}
+                              </span>
+                            )}
+                            {t.isRecurring && (
+                              <span
+                                className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                                title={t.recurrenceNextDate ? `Следующее списание: ${t.recurrenceNextDate}` : 'Регулярная операция'}
+                              >
+                                <Repeat size={10} className="text-teal-600" />
+                                <span>{t.recurrenceInterval ? getIntervalLabel(t.recurrenceInterval) : 'Регулярный'}</span>
+                              </span>
+                            )}
+                            {t.parentRecurringId && (
+                              <span
+                                className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                                title="Создано автоплатежом по расписанию"
+                              >
+                                <Repeat size={9} className="text-slate-400" />
+                                <span>Автоплатеж</span>
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 truncate">
                             <span>{t.date}</span>
@@ -303,8 +709,41 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                             {isTransfer && targetWallet && (
                               <span>➔ {targetWallet.name}</span>
                             )}
+                            {t.city && <span>• 📍 {t.city}</span>}
+                            {t.isForeignCurrency && t.exchangeRate && (
+                              <span className="text-slate-400">
+                                • курс {t.exchangeRate.toFixed(2)}
+                              </span>
+                            )}
                             {t.note && <span className="italic">({t.note})</span>}
                           </div>
+
+                          {/* Tags badges */}
+                          {t.tags && t.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {t.tags.map((tag) => {
+                                const isTagActive = selectedTag === tag;
+                                return (
+                                  <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedTag(isTagActive ? 'all' : tag);
+                                    }}
+                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md transition-colors cursor-pointer flex items-center gap-0.5 ${
+                                      isTagActive
+                                        ? 'bg-emerald-600 text-white shadow-2xs'
+                                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/70'
+                                    }`}
+                                    title={`Фильтровать по тегу #${tag}`}
+                                  >
+                                    <span>#{tag}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
 

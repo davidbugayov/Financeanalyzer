@@ -7,6 +7,8 @@ import {
   AlertCircle,
   CheckCircle2,
   HelpCircle,
+  Globe,
+  MapPin,
 } from 'lucide-react';
 import {
   PieChart,
@@ -112,6 +114,46 @@ export const StatisticsView: React.FC = () => {
       Доход: datesMap[date].income,
       Расход: datesMap[date].expense,
     }));
+  }, [filteredTxs]);
+
+  // Foreign currency / Travel expenses breakdown
+  const travelStats = useMemo(() => {
+    const foreignTxs = filteredTxs.filter((t) => t.isForeignCurrency);
+    if (foreignTxs.length === 0) return null;
+
+    const totalBaseSpent = foreignTxs.reduce(
+      (sum, t) => sum + (t.type === 'expense' ? t.amount : 0),
+      0
+    );
+
+    const countryMap: {
+      [country: string]: { baseTotal: number; count: number; currencies: Set<string> };
+    } = {};
+
+    foreignTxs.forEach((t) => {
+      const c = t.country || 'За рубежом';
+      if (!countryMap[c]) {
+        countryMap[c] = { baseTotal: 0, count: 0, currencies: new Set() };
+      }
+      countryMap[c].baseTotal += t.amount;
+      countryMap[c].count += 1;
+      if (t.originalCurrency) countryMap[c].currencies.add(t.originalCurrency);
+    });
+
+    const countries = Object.keys(countryMap)
+      .map((c) => ({
+        country: c,
+        baseTotal: countryMap[c].baseTotal,
+        count: countryMap[c].count,
+        currencies: Array.from(countryMap[c].currencies).join(', '),
+      }))
+      .sort((a, b) => b.baseTotal - a.baseTotal);
+
+    return {
+      totalBaseSpent,
+      txCount: foreignTxs.length,
+      countries,
+    };
   }, [filteredTxs]);
 
   // Score color helper
@@ -390,6 +432,59 @@ export const StatisticsView: React.FC = () => {
                 <Bar dataKey="Расход" fill="#EF4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {/* Foreign Travel & Currency Spending Card */}
+      {travelStats && (
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 shadow-sm border border-slate-700/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-400/30 flex items-center justify-center">
+                <Globe size={22} />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-white">
+                  Расходы за рубежом и в поездках
+                </h3>
+                <p className="text-xs text-slate-300">
+                  Траты в иностранной валюте, пересчитанные по курсу
+                </p>
+              </div>
+            </div>
+
+            <div className="text-left sm:text-right">
+              <span className="text-xs text-slate-400 block">Всего за рубежом</span>
+              <span className="text-lg font-black text-amber-400">
+                {formatCurrency(travelStats.totalBaseSpent, currency.symbol)}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {travelStats.countries.map((c) => (
+              <div
+                key={c.country}
+                className="bg-white/10 hover:bg-white/15 border border-white/10 rounded-2xl p-4 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <MapPin size={14} className="text-rose-400" />
+                    {c.country}
+                  </span>
+                  <span className="text-[11px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">
+                    {c.currencies}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-white/10">
+                  <span className="text-xs text-slate-400">{c.count} операций</span>
+                  <span className="text-sm font-black text-emerald-300">
+                    {formatCurrency(c.baseTotal, currency.symbol)}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

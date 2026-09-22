@@ -11,6 +11,15 @@ export const CURRENCIES: CurrencyConfig[] = [
   { code: 'TRY', symbol: '₺', name: 'Турецкая лира', rate: 0.38 },
 ];
 
+export const DEFAULT_CATEGORY_BUDGETS: Record<string, number> = {
+  cat_food: 25000,
+  cat_restaurant: 12000,
+  cat_transport: 8000,
+  cat_housing: 15000,
+  cat_health: 7000,
+  cat_entertainment: 6000,
+};
+
 export const DEFAULT_CATEGORIES: Category[] = [
   // Expense categories
   {
@@ -120,6 +129,15 @@ export const DEFAULT_CATEGORIES: Category[] = [
     color: '#D946EF', // Fuchsia
     isExpense: true,
     subcategories: ['Помощь фондам', 'Подарки близким'],
+  },
+  {
+    id: 'cat_travel',
+    name: 'Путешествия и поездки',
+    key: 'travel',
+    icon: 'Plane',
+    color: '#0284C7', // Sky Blue
+    isExpense: true,
+    subcategories: ['Отели и жилье', 'Кафе за рубежом', 'Сувениры и шоппинг', 'Транспорт и аренда', 'Экскурсии', 'Связь за границей'],
   },
   {
     id: 'cat_other_expense',
@@ -357,6 +375,18 @@ export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
     rarity: 'COMMON',
     icon: 'Lock',
   },
+  {
+    id: 'world_traveler',
+    title: 'Путешественник',
+    description: 'Совершите покупку или запишите расход в зарубежной валюте',
+    currentProgress: 2,
+    targetProgress: 1,
+    isUnlocked: true,
+    dateUnlocked: '2026-03-20',
+    category: 'TRANSACTIONS',
+    rarity: 'RARE',
+    icon: 'Globe',
+  },
 ];
 
 // Helper to generate dates around today
@@ -378,6 +408,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 86400000 * 1,
     walletId: 'w_main_card',
     note: 'Зарплата за текущий месяц',
+    tags: ['работа'],
   },
   {
     id: 'tx_2',
@@ -389,6 +420,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     walletId: 'w_main_card',
     targetWalletId: 'w_savings',
     note: 'Автосбережение 10% от зарплаты',
+    tags: ['сбережения'],
   },
   {
     id: 'tx_3',
@@ -401,6 +433,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 3600000 * 3,
     walletId: 'w_main_card',
     note: 'ВкусВилл и Перекресток',
+    tags: ['дом'],
   },
   {
     id: 'tx_4',
@@ -437,6 +470,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 86400000 * 3,
     walletId: 'w_main_card',
     note: 'Консультация по архитектуре проекта',
+    tags: ['фриланс', 'проект-альфа'],
   },
   {
     id: 'tx_7',
@@ -449,6 +483,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 86400000 * 4,
     walletId: 'w_main_card',
     note: 'Оплата квитанции ЕИРЦ',
+    tags: ['дом'],
   },
   {
     id: 'tx_8',
@@ -461,6 +496,7 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 86400000 * 5,
     walletId: 'w_main_card',
     note: 'Витаминный комплекс',
+    tags: ['здоровье'],
   },
   {
     id: 'tx_9',
@@ -544,5 +580,62 @@ export const INITIAL_TRANSACTIONS: Transaction[] = [
     timestamp: Date.now() - 86400000 * 12,
     walletId: 'w_main_card',
     note: 'Тариф за месяц',
+  },
+  {
+    id: 'tx_16',
+    amount: 2565,
+    type: 'expense',
+    category: 'Путешествия и поездки',
+    categoryId: 'cat_travel',
+    subcategory: 'Кафе за рубежом',
+    date: getPastDateStr(2),
+    timestamp: Date.now() - 86400000 * 2 - 14400000,
+    walletId: 'w_main_card',
+    note: 'Ужин с кебабом на Босфоре',
+    isForeignCurrency: true,
+    originalAmount: 950,
+    originalCurrency: 'TRY',
+    exchangeRate: 2.70,
+    country: 'Турция 🇹🇷',
+    city: 'Стамбул',
+    tags: ['отпуск', 'стамбул-2026', 'еда'],
+  },
+  {
+    id: 'tx_17',
+    amount: 7200,
+    type: 'expense',
+    category: 'Путешествия и поездки',
+    categoryId: 'cat_travel',
+    subcategory: 'Отели и жилье',
+    date: getPastDateStr(3),
+    timestamp: Date.now() - 86400000 * 3 - 3600000,
+    walletId: 'w_main_card',
+    note: 'Отель у пляжа Патонг',
+    isForeignCurrency: true,
+    originalAmount: 2800,
+    originalCurrency: 'THB',
+    exchangeRate: 2.57,
+    country: 'Таиланд 🇹🇭',
+    city: 'Пхукет',
+    tags: ['отпуск', 'тайланд-тур', 'отель'],
+  },
+  {
+    id: 'tx_18',
+    amount: 1750,
+    type: 'expense',
+    category: 'Кафе и рестораны',
+    categoryId: 'cat_restaurant',
+    subcategory: 'Кофе с собой',
+    date: getPastDateStr(4),
+    timestamp: Date.now() - 86400000 * 4,
+    walletId: 'w_main_card',
+    note: 'Кофе и десерт в ТЦ Дубай Молл',
+    isForeignCurrency: true,
+    originalAmount: 70,
+    originalCurrency: 'AED',
+    exchangeRate: 25.0,
+    country: 'ОАЭ 🇦🇪',
+    city: 'Дубай',
+    tags: ['поездка', 'оаэ'],
   },
 ];

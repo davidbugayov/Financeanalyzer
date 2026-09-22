@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -9,23 +9,49 @@ import {
   ShieldAlert,
   Wallet as WalletIcon,
   TrendingUp,
+  Globe,
+  Repeat,
+  Clock,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency, calculateTotals, getSmartTips } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
 import { Transaction } from '../types';
+import { getIntervalLabel } from '../utils/recurringProcessor';
+import { BudgetDashboardWidget } from './BudgetDashboardWidget';
+import { BudgetModal } from './BudgetModal';
+import { AiInsightsSection } from './AiInsightsSection';
 
 interface DashboardViewProps {
   onOpenAddModal: () => void;
   onEditTransaction: (tx: Transaction) => void;
+  onOpenConverterModal?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenAddModal,
   onEditTransaction,
+  onOpenConverterModal,
 }) => {
-  const { transactions, wallets, categories, currency, setActiveTab } = useFinance();
+  const { transactions, wallets, categories, currency, setActiveTab, processRecurring } = useFinance();
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [selectedBudgetCategoryId, setSelectedBudgetCategoryId] = useState<string | null>(null);
+
+  const handleOpenBudgetModal = (categoryId?: string) => {
+    setSelectedBudgetCategoryId(categoryId || null);
+    setIsBudgetModalOpen(true);
+  };
+
+  const recurringTemplates = useMemo(() => {
+    return transactions
+      .filter((t) => t.isRecurring)
+      .sort((a, b) => {
+        const dateA = a.recurrenceNextDate || a.date;
+        const dateB = b.recurrenceNextDate || b.date;
+        return dateA.localeCompare(dateB);
+      });
+  }, [transactions]);
 
   const { income, expense, net, savingsRate } = calculateTotals(transactions);
   const totalBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
@@ -112,7 +138,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* Quick Action Buttons */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
         <button
           id="action_add_tx_btn"
           onClick={onOpenAddModal}
@@ -156,7 +182,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
           <span className="text-[11px] font-bold text-slate-700">Перевод</span>
         </button>
+
+        {onOpenConverterModal && (
+          <button
+            id="action_converter_btn"
+            onClick={onOpenConverterModal}
+            className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-blue-50/70 to-indigo-50/70 border border-blue-200 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-xs">
+              <Globe size={19} className="stroke-[2]" />
+            </div>
+            <span className="text-[11px] font-bold text-blue-900">За рубежом</span>
+          </button>
+        )}
       </div>
+
+      {/* Monthly Budget Tracking System with Category Progress Bars */}
+      <BudgetDashboardWidget onOpenBudgetModal={handleOpenBudgetModal} />
+
+      {/* AI Insights & Spending Pattern Analysis Section */}
+      <AiInsightsSection
+        onOpenBudgetModal={handleOpenBudgetModal}
+        onNavigateTab={setActiveTab}
+      />
 
       {/* Smart Financial Advice Card */}
       {currentTip && (
@@ -172,6 +220,84 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <h4 className="text-xs sm:text-sm font-bold text-slate-900">{currentTip.title}</h4>
             </div>
             <p className="text-xs text-slate-600 mt-1 leading-relaxed">{currentTip.desc}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Recurring / Scheduled Transactions Widget */}
+      {recurringTemplates.length > 0 && (
+        <div
+          id="dashboard_recurring_widget"
+          className="bg-gradient-to-br from-teal-900 via-emerald-900 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-md border border-emerald-800/40"
+        >
+          <div className="flex items-center justify-between mb-3.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-teal-300">
+                <Repeat size={16} />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-extrabold text-white">
+                  Регулярные операции ({recurringTemplates.length})
+                </h3>
+                <p className="text-[11px] text-teal-200/80">
+                  Автоматическое списание и начисление по расписанию
+                </p>
+              </div>
+            </div>
+
+            <button
+              id="dashboard_process_recurring_btn"
+              onClick={() => processRecurring()}
+              className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/10 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              title="Проверить и провести наступившие регулярные платежи"
+            >
+              <Clock size={13} className="text-teal-300" />
+              <span>Проверить сейчас</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {recurringTemplates.slice(0, 3).map((item) => {
+              const cat = categories.find((c) => c.name === item.category || c.id === item.categoryId);
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => onEditTransaction(item)}
+                  className="bg-white/10 hover:bg-white/15 p-3 rounded-2xl border border-white/10 transition-colors cursor-pointer flex items-center justify-between gap-2"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-white shrink-0"
+                      style={{ backgroundColor: cat?.color || '#10B981' }}
+                    >
+                      <DynamicIcon name={cat?.icon || 'Tag'} size={14} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-white truncate flex items-center gap-1">
+                        <span>{item.category}</span>
+                        {item.recurrenceInterval && (
+                          <span className="text-[9px] font-extrabold bg-teal-400/20 text-teal-200 px-1 py-0.2 rounded">
+                            {getIntervalLabel(item.recurrenceInterval)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-teal-200/70 truncate flex items-center gap-1">
+                        <span>След:</span>
+                        <strong className="text-white font-semibold">
+                          {item.recurrenceNextDate || item.date}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-black text-teal-300">
+                      {formatCurrency(item.amount, currency.symbol)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -249,13 +375,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs sm:text-sm font-bold text-slate-900">
                           {t.category}
                         </span>
                         {t.subcategory && (
                           <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md">
                             {t.subcategory}
+                          </span>
+                        )}
+                        {t.isForeignCurrency && (
+                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                            <Globe size={11} className="text-blue-500" />
+                            <span>{t.originalAmount} {t.originalCurrency}</span>
+                            {t.country && <span className="opacity-80">({t.country})</span>}
+                          </span>
+                        )}
+                        {t.isRecurring && (
+                          <span
+                            className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                            title={t.recurrenceNextDate ? `Следующее списание: ${t.recurrenceNextDate}` : 'Регулярная операция'}
+                          >
+                            <Repeat size={10} className="text-teal-600" />
+                            <span>{t.recurrenceInterval ? getIntervalLabel(t.recurrenceInterval) : 'Регулярная'}</span>
+                          </span>
+                        )}
+                        {t.parentRecurringId && (
+                          <span
+                            className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                            title="Создано автоплатежом по расписанию"
+                          >
+                            <Repeat size={9} className="text-slate-400" />
+                            <span>Автоплатеж</span>
                           </span>
                         )}
                       </div>
@@ -287,6 +438,32 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* Floating Action Button (FAB) for ultra-fast transaction entry */}
+      <button
+        id="dashboard_fab_add_tx"
+        onClick={onOpenAddModal}
+        aria-label="Быстро добавить операцию"
+        title="Быстро добавить операцию"
+        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2.5 px-4 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
+      >
+        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+          <Plus size={18} className="stroke-[3] text-white" />
+        </div>
+        <span className="text-xs sm:text-sm font-extrabold tracking-wide whitespace-nowrap">
+          Добавить
+        </span>
+      </button>
+
+      {/* Budget Configuration Modal */}
+      <BudgetModal
+        isOpen={isBudgetModalOpen}
+        onClose={() => {
+          setIsBudgetModalOpen(false);
+          setSelectedBudgetCategoryId(null);
+        }}
+        initialCategoryId={selectedBudgetCategoryId}
+      />
     </div>
   );
 };

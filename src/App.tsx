@@ -7,12 +7,13 @@ import { HistoryView } from './components/HistoryView';
 import { StatisticsView } from './components/StatisticsView';
 import { WalletsView } from './components/WalletsView';
 import { SettingsView } from './components/SettingsView';
-import { TransactionModal } from './components/TransactionModal';
+import { TransactionModal, InitialForeignData } from './components/TransactionModal';
+import { CurrencyConverterModal } from './components/CurrencyConverterModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { ImportExportModal } from './components/ImportExportModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import { Transaction } from './types';
-import { Trophy, X } from 'lucide-react';
+import { Trophy, X, Repeat } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const {
@@ -20,20 +21,32 @@ const AppContent: React.FC = () => {
     activeTab,
     unlockedAchievementNotification,
     dismissAchievementNotification,
+    recurringNotification,
+    dismissRecurringNotification,
   } = useFinance();
 
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [foreignDataForTx, setForeignDataForTx] = useState<InitialForeignData | null>(null);
+  const [isConverterOpen, setIsConverterOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
 
   const handleOpenAddModal = () => {
     setEditingTx(null);
+    setForeignDataForTx(null);
     setIsTxModalOpen(true);
   };
 
   const handleEditTransaction = (tx: Transaction) => {
     setEditingTx(tx);
+    setForeignDataForTx(null);
+    setIsTxModalOpen(true);
+  };
+
+  const handleOpenAddWithForeignData = (data: InitialForeignData) => {
+    setEditingTx(null);
+    setForeignDataForTx(data);
     setIsTxModalOpen(true);
   };
 
@@ -47,6 +60,7 @@ const AppContent: React.FC = () => {
       <Navbar
         onOpenAddModal={handleOpenAddModal}
         onOpenAchievementsModal={() => setIsAchievementsOpen(true)}
+        onOpenConverterModal={() => setIsConverterOpen(true)}
       />
 
       {/* Unlocked Achievement Toast Notification */}
@@ -72,18 +86,44 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
+      {/* Scheduled Recurring Transactions Toast Notification */}
+      {recurringNotification && (
+        <div className="fixed top-20 right-4 z-50 max-w-sm bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-4 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-top-5 duration-300">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <Repeat size={20} className="text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-100 block">
+              Автоматическое расписание
+            </span>
+            <h4 className="text-xs font-bold truncate">
+              {recurringNotification}
+            </h4>
+          </div>
+          <button
+            onClick={dismissRecurringNotification}
+            className="p-1 hover:bg-black/10 rounded-lg text-white/80 hover:text-white"
+            title="Закрыть"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Main Container */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-5 pb-16">
         {activeTab === 'home' && (
           <DashboardView
             onOpenAddModal={handleOpenAddModal}
             onEditTransaction={handleEditTransaction}
+            onOpenConverterModal={() => setIsConverterOpen(true)}
           />
         )}
         {activeTab === 'history' && (
           <HistoryView
             onEditTransaction={handleEditTransaction}
             onOpenAddModal={handleOpenAddModal}
+            onOpenConverterModal={() => setIsConverterOpen(true)}
           />
         )}
         {activeTab === 'stats' && <StatisticsView />}
@@ -105,8 +145,16 @@ const AppContent: React.FC = () => {
         onClose={() => {
           setIsTxModalOpen(false);
           setEditingTx(null);
+          setForeignDataForTx(null);
         }}
         initialTransaction={editingTx}
+        initialForeignData={foreignDataForTx}
+      />
+
+      <CurrencyConverterModal
+        isOpen={isConverterOpen}
+        onClose={() => setIsConverterOpen(false)}
+        onOpenAddTransactionWithData={handleOpenAddWithForeignData}
       />
 
       <AchievementsModal

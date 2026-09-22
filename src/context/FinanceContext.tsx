@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Transaction,
@@ -14,12 +14,18 @@ import {
   DEFAULT_ACHIEVEMENTS,
   INITIAL_TRANSACTIONS,
   CURRENCIES,
+  DEFAULT_CATEGORY_BUDGETS,
 } from '../data/initialData';
+import {
+  processScheduledRecurrences,
+  calculateNextRecurrenceDate,
+} from '../utils/recurringProcessor';
 
 interface FinanceContextType {
   transactions: Transaction[];
   wallets: Wallet[];
   categories: Category[];
+  categoryBudgets: Record<string, number>;
   achievements: Achievement[];
   currency: CurrencyConfig;
   language: 'ru' | 'en';
@@ -41,6 +47,11 @@ interface FinanceContextType {
   transferBetweenWallets: (fromId: string, toId: string, amount: number, note?: string) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
   addSubcategory: (categoryId: string, subcategory: string) => void;
+  setCategoryBudget: (categoryId: string, limit: number) => void;
+  removeCategoryBudget: (categoryId: string) => void;
+  processRecurring: () => void;
+  recurringNotification: string | null;
+  dismissRecurringNotification: () => void;
   importTransactions: (newTxs: Transaction[]) => void;
   resetAllData: () => void;
   loadDemoData: () => void;
@@ -67,6 +78,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
   });
 
+  const [categoryBudgets, setCategoryBudgets] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('fa_category_budgets');
+    return saved ? JSON.parse(saved) : DEFAULT_CATEGORY_BUDGETS;
+  });
+
   const [achievements, setAchievements] = useState<Achievement[]>(() => {
     const saved = localStorage.getItem('fa_achievements');
     return saved ? JSON.parse(saved) : DEFAULT_ACHIEVEMENTS;
@@ -91,6 +107,47 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [activeTab, setActiveTab] = useState<'home' | 'history' | 'stats' | 'wallets' | 'profile'>('home');
   const [unlockedAchievementNotification, setUnlockedAchievementNotification] = useState<Achievement | null>(null);
+  const [recurringNotification, setRecurringNotification] = useState<string | null>(null);
+
+  // References to avoid stale closures in background recurrence task
+  const transactionsRef = useRef(transactions);
+  transactionsRef.current = transactions;
+  const walletsRef = useRef(wallets);
+  walletsRef.current = wallets;
+
+  // Background processor for scheduled recurring transactions
+  const processRecurring = useCallback(() => {
+    const result = processScheduledRecurrences(transactionsRef.current, walletsRef.current);
+    if (result.processedCount > 0) {
+      setTransactions(result.updatedTransactions);
+      setWallets(result.updatedWallets);
+      setRecurringNotification(
+        `Автоматически проведено ${result.processedCount} регулярных операций`
+      );
+    }
+  }, []);
+
+  // Background task to automatically check and process due recurring transactions
+  useEffect(() => {
+    // Initial check after app hydration
+    const timer = setTimeout(() => {
+      processRecurring();
+    }, 1200);
+
+    // Periodic background run every 45 seconds
+    const interval = setInterval(() => {
+      processRecurring();
+    }, 45000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [processRecurring]);
+
+  const dismissRecurringNotification = () => {
+    setRecurringNotification(null);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -104,6 +161,10 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem('fa_categories', JSON.stringify(categories));
   }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('fa_category_budgets', JSON.stringify(categoryBudgets));
+  }, [categoryBudgets]);
 
   useEffect(() => {
     localStorage.setItem('fa_achievements', JSON.stringify(achievements));
@@ -195,6 +256,16 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const timestamp = new Date(txData.date).getTime() || Date.now();
     const newTx: Transaction = { ...txData, id, timestamp };
 
+    // Set recurring defaults if recurring is enabled
+    if (newTx.isRecurring && newTx.recurrenceInterval) {
+      if (!newTx.recurrenceNextDate) {
+        newTx.recurrenceNextDate = calculateNextRecurrenceDate(newTx.date, newTx.recurrenceInterval);
+      }
+      if (!newTx.recurrenceLastProcessed) {
+        newTx.recurrenceLastProcessed = newTx.date;
+      }
+    }
+
     // Update wallet balances
     setWallets((prevWallets) => {
       return prevWallets.map((w) => {
@@ -244,6 +315,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const oldTx = transactions.find((t) => t.id === updatedTx.id);
     if (!oldTx) return;
 
+    const txToSave = { ...updatedTx };
+    if (txToSave.isRecurring && txToSave.recurrenceInterval && !txToSave.recurrenceNextDate) {
+      txToSave.recurrenceNextDate = calculateNextRecurrenceDate(txToSave.date, txToSave.recurrenceInterval);
+    }
+
     // Revert old effect on wallets, apply new
     setWallets((prevWallets) => {
       return prevWallets.map((w) => {
@@ -257,18 +333,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
 
         // Apply new
-        if (updatedTx.type === 'expense' && w.id === updatedTx.walletId) bal -= updatedTx.amount;
-        if (updatedTx.type === 'income' && w.id === updatedTx.walletId) bal += updatedTx.amount;
-        if (updatedTx.type === 'transfer') {
-          if (w.id === updatedTx.walletId) bal -= updatedTx.amount;
-          if (w.id === updatedTx.targetWalletId) bal += updatedTx.amount;
+        if (txToSave.type === 'expense' && w.id === txToSave.walletId) bal -= txToSave.amount;
+        if (txToSave.type === 'income' && w.id === txToSave.walletId) bal += txToSave.amount;
+        if (txToSave.type === 'transfer') {
+          if (w.id === txToSave.walletId) bal -= txToSave.amount;
+          if (w.id === txToSave.targetWalletId) bal += txToSave.amount;
         }
 
         return { ...w, balance: bal };
       });
     });
 
-    setTransactions((prev) => prev.map((t) => (t.id === updatedTx.id ? updatedTx : t)));
+    setTransactions((prev) => prev.map((t) => (t.id === txToSave.id ? txToSave : t)));
   };
 
   const deleteTransaction = (id: string) => {
@@ -347,6 +423,25 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
   };
 
+  const setCategoryBudget = (categoryId: string, limit: number) => {
+    setCategoryBudgets((prev) => {
+      if (limit <= 0) {
+        const next = { ...prev };
+        delete next[categoryId];
+        return next;
+      }
+      return { ...prev, [categoryId]: limit };
+    });
+  };
+
+  const removeCategoryBudget = (categoryId: string) => {
+    setCategoryBudgets((prev) => {
+      const next = { ...prev };
+      delete next[categoryId];
+      return next;
+    });
+  };
+
   const importTransactions = (newTxs: Transaction[]) => {
     if (newTxs.length === 0) return;
     setTransactions((prev) => [...newTxs, ...prev]);
@@ -356,14 +451,17 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const resetAllData = () => {
     setTransactions([]);
     setWallets(DEFAULT_WALLETS.map((w) => ({ ...w, balance: 0 })));
+    setCategoryBudgets({});
     localStorage.removeItem('fa_transactions');
     localStorage.removeItem('fa_wallets');
+    localStorage.removeItem('fa_category_budgets');
   };
 
   const loadDemoData = () => {
     setTransactions(INITIAL_TRANSACTIONS);
     setWallets(DEFAULT_WALLETS);
     setCategories(DEFAULT_CATEGORIES);
+    setCategoryBudgets(DEFAULT_CATEGORY_BUDGETS);
     setAchievements(DEFAULT_ACHIEVEMENTS);
   };
 
@@ -377,6 +475,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         transactions,
         wallets,
         categories,
+        categoryBudgets,
         achievements,
         currency,
         language,
@@ -398,6 +497,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         transferBetweenWallets,
         addCategory,
         addSubcategory,
+        setCategoryBudget,
+        removeCategoryBudget,
+        processRecurring,
+        recurringNotification,
+        dismissRecurringNotification,
         importTransactions,
         resetAllData,
         loadDemoData,
