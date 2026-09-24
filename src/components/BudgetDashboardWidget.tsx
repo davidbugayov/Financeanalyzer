@@ -225,17 +225,17 @@ export const BudgetDashboardWidget: React.FC<BudgetDashboardWidgetProps> = ({
 
       {/* Overall Budget Progress Card */}
       {categoriesWithBudget.length > 0 ? (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-850 to-slate-950 text-white shadow-md space-y-3.5">
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white border border-emerald-200/90 text-slate-800 shadow-xs space-y-3.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-800 block">
                 Суммарный расход по категориям с бюджетом
               </span>
               <div className="flex items-baseline gap-2 mt-0.5 flex-wrap">
-                <span className="text-2xl sm:text-3xl font-black text-white">
+                <span className="text-2xl sm:text-3xl font-black text-slate-900">
                   {formatCurrency(summary.totalSpentInBudgeted, currency.symbol)}
                 </span>
-                <span className="text-xs sm:text-sm text-slate-400 font-semibold">
+                <span className="text-xs sm:text-sm text-slate-500 font-bold">
                   из {formatCurrency(summary.totalLimit, currency.symbol)}
                 </span>
               </div>
@@ -243,25 +243,25 @@ export const BudgetDashboardWidget: React.FC<BudgetDashboardWidgetProps> = ({
 
             <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
               <span
-                className={`text-xs font-black px-2.5 py-1 rounded-xl shadow-xs ${
+                className={`text-xs font-black px-2.5 py-1 rounded-xl shadow-2xs border ${
                   summary.percent >= 100
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                    ? 'bg-rose-100 text-rose-800 border-rose-200'
                     : summary.percent >= 80
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    ? 'bg-amber-100 text-amber-800 border-amber-200'
+                    : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                 }`}
               >
                 {summary.percent}% использовано
               </span>
 
               {summary.percent <= monthElapsedPercent ? (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-300 flex items-center gap-1">
-                  <ShieldCheck size={12} />
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-100/80 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                  <ShieldCheck size={12} className="text-emerald-700" />
                   <span>В рамках темпа</span>
                 </span>
               ) : (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-300 flex items-center gap-1">
-                  <Flame size={12} />
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
+                  <Flame size={12} className="text-amber-700" />
                   <span>Выше темпа</span>
                 </span>
               )}
@@ -270,10 +270,10 @@ export const BudgetDashboardWidget: React.FC<BudgetDashboardWidgetProps> = ({
 
           {/* Master Visual Progress Bar with Month Pacing Line */}
           <div className="space-y-1.5">
-            <div className="w-full h-3.5 bg-slate-800/90 rounded-full overflow-hidden p-0.5 border border-white/10 relative">
+            <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/90 relative">
               {/* Month time indicator tick */}
               <div
-                className="absolute top-0 bottom-0 w-0.5 bg-white/40 z-10 pointer-events-none"
+                className="absolute top-0 bottom-0 w-0.5 bg-slate-400 z-10 pointer-events-none"
                 style={{ left: `${monthElapsedPercent}%` }}
                 title={`Прошло ${monthElapsedPercent}% месяца`}
               />
@@ -284,29 +284,29 @@ export const BudgetDashboardWidget: React.FC<BudgetDashboardWidgetProps> = ({
                     ? 'bg-gradient-to-r from-rose-500 to-red-600'
                     : summary.percent >= 80
                     ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                    : 'bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500'
+                    : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600'
                 }`}
                 style={{ width: `${Math.min(100, summary.percent)}%` }}
               />
             </div>
 
             <div className="flex items-center justify-between text-[11px] flex-wrap gap-1">
-              <span className="text-slate-300 font-medium">
+              <span className="text-slate-600 font-medium">
                 {summary.remaining >= 0 ? (
-                  <span className="flex items-center gap-1 text-emerald-300">
-                    <CheckCircle2 size={13} />
+                  <span className="flex items-center gap-1 text-emerald-700">
+                    <CheckCircle2 size={13} className="text-emerald-600" />
                     <span>
                       Осталось на месяц:{' '}
-                      <strong>{formatCurrency(summary.remaining, currency.symbol)}</strong>
+                      <strong className="text-emerald-800 font-extrabold">{formatCurrency(summary.remaining, currency.symbol)}</strong>
                       {daysRemaining > 0 && (
-                        <span className="text-slate-400 text-[10px] ml-1">
+                        <span className="text-slate-500 text-[10px] ml-1">
                           (~{formatCurrency(Math.round(summary.remaining / daysRemaining), currency.symbol)}/день)
                         </span>
                       )}
                     </span>
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-rose-300 font-bold">
+                  <span className="flex items-center gap-1 text-rose-700 font-bold">
                     <AlertTriangle size={13} />
                     <span>
                       Превышение бюджета: +{formatCurrency(Math.abs(summary.remaining), currency.symbol)}
@@ -316,7 +316,7 @@ export const BudgetDashboardWidget: React.FC<BudgetDashboardWidgetProps> = ({
               </span>
 
               {summary.overBudgetCount > 0 && (
-                <span className="text-rose-300 text-[11px] font-bold bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-800/60">
+                <span className="text-rose-700 text-[11px] font-bold bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
                   {summary.overBudgetCount} катег. с перерасходом
                 </span>
               )}

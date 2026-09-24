@@ -317,7 +317,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, on
                 </div>
                 <button
                   onClick={handleDownloadJSONBackup}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-xs"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs"
                 >
                   <Database size={15} /> Скачать бэкап
                 </button>

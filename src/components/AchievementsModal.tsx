@@ -92,7 +92,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({ isOpen, on
               onClick={() => setFilterCat(c.id as any)}
               className={`px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors ${
                 filterCat === c.id
-                  ? 'bg-slate-900 text-white shadow-xs'
+                  ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-white hover:bg-slate-200/70 border border-slate-200'
               }`}
             >

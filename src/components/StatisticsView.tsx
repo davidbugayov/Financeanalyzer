@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Globe,
   MapPin,
+  ArrowDownLeft,
+  ArrowUpRight,
 } from 'lucide-react';
 import {
   PieChart,
@@ -196,37 +198,81 @@ export const StatisticsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Summary KPI Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
-            Доходы
-          </span>
-          <div className="text-sm sm:text-xl font-extrabold text-emerald-600 truncate">
-            +{formatCurrency(income, currency.symbol)}
+      {/* Summary KPI Section - Redesigned UI/UX: No Truncation, No Spilling, Friendly Light Theme */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-3.5">
+        {/* Top: Net Result (Сальдо) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+          <div>
+            <div className="flex items-center gap-1.5 mb-1">
+              <div
+                className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${
+                  net >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                }`}
+              >
+                <TrendingUp size={14} className="stroke-[2.5]" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                Сальдо за период (Чистый результат)
+              </span>
+            </div>
+            <div
+              className={`text-2xl sm:text-3xl font-black whitespace-nowrap ${
+                net >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}
+            >
+              {net >= 0 ? '+' : ''}
+              {formatCurrency(net, currency.symbol)}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {income > 0 ? (
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200/80 text-left sm:text-right">
+                <span className="text-[10px] font-bold text-emerald-700 block uppercase tracking-wider">
+                  Норма сбережений
+                </span>
+                <span className="text-sm font-black text-emerald-800">
+                  {savingsRate}% от доходов
+                </span>
+              </div>
+            ) : (
+              <div className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold">
+                {period === 'week' ? 'За неделю' : period === 'month' ? 'За месяц' : period === 'year' ? 'За год' : 'Все время'}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
-            Расходы
-          </span>
-          <div className="text-sm sm:text-xl font-extrabold text-red-600 truncate">
-            -{formatCurrency(expense, currency.symbol)}
+        {/* Bottom: Incomes and Expenses side-by-side with 50% width each */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Доходы */}
+          <div className="p-3 sm:p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-emerald-200/80 text-emerald-800 flex items-center justify-center shrink-0">
+                <ArrowDownLeft size={14} className="stroke-[2.5]" />
+              </div>
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-emerald-800">
+                Доходы
+              </span>
+            </div>
+            <div className="text-base sm:text-2xl font-black text-emerald-700 whitespace-nowrap">
+              +{formatCurrency(income, currency.symbol)}
+            </div>
           </div>
-        </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
-            Сальдо
-          </span>
-          <div
-            className={`text-sm sm:text-xl font-extrabold truncate ${
-              net >= 0 ? 'text-emerald-700' : 'text-red-600'
-            }`}
-          >
-            {net >= 0 ? '+' : ''}
-            {formatCurrency(net, currency.symbol)}
+          {/* Расходы */}
+          <div className="p-3 sm:p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="w-6 h-6 rounded-lg bg-rose-200/80 text-rose-800 flex items-center justify-center shrink-0">
+                <ArrowUpRight size={14} className="stroke-[2.5]" />
+              </div>
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-rose-800">
+                Расходы
+              </span>
+            </div>
+            <div className="text-base sm:text-2xl font-black text-rose-700 whitespace-nowrap">
+              -{formatCurrency(expense, currency.symbol)}
+            </div>
           </div>
         </div>
       </div>
@@ -438,25 +484,25 @@ export const StatisticsView: React.FC = () => {
 
       {/* Foreign Travel & Currency Spending Card */}
       {travelStats && (
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 shadow-sm border border-slate-700/80">
+        <div className="bg-gradient-to-br from-indigo-50/80 via-blue-50/40 to-white text-slate-800 rounded-3xl p-6 shadow-xs border border-indigo-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 border border-blue-400/30 flex items-center justify-center">
-                <Globe size={22} />
+              <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center justify-center shadow-2xs">
+                <Globe size={20} />
               </div>
               <div>
-                <h3 className="text-base font-extrabold text-white">
+                <h3 className="text-base font-extrabold text-slate-900">
                   Расходы за рубежом и в поездках
                 </h3>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-slate-500">
                   Траты в иностранной валюте, пересчитанные по курсу
                 </p>
               </div>
             </div>
 
             <div className="text-left sm:text-right">
-              <span className="text-xs text-slate-400 block">Всего за рубежом</span>
-              <span className="text-lg font-black text-amber-400">
+              <span className="text-xs text-slate-500 block font-medium">Всего за рубежом</span>
+              <span className="text-lg font-black text-indigo-900">
                 {formatCurrency(travelStats.totalBaseSpent, currency.symbol)}
               </span>
             </div>
@@ -466,20 +512,20 @@ export const StatisticsView: React.FC = () => {
             {travelStats.countries.map((c) => (
               <div
                 key={c.country}
-                className="bg-white/10 hover:bg-white/15 border border-white/10 rounded-2xl p-4 transition-colors"
+                className="bg-white/90 hover:bg-white border border-slate-200/90 rounded-2xl p-4 transition-colors shadow-2xs"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <MapPin size={14} className="text-rose-400" />
+                  <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                    <MapPin size={14} className="text-rose-500" />
                     {c.country}
                   </span>
-                  <span className="text-[11px] font-bold text-blue-300 bg-blue-500/20 px-2 py-0.5 rounded-md">
+                  <span className="text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">
                     {c.currencies}
                   </span>
                 </div>
-                <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-white/10">
-                  <span className="text-xs text-slate-400">{c.count} операций</span>
-                  <span className="text-sm font-black text-emerald-300">
+                <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-slate-100">
+                  <span className="text-xs text-slate-400 font-medium">{c.count} операций</span>
+                  <span className="text-sm font-black text-emerald-700">
                     {formatCurrency(c.baseTotal, currency.symbol)}
                   </span>
                 </div>

@@ -175,7 +175,7 @@ export const CurrencyConverterModal: React.FC<CurrencyConverterModalProps> = ({
                     onClick={() => handleSelectDestination(dest)}
                     className={`shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
                       isActive
-                        ? 'bg-slate-900 text-white shadow-xs scale-102'
+                        ? 'bg-blue-600 text-white shadow-xs scale-102'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >

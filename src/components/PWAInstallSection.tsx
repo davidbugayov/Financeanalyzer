@@ -326,7 +326,7 @@ export const PWAInstallSection: React.FC = () => {
                 onClick={() => setActiveTab(guide.id)}
                 className={`relative px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 flex items-center gap-1.5 border ${
                   isSelected
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
                     : isDetected
                     ? 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'

@@ -182,23 +182,23 @@ export const AiInsightsSection: React.FC<AiInsightsSectionProps> = ({
       </div>
 
       {/* Main Highlights Hero Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-4 sm:p-5 mb-5 shadow-inner relative overflow-hidden">
+      <div className="bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white text-slate-800 rounded-3xl p-5 sm:p-6 mb-5 border border-emerald-200/90 shadow-xs relative overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
           {/* Main potential saving */}
-          <div className="md:col-span-1 border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0 md:pr-4">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-              <TrendingDown size={14} />
+          <div className="md:col-span-1 border-b md:border-b-0 md:border-r border-emerald-100/90 pb-4 md:pb-0 md:pr-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+              <TrendingDown size={14} className="text-emerald-600" />
               Потенциал оптимизации
             </span>
             <div className="mt-1.5 flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-emerald-400">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-700">
                 +{formatCurrency(analysis.totalPotentialMonthlySavings, currency.symbol)}
               </span>
-              <span className="text-xs text-slate-400">/ месяц</span>
+              <span className="text-xs text-slate-500 font-medium">/ месяц</span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1">
+            <p className="text-[11px] text-slate-600 mt-1">
               Эквивалентно{' '}
-              <strong className="text-white font-bold">
+              <strong className="text-slate-900 font-bold">
                 {formatCurrency(analysis.annualPotentialSavings, currency.symbol)}
               </strong>{' '}
               в год при дисциплине
@@ -206,43 +206,43 @@ export const AiInsightsSection: React.FC<AiInsightsSectionProps> = ({
           </div>
 
           {/* Savings Rate Impact */}
-          <div className="border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0 md:pr-4 flex flex-col justify-center">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <PiggyBank size={14} className="text-teal-300" />
+          <div className="border-b md:border-b-0 md:border-r border-emerald-100/90 pb-4 md:pb-0 md:pr-4 flex flex-col justify-center">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <PiggyBank size={14} className="text-teal-600" />
               Рост нормы сбережений
             </span>
             <div className="mt-1.5 flex items-center gap-2.5">
-              <span className="text-xl sm:text-2xl font-black text-slate-300">
+              <span className="text-xl sm:text-2xl font-black text-slate-500">
                 {analysis.currentSavingsRate}%
               </span>
-              <ArrowRight size={16} className="text-emerald-400" />
-              <span className="text-xl sm:text-2xl font-black text-emerald-400">
+              <ArrowRight size={16} className="text-emerald-600" />
+              <span className="text-xl sm:text-2xl font-black text-emerald-700">
                 ~{analysis.projectedNewSavingsRate}%
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-slate-500 mt-1">
               Удержание спонтанных покупок повысит свободный капитал
             </p>
           </div>
 
           {/* Speed & Daily Burn Rate */}
           <div className="flex flex-col justify-center">
-            <div className="flex items-center justify-between text-[11px] text-slate-300 mb-1">
-              <span className="flex items-center gap-1 text-slate-400">
+            <div className="flex items-center justify-between text-[11px] text-slate-600 mb-1">
+              <span className="flex items-center gap-1 text-slate-500">
                 <Clock size={12} />
                 Темп расходов:
               </span>
-              <strong className="text-white">
+              <strong className="text-slate-900 font-extrabold">
                 {formatCurrency(analysis.dailyBurnRate, currency.symbol)}/день
               </strong>
             </div>
 
             {analysis.spendingAccelerationPercent !== 0 && (
-              <div className="flex items-center justify-between text-[11px] text-slate-300 mb-1">
-                <span className="text-slate-400">Динамика к прошлому периоду:</span>
+              <div className="flex items-center justify-between text-[11px] text-slate-600 mb-1">
+                <span className="text-slate-500">Динамика к прошлому периоду:</span>
                 <span
                   className={`font-bold ${
-                    analysis.spendingAccelerationPercent > 0 ? 'text-rose-400' : 'text-emerald-400'
+                    analysis.spendingAccelerationPercent > 0 ? 'text-rose-600' : 'text-emerald-600'
                   }`}
                 >
                   {analysis.spendingAccelerationPercent > 0 ? '+' : ''}
@@ -252,9 +252,9 @@ export const AiInsightsSection: React.FC<AiInsightsSectionProps> = ({
             )}
 
             {analysis.discretionaryPercent > 0 && (
-              <div className="flex items-center justify-between text-[11px] text-slate-300">
-                <span className="text-slate-400">Необязательные траты:</span>
-                <span className="font-bold text-amber-300">
+              <div className="flex items-center justify-between text-[11px] text-slate-600">
+                <span className="text-slate-500">Необязательные траты:</span>
+                <span className="font-bold text-amber-700">
                   {analysis.discretionaryPercent}% бюджета
                 </span>
               </div>
@@ -350,7 +350,7 @@ export const AiInsightsSection: React.FC<AiInsightsSectionProps> = ({
           onClick={() => setFilterType('all')}
           className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-colors cursor-pointer ${
             filterType === 'all'
-              ? 'bg-slate-900 text-white'
+              ? 'bg-emerald-600 text-white shadow-2xs'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >

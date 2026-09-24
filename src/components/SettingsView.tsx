@@ -92,7 +92,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <div>
         <h2 className="text-xl sm:text-2xl font-black text-slate-900">Настройки и профиль</h2>
         <p className="text-xs text-slate-500">
-          Установка PWA приложения, валюта, безопасность, категории и данные
+          Валюта, безопасность, офлайн-режим, категории и резервное копирование
         </p>
       </div>
 

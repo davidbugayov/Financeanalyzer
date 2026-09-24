@@ -32,6 +32,7 @@ import {
   calculateNextRecurrenceDate,
   getIntervalLabel,
 } from '../utils/recurringProcessor';
+import { formatTransactionDate } from '../utils/financeCalculations';
 
 export interface InitialForeignData {
   baseAmount: number;
@@ -446,11 +447,11 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     >
       <div
         id="transaction_modal_content"
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden my-6 animate-in fade-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/70">
-          <h2 className="text-lg font-bold text-slate-800">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/70 shrink-0">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800">
             {initialTransaction ? 'Редактировать транзакцию' : 'Новая транзакция'}
           </h2>
           <button
@@ -462,7 +463,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="p-6 space-y-5">
+        <form onSubmit={handleSave} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700">
               {error}
@@ -1096,12 +1097,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                     Периодичность повтора
                   </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {(
                       [
                         { id: 'daily', label: 'Каждый день' },
                         { id: 'weekly', label: 'Еженедельно' },
-                        { id: 'biweekly', label: '2 недели' },
+                        { id: 'biweekly', label: 'Раз в 2 недели' },
                         { id: 'monthly', label: 'Ежемесячно' },
                         { id: 'yearly', label: 'Ежегодно' },
                       ] as const
@@ -1110,7 +1111,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                         key={item.id}
                         type="button"
                         onClick={() => setRecurrenceInterval(item.id)}
-                        className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all text-center ${
+                        className={`flex-1 min-w-[95px] py-2 px-2.5 rounded-xl text-xs font-bold transition-all text-center whitespace-nowrap cursor-pointer ${
                           recurrenceInterval === item.id
                             ? 'bg-emerald-600 text-white shadow-2xs'
                             : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
@@ -1123,16 +1124,16 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 </div>
 
                 {/* Next scheduled run date indicator */}
-                <div className="flex items-center justify-between text-xs bg-white/90 p-2.5 rounded-xl border border-emerald-200/60">
-                  <div className="flex items-center gap-1.5 text-slate-700">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-white/90 p-2.5 rounded-xl border border-emerald-200/60">
+                  <div className="flex items-center gap-1.5 text-slate-700 shrink-0">
                     <Clock size={13} className="text-emerald-600 shrink-0" />
-                    <span className="text-[11px] font-medium text-slate-600">
+                    <span className="text-[11px] font-medium text-slate-600 whitespace-nowrap">
                       Следующее автопроведение:
                     </span>
-                    <strong className="text-emerald-800 font-bold">
-                      {calculateNextRecurrenceDate(date, recurrenceInterval)}
-                    </strong>
                   </div>
+                  <strong className="text-emerald-800 font-bold whitespace-nowrap text-right shrink-0">
+                    {formatTransactionDate(calculateNextRecurrenceDate(date, recurrenceInterval))}
+                  </strong>
                 </div>
 
                 {/* Duration / End Date */}
@@ -1256,19 +1257,19 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="pt-2 flex items-center justify-end gap-3">
+          <div className="pt-3 pb-1 border-t border-slate-100 bg-white shrink-0 flex items-center justify-end gap-3">
             <button
               id="cancel_transaction_btn"
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
               Отмена
             </button>
             <button
               id="save_transaction_btn"
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md hover:shadow-lg transition-all"
+              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
               {initialTransaction ? 'Сохранить' : 'Добавить'}
             </button>

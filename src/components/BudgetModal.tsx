@@ -191,34 +191,34 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
         </div>
 
         {/* Total Month Overview Bar */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white border-b border-slate-800">
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white border-b border-emerald-800">
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="font-bold text-emerald-400">Общий прогресс бюджетов</span>
-            <span className="text-slate-300 font-semibold">
+            <span className="font-bold text-emerald-100">Общий прогресс бюджетов</span>
+            <span className="text-emerald-100 font-semibold">
               Категорий с лимитом: <strong className="text-white">{summary.activeBudgetCount}</strong> из {expenseCategories.length}
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-3 text-center sm:text-left">
-            <div className="bg-white/5 p-2.5 rounded-xl backdrop-blur-xs border border-white/5">
-              <span className="text-[10px] text-slate-400 block font-medium">Запланировано</span>
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-xs border border-white/10">
+              <span className="text-[10px] text-emerald-100 block font-medium">Запланировано</span>
               <span className="text-xs sm:text-sm font-bold text-white">
                 {formatCurrency(summary.totalLimit, currency.symbol)}
               </span>
             </div>
-            <div className="bg-white/5 p-2.5 rounded-xl backdrop-blur-xs border border-white/5">
-              <span className="text-[10px] text-slate-400 block font-medium">Потрачено в них</span>
-              <span className="text-xs sm:text-sm font-bold text-emerald-300">
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-xs border border-white/10">
+              <span className="text-[10px] text-emerald-100 block font-medium">Потрачено в них</span>
+              <span className="text-xs sm:text-sm font-bold text-emerald-100">
                 {formatCurrency(summary.totalSpentInBudgeted, currency.symbol)}
               </span>
             </div>
-            <div className="bg-white/5 p-2.5 rounded-xl backdrop-blur-xs border border-white/5">
-              <span className="text-[10px] text-slate-400 block font-medium">
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-xs border border-white/10">
+              <span className="text-[10px] text-emerald-100 block font-medium">
                 {summary.remaining >= 0 ? 'Остаток' : 'Превышение'}
               </span>
               <span
                 className={`text-xs sm:text-sm font-bold ${
-                  summary.remaining >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                  summary.remaining >= 0 ? 'text-white' : 'text-rose-200'
                 }`}
               >
                 {summary.remaining >= 0 ? '' : '+'}
@@ -452,7 +452,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
           >
             Готово
           </button>

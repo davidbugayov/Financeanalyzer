@@ -85,13 +85,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       )}
 
       {/* Main Balance Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white p-6 sm:p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white p-6 sm:p-8 shadow-xl shadow-emerald-900/10">
         <div className="relative z-10">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-100">
               Текущий капитал
             </span>
-            <span className="px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-bold backdrop-blur-md">
+            <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-md">
               Сбережения: {savingsRate}%
             </span>
           </div>
@@ -100,32 +100,32 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="text-3xl sm:text-5xl font-extrabold tracking-tight">
               {formatCurrency(totalBalance, currency.symbol)}
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-emerald-100/90 mt-1">
               Суммарный остаток на всех ваших счетах
             </p>
           </div>
 
           {/* Income & Expense pill grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl backdrop-blur-xs">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-white/15">
+            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-xs">
+              <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
                 <ArrowDownLeft size={20} className="stroke-[2.5]" />
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block">Доходы</span>
-                <span className="text-sm sm:text-base font-bold text-emerald-400">
+                <span className="text-[11px] font-medium text-emerald-100 block">Доходы</span>
+                <span className="text-sm sm:text-base font-bold text-white">
                   +{formatCurrency(income, currency.symbol)}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-white/5 p-3 rounded-2xl backdrop-blur-xs">
-              <div className="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-xs">
+              <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
                 <ArrowUpRight size={20} className="stroke-[2.5]" />
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block">Расходы</span>
-                <span className="text-sm sm:text-base font-bold text-red-400">
+                <span className="text-[11px] font-medium text-emerald-100 block">Расходы</span>
+                <span className="text-sm sm:text-base font-bold text-white">
                   -{formatCurrency(expense, currency.symbol)}
                 </span>
               </div>
@@ -134,65 +134,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Decorative background glow */}
-        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Quick Action Buttons */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
-        <button
-          id="action_add_tx_btn"
-          onClick={onOpenAddModal}
-          className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-emerald-500 hover:shadow-md transition-all group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-            <Plus size={20} className="stroke-[2.5]" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700">Транзакция</span>
-        </button>
-
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
           id="action_view_wallets_btn"
           onClick={() => setActiveTab('wallets')}
-          className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-            <WalletIcon size={20} className="stroke-[2]" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
+            <WalletIcon size={18} className="stroke-[2]" />
           </div>
-          <span className="text-[11px] font-bold text-slate-700">Кошельки</span>
+          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Кошельки</span>
         </button>
 
         <button
           id="action_view_analytics_btn"
           onClick={() => setActiveTab('stats')}
-          className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-purple-500 hover:shadow-md transition-all group"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-purple-500 hover:shadow-md transition-all group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-            <TrendingUp size={20} className="stroke-[2]" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
+            <TrendingUp size={18} className="stroke-[2]" />
           </div>
-          <span className="text-[11px] font-bold text-slate-700">Аналитика</span>
+          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Аналитика</span>
         </button>
 
         <button
           id="action_transfer_btn"
           onClick={onOpenAddModal}
-          className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-amber-500 hover:shadow-md transition-all group"
+          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-amber-500 hover:shadow-md transition-all group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-            <ArrowLeftRight size={20} className="stroke-[2]" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
+            <ArrowLeftRight size={18} className="stroke-[2]" />
           </div>
-          <span className="text-[11px] font-bold text-slate-700">Перевод</span>
+          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Перевод</span>
         </button>
 
         {onOpenConverterModal && (
           <button
             id="action_converter_btn"
             onClick={onOpenConverterModal}
-            className="col-span-2 sm:col-span-1 flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-gradient-to-b from-blue-50/70 to-indigo-50/70 border border-blue-200 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group"
+            className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-gradient-to-b from-blue-50/70 to-indigo-50/70 border border-blue-200 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform shadow-xs">
-              <Globe size={19} className="stroke-[2]" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-1 group-hover:scale-105 transition-transform shadow-xs">
+              <Globe size={18} className="stroke-[2]" />
             </div>
-            <span className="text-[11px] font-bold text-blue-900">За рубежом</span>
+            <span className="text-[10px] sm:text-xs font-bold text-blue-900 truncate w-full text-center">Валюты</span>
           </button>
         )}
       </div>
@@ -228,18 +217,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {recurringTemplates.length > 0 && (
         <div
           id="dashboard_recurring_widget"
-          className="bg-gradient-to-br from-teal-900 via-emerald-900 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-md border border-emerald-800/40"
+          className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-teal-200/80 space-y-3.5"
         >
-          <div className="flex items-center justify-between mb-3.5">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-teal-300">
+              <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center shrink-0">
                 <Repeat size={16} />
               </div>
               <div>
-                <h3 className="text-sm sm:text-base font-extrabold text-white">
+                <h3 className="text-sm sm:text-base font-extrabold text-slate-900">
                   Регулярные операции ({recurringTemplates.length})
                 </h3>
-                <p className="text-[11px] text-teal-200/80">
+                <p className="text-[11px] text-slate-500">
                   Автоматическое списание и начисление по расписанию
                 </p>
               </div>
@@ -248,10 +237,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               id="dashboard_process_recurring_btn"
               onClick={() => processRecurring()}
-              className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/10 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 active:bg-teal-200 text-teal-800 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-teal-200"
               title="Проверить и провести наступившие регулярные платежи"
             >
-              <Clock size={13} className="text-teal-300" />
+              <Clock size={13} className="text-teal-700" />
               <span>Проверить сейчас</span>
             </button>
           </div>
@@ -263,7 +252,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <div
                   key={item.id}
                   onClick={() => onEditTransaction(item)}
-                  className="bg-white/10 hover:bg-white/15 p-3 rounded-2xl border border-white/10 transition-colors cursor-pointer flex items-center justify-between gap-2"
+                  className="bg-slate-50/80 hover:bg-slate-100 p-3 rounded-2xl border border-slate-200/80 transition-colors cursor-pointer flex items-center justify-between gap-2"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div
@@ -273,17 +262,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <DynamicIcon name={cat?.icon || 'Tag'} size={14} />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xs font-bold text-white truncate flex items-center gap-1">
+                      <div className="text-xs font-bold text-slate-800 truncate flex items-center gap-1">
                         <span>{item.category}</span>
                         {item.recurrenceInterval && (
-                          <span className="text-[9px] font-extrabold bg-teal-400/20 text-teal-200 px-1 py-0.2 rounded">
+                          <span className="text-[9px] font-extrabold bg-teal-100 text-teal-800 px-1 py-0.2 rounded">
                             {getIntervalLabel(item.recurrenceInterval)}
                           </span>
                         )}
                       </div>
-                      <div className="text-[10px] text-teal-200/70 truncate flex items-center gap-1">
+                      <div className="text-[10px] text-slate-400 truncate flex items-center gap-1">
                         <span>След:</span>
-                        <strong className="text-white font-semibold">
+                        <strong className="text-slate-700 font-semibold">
                           {item.recurrenceNextDate || item.date}
                         </strong>
                       </div>
@@ -291,7 +280,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-black text-teal-300">
+                    <span className="text-xs font-black text-teal-700 whitespace-nowrap">
                       {formatCurrency(item.amount, currency.symbol)}
                     </span>
                   </div>
@@ -327,7 +316,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => setFilterType(mode)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
                 filterType === mode
-                  ? 'bg-slate-900 text-white'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >

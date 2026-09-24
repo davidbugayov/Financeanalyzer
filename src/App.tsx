@@ -145,12 +145,10 @@ const AppContent: React.FC = () => {
         onClick={handleOpenAddModal}
         aria-label="Добавить операцию"
         title="Добавить операцию"
-        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-950/25 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
+        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center justify-center w-13 h-13 sm:w-auto sm:h-auto sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-950/30 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
       >
-        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-          <Plus size={16} className="stroke-[3] text-white" />
-        </div>
-        <span className="text-xs sm:text-sm font-extrabold tracking-wide whitespace-nowrap">
+        <Plus size={22} className="stroke-[2.8] text-white shrink-0 sm:mr-1.5" />
+        <span className="hidden sm:inline text-sm font-extrabold tracking-wide whitespace-nowrap">
           Добавить
         </span>
       </button>
