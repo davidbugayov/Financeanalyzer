@@ -21,6 +21,7 @@ import { getIntervalLabel } from '../utils/recurringProcessor';
 import { BudgetDashboardWidget } from './BudgetDashboardWidget';
 import { BudgetModal } from './BudgetModal';
 import { AiInsightsSection } from './AiInsightsSection';
+import { MonthlySpendingTrendChart } from './MonthlySpendingTrendChart';
 
 interface DashboardViewProps {
   onOpenAddModal: () => void;
@@ -71,7 +72,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const currentTip = smartTips[0];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       {/* Over-limit warning banner if any */}
       {overLimitWallets.length > 0 && (
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 text-amber-900">
@@ -185,6 +186,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
         )}
       </div>
+
+      {/* 6-Month Monthly Spending Trend Chart */}
+      <MonthlySpendingTrendChart />
 
       {/* Monthly Budget Tracking System with Category Progress Bars */}
       <BudgetDashboardWidget onOpenBudgetModal={handleOpenBudgetModal} />

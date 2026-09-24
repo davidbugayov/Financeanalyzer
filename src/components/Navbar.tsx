@@ -2,7 +2,6 @@ import React from 'react';
 import { Trophy, Lock, Wallet as WalletIcon, ArrowRightLeft } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/financeCalculations';
-import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
   onOpenAddModal?: () => void;
@@ -14,7 +13,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAchievementsModal,
   onOpenConverterModal,
-  onOpenSettings,
 }) => {
   const { wallets, achievements, currency, pinCode, lockApp } = useFinance();
 
@@ -61,9 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <ArrowRightLeft size={18} className="text-blue-600" />
             <span className="hidden md:inline">Конвертер валют</span>
           </button>
-
-          {/* PWA Install Button */}
-          <PWAInstallButton onNavigateToSettings={onOpenSettings} />
 
           {/* Achievements button */}
           <button

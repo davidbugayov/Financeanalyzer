@@ -12,9 +12,10 @@ import { CurrencyConverterModal } from './components/CurrencyConverterModal';
 import { AchievementsModal } from './components/AchievementsModal';
 import { ImportExportModal } from './components/ImportExportModal';
 import { PinLockScreen } from './components/PinLockScreen';
-import { Transaction } from './types';
-import { Trophy, X, Repeat, Plus } from 'lucide-react';
+import { Transaction, TransactionType } from './types';
+import { Trophy, X, Repeat } from 'lucide-react';
 import { OfflineIndicator } from './components/OfflineIndicator';
+import { ExpandableFAB } from './components/ExpandableFAB';
 
 const AppContent: React.FC = () => {
   const {
@@ -30,13 +31,15 @@ const AppContent: React.FC = () => {
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [foreignDataForTx, setForeignDataForTx] = useState<InitialForeignData | null>(null);
+  const [initialTxType, setInitialTxType] = useState<TransactionType | undefined>(undefined);
   const [isConverterOpen, setIsConverterOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
 
-  const handleOpenAddModal = () => {
+  const handleOpenAddModal = (type?: TransactionType) => {
     setEditingTx(null);
     setForeignDataForTx(null);
+    setInitialTxType(type);
     setIsTxModalOpen(true);
   };
 
@@ -114,7 +117,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Main Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-28 sm:pb-24">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-24 sm:pb-24">
         {activeTab === 'home' && (
           <DashboardView
             onOpenAddModal={handleOpenAddModal}
@@ -139,19 +142,11 @@ const AppContent: React.FC = () => {
         )}
       </main>
 
-      {/* Floating Action Button (FAB) - single prominent button at the bottom */}
-      <button
-        id="global_fab_add_tx"
-        onClick={handleOpenAddModal}
-        aria-label="Добавить операцию"
-        title="Добавить операцию"
-        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center justify-center w-13 h-13 sm:w-auto sm:h-auto sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-950/30 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
-      >
-        <Plus size={22} className="stroke-[2.8] text-white shrink-0 sm:mr-1.5" />
-        <span className="hidden sm:inline text-sm font-extrabold tracking-wide whitespace-nowrap">
-          Добавить
-        </span>
-      </button>
+      {/* Floating Action Button (FAB) - expandable on long-press or right-click */}
+      <ExpandableFAB
+        onOpenDefault={() => handleOpenAddModal()}
+        onSelectType={(type) => handleOpenAddModal(type)}
+      />
 
       {/* Bottom Tab Navigation */}
       <BottomNav />
@@ -163,9 +158,11 @@ const AppContent: React.FC = () => {
           setIsTxModalOpen(false);
           setEditingTx(null);
           setForeignDataForTx(null);
+          setInitialTxType(undefined);
         }}
         initialTransaction={editingTx}
         initialForeignData={foreignDataForTx}
+        initialType={initialTxType}
       />
 
       <CurrencyConverterModal

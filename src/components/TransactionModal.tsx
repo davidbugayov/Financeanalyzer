@@ -60,6 +60,7 @@ interface TransactionModalProps {
   onClose: () => void;
   initialTransaction?: Transaction | null;
   initialForeignData?: InitialForeignData | null;
+  initialType?: TransactionType;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -67,6 +68,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   onClose,
   initialTransaction,
   initialForeignData,
+  initialType,
 }) => {
   const { categories, wallets, transactions, addTransaction, updateTransaction, currency, addSubcategory } = useFinance();
 
@@ -179,9 +181,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setCountry(initialForeignData.country || '');
       setCity('');
     } else {
-      setType('expense');
+      const selectedType: TransactionType = initialType || 'expense';
+      setType(selectedType);
       setAmount('');
-      const defaultCat = categories.find((c) => c.isExpense);
+      const defaultCat =
+        selectedType === 'transfer'
+          ? undefined
+          : categories.find((c) => (selectedType === 'income' ? !c.isExpense : c.isExpense));
       setCategoryId(defaultCat?.id || '');
       setSubcategory(defaultCat?.subcategories[0] || '');
       setWalletId(wallets[0]?.id || '');
@@ -205,7 +211,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setCity('');
     }
     setError('');
-  }, [initialTransaction, initialForeignData, isOpen, categories, wallets, currency.code]);
+  }, [initialTransaction, initialForeignData, initialType, isOpen, categories, wallets, currency.code]);
 
   const handleAddTag = (rawTag: string) => {
     const clean = rawTag.trim().replace(/^#+/, '').toLowerCase();

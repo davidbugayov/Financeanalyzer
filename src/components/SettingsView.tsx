@@ -87,7 +87,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 pb-28">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h2 className="text-xl sm:text-2xl font-black text-slate-900">Настройки и профиль</h2>
@@ -95,9 +95,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           Валюта, безопасность, офлайн-режим, категории и резервное копирование
         </p>
       </div>
-
-      {/* PWA Installation & Browser Guide Section */}
-      <PWAInstallSection />
 
       {/* Currency Switcher Card */}
       <div className="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-3">
@@ -273,6 +270,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           сервера.
         </div>
       </div>
+
+      {/* PWA Installation & Offline Mode Section (at bottom of Settings) */}
+      <PWAInstallSection />
 
       {/* PIN Setup Modal */}
       {isPinModalOpen && (
