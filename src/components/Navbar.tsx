@@ -1,18 +1,20 @@
 import React from 'react';
-import { Plus, Trophy, Lock, Wallet as WalletIcon, ArrowRightLeft } from 'lucide-react';
+import { Trophy, Lock, Wallet as WalletIcon, ArrowRightLeft } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from '../utils/financeCalculations';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavbarProps {
-  onOpenAddModal: () => void;
+  onOpenAddModal?: () => void;
   onOpenAchievementsModal: () => void;
   onOpenConverterModal: () => void;
+  onOpenSettings?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  onOpenAddModal,
   onOpenAchievementsModal,
   onOpenConverterModal,
+  onOpenSettings,
 }) => {
   const { wallets, achievements, currency, pinCode, lockApp } = useFinance();
 
@@ -60,16 +62,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="hidden md:inline">Конвертер валют</span>
           </button>
 
+          {/* PWA Install Button */}
+          <PWAInstallButton onNavigateToSettings={onOpenSettings} />
+
           {/* Achievements button */}
           <button
             id="achievements_nav_btn"
             onClick={onOpenAchievementsModal}
-            className="relative p-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-colors"
+            className="relative p-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-colors shrink-0"
             title="Достижения"
           >
             <Trophy size={20} />
             {unlockedCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-0 min-w-[16px] h-4 px-1 bg-amber-500 text-white text-[9px] font-black rounded-full flex items-center justify-center ring-2 ring-white shadow-2xs pointer-events-none">
                 {unlockedCount}
               </span>
             )}
@@ -86,16 +91,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Lock size={19} />
             </button>
           )}
-
-          {/* Primary Quick Add Transaction Button */}
-          <button
-            id="quick_add_transaction_btn"
-            onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md shadow-emerald-600/25 transition-all"
-          >
-            <Plus size={18} className="stroke-[2.5]" />
-            <span>Добавить</span>
-          </button>
         </div>
       </div>
     </header>

@@ -755,12 +755,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Category selection (for expense / income) */}
           {type !== 'transfer' ? (
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Категория
                 </label>
                 {categorySuggestion && categoryId === categorySuggestion.category.id && (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                     <Sparkles size={10} className="text-emerald-600" />
                     Подобрано по описанию
                   </span>
@@ -788,7 +788,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                             {categorySuggestion.subcategory}
                           </span>
                         )}
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-[10px] text-slate-500 hidden sm:inline">
                           (по слову «{categorySuggestion.matchedKeyword}»)
                         </span>
                       </div>
@@ -818,7 +818,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 </div>
               )}
 
-              <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-100 rounded-xl bg-slate-50/50">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 sm:gap-2 max-h-52 overflow-y-auto p-1.5 border border-slate-100 rounded-2xl bg-slate-50/50">
                 {filteredCategories.map((cat) => {
                   const isSelected = categoryId === cat.id;
                   const isSuggested = categorySuggestion?.category.id === cat.id;
@@ -832,7 +832,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                         setSubcategory(cat.subcategories[0] || '');
                         setUserManuallySelectedCategory(true);
                       }}
-                      className={`relative flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+                      title={cat.name}
+                      className={`relative flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all overflow-hidden min-w-0 w-full ${
                         isSelected
                           ? 'border-emerald-500 bg-emerald-50/80 shadow-xs ring-1 ring-emerald-500'
                           : isSuggested
@@ -841,17 +842,17 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                       }`}
                     >
                       {isSuggested && !isSelected && (
-                        <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider shadow-2xs">
+                        <span className="absolute top-1 right-1 px-1 py-0.2 rounded-full bg-emerald-600 text-white text-[8px] font-black uppercase tracking-wider shadow-2xs leading-none">
                           AI
                         </span>
                       )}
                       <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white mb-1 shadow-xs"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white mb-1 shadow-xs shrink-0"
                         style={{ backgroundColor: cat.color }}
                       >
                         <DynamicIcon name={cat.icon} size={16} />
                       </div>
-                      <span className="text-[11px] font-medium text-slate-800 line-clamp-1">
+                      <span className="w-full text-[10px] sm:text-[11px] font-medium text-slate-800 truncate block px-0.5 text-center leading-tight">
                         {cat.name}
                       </span>
                     </button>
@@ -969,7 +970,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 id="tx_wallet_select"
                 value={walletId}
                 onChange={(e) => setWalletId(e.target.value)}
-                className="w-full text-sm font-semibold px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full text-xs sm:text-sm font-semibold px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 truncate"
               >
                 {wallets.map((w) => (
                   <option key={w.id} value={w.id}>
@@ -982,7 +983,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           )}
 
           {/* Date & Note Grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
                 Дата
@@ -993,7 +994,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full text-xs sm:text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <div>
@@ -1003,16 +1004,16 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               <input
                 id="tx_note_input"
                 type="text"
-                placeholder="Например, кофе, такси, пятерочка"
+                placeholder="Например, кофе, такси, супермаркет"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="w-full text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full text-xs sm:text-sm px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
               {type !== 'transfer' && categorySuggestion && (
                 <div className="mt-1 flex items-center justify-between text-[11px] text-emerald-850 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-lg">
-                  <span className="truncate flex items-center gap-1">
+                  <span className="truncate flex items-center gap-1 min-w-0">
                     <Sparkles size={10} className="text-emerald-600 shrink-0" />
-                    <span>
+                    <span className="truncate">
                       {categorySuggestion.category.name}
                       {categorySuggestion.subcategory ? ` • ${categorySuggestion.subcategory}` : ''}
                     </span>
@@ -1172,12 +1173,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
           {/* Tags section for project, trip, or interest */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Tag size={13} className="text-emerald-600" />
-                <span>Теги (проект, поездка, интерес)</span>
+            <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 min-w-0">
+                <Tag size={13} className="text-emerald-600 shrink-0" />
+                <span>Теги</span>
+                <span className="text-[10px] lowercase text-slate-400 font-normal">
+                  (проект, поездка)
+                </span>
               </label>
-              <span className="text-[11px] text-slate-400">Enter или запятая</span>
+              <span className="text-[10px] text-slate-400 shrink-0">Enter или запятая</span>
             </div>
 
             {/* Active Tags */}

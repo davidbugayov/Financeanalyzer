@@ -80,7 +80,14 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [categoryBudgets, setCategoryBudgets] = useState<Record<string, number>>(() => {
     const saved = localStorage.getItem('fa_category_budgets');
-    return saved ? JSON.parse(saved) : DEFAULT_CATEGORY_BUDGETS;
+    if (!saved) return DEFAULT_CATEGORY_BUDGETS;
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        return { ...DEFAULT_CATEGORY_BUDGETS, ...parsed };
+      }
+    } catch {}
+    return DEFAULT_CATEGORY_BUDGETS;
   });
 
   const [achievements, setAchievements] = useState<Achievement[]>(() => {

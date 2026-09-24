@@ -13,12 +13,14 @@ import { AchievementsModal } from './components/AchievementsModal';
 import { ImportExportModal } from './components/ImportExportModal';
 import { PinLockScreen } from './components/PinLockScreen';
 import { Transaction } from './types';
-import { Trophy, X, Repeat } from 'lucide-react';
+import { Trophy, X, Repeat, Plus } from 'lucide-react';
+import { OfflineIndicator } from './components/OfflineIndicator';
 
 const AppContent: React.FC = () => {
   const {
     isLocked,
     activeTab,
+    setActiveTab,
     unlockedAchievementNotification,
     dismissAchievementNotification,
     recurringNotification,
@@ -61,6 +63,7 @@ const AppContent: React.FC = () => {
         onOpenAddModal={handleOpenAddModal}
         onOpenAchievementsModal={() => setIsAchievementsOpen(true)}
         onOpenConverterModal={() => setIsConverterOpen(true)}
+        onOpenSettings={() => setActiveTab('profile')}
       />
 
       {/* Unlocked Achievement Toast Notification */}
@@ -111,7 +114,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Main Container */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-5 pb-16">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-28 sm:pb-24">
         {activeTab === 'home' && (
           <DashboardView
             onOpenAddModal={handleOpenAddModal}
@@ -135,6 +138,22 @@ const AppContent: React.FC = () => {
           />
         )}
       </main>
+
+      {/* Floating Action Button (FAB) - single prominent button at the bottom */}
+      <button
+        id="global_fab_add_tx"
+        onClick={handleOpenAddModal}
+        aria-label="Добавить операцию"
+        title="Добавить операцию"
+        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-950/25 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
+      >
+        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+          <Plus size={16} className="stroke-[3] text-white" />
+        </div>
+        <span className="text-xs sm:text-sm font-extrabold tracking-wide whitespace-nowrap">
+          Добавить
+        </span>
+      </button>
 
       {/* Bottom Tab Navigation */}
       <BottomNav />
@@ -166,6 +185,9 @@ const AppContent: React.FC = () => {
         isOpen={isImportExportOpen}
         onClose={() => setIsImportExportOpen(false)}
       />
+
+      {/* Non-intrusive offline indicator for PWA */}
+      <OfflineIndicator />
     </div>
   );
 };

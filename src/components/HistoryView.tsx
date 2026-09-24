@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { Transaction, GroupingType, TransactionType } from '../types';
-import { formatCurrency } from '../utils/financeCalculations';
+import { formatCurrency, formatTransactionDate } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
 import { getIntervalLabel } from '../utils/recurringProcessor';
 import { DateRangePicker, DateRange, formatHumanDateRange } from './DateRangePicker';
@@ -706,9 +706,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                   return (
                     <div
                       key={t.id}
-                      className="px-4 py-3 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors group"
+                      className="px-3 sm:px-4 py-3 flex items-center justify-between gap-2.5 sm:gap-3 hover:bg-slate-50/70 transition-colors group"
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                         <div
                           className="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs"
                           style={{
@@ -721,26 +721,26 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                           />
                         </div>
 
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                            <span className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[150px] sm:max-w-none">
                               {t.category}
                             </span>
                             {t.subcategory && (
-                              <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md">
+                              <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
                                 {t.subcategory}
                               </span>
                             )}
                             {t.isForeignCurrency && (
-                              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0">
                                 <Globe size={11} className="text-blue-500" />
-                                <span>{t.originalAmount} {t.originalCurrency}</span>
+                                <span>{t.originalAmount}&nbsp;{t.originalCurrency}</span>
                                 {t.country && <span className="opacity-80">({t.country})</span>}
                               </span>
                             )}
                             {t.isRecurring && (
                               <span
-                                className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                                className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0"
                                 title={t.recurrenceNextDate ? `Следующее списание: ${t.recurrenceNextDate}` : 'Регулярная операция'}
                               >
                                 <Repeat size={10} className="text-teal-600" />
@@ -749,7 +749,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                             )}
                             {t.parentRecurringId && (
                               <span
-                                className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                                className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0"
                                 title="Создано автоплатежом по расписанию"
                               >
                                 <Repeat size={9} className="text-slate-400" />
@@ -757,20 +757,22 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5 truncate">
-                            <span>{t.date}</span>
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5 min-w-0 overflow-hidden flex-wrap">
+                            <span className="whitespace-nowrap font-medium text-slate-500 shrink-0">
+                              {formatTransactionDate(t.date)}
+                            </span>
                             <span>•</span>
-                            <span>{wallet?.name || 'Счет'}</span>
+                            <span className="truncate max-w-[120px] sm:max-w-[180px] shrink-0">{wallet?.name || 'Счет'}</span>
                             {isTransfer && targetWallet && (
-                              <span>➔ {targetWallet.name}</span>
+                              <span className="truncate max-w-[120px] sm:max-w-[180px] shrink-0">➔ {targetWallet.name}</span>
                             )}
-                            {t.city && <span>• 📍 {t.city}</span>}
+                            {t.city && <span className="whitespace-nowrap shrink-0">• 📍 {t.city}</span>}
                             {t.isForeignCurrency && t.exchangeRate && (
-                              <span className="text-slate-400">
+                              <span className="whitespace-nowrap shrink-0 text-slate-400">
                                 • курс {t.exchangeRate.toFixed(2)}
                               </span>
                             )}
-                            {t.note && <span className="italic">({t.note})</span>}
+                            {t.note && <span className="truncate italic max-w-[140px] text-slate-400">({t.note})</span>}
                           </div>
 
                           {/* Tags badges */}
@@ -803,9 +805,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                       </div>
 
                       {/* Amount & Quick Actions */}
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0 pl-2">
                         <span
-                          className={`text-xs sm:text-sm font-extrabold ${
+                          className={`text-xs sm:text-sm font-extrabold whitespace-nowrap ${
                             isIncome
                               ? 'text-emerald-600'
                               : isTransfer

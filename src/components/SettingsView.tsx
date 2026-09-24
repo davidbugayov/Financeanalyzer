@@ -15,6 +15,7 @@ import {
 import { useFinance } from '../context/FinanceContext';
 import { CURRENCIES } from '../data/initialData';
 import { DynamicIcon } from '../utils/iconHelper';
+import { PWAInstallSection } from './PWAInstallSection';
 
 interface SettingsViewProps {
   onOpenImportExport: () => void;
@@ -91,9 +92,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <div>
         <h2 className="text-xl sm:text-2xl font-black text-slate-900">Настройки и профиль</h2>
         <p className="text-xs text-slate-500">
-          Валюта, параметры безопасности, управление категориями и данными
+          Установка PWA приложения, валюта, безопасность, категории и данные
         </p>
       </div>
+
+      {/* PWA Installation & Browser Guide Section */}
+      <PWAInstallSection />
 
       {/* Currency Switcher Card */}
       <div className="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-3">
@@ -112,7 +116,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 key={curr.code}
                 onClick={() => setCurrency(curr.code)}
-                className={`p-3 rounded-2xl border text-left transition-all ${
+                className={`p-3 rounded-2xl border text-left transition-all overflow-hidden min-w-0 ${
                   isSelected
                     ? 'border-emerald-500 bg-emerald-50/70 shadow-xs'
                     : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -124,7 +128,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     {curr.code}
                   </span>
                 </div>
-                <div className="text-[11px] font-medium text-slate-600 line-clamp-1">
+                <div className="text-[11px] font-medium text-slate-600 truncate">
                   {curr.name}
                 </div>
               </button>

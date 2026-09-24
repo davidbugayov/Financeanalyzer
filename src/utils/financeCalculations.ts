@@ -84,7 +84,29 @@ export function formatCurrency(amount: number, symbol: string = '₽'): string {
   const formatted = new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 0,
   }).format(amount);
-  return `${formatted} ${symbol}`;
+  return `${formatted}\u00A0${symbol}`;
+}
+
+export function formatTransactionDate(dateStr: string): string {
+  if (!dateStr) return '';
+  try {
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const year = Number(parts[0]);
+    const month = Number(parts[1]) - 1;
+    const day = Number(parts[2]);
+    const d = new Date(year, month, day);
+    if (isNaN(d.getTime())) return dateStr;
+
+    const now = new Date();
+    const isCurrentYear = d.getFullYear() === now.getFullYear();
+    if (isCurrentYear) {
+      return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    }
+    return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  } catch {
+    return dateStr;
+  }
 }
 
 export function getSmartTips(transactions: Transaction[]): { title: string; desc: string; icon: string }[] {

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#064E3B" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Inner Subtle Border -->
+  <rect x="8" y="8" width="496" height="496" rx="104" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="4" />
+
+  <!-- Wallet Body Group -->
+  <g filter="url(#shadow)">
+    <!-- Main Wallet Body -->
+    <rect x="96" y="140" width="320" height="232" rx="28" fill="#FFFFFF" />
+
+    <!-- Wallet Front Flap -->
+    <path d="M 96 220 L 416 220" stroke="#E2E8F0" stroke-width="3" stroke-dasharray="8 6" />
+
+    <!-- Card/Cash sticking out slightly -->
+    <rect x="136" y="112" width="180" height="48" rx="12" fill="#E6FFFA" stroke="#10B981" stroke-width="3" />
+    <path d="M 160 136 L 240 136" stroke="#059669" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Right Flap Lock Tab -->
+    <path d="M 330 216 H 416 V 296 H 330 C 308 296 290 278 290 256 C 290 234 308 216 330 216 Z" fill="#059669" />
+    
+    <!-- Lock Coin / Clasp -->
+    <circle cx="336" cy="256" r="16" fill="url(#coinGrad)" stroke="#FFFFFF" stroke-width="3" />
+    
+    <!-- Growth chart line inside wallet -->
+    <path d="M 140 320 L 180 285 L 220 300 L 270 250" fill="none" stroke="#10B981" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="270" cy="250" r="7" fill="#10B981" />
+  </g>
+</svg>

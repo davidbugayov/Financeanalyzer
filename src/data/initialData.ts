@@ -17,7 +17,15 @@ export const DEFAULT_CATEGORY_BUDGETS: Record<string, number> = {
   cat_transport: 8000,
   cat_housing: 15000,
   cat_health: 7000,
+  cat_clothing: 10000,
   cat_entertainment: 6000,
+  cat_communication: 2000,
+  cat_pet: 5000,
+  cat_services: 4500,
+  cat_credit: 25000,
+  cat_charity: 3000,
+  cat_travel: 15000,
+  cat_other_expense: 5000,
 };
 
 export const DEFAULT_CATEGORIES: Category[] = [

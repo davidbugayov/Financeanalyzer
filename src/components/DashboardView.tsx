@@ -14,7 +14,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
-import { formatCurrency, calculateTotals, getSmartTips } from '../utils/financeCalculations';
+import { formatCurrency, formatTransactionDate, calculateTotals, getSmartTips } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
 import { Transaction } from '../types';
 import { getIntervalLabel } from '../utils/recurringProcessor';
@@ -360,9 +360,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   key={t.id}
                   id={`tx_item_${t.id}`}
                   onClick={() => onEditTransaction(t)}
-                  className="py-3 sm:py-3.5 flex items-center justify-between gap-3 hover:bg-slate-50 px-2 rounded-xl cursor-pointer transition-colors"
+                  className="py-3 sm:py-3.5 flex items-center justify-between gap-2.5 sm:gap-3 hover:bg-slate-50 px-2 sm:px-2.5 rounded-xl cursor-pointer transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs"
                       style={{
@@ -374,26 +374,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         size={18}
                       />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs sm:text-sm font-bold text-slate-900">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[150px] sm:max-w-none">
                           {t.category}
                         </span>
                         {t.subcategory && (
-                          <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md">
+                          <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md truncate max-w-[120px]">
                             {t.subcategory}
                           </span>
                         )}
                         {t.isForeignCurrency && (
-                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0">
                             <Globe size={11} className="text-blue-500" />
-                            <span>{t.originalAmount} {t.originalCurrency}</span>
+                            <span>{t.originalAmount}&nbsp;{t.originalCurrency}</span>
                             {t.country && <span className="opacity-80">({t.country})</span>}
                           </span>
                         )}
                         {t.isRecurring && (
                           <span
-                            className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                            className="text-[10px] font-bold text-teal-800 bg-teal-50 border border-teal-200/90 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0"
                             title={t.recurrenceNextDate ? `Следующее списание: ${t.recurrenceNextDate}` : 'Регулярная операция'}
                           >
                             <Repeat size={10} className="text-teal-600" />
@@ -402,7 +402,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         )}
                         {t.parentRecurringId && (
                           <span
-                            className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                            className="text-[10px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md flex items-center gap-1 shrink-0"
                             title="Создано автоплатежом по расписанию"
                           >
                             <Repeat size={9} className="text-slate-400" />
@@ -410,17 +410,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                        <span>{t.date}</span>
-                        {wallet && <span>• {wallet.name}</span>}
-                        {t.note && <span className="line-clamp-1 italic">• {t.note}</span>}
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5 min-w-0 overflow-hidden">
+                        <span className="whitespace-nowrap font-medium text-slate-500 shrink-0">
+                          {formatTransactionDate(t.date)}
+                        </span>
+                        {wallet && (
+                          <span className="truncate max-w-[110px] sm:max-w-[180px] shrink-0" title={wallet.name}>
+                            • {wallet.name}
+                          </span>
+                        )}
+                        {t.note && (
+                          <span className="truncate flex-1 min-w-[50px] italic text-slate-400" title={t.note}>
+                            • {t.note}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
+                  <div className="text-right shrink-0 pl-2">
                     <span
-                      className={`text-xs sm:text-sm font-extrabold ${
+                      className={`text-xs sm:text-sm font-extrabold whitespace-nowrap block tracking-tight ${
                         isIncome
                           ? 'text-emerald-600'
                           : isTransfer
@@ -438,22 +448,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         )}
       </div>
-
-      {/* Floating Action Button (FAB) for ultra-fast transaction entry */}
-      <button
-        id="dashboard_fab_add_tx"
-        onClick={onOpenAddModal}
-        aria-label="Быстро добавить операцию"
-        title="Быстро добавить операцию"
-        className="fixed bottom-20 right-4 sm:bottom-8 sm:right-8 z-30 flex items-center gap-2.5 px-4 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white shadow-xl hover:shadow-2xl shadow-emerald-900/30 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-emerald-400/40 cursor-pointer"
-      >
-        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-          <Plus size={18} className="stroke-[3] text-white" />
-        </div>
-        <span className="text-xs sm:text-sm font-extrabold tracking-wide whitespace-nowrap">
-          Добавить
-        </span>
-      </button>
 
       {/* Budget Configuration Modal */}
       <BudgetModal
