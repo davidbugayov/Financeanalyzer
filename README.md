@@ -46,3 +46,13 @@ npm run dev
 # Сборка для продакшена
 npm run build
 ```
+
+## 🔐 Работа с Git и SSH
+
+Поскольку в проектах используется аутентификация через SSH-ключи (в том числе для обхода ошибки `403` при отправке по HTTPS), убедитесь, что ваш `remote` настроен на использование SSH.
+
+Для изменения URL на SSH выполните команду:
+
+```bash
+git remote set-url origin git@github.com:davidbugayov/Financeanalyzer.git
+```
