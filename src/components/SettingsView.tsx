@@ -210,13 +210,26 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <RefreshCw size={14} />
             <span>Восстановить демо-данные</span>
           </button>
+        </div>
+      </div>
 
+      {/* Clear Data Section */}
+      <div className="bg-white rounded-3xl border border-red-200 p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="flex items-center gap-2">
+          <Trash2 size={18} className="text-red-600" />
+          <h3 className="text-sm font-extrabold text-slate-900">Очистка истории</h3>
+        </div>
+        <p className="text-xs text-slate-500">
+          Удаление демо-данных или старой истории транзакций для начала работы с чистого листа. Балансы кошельков будут обнулены.
+        </p>
+
+        <div className="flex flex-wrap gap-2 pt-1">
           <button
             onClick={() => setIsResetConfirmOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-xl transition-colors ml-auto"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-xl transition-colors"
           >
             <Trash2 size={14} />
-            <span>Стереть все данные</span>
+            <span>Очистить историю и начать заново</span>
           </button>
         </div>
       </div>
