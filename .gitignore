@@ -98,3 +98,4 @@ tools/pepk_out.zip
 
 # macOS Terminal history
 .history
+node_modules
