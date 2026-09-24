@@ -18,6 +18,7 @@ import { Transaction, GroupingType, TransactionType } from '../types';
 import { formatCurrency } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
 import { getIntervalLabel } from '../utils/recurringProcessor';
+import { DateRangePicker, DateRange, formatHumanDateRange } from './DateRangePicker';
 
 interface HistoryViewProps {
   onEditTransaction: (tx: Transaction) => void;
@@ -32,6 +33,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 }) => {
   const { transactions, categories, wallets, currency, deleteTransaction } = useFinance();
 
+  const [dateRange, setDateRange] = useState<DateRange>({
+    preset: 'all',
+    startDate: '',
+    endDate: '',
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<TransactionType | 'all' | 'foreign' | 'recurring'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -128,9 +134,23 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
         return false;
       }
 
+      // Date range filter
+      if (dateRange.startDate && t.date < dateRange.startDate) return false;
+      if (dateRange.endDate && t.date > dateRange.endDate) return false;
+
       return true;
     });
-  }, [transactions, searchQuery, selectedTag, recurrenceFilter, recurringSubType, selectedType, selectedCategory, selectedWallet]);
+  }, [
+    transactions,
+    searchQuery,
+    selectedTag,
+    recurrenceFilter,
+    recurringSubType,
+    selectedType,
+    selectedCategory,
+    selectedWallet,
+    dateRange,
+  ]);
 
   // Grouped transactions
   const groupedData = useMemo(() => {
@@ -206,8 +226,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           <p className="text-xs text-slate-500">Поиск, фильтры и группировка расходов и доходов</p>
         </div>
 
-        {/* Grouping switcher and converter */}
+        {/* Date Range Picker, grouping switcher and converter */}
         <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          {/* Date range picker component in HistoryView header */}
+          <DateRangePicker dateRange={dateRange} onChange={setDateRange} />
+
           {onOpenConverterModal && (
             <button
               id="history_open_converter_btn"
@@ -587,6 +610,38 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                 setRecurringSubType('all');
               }}
               className="text-xs font-bold text-teal-800 hover:text-teal-950 underline cursor-pointer"
+            >
+              Сбросить
+            </button>
+          </div>
+        )}
+
+        {/* Active Date Range Filter Banner */}
+        {(dateRange.preset !== 'all' || dateRange.startDate || dateRange.endDate) && (
+          <div
+            id="active_date_range_banner"
+            className="flex items-center justify-between px-3 py-2 bg-emerald-50/90 border border-emerald-200 rounded-xl text-xs"
+          >
+            <div className="flex items-center gap-2">
+              <Calendar size={14} className="text-emerald-700" />
+              <span className="font-semibold text-emerald-950">Период дат:</span>
+              <span className="px-2 py-0.5 rounded-md font-bold text-white bg-emerald-700">
+                {formatHumanDateRange(dateRange)}
+              </span>
+              <span className="text-emerald-800 font-medium">
+                (найдено: {filtered.length})
+              </span>
+            </div>
+            <button
+              id="reset_date_range_filter_btn"
+              onClick={() => {
+                setDateRange({
+                  preset: 'all',
+                  startDate: '',
+                  endDate: '',
+                });
+              }}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline cursor-pointer"
             >
               Сбросить
             </button>
