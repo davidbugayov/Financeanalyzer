@@ -13,6 +13,10 @@ import {
   MapPin,
   ArrowDownLeft,
   ArrowUpRight,
+  SlidersHorizontal,
+  AlertTriangle,
+  ShieldCheck,
+  Plus,
 } from 'lucide-react';
 import {
   PieChart,
@@ -37,10 +41,19 @@ import {
 import { DynamicIcon } from '../utils/iconHelper';
 import { MonthlyExpensesAnalytics } from './MonthlyExpensesAnalytics';
 import { FinancialBalanceWidget } from './FinancialBalanceWidget';
+import { BudgetModal } from './BudgetModal';
 
 export const StatisticsView: React.FC = () => {
-  const { transactions, wallets, categories, currency } = useFinance();
+  const { transactions, wallets, categories, categoryBudgets, currency } = useFinance();
   const [period, setPeriod] = useState<PeriodType>('month');
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [selectedBudgetCategoryId, setSelectedBudgetCategoryId] = useState<string | null>(null);
+  const [budgetFilter, setBudgetFilter] = useState<'all' | 'with_budget' | 'over_budget'>('all');
+
+  const handleOpenBudgetModal = (categoryId?: string) => {
+    setSelectedBudgetCategoryId(categoryId || null);
+    setIsBudgetModalOpen(true);
+  };
 
   // Filter transactions by period
   const filteredTxs = useMemo(() => {
@@ -264,21 +277,58 @@ export const StatisticsView: React.FC = () => {
     }
   }, [income, prevIncome, period]);
 
-  // Category distribution for expenses with comparison to previous period
+  // Helper to adjust monthly budget to selected period
+  const getPeriodBudgetLimit = (monthlyLimit: number): number => {
+    if (!monthlyLimit || monthlyLimit <= 0) return 0;
+    if (period === 'month') return monthlyLimit;
+    if (period === 'week') return Math.round((monthlyLimit * 7) / 30.4);
+    if (period === 'day') return Math.round(monthlyLimit / 30.4);
+    if (period === 'year') return monthlyLimit * 12;
+    return monthlyLimit; // 'all'
+  };
+
+  const periodBudgetLabel = useMemo(() => {
+    switch (period) {
+      case 'day':
+        return 'на день';
+      case 'week':
+        return 'на неделю';
+      case 'month':
+        return 'на месяц';
+      case 'year':
+        return 'на год';
+      case 'all':
+        return 'за период';
+      default:
+        return 'на месяц';
+    }
+  }, [period]);
+
+  // Category distribution for expenses with comparison to previous period and budget limits
   const categoryData = useMemo(() => {
-    const map: { [name: string]: { amount: number; color: string; icon: string } } = {};
+    const map: {
+      [name: string]: {
+        amount: number;
+        color: string;
+        icon: string;
+        categoryId: string;
+      };
+    } = {};
     const prevMap: { [name: string]: number } = {};
 
     filteredTxs
       .filter((t) => t.type === 'expense')
       .forEach((t) => {
-        const cat = categories.find((c) => c.name === t.category || c.id === t.categoryId);
-        const name = t.category;
+        const cat = categories.find(
+          (c) => (t.categoryId && c.id === t.categoryId) || c.name === t.category
+        );
+        const name = cat?.name || t.category;
         const color = cat?.color || '#94A3B8';
         const icon = cat?.icon || 'Tag';
+        const categoryId = cat?.id || t.categoryId || name;
 
         if (!map[name]) {
-          map[name] = { amount: 0, color, icon };
+          map[name] = { amount: 0, color, icon, categoryId };
         }
         map[name].amount += t.amount;
       });
@@ -286,16 +336,56 @@ export const StatisticsView: React.FC = () => {
     prevFilteredTxs
       .filter((t) => t.type === 'expense')
       .forEach((t) => {
-        const name = t.category;
+        const cat = categories.find(
+          (c) => (t.categoryId && c.id === t.categoryId) || c.name === t.category
+        );
+        const name = cat?.name || t.category;
         prevMap[name] = (prevMap[name] || 0) + t.amount;
       });
+
+    // If filter is 'with_budget', also include expense categories that have a budget even if spent is 0
+    if (budgetFilter === 'with_budget') {
+      categories
+        .filter((c) => c.isExpense)
+        .forEach((c) => {
+          const rawLimit =
+            (categoryBudgets && categoryBudgets[c.id]) ||
+            (c.key && categoryBudgets && categoryBudgets[c.key]) ||
+            0;
+          if (rawLimit > 0 && !map[c.name]) {
+            map[c.name] = {
+              amount: 0,
+              color: c.color,
+              icon: c.icon,
+              categoryId: c.id,
+            };
+          }
+        });
+    }
 
     return Object.keys(map)
       .map((name) => {
         const currentAmount = map[name].amount;
         const previousAmount = prevMap[name] || 0;
-        let comparison = null;
+        const catId = map[name].categoryId;
+        const catObj = categories.find((c) => c.id === catId || c.name === name);
 
+        // Budget resolution
+        const rawMonthlyLimit =
+          (categoryBudgets && catId && categoryBudgets[catId]) ||
+          (catObj?.id && categoryBudgets && categoryBudgets[catObj.id]) ||
+          (catObj?.key && categoryBudgets && categoryBudgets[catObj.key]) ||
+          0;
+
+        const periodLimit = getPeriodBudgetLimit(rawMonthlyLimit);
+        const budgetPercent =
+          periodLimit > 0 ? Math.round((currentAmount / periodLimit) * 100) : null;
+        const budgetDiff = periodLimit > 0 ? periodLimit - currentAmount : null;
+        const isOverBudget = periodLimit > 0 && currentAmount > periodLimit;
+        const isNearBudget =
+          periodLimit > 0 && budgetPercent !== null && budgetPercent >= 80 && budgetPercent < 100;
+
+        let comparison = null;
         if (previousAmount > 0) {
           const diff = currentAmount - previousAmount;
           const absDiff = Math.abs(diff);
@@ -323,15 +413,98 @@ export const StatisticsView: React.FC = () => {
 
         return {
           name,
+          categoryId: catId,
           value: currentAmount,
           color: map[name].color,
           icon: map[name].icon,
           percentage: expense > 0 ? Math.round((currentAmount / expense) * 100) : 0,
           comparison,
+          rawMonthlyLimit,
+          periodLimit,
+          budgetPercent,
+          budgetDiff,
+          isOverBudget,
+          isNearBudget,
         };
       })
-      .sort((a, b) => b.value - a.value);
-  }, [filteredTxs, prevFilteredTxs, categories, expense]);
+      .filter((cat) => {
+        if (budgetFilter === 'with_budget') return cat.periodLimit > 0;
+        if (budgetFilter === 'over_budget') return cat.isOverBudget;
+        return true;
+      })
+      .sort((a, b) => {
+        if (budgetFilter === 'over_budget') {
+          return (b.budgetPercent || 0) - (a.budgetPercent || 0);
+        }
+        return b.value - a.value;
+      });
+  }, [
+    filteredTxs,
+    prevFilteredTxs,
+    categories,
+    categoryBudgets,
+    expense,
+    period,
+    budgetFilter,
+  ]);
+
+  // Overall budget summary metrics
+  const budgetSummary = useMemo(() => {
+    let budgetedCount = 0;
+    let safeCount = 0;
+    let nearCount = 0;
+    let overCount = 0;
+    let totalPeriodBudget = 0;
+    let totalSpentInBudgeted = 0;
+
+    categories
+      .filter((c) => c.isExpense)
+      .forEach((c) => {
+        const rawLimit =
+          (categoryBudgets && categoryBudgets[c.id]) ||
+          (c.key && categoryBudgets && categoryBudgets[c.key]) ||
+          0;
+        if (rawLimit > 0) {
+          budgetedCount++;
+          const periodLimit = getPeriodBudgetLimit(rawLimit);
+          totalPeriodBudget += periodLimit;
+
+          // Find spent amount in this category
+          const found = categoryData.find(
+            (item) => item.categoryId === c.id || item.name === c.name
+          );
+          const spent = found ? found.value : 0;
+          totalSpentInBudgeted += spent;
+
+          if (periodLimit > 0 && spent > periodLimit) {
+            overCount++;
+          } else if (
+            periodLimit > 0 &&
+            Math.round((spent / periodLimit) * 100) >= 80 &&
+            spent <= periodLimit
+          ) {
+            nearCount++;
+          } else {
+            safeCount++;
+          }
+        }
+      });
+
+    const overallPercent =
+      totalPeriodBudget > 0
+        ? Math.round((totalSpentInBudgeted / totalPeriodBudget) * 100)
+        : 0;
+
+    return {
+      budgetedCount,
+      safeCount,
+      nearCount,
+      overCount,
+      totalPeriodBudget,
+      totalSpentInBudgeted,
+      overallPercent,
+    };
+  }, [categories, categoryBudgets, categoryData, period]);
 
   // Dynamics Bar Chart Data (grouped by date or week)
   const dynamicsData = useMemo(() => {
@@ -695,37 +868,167 @@ export const StatisticsView: React.FC = () => {
         )}
       </div>
 
-      {/* Category Expenses Breakdown with Donut Chart */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+      {/* Category Expenses Breakdown with Donut Chart and Budget Progress Bars */}
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-5">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <PieChartIcon size={20} className="text-emerald-600" />
-            <h3 className="text-base font-extrabold text-slate-900">Структура расходов</h3>
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900">
+                Структура расходов и лимиты бюджетов
+              </h3>
+              <p className="text-xs text-slate-500">
+                Индикаторы соблюдения установленных лимитов по категориям ({periodBudgetLabel})
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleOpenBudgetModal()}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <SlidersHorizontal size={13} />
+              <span>Настроить лимиты</span>
+            </button>
             <span
-              className={`text-xs font-bold px-2.5 py-0.5 rounded-lg border ${expenseComparison.badgeClass}`}
+              className={`text-xs font-bold px-2.5 py-1 rounded-xl border ${expenseComparison.badgeClass}`}
             >
               {expenseComparison.label}
             </span>
-            <span className="text-xs font-bold text-slate-500">
+            <span className="text-xs font-black text-slate-700 bg-slate-100 px-2.5 py-1 rounded-xl">
               Всего: {formatCurrency(expense, currency.symbol)}
             </span>
           </div>
         </div>
 
+        {/* Budget Execution Summary Banner */}
+        {budgetSummary.budgetedCount > 0 && (
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 via-emerald-50/30 to-slate-50 border border-slate-200/90 text-xs space-y-2.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                <span className="font-extrabold text-slate-800">
+                  Исполнение бюджета {periodBudgetLabel}:
+                </span>
+                <span className="font-black text-slate-900">
+                  {formatCurrency(budgetSummary.totalSpentInBudgeted, currency.symbol)} /{' '}
+                  {formatCurrency(budgetSummary.totalPeriodBudget, currency.symbol)}
+                </span>
+                <span
+                  className={`font-black px-1.5 py-0.5 rounded-md text-[11px] ${
+                    budgetSummary.overallPercent > 100
+                      ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                      : budgetSummary.overallPercent >= 80
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                  }`}
+                >
+                  {budgetSummary.overallPercent}%
+                </span>
+              </div>
+
+              {/* Status Chips */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="px-2 py-0.5 rounded-lg bg-emerald-100/80 text-emerald-800 font-bold text-[11px] inline-flex items-center gap-1">
+                  <CheckCircle2 size={11} /> {budgetSummary.safeCount} в норме
+                </span>
+                {budgetSummary.nearCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 font-bold text-[11px] inline-flex items-center gap-1">
+                    <AlertCircle size={11} /> {budgetSummary.nearCount} у лимита
+                  </span>
+                )}
+                {budgetSummary.overCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-800 font-bold text-[11px] inline-flex items-center gap-1">
+                    <AlertTriangle size={11} /> {budgetSummary.overCount} превышено!
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Total Budget Progress Bar */}
+            <div className="h-2 w-full bg-slate-200/80 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  budgetSummary.overallPercent > 100
+                    ? 'bg-gradient-to-r from-rose-500 to-red-600'
+                    : budgetSummary.overallPercent >= 80
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500'
+                    : 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                }`}
+                style={{ width: `${Math.min(100, budgetSummary.overallPercent)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Filter Pills for Categories */}
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setBudgetFilter('all')}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                budgetFilter === 'all'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              Все статьи ({categoryData.length})
+            </button>
+            <button
+              onClick={() => setBudgetFilter('with_budget')}
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1 cursor-pointer ${
+                budgetFilter === 'with_budget'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              С лимитами ({budgetSummary.budgetedCount})
+            </button>
+            {budgetSummary.overCount > 0 && (
+              <button
+                onClick={() => setBudgetFilter('over_budget')}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1 cursor-pointer ${
+                  budgetFilter === 'over_budget'
+                    ? 'bg-rose-600 text-white shadow-2xs'
+                    : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                }`}
+              >
+                <AlertTriangle size={12} />
+                Превышение ({budgetSummary.overCount})
+              </button>
+            )}
+          </div>
+          <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">
+            Нажмите на лимит категории для быстрого изменения
+          </span>
+        </div>
+
+        {/* Content Body */}
         {categoryData.length === 0 ? (
-          <p className="text-xs text-center py-8 text-slate-400 font-medium">
-            Нет данных о расходах за выбранный период
-          </p>
+          <div className="text-center py-8 text-slate-400 font-medium space-y-2">
+            <p className="text-xs">
+              {budgetFilter === 'over_budget'
+                ? 'Отлично! Превышений лимита по категориям не обнаружено 🎉'
+                : 'Нет данных о расходах за выбранный период'}
+            </p>
+            {budgetFilter === 'over_budget' && (
+              <button
+                onClick={() => setBudgetFilter('all')}
+                className="text-xs text-emerald-600 font-bold hover:underline cursor-pointer"
+              >
+                Показать все категории
+              </button>
+            )}
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             {/* Donut Chart */}
-            <div className="h-56 w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-64 w-full flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height="88%">
                 <PieChart>
                   <Pie
-                    data={categoryData}
+                    data={categoryData.filter((c) => c.value > 0)}
                     cx="50%"
                     cy="50%"
                     innerRadius={55}
@@ -733,68 +1036,178 @@ export const StatisticsView: React.FC = () => {
                     paddingAngle={3}
                     dataKey="value"
                   >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                    {categoryData
+                      .filter((c) => c.value > 0)
+                      .map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
                   </Pie>
                   <Tooltip
                     formatter={(val: number) => [
                       formatCurrency(val, currency.symbol),
-                      'Сумма',
+                      'Расход',
                     ]}
                   />
                 </PieChart>
               </ResponsiveContainer>
+              <span className="text-[11px] text-slate-400 text-center font-medium mt-1">
+                Распределение трат по статьям расходов
+              </span>
             </div>
 
-            {/* List with progress bars and comparison badges */}
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+            {/* List with Progress Bars showing Expense vs Budget Limit */}
+            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
               {categoryData.map((cat) => (
-                <div key={cat.name} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                <div
+                  key={cat.name}
+                  className="p-3 rounded-2xl bg-slate-50/80 hover:bg-slate-50 border border-slate-200/70 hover:border-slate-300 transition-all space-y-2"
+                >
+                  {/* Category Header Row */}
+                  <div className="flex items-center justify-between text-xs gap-2">
+                    <div className="flex items-center gap-2 flex-wrap min-w-0">
                       <div
-                        className="w-3 h-3 rounded-full shrink-0"
+                        className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs text-white"
                         style={{ backgroundColor: cat.color }}
-                      />
-                      <span className="font-bold text-slate-800">{cat.name}</span>
-                      <span className="text-[11px] text-slate-400 font-medium">
-                        ({cat.percentage}%)
-                      </span>
-                      {cat.comparison && (
-                        <span
-                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${
-                            cat.comparison.direction === 'down'
-                              ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/80'
-                              : cat.comparison.direction === 'up'
-                              ? 'text-rose-700 bg-rose-50 border border-rose-200/80'
-                              : 'text-slate-600 bg-slate-100 border border-slate-200'
-                          }`}
-                        >
-                          {cat.comparison.direction === 'down' && (
-                            <TrendingDown size={10} className="stroke-[2.5]" />
-                          )}
-                          {cat.comparison.direction === 'up' && (
-                            <TrendingUp size={10} className="stroke-[2.5]" />
-                          )}
-                          {cat.comparison.label}
+                      >
+                        <DynamicIcon name={cat.icon} size={14} className="stroke-[2.2]" />
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-extrabold text-slate-900 truncate">
+                          {cat.name}
                         </span>
-                      )}
+                        <span className="text-[11px] text-slate-400 font-semibold">
+                          ({cat.percentage}% от всех трат)
+                        </span>
+                        {cat.comparison && (
+                          <span
+                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-flex items-center gap-0.5 ${
+                              cat.comparison.direction === 'down'
+                                ? 'text-emerald-700 bg-emerald-50 border border-emerald-200/80'
+                                : cat.comparison.direction === 'up'
+                                ? 'text-rose-700 bg-rose-50 border border-rose-200/80'
+                                : 'text-slate-600 bg-slate-100 border border-slate-200'
+                            }`}
+                          >
+                            {cat.comparison.direction === 'down' && (
+                              <TrendingDown size={10} className="stroke-[2.5]" />
+                            )}
+                            {cat.comparison.direction === 'up' && (
+                              <TrendingUp size={10} className="stroke-[2.5]" />
+                            )}
+                            {cat.comparison.label}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <span className="font-extrabold text-slate-900 shrink-0">
-                      {formatCurrency(cat.value, currency.symbol)}
-                    </span>
+                    <div className="text-right shrink-0">
+                      <span className="font-black text-sm text-slate-900 block">
+                        {formatCurrency(cat.value, currency.symbol)}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${cat.percentage}%`,
-                        backgroundColor: cat.color,
-                      }}
-                    />
-                  </div>
+                  {/* Budget Indicators and Progress Bar */}
+                  {cat.periodLimit > 0 ? (
+                    <div className="space-y-1.5 pt-0.5">
+                      <div className="flex items-center justify-between text-xs gap-2 flex-wrap">
+                        <div>
+                          {cat.isOverBudget ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                              <AlertTriangle size={11} className="text-rose-600 shrink-0" />
+                              Превышение лимита: +{formatCurrency(Math.abs(cat.budgetDiff!), currency.symbol)} ({cat.budgetPercent}%)
+                            </span>
+                          ) : cat.isNearBudget ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                              <AlertCircle size={11} className="text-amber-700 shrink-0" />
+                              Внимание: {cat.budgetPercent}% (осталось {formatCurrency(cat.budgetDiff!, currency.symbol)})
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/70">
+                              <CheckCircle2 size={11} className="text-emerald-600 shrink-0" />
+                              Израсходовано {cat.budgetPercent}% (осталось {formatCurrency(cat.budgetDiff!, currency.symbol)})
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Limit display and edit button */}
+                        <div className="flex items-center gap-1 text-[11px] text-slate-500 shrink-0">
+                          <span>Лимит:</span>
+                          <button
+                            onClick={() => handleOpenBudgetModal(cat.categoryId)}
+                            className="font-bold text-slate-800 hover:text-emerald-700 underline decoration-dotted inline-flex items-center gap-1 transition-colors cursor-pointer"
+                            title="Изменить лимит категории"
+                          >
+                            <span>{formatCurrency(cat.periodLimit, currency.symbol)}</span>
+                            <SlidersHorizontal size={10} className="text-slate-400" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Visual Progress Bar (Отношение текущих расходов к заданному лимиту бюджета) */}
+                      <div className="space-y-1">
+                        <div className="relative h-2.5 w-full bg-slate-200/80 rounded-full overflow-hidden p-0.5">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              cat.isOverBudget
+                                ? 'bg-gradient-to-r from-rose-500 via-rose-600 to-red-600 shadow-2xs'
+                                : cat.isNearBudget
+                                ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-2xs'
+                                : 'bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600 shadow-2xs'
+                            }`}
+                            style={{ width: `${Math.min(100, cat.budgetPercent || 0)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-slate-400 px-0.5">
+                          <span>0%</span>
+                          <span
+                            className={
+                              cat.isOverBudget
+                                ? 'font-bold text-rose-600'
+                                : cat.isNearBudget
+                                ? 'font-bold text-amber-700'
+                                : 'font-medium text-slate-500'
+                            }
+                          >
+                            {cat.budgetPercent}% {cat.isOverBudget ? '⚠️ лимит исчерпан' : `(ост. ${formatCurrency(cat.budgetDiff!, currency.symbol)})`}
+                          </span>
+                          <span className={cat.isOverBudget ? 'font-bold text-rose-600' : ''}>
+                            {formatCurrency(cat.periodLimit, currency.symbol)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5 pt-0.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          Лимит бюджета не задан
+                        </span>
+                        <button
+                          onClick={() => handleOpenBudgetModal(cat.categoryId)}
+                          className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          <Plus size={11} />
+                          <span>Задать лимит</span>
+                        </button>
+                      </div>
+                      {/* Share of total expenses bar */}
+                      <div className="space-y-1">
+                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${cat.percentage}%`,
+                              backgroundColor: cat.color,
+                            }}
+                          />
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-slate-400 px-0.5">
+                          <span>Доля в расходах: {cat.percentage}%</span>
+                          <span>Лимит не установлен</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -885,6 +1298,13 @@ export const StatisticsView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Budget Limit Management Modal */}
+      <BudgetModal
+        isOpen={isBudgetModalOpen}
+        onClose={() => setIsBudgetModalOpen(false)}
+        initialCategoryId={selectedBudgetCategoryId}
+      />
     </div>
   );
 };
