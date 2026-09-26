@@ -36,6 +36,7 @@ import {
 } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
 import { MonthlyExpensesAnalytics } from './MonthlyExpensesAnalytics';
+import { FinancialBalanceWidget } from './FinancialBalanceWidget';
 
 export const StatisticsView: React.FC = () => {
   const { transactions, wallets, categories, currency } = useFinance();
@@ -587,6 +588,16 @@ export const StatisticsView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Financial Balance Graphical Assessment (Income vs Expenses) */}
+      <FinancialBalanceWidget
+        income={income}
+        expense={expense}
+        net={net}
+        savingsRate={savingsRate}
+        currencySymbol={currency.symbol}
+        period={period}
+      />
 
       {/* Monthly Expenses Recharts Visualization & Deep-Dive Analytics */}
       <MonthlyExpensesAnalytics />
