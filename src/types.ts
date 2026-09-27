@@ -97,3 +97,38 @@ export interface FinancialHealthBreakdown {
   diversificationScore: number;
   recommendations: string[];
 }
+
+export interface SpendingProjectionMonth {
+  monthKey: string; // e.g. "2026-10"
+  label: string; // e.g. "Окт 2026"
+  fullLabel: string; // e.g. "Октябрь 2026"
+  projectedExpense: number;
+  lowerBound: number; // optimistic estimate
+  upperBound: number; // pessimistic estimate
+  baselineExpense: number;
+  recurringCommitment: number;
+  confidenceScore: number; // 0-100%
+}
+
+export interface SpendingChartPoint {
+  monthKey: string;
+  label: string;
+  fullLabel: string;
+  actualExpense?: number;
+  projectedExpense?: number;
+  lowerBound?: number;
+  upperBound?: number;
+  isForecast: boolean;
+  isAnchor?: boolean;
+}
+
+export interface SpendingProjection {
+  projectedMonths: SpendingProjectionMonth[];
+  historicalMonths: { monthKey: string; label: string; actualExpense: number }[];
+  combinedChartData: SpendingChartPoint[];
+  totalThreeMonthProjected: number;
+  averageMonthlyProjected: number;
+  trendPercentage: number;
+  recurringCommitmentsTotal: number;
+  methodology: string;
+}

@@ -41,11 +41,112 @@ import {
 import { DynamicIcon } from '../utils/iconHelper';
 import { MonthlyExpensesAnalytics } from './MonthlyExpensesAnalytics';
 import { FinancialBalanceWidget } from './FinancialBalanceWidget';
+import { MonthlyBudgetProgressWidget } from './MonthlyBudgetProgressWidget';
 import { BudgetModal } from './BudgetModal';
+import { PersonalizedFinancialAdvice } from './PersonalizedFinancialAdvice';
+import { SpendingForecastLineChart } from './SpendingForecastLineChart';
+import {
+  DateRangePicker,
+  DateRange,
+  computePresetRange,
+  formatHumanDateRange,
+} from './DateRangePicker';
+
+function getPreviousPeriodRange(range: DateRange): { startDate: string; endDate: string } {
+  const now = new Date();
+  const formatIso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+  if (range.preset === 'today') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 1);
+    const y = formatIso(d);
+    return { startDate: y, endDate: y };
+  }
+  if (range.preset === 'yesterday') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 2);
+    const y = formatIso(d);
+    return { startDate: y, endDate: y };
+  }
+  if (range.preset === 'last7') {
+    const end = new Date(now);
+    end.setDate(now.getDate() - 7);
+    const start = new Date(end);
+    start.setDate(end.getDate() - 6);
+    return { startDate: formatIso(start), endDate: formatIso(end) };
+  }
+  if (range.preset === 'last30') {
+    const end = new Date(now);
+    end.setDate(now.getDate() - 30);
+    const start = new Date(end);
+    start.setDate(end.getDate() - 29);
+    return { startDate: formatIso(start), endDate: formatIso(end) };
+  }
+  if (range.preset === 'this_month') {
+    const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+    const start = new Date(prevYear, prevMonth, 1);
+    const end = new Date(prevYear, prevMonth + 1, 0);
+    return { startDate: formatIso(start), endDate: formatIso(end) };
+  }
+  if (range.preset === 'last_month') {
+    const prevYear = now.getMonth() <= 1 ? now.getFullYear() - 1 : now.getFullYear();
+    const prevMonth = now.getMonth() === 0 ? 10 : now.getMonth() === 1 ? 11 : now.getMonth() - 2;
+    const start = new Date(prevYear, prevMonth, 1);
+    const end = new Date(prevYear, prevMonth + 1, 0);
+    return { startDate: formatIso(start), endDate: formatIso(end) };
+  }
+  if (range.preset === 'this_year') {
+    const prevYear = now.getFullYear() - 1;
+    return {
+      startDate: `${prevYear}-01-01`,
+      endDate: `${prevYear}-12-31`,
+    };
+  }
+  if (range.preset === 'all') {
+    const sixMonthsAgo = new Date(now);
+    sixMonthsAgo.setMonth(now.getMonth() - 6);
+    const twelveMonthsAgo = new Date(now);
+    twelveMonthsAgo.setMonth(now.getMonth() - 12);
+    return {
+      startDate: formatIso(twelveMonthsAgo),
+      endDate: formatIso(sixMonthsAgo),
+    };
+  }
+
+  // Custom date range: shift backwards by exact duration in days
+  if (range.startDate && range.endDate) {
+    const [sy, sm, sd] = range.startDate.split('-').map(Number);
+    const [ey, em, ed] = range.endDate.split('-').map(Number);
+    const startD = new Date(sy, sm - 1, sd);
+    const endD = new Date(ey, em - 1, ed);
+    const diffDays = Math.max(1, Math.round((endD.getTime() - startD.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+
+    const prevEnd = new Date(startD);
+    prevEnd.setDate(startD.getDate() - 1);
+    const prevStart = new Date(prevEnd);
+    prevStart.setDate(prevEnd.getDate() - (diffDays - 1));
+
+    return {
+      startDate: formatIso(prevStart),
+      endDate: formatIso(prevEnd),
+    };
+  }
+
+  return { startDate: '', endDate: '' };
+}
 
 export const StatisticsView: React.FC = () => {
   const { transactions, wallets, categories, categoryBudgets, currency } = useFinance();
-  const [period, setPeriod] = useState<PeriodType>('month');
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const { startDate, endDate } = computePresetRange('this_month');
+    return {
+      preset: 'this_month',
+      startDate,
+      endDate,
+    };
+  });
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [selectedBudgetCategoryId, setSelectedBudgetCategoryId] = useState<string | null>(null);
   const [budgetFilter, setBudgetFilter] = useState<'all' | 'with_budget' | 'over_budget'>('all');
@@ -55,66 +156,58 @@ export const StatisticsView: React.FC = () => {
     setIsBudgetModalOpen(true);
   };
 
-  // Filter transactions by period
+  // Map date range to coarse period type for widgets expecting PeriodType
+  const effectivePeriod: PeriodType = useMemo(() => {
+    if (dateRange.preset === 'today' || dateRange.preset === 'yesterday') return 'day';
+    if (dateRange.preset === 'last7') return 'week';
+    if (
+      dateRange.preset === 'this_month' ||
+      dateRange.preset === 'last_month' ||
+      dateRange.preset === 'last30'
+    )
+      return 'month';
+    if (dateRange.preset === 'this_year') return 'year';
+    if (dateRange.preset === 'all') return 'all';
+
+    // Custom date range
+    if (dateRange.startDate && dateRange.endDate) {
+      const s = new Date(dateRange.startDate).getTime();
+      const e = new Date(dateRange.endDate).getTime();
+      const days = Math.max(1, Math.round(Math.abs(e - s) / (1000 * 60 * 60 * 24))) + 1;
+      if (days <= 1) return 'day';
+      if (days <= 10) return 'week';
+      if (days <= 45) return 'month';
+      if (days <= 400) return 'year';
+      return 'all';
+    }
+    return 'month';
+  }, [dateRange]);
+
+  // Filter transactions dynamically by the selected date range
   const filteredTxs = useMemo(() => {
-    const now = new Date();
     return transactions.filter((t) => {
-      const txDate = new Date(t.date);
-      if (period === 'day') {
-        return txDate.toDateString() === now.toDateString();
-      }
-      if (period === 'week') {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return txDate >= weekAgo;
-      }
-      if (period === 'month') {
-        return (
-          txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear()
-        );
-      }
-      if (period === 'year') {
-        return txDate.getFullYear() === now.getFullYear();
-      }
-      return true; // 'all'
+      if (dateRange.startDate && t.date < dateRange.startDate) return false;
+      if (dateRange.endDate && t.date > dateRange.endDate) return false;
+      return true;
     });
-  }, [transactions, period]);
+  }, [transactions, dateRange]);
+
+  // Calculate previous date range for dynamic comparison
+  const prevDateRange = useMemo(() => {
+    return getPreviousPeriodRange(dateRange);
+  }, [dateRange]);
 
   // Filter transactions for previous period (for comparison)
   const prevFilteredTxs = useMemo(() => {
-    const now = new Date();
+    if (!prevDateRange.startDate && !prevDateRange.endDate) {
+      return [];
+    }
     return transactions.filter((t) => {
-      const txDate = new Date(t.date);
-      if (period === 'day') {
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        return txDate.toDateString() === yesterday.toDateString();
-      }
-      if (period === 'week') {
-        const weekAgo = new Date(now);
-        weekAgo.setDate(now.getDate() - 7);
-        const twoWeeksAgo = new Date(now);
-        twoWeeksAgo.setDate(now.getDate() - 14);
-        return txDate >= twoWeeksAgo && txDate < weekAgo;
-      }
-      if (period === 'month') {
-        const prevMonthYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-        const prevMonthIndex = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-        return (
-          txDate.getMonth() === prevMonthIndex && txDate.getFullYear() === prevMonthYear
-        );
-      }
-      if (period === 'year') {
-        return txDate.getFullYear() === now.getFullYear() - 1;
-      }
-      // 'all': compare past 6 months vs prior 6 months
-      const sixMonthsAgo = new Date(now);
-      sixMonthsAgo.setMonth(now.getMonth() - 6);
-      const twelveMonthsAgo = new Date(now);
-      twelveMonthsAgo.setMonth(now.getMonth() - 12);
-      return txDate >= twelveMonthsAgo && txDate < sixMonthsAgo;
+      if (prevDateRange.startDate && t.date < prevDateRange.startDate) return false;
+      if (prevDateRange.endDate && t.date > prevDateRange.endDate) return false;
+      return true;
     });
-  }, [transactions, period]);
+  }, [transactions, prevDateRange]);
 
   const { income, expense, net, savingsRate } = calculateTotals(filteredTxs);
   const { income: prevIncome, expense: prevExpense } = useMemo(
@@ -123,17 +216,34 @@ export const StatisticsView: React.FC = () => {
   );
   const health = calculateFinancialHealth(filteredTxs, wallets);
 
+  // Human comparison text based on active dateRange
+  const comparisonPeriodDesc = useMemo(() => {
+    switch (dateRange.preset) {
+      case 'today':
+        return { compareText: 'чем вчера', periodLabel: 'вчера' };
+      case 'yesterday':
+        return { compareText: 'чем позавчера', periodLabel: 'позавчера' };
+      case 'last7':
+        return { compareText: 'чем за пред. 7 дней', periodLabel: 'пред. 7 дней' };
+      case 'last30':
+        return { compareText: 'чем за пред. 30 дней', periodLabel: 'пред. 30 дней' };
+      case 'this_month':
+        return { compareText: 'чем в прошлом месяце', periodLabel: 'прошлым месяцем' };
+      case 'last_month':
+        return { compareText: 'чем в позапрошлом месяце', periodLabel: 'позапрошлым месяцем' };
+      case 'this_year':
+        return { compareText: 'чем в прошлом году', periodLabel: 'прошлым годом' };
+      case 'all':
+        return { compareText: 'чем в прошлом периоде', periodLabel: 'прошлым периодом' };
+      case 'custom':
+      default:
+        return { compareText: 'чем за прошлый период', periodLabel: 'прошлым периодом' };
+    }
+  }, [dateRange.preset]);
+
   // Indicators comparing expenses with previous period
   const expenseComparison = useMemo(() => {
-    const periodDescriptions: Record<PeriodType, { compareText: string; periodLabel: string }> = {
-      day: { compareText: 'чем вчера', periodLabel: 'вчера' },
-      week: { compareText: 'чем на прошлой неделе', periodLabel: 'прошлой неделей' },
-      month: { compareText: 'чем в прошлом месяце', periodLabel: 'прошлым месяцем' },
-      year: { compareText: 'чем в прошлом году', periodLabel: 'прошлым годом' },
-      all: { compareText: 'чем в прошлом периоде', periodLabel: 'прошлым периодом' },
-    };
-
-    const desc = periodDescriptions[period] || periodDescriptions.month;
+    const desc = comparisonPeriodDesc;
 
     if (prevExpense === 0) {
       if (expense === 0) {
@@ -212,19 +322,11 @@ export const StatisticsView: React.FC = () => {
         indicatorTone: 'neutral',
       };
     }
-  }, [expense, prevExpense, period, currency]);
+  }, [expense, prevExpense, comparisonPeriodDesc, currency]);
 
   // Indicators comparing incomes with previous period
   const incomeComparison = useMemo(() => {
-    const periodDescriptions: Record<PeriodType, { compareText: string }> = {
-      day: { compareText: 'чем вчера' },
-      week: { compareText: 'чем на прошлой неделе' },
-      month: { compareText: 'чем в прошлом месяце' },
-      year: { compareText: 'чем в прошлом году' },
-      all: { compareText: 'чем в прошлом периоде' },
-    };
-
-    const desc = periodDescriptions[period] || periodDescriptions.month;
+    const desc = comparisonPeriodDesc;
 
     if (prevIncome === 0) {
       return {
@@ -275,34 +377,55 @@ export const StatisticsView: React.FC = () => {
         textClass: 'text-slate-600',
       };
     }
-  }, [income, prevIncome, period]);
+  }, [income, prevIncome, comparisonPeriodDesc]);
 
-  // Helper to adjust monthly budget to selected period
+  // Helper to adjust monthly budget limit dynamically to the selected date range
   const getPeriodBudgetLimit = (monthlyLimit: number): number => {
     if (!monthlyLimit || monthlyLimit <= 0) return 0;
-    if (period === 'month') return monthlyLimit;
-    if (period === 'week') return Math.round((monthlyLimit * 7) / 30.4);
-    if (period === 'day') return Math.round(monthlyLimit / 30.4);
-    if (period === 'year') return monthlyLimit * 12;
-    return monthlyLimit; // 'all'
+    if (dateRange.preset === 'this_month' || dateRange.preset === 'last_month') return monthlyLimit;
+    if (dateRange.preset === 'this_year') return monthlyLimit * 12;
+    if (dateRange.preset === 'today' || dateRange.preset === 'yesterday')
+      return Math.round(monthlyLimit / 30.4);
+    if (dateRange.preset === 'last7') return Math.round((monthlyLimit * 7) / 30.4);
+    if (dateRange.preset === 'last30') return monthlyLimit;
+    if (dateRange.preset === 'all') return monthlyLimit;
+
+    // Custom date range: proportional to number of days
+    if (dateRange.startDate && dateRange.endDate) {
+      const s = new Date(dateRange.startDate).getTime();
+      const e = new Date(dateRange.endDate).getTime();
+      const days = Math.max(1, Math.round(Math.abs(e - s) / (1000 * 60 * 60 * 24))) + 1;
+      return Math.round((monthlyLimit * days) / 30.4);
+    }
+    return monthlyLimit;
   };
 
   const periodBudgetLabel = useMemo(() => {
-    switch (period) {
-      case 'day':
-        return 'на день';
-      case 'week':
-        return 'на неделю';
-      case 'month':
+    switch (dateRange.preset) {
+      case 'today':
+        return 'на сегодня';
+      case 'yesterday':
+        return 'за вчера';
+      case 'last7':
+        return 'на 7 дней';
+      case 'last30':
+        return 'на 30 дней';
+      case 'this_month':
         return 'на месяц';
-      case 'year':
+      case 'last_month':
+        return 'за прошлый месяц';
+      case 'this_year':
         return 'на год';
       case 'all':
-        return 'за период';
+        return 'за всё время';
+      case 'custom':
       default:
-        return 'на месяц';
+        if (dateRange.startDate && dateRange.endDate) {
+          return 'за выбранный период';
+        }
+        return 'за период';
     }
-  }, [period]);
+  }, [dateRange]);
 
   // Category distribution for expenses with comparison to previous period and budget limits
   const categoryData = useMemo(() => {
@@ -444,7 +567,7 @@ export const StatisticsView: React.FC = () => {
     categories,
     categoryBudgets,
     expense,
-    period,
+    dateRange,
     budgetFilter,
   ]);
 
@@ -504,7 +627,7 @@ export const StatisticsView: React.FC = () => {
       totalSpentInBudgeted,
       overallPercent,
     };
-  }, [categories, categoryBudgets, categoryData, period]);
+  }, [categories, categoryBudgets, categoryData, dateRange]);
 
   // Dynamics Bar Chart Data (grouped by date or week)
   const dynamicsData = useMemo(() => {
@@ -579,35 +702,98 @@ export const StatisticsView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header & Period Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Header & Date Range Filter Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900">Финансовая аналитика</h2>
-          <p className="text-xs text-slate-500">Динамика, структура расходов и индекс здоровья</p>
+          <p className="text-xs text-slate-500">
+            Динамика, структура расходов и индекс здоровья • Фильтрация по датам
+          </p>
         </div>
 
-        {/* Period Buttons */}
-        <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl text-xs font-bold text-slate-600 self-start sm:self-auto">
-          {(
-            [
-              { id: 'week', label: 'Неделя' },
-              { id: 'month', label: 'Месяц' },
-              { id: 'year', label: 'Год' },
-              { id: 'all', label: 'Все время' },
-            ] as const
-          ).map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setPeriod(item.id)}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                period === item.id ? 'bg-white text-slate-900 shadow-xs' : 'hover:text-slate-900'
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
+        {/* Date Filter Controls: Quick presets + DateRangePicker */}
+        <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
+          {/* Quick Presets */}
+          <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl text-xs font-bold text-slate-600">
+            {[
+              { preset: 'last7' as const, label: 'Неделя' },
+              { preset: 'this_month' as const, label: 'Месяц' },
+              { preset: 'this_year' as const, label: 'Год' },
+              { preset: 'all' as const, label: 'Все время' },
+            ].map((item) => {
+              const isActive = dateRange.preset === item.preset;
+              return (
+                <button
+                  key={item.preset}
+                  onClick={() => {
+                    const { startDate, endDate } = computePresetRange(item.preset);
+                    setDateRange({
+                      preset: item.preset,
+                      startDate,
+                      endDate,
+                    });
+                  }}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-white text-slate-900 shadow-xs font-black'
+                      : 'hover:text-slate-900'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Date Range Picker Popover (supports custom date range & all presets) */}
+          <DateRangePicker
+            dateRange={dateRange}
+            onChange={(newRange) => setDateRange(newRange)}
+          />
         </div>
       </div>
+
+      {/* Active Date Filter Alert / Indicator Bar */}
+      {(dateRange.preset === 'custom' || (dateRange.startDate && dateRange.preset !== 'this_month')) && (
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/50 to-slate-50 border border-emerald-200/90 text-xs shadow-2xs">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="font-extrabold text-slate-800">
+              Выбранный период:
+            </span>
+            <span className="font-black text-emerald-900 bg-white px-2.5 py-0.5 rounded-lg border border-emerald-200/80 shadow-2xs">
+              {formatHumanDateRange(dateRange)}
+            </span>
+            {dateRange.startDate && dateRange.endDate && (
+              <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-100/60 px-2 py-0.5 rounded-md">
+                {dateRange.startDate} — {dateRange.endDate}
+              </span>
+            )}
+            <span className="text-slate-500 text-[11px]">
+              • {filteredTxs.length}{' '}
+              {filteredTxs.length === 1
+                ? 'операция'
+                : filteredTxs.length > 1 && filteredTxs.length < 5
+                ? 'операции'
+                : 'операций'}
+            </span>
+          </div>
+
+          <button
+            onClick={() => {
+              const { startDate, endDate } = computePresetRange('this_month');
+              setDateRange({
+                preset: 'this_month',
+                startDate,
+                endDate,
+              });
+            }}
+            className="text-[11px] font-bold text-emerald-700 hover:text-emerald-950 underline decoration-dotted transition-colors shrink-0 cursor-pointer"
+          >
+            Сбросить к текущему месяцу
+          </button>
+        </div>
+      )}
 
       {/* Summary KPI Section - Redesigned UI/UX: No Truncation, No Spilling, Friendly Light Theme */}
       <div className="bg-white rounded-3xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-3.5">
@@ -648,7 +834,7 @@ export const StatisticsView: React.FC = () => {
               </div>
             ) : (
               <div className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold">
-                {period === 'week' ? 'За неделю' : period === 'month' ? 'За месяц' : period === 'year' ? 'За год' : 'Все время'}
+                {formatHumanDateRange(dateRange)}
               </div>
             )}
           </div>
@@ -769,11 +955,27 @@ export const StatisticsView: React.FC = () => {
         net={net}
         savingsRate={savingsRate}
         currencySymbol={currency.symbol}
-        period={period}
+        period={effectivePeriod}
+      />
+
+      {/* Monthly Budget vs Goal Progress Bar Widget */}
+      <MonthlyBudgetProgressWidget
+        onOpenBudgetModal={handleOpenBudgetModal}
+      />
+
+      {/* Personalized Financial Advice Block (Smart Spending Insights) */}
+      <PersonalizedFinancialAdvice
+        period={effectivePeriod}
+        filteredTxs={filteredTxs}
+        prevFilteredTxs={prevFilteredTxs}
+        onOpenBudgetModal={handleOpenBudgetModal}
       />
 
       {/* Monthly Expenses Recharts Visualization & Deep-Dive Analytics */}
       <MonthlyExpensesAnalytics />
+
+      {/* 3-Month Spending Forecast Line Chart */}
+      <SpendingForecastLineChart />
 
       {/* Financial Health Score Meter */}
       <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">

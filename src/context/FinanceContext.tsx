@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Transaction,
@@ -7,6 +7,7 @@ import {
   Achievement,
   CurrencyConfig,
   TransactionType,
+  SpendingProjection,
 } from '../types';
 import {
   DEFAULT_CATEGORIES,
@@ -20,6 +21,7 @@ import {
   processScheduledRecurrences,
   calculateNextRecurrenceDate,
 } from '../utils/recurringProcessor';
+import { calculate3MonthSpendingProjection } from '../utils/spendingProjection';
 
 interface FinanceContextType {
   transactions: Transaction[];
@@ -28,6 +30,7 @@ interface FinanceContextType {
   categoryBudgets: Record<string, number>;
   achievements: Achievement[];
   currency: CurrencyConfig;
+  spendingProjection: SpendingProjection;
   language: 'ru' | 'en';
   isLocked: boolean;
   pinCode: string | null;
@@ -476,6 +479,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setUnlockedAchievementNotification(null);
   };
 
+  // 3-Month Spending Projection
+  const spendingProjection = useMemo(() => {
+    return calculate3MonthSpendingProjection(transactions, categoryBudgets);
+  }, [transactions, categoryBudgets]);
+
   return (
     <FinanceContext.Provider
       value={{
@@ -485,6 +493,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         categoryBudgets,
         achievements,
         currency,
+        spendingProjection,
         language,
         isLocked,
         pinCode,

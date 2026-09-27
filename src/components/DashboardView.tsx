@@ -12,11 +12,13 @@ import {
   Globe,
   Repeat,
   Clock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency, formatTransactionDate, calculateTotals, getSmartTips } from '../utils/financeCalculations';
 import { DynamicIcon } from '../utils/iconHelper';
-import { Transaction } from '../types';
+import { Transaction, TransactionType } from '../types';
 import { getIntervalLabel } from '../utils/recurringProcessor';
 import { BudgetDashboardWidget } from './BudgetDashboardWidget';
 import { BudgetModal } from './BudgetModal';
@@ -24,7 +26,7 @@ import { AiInsightsSection } from './AiInsightsSection';
 import { MonthlySpendingTrendChart } from './MonthlySpendingTrendChart';
 
 interface DashboardViewProps {
-  onOpenAddModal: () => void;
+  onOpenAddModal: (type?: TransactionType) => void;
   onEditTransaction: (tx: Transaction) => void;
   onOpenConverterModal?: () => void;
 }
@@ -38,6 +40,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [selectedBudgetCategoryId, setSelectedBudgetCategoryId] = useState<string | null>(null);
+  const [isBalanceHidden, setIsBalanceHidden] = useState<boolean>(() => {
+    return localStorage.getItem('fa_balance_hidden') === 'true';
+  });
+
+  const toggleHideBalance = () => {
+    setIsBalanceHidden((prev) => {
+      const next = !prev;
+      localStorage.setItem('fa_balance_hidden', String(next));
+      return next;
+    });
+  };
 
   const handleOpenBudgetModal = (categoryId?: string) => {
     setSelectedBudgetCategoryId(categoryId || null);
@@ -85,106 +98,119 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       )}
 
-      {/* Main Balance Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white p-6 sm:p-8 shadow-xl shadow-emerald-900/10">
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-100">
-              Текущий капитал
-            </span>
-            <span className="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-md">
-              Сбережения: {savingsRate}%
-            </span>
+      {/* Main Balance Card with enhanced UI/UX, tabular numbers, and direct actions */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white p-5 sm:p-7 shadow-xl shadow-emerald-950/20">
+        <div className="relative z-10 space-y-4">
+          {/* Top row: Capital label + Eye toggle + Savings & Net pills */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase tracking-widest text-emerald-100">
+                Текущий капитал
+              </span>
+              <button
+                type="button"
+                onClick={toggleHideBalance}
+                className="p-1 rounded-lg text-emerald-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                title={isBalanceHidden ? 'Показать цифры' : 'Скрыть цифры'}
+                aria-label={isBalanceHidden ? 'Показать цифры' : 'Скрыть цифры'}
+              >
+                {isBalanceHidden ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-black backdrop-blur-md tabular-nums border border-white/20">
+                Сбережения: {savingsRate}%
+              </span>
+              {!isBalanceHidden && net !== 0 && (
+                <span
+                  className={`px-2.5 py-1 rounded-full text-xs font-black backdrop-blur-md tabular-nums border ${
+                    net > 0
+                      ? 'bg-emerald-400/25 text-emerald-100 border-emerald-300/30'
+                      : 'bg-rose-500/25 text-rose-100 border-rose-300/30'
+                  }`}
+                >
+                  {net > 0 ? '+' : ''}
+                  {formatCurrency(net, currency.symbol)} сальдо
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="mt-2 mb-6">
-            <div className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-              {formatCurrency(totalBalance, currency.symbol)}
+          {/* Amount and Subtitle */}
+          <div>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl sm:text-5xl font-black tracking-tight tabular-nums select-all">
+                {isBalanceHidden ? '••••••••' : formatCurrency(totalBalance, currency.symbol)}
+              </span>
             </div>
-            <p className="text-xs sm:text-sm text-emerald-100/90 mt-1">
-              Суммарный остаток на всех ваших счетах
+            <p className="text-xs sm:text-sm text-emerald-100/90 mt-1 font-medium">
+              Суммарный остаток на всех ваших счетах ({wallets.length} {wallets.length === 1 ? 'счет' : 'счетов'})
             </p>
           </div>
 
-          {/* Income & Expense pill grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-white/15">
-            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-xs">
-              <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
+          {/* Direct Income & Expense Action Buttons (clickable cards) */}
+          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/15">
+            <button
+              type="button"
+              id="dashboard_quick_add_income_btn"
+              onClick={() => onOpenAddModal('income')}
+              className="flex items-center gap-2.5 sm:gap-3 bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-3 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer"
+              title="Нажмите, чтобы добавить доход"
+            >
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/40 text-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
                 <ArrowDownLeft size={20} className="stroke-[2.5]" />
               </div>
-              <div>
-                <span className="text-[11px] font-medium text-emerald-100 block">Доходы</span>
-                <span className="text-sm sm:text-base font-bold text-white">
-                  +{formatCurrency(income, currency.symbol)}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-emerald-100 block">Доходы</span>
+                  <Plus size={13} className="text-emerald-200 opacity-60 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-sm sm:text-base font-black text-white tabular-nums block truncate">
+                  {isBalanceHidden ? '••••••' : `+${formatCurrency(income, currency.symbol)}`}
                 </span>
               </div>
-            </div>
+            </button>
 
-            <div className="flex items-center gap-3 bg-white/10 p-3 rounded-2xl backdrop-blur-xs">
-              <div className="w-10 h-10 rounded-xl bg-white/20 text-white flex items-center justify-center shrink-0">
+            <button
+              type="button"
+              id="dashboard_quick_add_expense_btn"
+              onClick={() => onOpenAddModal('expense')}
+              className="flex items-center gap-2.5 sm:gap-3 bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-3 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer"
+              title="Нажмите, чтобы добавить расход"
+            >
+              <div className="w-10 h-10 rounded-xl bg-rose-500/35 text-rose-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
                 <ArrowUpRight size={20} className="stroke-[2.5]" />
               </div>
-              <div>
-                <span className="text-[11px] font-medium text-emerald-100 block">Расходы</span>
-                <span className="text-sm sm:text-base font-bold text-white">
-                  -{formatCurrency(expense, currency.symbol)}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-rose-100 block">Расходы</span>
+                  <Plus size={13} className="text-rose-200 opacity-60 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-sm sm:text-base font-black text-white tabular-nums block truncate">
+                  {isBalanceHidden ? '••••••' : `-${formatCurrency(expense, currency.symbol)}`}
                 </span>
               </div>
-            </div>
+            </button>
+          </div>
+
+          {/* Quick Transfer Between Wallets */}
+          <div className="flex justify-end pt-0.5">
+            <button
+              type="button"
+              id="dashboard_card_transfer_btn"
+              onClick={() => onOpenAddModal('transfer')}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-emerald-100 hover:text-white text-xs font-bold transition-all border border-white/15 cursor-pointer"
+              title="Сделать перевод между своими счетами"
+            >
+              <ArrowLeftRight size={13} />
+              <span>Перевод между счетами</span>
+            </button>
           </div>
         </div>
 
         {/* Decorative background glow */}
         <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
-
-      {/* Quick Action Buttons */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-3">
-        <button
-          id="action_view_wallets_btn"
-          onClick={() => setActiveTab('wallets')}
-          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer"
-        >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
-            <WalletIcon size={18} className="stroke-[2]" />
-          </div>
-          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Кошельки</span>
-        </button>
-
-        <button
-          id="action_view_analytics_btn"
-          onClick={() => setActiveTab('stats')}
-          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-purple-500 hover:shadow-md transition-all group cursor-pointer"
-        >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
-            <TrendingUp size={18} className="stroke-[2]" />
-          </div>
-          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Аналитика</span>
-        </button>
-
-        <button
-          id="action_transfer_btn"
-          onClick={onOpenAddModal}
-          className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-amber-500 hover:shadow-md transition-all group cursor-pointer"
-        >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-1 group-hover:scale-105 transition-transform">
-            <ArrowLeftRight size={18} className="stroke-[2]" />
-          </div>
-          <span className="text-[10px] sm:text-xs font-bold text-slate-700 truncate w-full text-center">Перевод</span>
-        </button>
-
-        {onOpenConverterModal && (
-          <button
-            id="action_converter_btn"
-            onClick={onOpenConverterModal}
-            className="flex flex-col items-center justify-center p-2.5 sm:p-3.5 rounded-2xl bg-gradient-to-b from-blue-50/70 to-indigo-50/70 border border-blue-200 shadow-xs hover:border-blue-500 hover:shadow-md transition-all group cursor-pointer"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-1 group-hover:scale-105 transition-transform shadow-xs">
-              <Globe size={18} className="stroke-[2]" />
-            </div>
-            <span className="text-[10px] sm:text-xs font-bold text-blue-900 truncate w-full text-center">Валюты</span>
-          </button>
-        )}
       </div>
 
       {/* 6-Month Monthly Spending Trend Chart */}
@@ -334,8 +360,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="text-center py-10">
             <p className="text-sm font-semibold text-slate-500">Нет транзакций</p>
             <button
-              onClick={onOpenAddModal}
-              className="mt-3 text-xs font-bold text-emerald-600 hover:underline"
+              onClick={() => onOpenAddModal()}
+              className="mt-3 text-xs font-bold text-emerald-600 hover:underline cursor-pointer"
             >
               Добавить первую операцию
             </button>
