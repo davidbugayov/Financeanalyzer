@@ -42,6 +42,7 @@ import { DynamicIcon } from '../utils/iconHelper';
 import { MonthlyExpensesAnalytics } from './MonthlyExpensesAnalytics';
 import { FinancialBalanceWidget } from './FinancialBalanceWidget';
 import { MonthlyBudgetProgressWidget } from './MonthlyBudgetProgressWidget';
+import { CategoryDonutChart } from './CategoryDonutChart';
 import { BudgetModal } from './BudgetModal';
 import { PersonalizedFinancialAdvice } from './PersonalizedFinancialAdvice';
 import { SpendingForecastLineChart } from './SpendingForecastLineChart';
@@ -149,6 +150,7 @@ export const StatisticsView: React.FC = () => {
   });
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [selectedBudgetCategoryId, setSelectedBudgetCategoryId] = useState<string | null>(null);
+  const [hoveredChartCategoryId, setHoveredChartCategoryId] = useState<string | null>(null);
   const [budgetFilter, setBudgetFilter] = useState<'all' | 'with_budget' | 'over_budget'>('all');
 
   const handleOpenBudgetModal = (categoryId?: string) => {
@@ -1225,44 +1227,30 @@ export const StatisticsView: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-            {/* Donut Chart */}
-            <div className="h-64 w-full flex flex-col items-center justify-center">
-              <ResponsiveContainer width="100%" height="88%">
-                <PieChart>
-                  <Pie
-                    data={categoryData.filter((c) => c.value > 0)}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {categoryData
-                      .filter((c) => c.value > 0)
-                      .map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val: number) => [
-                      formatCurrency(val, currency.symbol),
-                      'Расход',
-                    ]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <span className="text-[11px] text-slate-400 text-center font-medium mt-1">
-                Распределение трат по статьям расходов
-              </span>
+            {/* Interactive Category Donut Chart */}
+            <div className="w-full flex flex-col items-center justify-center p-2 rounded-2xl bg-slate-50/50 border border-slate-100">
+              <CategoryDonutChart
+                data={categoryData}
+                totalExpense={expense}
+                currencySymbol={currency.symbol}
+                periodLabel={periodBudgetLabel}
+                activeCategoryId={hoveredChartCategoryId}
+                onSelectCategory={(catId) => handleOpenBudgetModal(catId)}
+              />
             </div>
 
             {/* List with Progress Bars showing Expense vs Budget Limit */}
-            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
               {categoryData.map((cat) => (
                 <div
                   key={cat.name}
-                  className="p-3 rounded-2xl bg-slate-50/80 hover:bg-slate-50 border border-slate-200/70 hover:border-slate-300 transition-all space-y-2"
+                  onMouseEnter={() => setHoveredChartCategoryId(cat.categoryId || cat.name)}
+                  onMouseLeave={() => setHoveredChartCategoryId(null)}
+                  className={`p-3 rounded-2xl border transition-all space-y-2 ${
+                    hoveredChartCategoryId === (cat.categoryId || cat.name)
+                      ? 'bg-slate-100 border-slate-400 shadow-xs ring-1 ring-slate-400/30'
+                      : 'bg-slate-50/80 hover:bg-slate-50 border-slate-200/70 hover:border-slate-300'
+                  }`}
                 >
                   {/* Category Header Row */}
                   <div className="flex items-center justify-between text-xs gap-2">
