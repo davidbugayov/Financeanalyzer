@@ -47,6 +47,7 @@ import { CategoryDonutChart } from './CategoryDonutChart';
 import { BudgetModal } from './BudgetModal';
 import { PersonalizedFinancialAdvice } from './PersonalizedFinancialAdvice';
 import { SpendingForecastLineChart } from './SpendingForecastLineChart';
+import { SpendingForecast } from './SpendingForecast';
 import {
   DateRangePicker,
   DateRange,
@@ -979,6 +980,9 @@ export const StatisticsView: React.FC = () => {
 
       {/* Monthly Expenses Recharts Visualization & Deep-Dive Analytics */}
       <MonthlyExpensesAnalytics />
+
+      {/* End-of-Month Spending Forecast & Trajectory Analysis */}
+      <SpendingForecast />
 
       {/* 3-Month Spending Forecast Line Chart */}
       <SpendingForecastLineChart />
