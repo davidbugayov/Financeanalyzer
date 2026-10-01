@@ -16,15 +16,21 @@ import { useFinance } from '../context/FinanceContext';
 import { CURRENCIES } from '../data/initialData';
 import { DynamicIcon } from '../utils/iconHelper';
 import { PWAInstallSection } from './PWAInstallSection';
+import { RecurringSchedulesManager } from './RecurringSchedulesManager';
+import { Transaction } from '../types';
 
 interface SettingsViewProps {
   onOpenImportExport: () => void;
   onOpenAchievements: () => void;
+  onOpenAddModal: (isRecurring?: boolean) => void;
+  onEditTransaction: (tx: Transaction) => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
   onOpenImportExport,
   onOpenAchievements,
+  onOpenAddModal,
+  onEditTransaction,
 }) => {
   const {
     currency,
@@ -133,6 +139,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Dedicated Recurring Schedules & Subscriptions Management View */}
+      <RecurringSchedulesManager
+        onOpenAddModal={onOpenAddModal}
+        onEditTransaction={onEditTransaction}
+      />
 
       {/* Security & PIN Lock */}
       <div className="bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-4">

@@ -22,6 +22,17 @@ import {
   calculateNextRecurrenceDate,
 } from '../utils/recurringProcessor';
 import { calculate3MonthSpendingProjection } from '../utils/spendingProjection';
+import { formatCurrency } from '../utils/financeCalculations';
+
+export interface BudgetAlertNotification {
+  categoryName: string;
+  categoryId: string;
+  percent: number;
+  spent: number;
+  limit: number;
+  type: 'warning_80' | 'warning_90' | 'danger_100';
+  message: string;
+}
 
 interface FinanceContextType {
   transactions: Transaction[];
@@ -60,6 +71,8 @@ interface FinanceContextType {
   loadDemoData: () => void;
   unlockedAchievementNotification: Achievement | null;
   dismissAchievementNotification: () => void;
+  budgetAlertNotification: BudgetAlertNotification | null;
+  dismissBudgetAlertNotification: () => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -102,6 +115,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return localStorage.getItem('fa_currency') || 'RUB';
   });
 
+  const currency = CURRENCIES.find((c) => c.code === currencyCode) || CURRENCIES[0];
+
   const [language, setLanguageState] = useState<'ru' | 'en'>(() => {
     return (localStorage.getItem('fa_language') as 'ru' | 'en') || 'ru';
   });
@@ -118,6 +133,75 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [activeTab, setActiveTab] = useState<'home' | 'history' | 'stats' | 'wallets' | 'profile'>('home');
   const [unlockedAchievementNotification, setUnlockedAchievementNotification] = useState<Achievement | null>(null);
   const [recurringNotification, setRecurringNotification] = useState<string | null>(null);
+  const [budgetAlertNotification, setBudgetAlertNotification] = useState<BudgetAlertNotification | null>(null);
+
+  const dismissBudgetAlertNotification = () => setBudgetAlertNotification(null);
+
+  // Check budget threshold (80%, 90%, 100%) and trigger notification
+  const checkBudgetThreshold = useCallback(
+    (tx: Transaction, updatedTxs: Transaction[]) => {
+      if (tx.type !== 'expense') return;
+
+      const cat = categories.find((c) => c.id === tx.categoryId || c.name === tx.category);
+      if (!cat) return;
+
+      const budgetLimit = categoryBudgets[cat.id];
+      if (!budgetLimit || budgetLimit <= 0) return;
+
+      const monthKey = tx.date ? tx.date.slice(0, 7) : new Date().toISOString().slice(0, 7);
+      const totalSpent = updatedTxs.reduce((sum, t) => {
+        if (
+          t.type === 'expense' &&
+          (t.categoryId === cat.id || t.category === cat.name) &&
+          t.date?.startsWith(monthKey)
+        ) {
+          return sum + t.amount;
+        }
+        return sum;
+      }, 0);
+
+      const percent = Math.round((totalSpent / budgetLimit) * 100);
+
+      if (percent >= 80) {
+        let type: 'warning_80' | 'warning_90' | 'danger_100' = 'warning_80';
+        let message = '';
+
+        if (percent >= 100) {
+          type = 'danger_100';
+          message = `Лимит категории «${cat.name}» превышен (${percent}%). Израсходовано ${formatCurrency(totalSpent, currency.symbol)} из ${formatCurrency(budgetLimit, currency.symbol)}.`;
+        } else if (percent >= 90) {
+          type = 'warning_90';
+          message = `Внимание! В категории «${cat.name}» потрачено ${percent}% лимита (${formatCurrency(totalSpent, currency.symbol)} из ${formatCurrency(budgetLimit, currency.symbol)}).`;
+        } else {
+          type = 'warning_80';
+          message = `В категории «${cat.name}» израсходовано ${percent}% бюджета (${formatCurrency(totalSpent, currency.symbol)} из ${formatCurrency(budgetLimit, currency.symbol)}).`;
+        }
+
+        setBudgetAlertNotification({
+          categoryName: cat.name,
+          categoryId: cat.id,
+          percent,
+          spent: totalSpent,
+          limit: budgetLimit,
+          type,
+          message,
+        });
+
+        // Trigger browser notification if supported and allowed
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification(`Бюджет: «${cat.name}» (${percent}%)`, {
+              body: message,
+              icon: '/pwa-192x192.png',
+            });
+          } catch {
+            // ignore
+          }
+        }
+      }
+    },
+    [categories, categoryBudgets, currency.symbol]
+  );
 
   // References to avoid stale closures in background recurrence task
   const transactionsRef = useRef(transactions);
@@ -187,8 +271,6 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem('fa_language', language);
   }, [language]);
-
-  const currency = CURRENCIES.find((c) => c.code === currencyCode) || CURRENCIES[0];
 
   const setCurrency = (code: string) => {
     setCurrencyCode(code);
@@ -300,6 +382,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const newTransactionsList = [newTx, ...transactions];
     setTransactions(newTransactionsList);
     checkAchievementsAfterTx(newTransactionsList);
+    checkBudgetThreshold(newTx, newTransactionsList);
 
     // Auto-savings logic: If this is an income transaction, check if any savings wallet has autoSavingsPercent!
     if (newTx.type === 'income') {
@@ -354,7 +437,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
     });
 
-    setTransactions((prev) => prev.map((t) => (t.id === txToSave.id ? txToSave : t)));
+    const updatedList = transactions.map((t) => (t.id === txToSave.id ? txToSave : t));
+    setTransactions(updatedList);
+    checkBudgetThreshold(txToSave, updatedList);
   };
 
   const deleteTransaction = (id: string) => {
@@ -523,6 +608,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         loadDemoData,
         unlockedAchievementNotification,
         dismissAchievementNotification,
+        budgetAlertNotification,
+        dismissBudgetAlertNotification,
       }}
     >
       {children}

@@ -42,6 +42,7 @@ import { DynamicIcon } from '../utils/iconHelper';
 import { MonthlyExpensesAnalytics } from './MonthlyExpensesAnalytics';
 import { FinancialBalanceWidget } from './FinancialBalanceWidget';
 import { MonthlyBudgetProgressWidget } from './MonthlyBudgetProgressWidget';
+import { IncomeExpenseTrendLineChart } from './IncomeExpenseTrendLineChart';
 import { CategoryDonutChart } from './CategoryDonutChart';
 import { BudgetModal } from './BudgetModal';
 import { PersonalizedFinancialAdvice } from './PersonalizedFinancialAdvice';
@@ -972,6 +973,9 @@ export const StatisticsView: React.FC = () => {
         prevFilteredTxs={prevFilteredTxs}
         onOpenBudgetModal={handleOpenBudgetModal}
       />
+
+      {/* 6-Month Income and Expenses Trend Line Chart with Financial Pattern Analysis */}
+      <IncomeExpenseTrendLineChart />
 
       {/* Monthly Expenses Recharts Visualization & Deep-Dive Analytics */}
       <MonthlyExpensesAnalytics />

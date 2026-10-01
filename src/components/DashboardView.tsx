@@ -29,12 +29,14 @@ interface DashboardViewProps {
   onOpenAddModal: (type?: TransactionType) => void;
   onEditTransaction: (tx: Transaction) => void;
   onOpenConverterModal?: () => void;
+  onOpenRecurringManager?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenAddModal,
   onEditTransaction,
   onOpenConverterModal,
+  onOpenRecurringManager,
 }) => {
   const { transactions, wallets, categories, currency, setActiveTab, processRecurring } = useFinance();
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
@@ -119,12 +121,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-black backdrop-blur-md tabular-nums border border-white/20">
+              <span className="px-3 py-1 rounded-full bg-white/15 text-white text-xs font-black backdrop-blur-md tabular-nums border border-white/20 whitespace-nowrap">
                 Сбережения: {savingsRate}%
               </span>
               {!isBalanceHidden && net !== 0 && (
                 <span
-                  className={`px-2.5 py-1 rounded-full text-xs font-black backdrop-blur-md tabular-nums border ${
+                  className={`px-2.5 py-1 rounded-full text-xs font-black backdrop-blur-md tabular-nums border whitespace-nowrap ${
                     net > 0
                       ? 'bg-emerald-400/25 text-emerald-100 border-emerald-300/30'
                       : 'bg-rose-500/25 text-rose-100 border-rose-300/30'
@@ -150,23 +152,27 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* Direct Income & Expense Action Buttons (clickable cards) */}
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-white/15">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 pt-3 border-t border-white/15">
             <button
               type="button"
               id="dashboard_quick_add_income_btn"
               onClick={() => onOpenAddModal('income')}
-              className="flex items-center gap-2.5 sm:gap-3 bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-3 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer"
-              title="Нажмите, чтобы добавить доход"
+              className="flex flex-col justify-between bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-2.5 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer min-w-0 shadow-2xs"
+              title={`Добавить доход (${formatCurrency(income, currency.symbol)})`}
             >
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/40 text-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
-                <ArrowDownLeft size={20} className="stroke-[2.5]" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-emerald-100 block">Доходы</span>
-                  <Plus size={13} className="text-emerald-200 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-between w-full mb-1 sm:mb-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500/40 text-emerald-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                    <ArrowDownLeft size={14} className="stroke-[2.5]" />
+                  </div>
+                  <span className="text-[11px] sm:text-xs font-extrabold text-emerald-100 truncate">Доходы</span>
                 </div>
-                <span className="text-sm sm:text-base font-black text-white tabular-nums block truncate">
+                <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-emerald-200 group-hover:bg-white/25 transition-colors shrink-0">
+                  <Plus size={12} className="stroke-[2.5]" />
+                </span>
+              </div>
+              <div className="w-full">
+                <span className="text-[14px] xs:text-[15px] sm:text-base md:text-lg font-black text-white tabular-nums tracking-tight whitespace-nowrap block leading-tight">
                   {isBalanceHidden ? '••••••' : `+${formatCurrency(income, currency.symbol)}`}
                 </span>
               </div>
@@ -176,18 +182,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               type="button"
               id="dashboard_quick_add_expense_btn"
               onClick={() => onOpenAddModal('expense')}
-              className="flex items-center gap-2.5 sm:gap-3 bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-3 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer"
-              title="Нажмите, чтобы добавить расход"
+              className="flex flex-col justify-between bg-white/15 hover:bg-white/25 active:scale-[0.98] border border-white/20 p-2.5 sm:p-3.5 rounded-2xl backdrop-blur-xs transition-all text-left group cursor-pointer min-w-0 shadow-2xs"
+              title={`Добавить расход (${formatCurrency(expense, currency.symbol)})`}
             >
-              <div className="w-10 h-10 rounded-xl bg-rose-500/35 text-rose-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-xs">
-                <ArrowUpRight size={20} className="stroke-[2.5]" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-rose-100 block">Расходы</span>
-                  <Plus size={13} className="text-rose-200 opacity-60 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-between w-full mb-1 sm:mb-1.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6 h-6 rounded-lg bg-rose-500/35 text-rose-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
+                    <ArrowUpRight size={14} className="stroke-[2.5]" />
+                  </div>
+                  <span className="text-[11px] sm:text-xs font-extrabold text-rose-100 truncate">Расходы</span>
                 </div>
-                <span className="text-sm sm:text-base font-black text-white tabular-nums block truncate">
+                <span className="w-5 h-5 rounded-md bg-white/10 flex items-center justify-center text-rose-200 group-hover:bg-white/25 transition-colors shrink-0">
+                  <Plus size={12} className="stroke-[2.5]" />
+                </span>
+              </div>
+              <div className="w-full">
+                <span className="text-[14px] xs:text-[15px] sm:text-base md:text-lg font-black text-white tabular-nums tracking-tight whitespace-nowrap block leading-tight">
                   {isBalanceHidden ? '••••••' : `-${formatCurrency(expense, currency.symbol)}`}
                 </span>
               </div>
@@ -264,15 +274,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
 
-            <button
-              id="dashboard_process_recurring_btn"
-              onClick={() => processRecurring()}
-              className="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 active:bg-teal-200 text-teal-800 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-teal-200"
-              title="Проверить и провести наступившие регулярные платежи"
-            >
-              <Clock size={13} className="text-teal-700" />
-              <span>Проверить сейчас</span>
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                id="dashboard_process_recurring_btn"
+                onClick={() => processRecurring()}
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 active:bg-teal-200 text-teal-800 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-teal-200"
+                title="Проверить и провести наступившие регулярные платежи"
+              >
+                <Clock size={13} className="text-teal-700" />
+                <span className="hidden sm:inline">Проверить</span>
+              </button>
+
+              {onOpenRecurringManager && (
+                <button
+                  id="dashboard_open_recurring_manager_btn"
+                  onClick={onOpenRecurringManager}
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                  title="Открыть управление всеми регулярными расписаниями"
+                >
+                  <span>Все расписания</span>
+                  <ChevronRight size={13} />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">

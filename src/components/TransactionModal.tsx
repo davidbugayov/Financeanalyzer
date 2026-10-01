@@ -61,6 +61,7 @@ interface TransactionModalProps {
   initialTransaction?: Transaction | null;
   initialForeignData?: InitialForeignData | null;
   initialType?: TransactionType;
+  initialIsRecurring?: boolean;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -69,6 +70,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   initialTransaction,
   initialForeignData,
   initialType,
+  initialIsRecurring,
 }) => {
   const { categories, wallets, transactions, addTransaction, updateTransaction, currency, addSubcategory } = useFinance();
 
@@ -197,7 +199,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setTags([]);
       setTagInput('');
 
-      setIsRecurring(false);
+      setIsRecurring(Boolean(initialIsRecurring));
       setRecurrenceInterval('monthly');
       setHasEndDate(false);
       setRecurrenceEndDate('');
@@ -211,7 +213,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setCity('');
     }
     setError('');
-  }, [initialTransaction, initialForeignData, initialType, isOpen, categories, wallets, currency.code]);
+  }, [initialTransaction, initialForeignData, initialType, initialIsRecurring, isOpen, categories, wallets, currency.code]);
 
   const handleAddTag = (rawTag: string) => {
     const clean = rawTag.trim().replace(/^#+/, '').toLowerCase();
